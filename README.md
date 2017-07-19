@@ -1,5 +1,14 @@
-# missingHE
-Health Economic Evaluations with Missing Data using a set of pre-defined Bayesian models written in BUGS 
+## Health Economic Evaluations with Missing Data
+Health Economic Evaluations with Missing Data using a set of pre-defined Bayesian models written in the BUGS language using either [JAGS](http://mcmc-jags.sourceforge.net/) or [OpenBUGS] (http://www.openbugs.net/w/FrontPage). 
 
-#Installation
-Contains a suite of functions to systematise the workflow involving survival analysis in health economic evaluation. survHE can fit a large range of survival models using both a frequentist approach (by calling the R package flexsurv) and a Bayesian perspective. For a selected range of models, both Integrated Nested Laplace Integration (via the R package INLA) and Hamiltonian Monte Carlo (via the R package rstan) are possible. HMC models are pre-compiled so that they can run in a very efficient and fast way. In addition to model fitting, survHE provides a set of specialised functions, for example to perform Probabilistic Sensitivity Analysis, export the results of the modelling to a spreadsheet, plotting survival curves and uncertainty around the mean estimates
+## Installation
+It is possible to install `missingHE` using the "development" version - this will usually be updated frequently and may be continuously tested. On Windows machines, you need to install a few dependencies, including [Rtools](https://cran.r-project.org/bin/windows/Rtools/) first, e.g. by running
+```R
+pkgs <- c("R2jags","R2OpenBUGS","ggplot2","gridExtra","BCEA","ggmcmc","Rtools","devtools")
+repos <- c("https://cran.rstudio.com") 
+install.packages(pkgs,repos=repos,dependencies = "Depends")
+```
+before installing the package using `devtools`:
+```R
+devtools::install_github("AnGabrio/missingHE")
+```
