@@ -1,0 +1,21 @@
+Package: missingHE
+Type: Package
+Title: Health Economic Evaluation with Missing Data
+Version: 0.0.0.9000
+Authors@R: person("Andrea", "Gabrio", email = "ucakgab@ucl.ac.uk", role = c("aut", "cre"))
+Description: Contains a suite of functions for health economic evaluations with missing outcome data.
+Depends: R (>= 3.3.0),
+         coda
+License: GPL-2
+Encoding: UTF-8
+LazyData: true
+Imports: R2OpenBUGS,
+         R2jags,
+         mcmcplots,
+         ggmcmc,
+         ggthemes,
+         BCEA,
+         ggplot2,
+         grid,
+         gridExtra,
+         methods
