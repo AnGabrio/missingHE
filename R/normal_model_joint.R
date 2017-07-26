@@ -162,22 +162,22 @@ normal_model_joint<-function(type=type)eval.parent(substitute({
       beta0_c[t]~dnorm(0,0.0001)
       beta0_e[t]~dnorm(0,0.0001)
       }
-      for (j in 1:p) {
+      for (j in 1:p) {#begin beta priors
       for(t in 1:2){
       beta_c[j,t]~dnorm(0,0.01)
       beta_e[j,t]~dnorm(0,0.01)
-      }
-      }
+        }
+      }#end beta priors
       
       #missing data mechanism
       #intercepts
       gamma0_c~dlogis(0,1)
       gamma0_e~dlogis(0,1)
       #logistic regression coefficients
-      for(j in 1:p){
+      for (j in 1:p){#begin gamma priors
       gamma_c[j]~dnorm(0,1)
       gamma_e[j]~dnorm(0,1)
-       }
+      }#end gamma priors
       }
       "
       
@@ -339,12 +339,12 @@ normal_model_joint<-function(type=type)eval.parent(substitute({
       beta0_c[t]~dnorm(0,0.0001)
       beta0_e[t]~dnorm(0,0.0001)
       }
-      for (j in 1:p) {
+      for (j in 1:p) {#begin beta priors
       for(t in 1:2){
       beta_c[j,t]~dnorm(0,0.01)
       beta_e[j,t]~dnorm(0,0.01)
-      }
-      }
+        }
+      }#end beta priors
       
       #missing data mechanism
       #intercepts
@@ -355,10 +355,10 @@ normal_model_joint<-function(type=type)eval.parent(substitute({
       delta_c~dnorm(0,1)
       
       #logistic regression coefficients
-      for(j in 1:p){
+      for (j in 1:p){#begin gamma priors
       gamma_c[j]~dnorm(0,1)
       gamma_e[j]~dnorm(0,1)
-     }
+      }#end gamma priors
       }
       "
       if(type=="MNAR_eff_cov"){
@@ -366,7 +366,62 @@ normal_model_joint<-function(type=type)eval.parent(substitute({
       } else if(type=="MNAR_cost_cov"){
         model_string_jags<-gsub("delta_e~dnorm(0,1)","delta_e<-0",model_string_jags,fixed=TRUE)
       }
-     }
+    }
+  #if predictor is one BUGS need a different specification for inpprod function
+  if(p==1){
+    if(type=="MAR"|type=="MNAR_cov"|type=="MNAR_eff_cov"|type=="MNAR_cost_cov"){
+      X1<-as.vector(X1)
+      X2<-as.vector(X2)
+      inprod_e1<-"X1[i]*beta_e[1]"
+      inprod_e2<-"X2[i]*beta_e[2]"
+      inprod_c1<-"X1[i]*beta_c[1]"
+      inprod_c2<-"X2[i]*beta_c[2]"
+      inprod_pq1<-"X1[i]*gamma_e"
+      inprod_pq2<-"X2[i]*gamma_e"
+      inprod_pc1<-"X1[i]*gamma_c"
+      inprod_pc2<-"X2[i]*gamma_c"
+      inprod_mean_e1<-"mean_cov1*beta_e[1]"
+      inprod_mean_e2<-"mean_cov2*beta_e[2]"
+      inprod_mean_c1<-"mean_cov1*beta_c[1]"
+      inprod_mean_c2<-"mean_cov2*beta_c[2]"
+      inprod_mean_pq1<-"mean_cov1*gamma_e"
+      inprod_mean_pq2<-"mean_cov2*gamma_e"
+      inprod_mean_pc1<-"mean_cov1*gamma_c"
+      inprod_mean_pc2<-"mean_cov2*gamma_c"
+      begin_prior_beta<-"#begin beta priors"
+      prior_beta_e<-"beta_e[t]~dnorm(0,0.01)"
+      prior_beta_c<-"beta_c[t]~dnorm(0,0.01)"
+      end_prior_beta<-"#end beta priors"
+      begin_prior_gamma<-"#begin gamma priors"
+      prior_gamma_e<-"gamma_e~dnorm(0,1)"
+      prior_gamma_c<-"gamma_c~dnorm(0,1)"
+      end_prior_gamma<-"#end gamma priors"
+      model_string_jags<-gsub("inprod(X1[i,],beta_e[,1])", inprod_e1, model_string_jags,fixed=TRUE)
+      model_string_jags<-gsub("inprod(X2[i,],beta_e[,2])", inprod_e2, model_string_jags,fixed=TRUE)
+      model_string_jags<-gsub("inprod(X1[i,],beta_c[,1])", inprod_c1, model_string_jags,fixed=TRUE)
+      model_string_jags<-gsub("inprod(X2[i,],beta_c[,2])", inprod_c2, model_string_jags,fixed=TRUE)
+      model_string_jags<-gsub("inprod(X1[i,],gamma_e[])", inprod_pq1, model_string_jags,fixed=TRUE)
+      model_string_jags<-gsub("inprod(X2[i,],gamma_e[])", inprod_pq2, model_string_jags,fixed=TRUE)
+      model_string_jags<-gsub("inprod(X1[i,],gamma_c[])", inprod_pc1, model_string_jags,fixed=TRUE)
+      model_string_jags<-gsub("inprod(X2[i,],gamma_c[])", inprod_pc2, model_string_jags,fixed=TRUE)
+      model_string_jags<-gsub("inprod(mean_cov1[],beta_e[,1])", inprod_mean_e1, model_string_jags,fixed=TRUE)
+      model_string_jags<-gsub("inprod(mean_cov2[],beta_e[,2])", inprod_mean_e2, model_string_jags,fixed=TRUE)
+      model_string_jags<-gsub("inprod(mean_cov1[],beta_c[,1])", inprod_mean_c1, model_string_jags,fixed=TRUE)
+      model_string_jags<-gsub("inprod(mean_cov2[],beta_c[,2])", inprod_mean_c2, model_string_jags,fixed=TRUE)
+      model_string_jags<-gsub("inprod(mean_cov1[],gamma_e[])", inprod_mean_pq1, model_string_jags,fixed=TRUE)
+      model_string_jags<-gsub("inprod(mean_cov2[],gamma_e[])", inprod_mean_pq2, model_string_jags,fixed=TRUE)
+      model_string_jags<-gsub("inprod(mean_cov1[],gamma_c[])", inprod_mean_pc1, model_string_jags,fixed=TRUE)
+      model_string_jags<-gsub("inprod(mean_cov2[],gamma_c[])", inprod_mean_pc2, model_string_jags,fixed=TRUE)
+      model_string_jags<-gsub("for (j in 1:p) {#begin beta priors", begin_prior_beta, model_string_jags,fixed=TRUE)
+      model_string_jags<-gsub("beta_e[j,t]~dnorm(0,0.01)", prior_beta_e, model_string_jags,fixed=TRUE)
+      model_string_jags<-gsub("beta_c[j,t]~dnorm(0,0.01)", prior_beta_c, model_string_jags,fixed=TRUE)
+      model_string_jags<-gsub("}#end beta priors", end_prior_beta, model_string_jags,fixed=TRUE)
+      model_string_jags<-gsub("for (j in 1:p){#begin gamma priors", begin_prior_gamma, model_string_jags,fixed=TRUE)
+      model_string_jags<-gsub("gamma_e[j]~dnorm(0,1)", prior_gamma_e, model_string_jags,fixed=TRUE)
+      model_string_jags<-gsub("gamma_c[j]~dnorm(0,1)", prior_gamma_c, model_string_jags,fixed=TRUE)
+      model_string_jags<-gsub("}#end gamma priors", end_prior_gamma, model_string_jags,fixed=TRUE)
+    }
+  }
   #call prior_change function to make changes to prior values and distributions if prior inputs in run_model are provided
   model_string_jags<-prior_change(type=type,dist_e ="norm",dist_c="norm")
                 #assign name to model file to be called by run_jags or run_bugs

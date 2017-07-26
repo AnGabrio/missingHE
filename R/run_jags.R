@@ -78,6 +78,11 @@ run_jags<-function(type,dist_e,dist_c,forward,inits)eval.parent(substitute({
       }
     }
   }
+  #remove p if p=1
+  if(p==1){
+    pos_p<-which(datalist[]=="p")
+    datalist[pos_p]<-NULL
+  }
   #DIC is set to FALSE as no data provided
   DIC<-TRUE
   if(forward==FALSE){DIC=TRUE}else{DIC=FALSE}

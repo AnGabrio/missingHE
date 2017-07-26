@@ -34,20 +34,6 @@ run_bugs<-function(type,dist_e,dist_c,forward,inits)eval.parent(substitute({
   if(!type %in% c("MCAR","MAR","MNAR","MNAR_eff","MNAR_cost","MNAR_cov","MNAR_eff_cov","MNAR_cost_cov")) {
     stop("Types available for use are 'MCAR','MAR','MNAR_eff','MNAR_cost','MNAR','MNAR_eff_cov','MNAR_cost_cov','MNAR_cov'")
   }
-  #arrange data so that if only one covariate is provided it is recognised by BUGS as matrix not vector
-  if(p==1){
-    if(any(colnames(data)%in% paste("X",x_numb,sep=""))==TRUE){
-    X1<-as.matrix(cbind(X1,rep(0,length(X1))))
-    X2<-as.matrix(cbind(X2,rep(0,length(X2))))
-    X1_s<-as.matrix(cbind(X1_s,rep(0,length(X1_s))))
-    X2_s<-as.matrix(cbind(X2_s,rep(0,length(X2_s))))
-    mean_cov1<-as.vector(c(mean_cov1,0))
-    mean_cov2<-as.vector(c(mean_cov2,0))
-    mean_cov1_t<-as.vector(c(mean_cov1_t,0))
-    mean_cov2_t<-as.vector(c(mean_cov2_t,0))
-    p<-2
-    }
-  }
   #define objects that are common to all types of distributions and mechanisms
   #null initialised parameter values by default or user-provided
   if(is.null(inits)==FALSE){inits=inits}
@@ -58,11 +44,11 @@ run_bugs<-function(type,dist_e,dist_c,forward,inits)eval.parent(substitute({
     if(type=="MCAR"){
       list_init<-list(gamma0_e=rnorm(1,0,1),gamma0_c=rnorm(1,0,1),mu_e=runif(2,0,1),mu_c=runif(2,0,100),s_c=runif(2,0,10),s_e=runif(2,0,0.001))
         inits <- function(){list_init}
-        if(any(transf=="logit")==TRUE){
+        if(any(transf=="logit")==TRUE){#logit transformation
           list_init[[3]]<-rnorm(2,0,1)
           names(list_init)[3]<-"nu_e"
           inits <- function(){list_init}}
-        if(any(transf=="log")==TRUE){
+        if(any(transf=="log")==TRUE){#log transformation
           list_init[[4]]<-rnorm(2,0,1)
           names(list_init)[4]<-"nu_c"
           inits <- function(){list_init}}
@@ -70,20 +56,25 @@ run_bugs<-function(type,dist_e,dist_c,forward,inits)eval.parent(substitute({
       list_init<-list(gamma0_e=rnorm(1,0,1),gamma0_c=rnorm(1,0,1),beta_e=cbind(rnorm(p,0,0.001),rnorm(p,0,0.001)),beta_c=cbind(rnorm(p,0,0.001),rnorm(p,0,0.001)),
                       gamma_e=rnorm(p,0,0.001),gamma_c=rnorm(p,0,0.001),beta0_e=runif(2,0,1),beta0_c=runif(2,0,100),s_c=runif(2,0,10),s_e=runif(2,0,0.01))
       inits <- function(){list_init}
-      if(any(transf=="logit")==TRUE){
+      if(any(transf=="logit")==TRUE){#logit transformation
         list_init[[7]]<-rnorm(2,0,1)
         inits <- function(){list_init}}
-      if(any(transf=="log")==TRUE){
+      if(any(transf=="log")==TRUE){#log transformation
         list_init[[8]]<-rnorm(2,0,1)
         inits <- function(){list_init}}
+      if(p==1){#one covariate
+        list_init$beta_e<-rnorm(2,0,0.001)
+        list_init$beta_c<-rnorm(2,0,0.001)
+        inits <- function(){list_init}
+      }
     }else if(type=="MNAR"|type=="MNAR_eff"|type=="MNAR_cost"){
       list_init<-list(gamma0_e=rnorm(1,0,1),gamma0_c=rnorm(1,0,1),mu_e=runif(2,0,1)
                       ,mu_c=runif(2,0,100),s_c=runif(2,0,10),s_e=runif(2,0,0.01),delta_e=rnorm(1,0,1),delta_c=rnorm(1,0,1))
       inits <- function(){list_init}
-      if(any(transf=="logit")==TRUE){
+      if(any(transf=="logit")==TRUE){#logit transformation
         list_init[[3]]<-rnorm(2,0,1)
         names(list_init)[3]<-"nu_e"}
-      if(any(transf=="log")==TRUE){
+      if(any(transf=="log")==TRUE){#log transformation
         list_init[[4]]<-rnorm(2,0,1)
         names(list_init)[4]<-"nu_c"}
       inits <- function(){list_init}
@@ -96,20 +87,25 @@ run_bugs<-function(type,dist_e,dist_c,forward,inits)eval.parent(substitute({
                       gamma_e=rnorm(p,0,0.001),gamma_c=rnorm(p,0,0.001),
                       beta0_e=runif(2,0,1),beta0_c=rnorm(2,0,1),s_c=runif(2,0,10),s_e=runif(2,0,0.01),delta_e=rnorm(1,0,1),delta_c=rnorm(1,0,1))
       inits <- function(){list_init}
-      if(any(transf=="logit")==TRUE){
-        list_init[[7]]<-rnorm(2,0,1)}
-      if(any(transf=="log")==TRUE){
-        list_init[[8]]<-rnorm(2,0,1)}
+      if(any(transf=="logit")==TRUE){#logit transformation
+        list_init$beta0_e<-rnorm(2,0,1)}
+      if(any(transf=="log")==TRUE){#log transformation
+        list_init$beta0_c<-rnorm(2,0,1)}
       inits <- function(){list_init}
       if(type=="MNAR_eff_cov"){inits<-function(){list_init[-12]}
       } else if(type=="MNAR_cost_cov"){inits<-function(){list_init[-11]}
-     }
+      }
+      if(p==1){#one covariate
+        list_init$beta_e<-rnorm(2,0,0.001)
+        list_init$beta_c<-rnorm(2,0,0.001)
+        inits <- function(){list_init}
+      }
     }
   }else if(dist_e=="beta" & dist_c=="norm"){
     if(type=="MCAR"){
       list_init<-list(gamma0_e=rnorm(1,0,1),gamma0_c=rnorm(1,0,1),mu_e=runif(2,0,1),mu_c=rnorm(2,0,1),ls_c=runif(2,0,1),s_e=runif(2,0,0.01))
       inits <- function(){list_init}
-      if(any(transf=="logit")==TRUE){
+      if(any(transf=="logit")==TRUE){#logit transformation
         list_init[[3]]<-rnorm(2,0,1)
         names(list_init)[3]<-"nu_e"
         inits <- function(){list_init}}
@@ -118,15 +114,20 @@ run_bugs<-function(type,dist_e,dist_c,forward,inits)eval.parent(substitute({
       beta_e=cbind(rnorm(p,0,0.001),rnorm(p,0,0.001)),beta_c=cbind(rnorm(p,0,0.001),rnorm(p,0,0.001)),
       gamma_e=rnorm(p,0,0.001),gamma_c=rnorm(p,0,0.001),beta0_e=runif(2,0,1),beta0_c=rnorm(2,0,1),ls_c=runif(2,0,1),s_e=runif(2,0,0.01))
       inits <- function(){list_init}
-      if(any(transf=="logit")==TRUE){
-        list_init[[7]]<-rnorm(2,0,1)
+      if(any(transf=="logit")==TRUE){#logit transformation
+        list_init$beta0_e<-rnorm(2,0,1)
         inits <- function(){list_init}}
+      if(p==1){#one covariate
+        list_init$beta_e<-rnorm(2,0,0.001)
+        list_init$beta_c<-rnorm(2,0,0.001)
+        inits <- function(){list_init}
+      }
     }else if(type=="MNAR"|type=="MNAR_eff"|type=="MNAR_cost"){
       list_init<-list(gamma0_e=rlogis(1,0,1),gamma0_c=rlogis(1,0,1),mu_e=runif(2,0,1)
                       ,mu_c=rnorm(2,0,1),ls_c=runif(2,0,1),s_e=runif(2,0,0.01),
                       delta_e=rnorm(1,0,1),delta_c=rnorm(1,0,1))
       inits <- function(){list_init}
-      if(any(transf=="logit")==TRUE){
+      if(any(transf=="logit")==TRUE){#logit transformation
         list_init[[3]]<-rnorm(2,0,1)
         names(list_init)[3]<-"nu_e"}
         inits <- function(){list_init}
@@ -140,18 +141,23 @@ run_bugs<-function(type,dist_e,dist_c,forward,inits)eval.parent(substitute({
                       beta0_e=runif(2,0,1),beta0_c=rnorm(2,0,1),
                       ls_c=runif(2,0,1),s_e=runif(2,0,0.01),delta_e=rnorm(1,0,1),delta_c=rnorm(1,0,1))
       inits <- function(){list_init}
-      if(any(transf=="logit")==TRUE){
-        list_init[[7]]<-rnorm(2,0,1)
+      if(any(transf=="logit")==TRUE){#logit transformation
+        list_init$beta0_e<-rnorm(2,0,1)
         inits <- function(){list_init}}
       if(type=="MNAR_eff_cov"){inits<-function(){list_init[-12]}
        } else if(type=="MNAR_cost_cov"){inits<-function(){list_init[-11]}
+       }
+      if(p==1){#one covariate
+        list_init$beta_e<-rnorm(2,0,0.001)
+        list_init$beta_c<-rnorm(2,0,0.001)
+        inits <- function(){list_init}
       }
      }
   }else if(dist_e=="norm" & dist_c=="gamma"){
     if(type=="MCAR"){
       list_init<-list(gamma0_e=rnorm(1,0,1),gamma0_c=rnorm(1,0,1),mu_e=rnorm(2,0,1),mu_c=runif(2,0,10),s_c=runif(2,0,10),ls_e=runif(2,0,1))
       inits <- function(){list_init}
-    if(any(transf=="log")==TRUE){
+    if(any(transf=="log")==TRUE){#log transformation
       list_init[[4]]<-rnorm(2,0,1)
       names(list_init)[4]<-"nu_c"
       inits <- function(){list_init}}
@@ -161,14 +167,19 @@ run_bugs<-function(type,dist_e,dist_c,forward,inits)eval.parent(substitute({
                       gamma_e=rnorm(p,0,0.001),gamma_c=rnorm(p,0,0.001),
                       beta0_e=rnorm(2,0,1),beta0_c=runif(2,0,100),s_c=runif(2,0,10),ls_e=runif(2,0,1))
       inits <- function(){list_init}
-    if(any(transf=="log")==TRUE){
-      list_init[[8]]<-rnorm(2,0,1)
+    if(any(transf=="log")==TRUE){#log transformation
+      list_init$beta0_c<-rnorm(2,0,1)
       inits <- function(){list_init}}
+      if(p==1){#one covariate
+        list_init$beta_e<-rnorm(2,0,0.001)
+        list_init$beta_c<-rnorm(2,0,0.001)
+        inits <- function(){list_init}
+      }
     }else if(type=="MNAR"|type=="MNAR_eff"|type=="MNAR_cost"){
       list_init<-list(gamma0_e=rnorm(1,0,1),gamma0_c=rnorm(1,0,1),mu_e=rnorm(2,0,1)
                       ,mu_c=runif(2,0,100),s_c=runif(2,0,10),ls_e=runif(2,0,1),delta_e=rnorm(1,0,1),delta_c=rnorm(1,0,0.001))
       inits <- function(){list_init}
-      if(any(transf=="log")==TRUE){
+      if(any(transf=="log")==TRUE){#log transformation
         list_init[[4]]<-rnorm(2,0,1)
         names(list_init)[4]<-"nu_c"
         inits <- function(){list_init}}
@@ -181,11 +192,16 @@ run_bugs<-function(type,dist_e,dist_c,forward,inits)eval.parent(substitute({
                       gamma_e=rnorm(p,0,0.001),gamma_c=rnorm(p,0,0.001),
                       beta0_e=rnorm(2,0,1),beta0_c=runif(2,0,100),s_c=runif(2,0,10),ls_e=runif(2,0,1),delta_e=rnorm(1,0,1),delta_c=rnorm(1,0,1))
       inits <- function(){list_init}
-      if(any(transf=="log")==TRUE){
-        list_init[[8]]<-rnorm(2,0,1)
+      if(any(transf=="log")==TRUE){#log transformation
+        list_init$beta0_c<-rnorm(2,0,1)
         inits <- function(){list_init}}
       if(type=="MNAR_eff_cov"){inits<-function(){list_init[-12]}
        } else if(type=="MNAR_cost_cov"){inits<-function(){list_init[-11]}
+       }
+      if(p==1){#one covariate
+        list_init$beta_e<-rnorm(2,0,0.001)
+        list_init$beta_c<-rnorm(2,0,0.001)
+        inits <- function(){list_init}
       }
      }
   }else if(dist_e=="norm" & dist_c=="norm"){
@@ -193,14 +209,14 @@ run_bugs<-function(type,dist_e,dist_c,forward,inits)eval.parent(substitute({
       list_init<-list(gamma0_e=rnorm(1,0,1),gamma0_c=rnorm(1,0,1),mu_e=rnorm(2,0,1)
                       ,mu_c=rnorm(2,0,1),ls_c=runif(2,-1,1),ls_e=runif(2,-1,1))
       inits <- function(){list_init}
-      if(stand==TRUE){
+      if(stand==TRUE){#scaled model
         names(list_init)[3]<-"mu_e_t"
         names(list_init)[4]<-"mu_c_t"
         names(list_init)[5]<-"ls_c_t"
         names(list_init)[6]<-"ls_e_t"
         inits <- function(){list_init}
       }
-      if(ind==FALSE){
+      if(ind==FALSE){#joint model
         list_init$theta<-rnorm(2,0,0.001)
         inits <- function(){list_init}
       }
@@ -211,13 +227,18 @@ run_bugs<-function(type,dist_e,dist_c,forward,inits)eval.parent(substitute({
                       beta0_e=rnorm(2,0,1),beta0_c=rnorm(2,0,1),
                       ls_c=runif(2,-1,1),ls_e=runif(2,-1,1))
       inits <- function(){list_init}
-      if(stand==TRUE){
+      if(stand==TRUE){#scaled model
         names(list_init)[9]<-"ls_c_t"
         names(list_init)[10]<-"ls_e_t"
         inits <- function(){list_init}
       }
-      if(ind==FALSE){
+      if(ind==FALSE){#joint model
         list_init$theta<-rnorm(2,0,0.001)
+        inits <- function(){list_init}
+      }
+      if(p==1){#one covariate
+        list_init$beta_e<-rnorm(2,0,0.001)
+        list_init$beta_c<-rnorm(2,0,0.001)
         inits <- function(){list_init}
       }
     }else if(type=="MNAR"|type=="MNAR_eff"|type=="MNAR_cost"){
@@ -228,14 +249,14 @@ run_bugs<-function(type,dist_e,dist_c,forward,inits)eval.parent(substitute({
       if(type=="MNAR_eff"){inits<-function(){list_init[-8]}
       } else if(type=="MNAR_cost"){inits<-function(){list_init[-7]}
       }
-      if(stand==TRUE){
+      if(stand==TRUE){#scaled model
         names(list_init)[3]<-"mu_e_t"
         names(list_init)[4]<-"mu_c_t"
         names(list_init)[5]<-"ls_c_t"
         names(list_init)[6]<-"ls_e_t"
         inits <- function(){list_init}
       }
-      if(ind==FALSE){
+      if(ind==FALSE){#joint model
         list_init$theta<-rnorm(2,0,0.001)
         inits <- function(){list_init}
       }
@@ -249,13 +270,18 @@ run_bugs<-function(type,dist_e,dist_c,forward,inits)eval.parent(substitute({
       if(type=="MNAR_eff_cov"){inits<-function(){list_init[-12]}
        } else if(type=="MNAR_cost_cov"){inits<-function(){list_init[-11]}
        }
-      if(stand==TRUE){
+      if(stand==TRUE){#scaled model
         names(list_init)[9]<-"ls_c_t"
         names(list_init)[10]<-"ls_e_t"
         inits <- function(){list_init}
       }
-      if(ind==FALSE){
+      if(ind==FALSE){#joint model
         list_init$theta<-rnorm(2,0,0.001)
+        inits <- function(){list_init}
+      }
+      if(p==1){#one covariate
+        list_init$beta_e<-rnorm(2,0,0.001)
+        list_init$beta_c<-rnorm(2,0,0.001)
         inits <- function(){list_init}
       }
      }
@@ -302,6 +328,11 @@ run_bugs<-function(type,dist_e,dist_c,forward,inits)eval.parent(substitute({
                        "p","mean_cov1","mean_cov2")
       }
     }
+  }
+  #remove p if p=1
+  if(p==1){
+    pos_p<-which(datalist[]=="p")
+    datalist[pos_p]<-NULL
   }
   #DIC is set to FALSE as no data provided
   DIC<-TRUE

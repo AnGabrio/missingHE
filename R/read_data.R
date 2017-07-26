@@ -221,3 +221,7 @@ read_data<-function(data){
   return(list(data_raw=data_raw,data_stand=data_stand))
   
 }
+
+
+
+
