@@ -22,7 +22,7 @@ summary.missingHE<-function(object,...){
   exArgs <- list(...)
   #x can only be object of class missing
   if(class(object)!="missingHE"){
-    stop("Only objects of class 'missing' can be used")
+    stop("Only objects of class 'missingHE' can be used")
   }
   #not possible if forward sampling selected
   if(object$model_class=="forward"){

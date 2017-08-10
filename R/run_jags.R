@@ -184,6 +184,11 @@ run_jags<-function(type,dist_e,dist_c,forward,inits)eval.parent(substitute({
   }else if(forward==TRUE){model_sum<-"default"}
   #save imputed outcome data if standard sampling else set it as null
   if(forward==FALSE){
+    #set colnames
+    colnames(eff1_pos)<-c("mean","LB","UB")
+    colnames(eff2_pos)<-c("mean","LB","UB")
+    colnames(cost1_pos)<-c("mean","LB","UB")
+    colnames(cost2_pos)<-c("mean","LB","UB")
     imputed<-list("effects1"=eff1_pos,"effects2"=eff2_pos,"costs1"=cost1_pos,"costs2"=cost2_pos)
   }else{imputed<-NULL}
   #define model output list

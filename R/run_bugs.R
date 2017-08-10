@@ -348,6 +348,16 @@ run_bugs<-function(type,dist_e,dist_c,forward,inits)eval.parent(substitute({
   if(type=="MNAR_cov"){params<-c("mu_e","mu_c","s_e","s_c","beta0_e","beta0_c","beta_e","beta_c","gamma0_e","gamma0_c","gamma_e","gamma_c","delta_e","delta_c")}
   if(ind==FALSE & dist_e=="norm" & dist_c=="norm"){params<-c(params,"theta")}
   if(forward==FALSE){params<-c(params,"eff1","cost1","eff2","cost2")}
+  #index for data vectors
+  #remove variable from parameters if no missing values
+  index_eff1<-match("eff1",params)
+  if(any(is.na(eff1))==FALSE){params<-params[-index_eff1]}
+  index_eff2<-match("eff2",params)
+  if(any(is.na(eff2))==FALSE){params<-params[-index_eff2]}
+  index_cost1<-match("cost1",params)
+  if(any(is.na(cost1))==FALSE){params<-params[-index_cost1]}
+  index_cost2<-match("cost2",params)
+  if(any(is.na(cost2))==FALSE){params<-params[-index_cost2]}
   #run model
   modelN1<-R2OpenBUGS::bugs(data=datalist,inits=inits,parameters.to.save=params,model.file=filein,n.chains=n.chains,
                         n.iter=n.iter,n.burnin = n.burnin,DIC=DIC,n.thin=n.thin)
@@ -368,18 +378,26 @@ run_bugs<-function(type,dist_e,dist_c,forward,inits)eval.parent(substitute({
     cost1_pos<-matrix(cost1,N1,3)
     eff2_pos<-matrix(eff2,N2,3)
     cost2_pos<-matrix(cost2,N2,3)
-    eff1_pos[,1][is.na(eff1_pos[,1])]<-apply(modelN1$sims.list$eff1,2,mean)
-    eff1_pos[,2][is.na(eff1_pos[,2])]<-apply(modelN1$sims.list$eff1,2,quantile,probs=prob[1])
-    eff1_pos[,3][is.na(eff1_pos[,3])]<-apply(modelN1$sims.list$eff1,2,quantile,probs=prob[2])
-    eff2_pos[,1][is.na(eff2_pos[,1])]<-apply(modelN1$sims.list$eff2,2,mean)
-    eff2_pos[,2][is.na(eff2_pos[,2])]<-apply(modelN1$sims.list$eff2,2,quantile,probs=prob[1])
-    eff2_pos[,3][is.na(eff2_pos[,3])]<-apply(modelN1$sims.list$eff2,2,quantile,probs=prob[2])
-    cost1_pos[,1][is.na(cost1_pos[,1])]<-apply(modelN1$sims.list$cost1,2,mean)
-    cost1_pos[,2][is.na(cost1_pos[,2])]<-apply(modelN1$sims.list$cost1,2,quantile,probs=prob[1])
-    cost1_pos[,3][is.na(cost1_pos[,3])]<-apply(modelN1$sims.list$cost1,2,quantile,probs=prob[2])
-    cost2_pos[,1][is.na(cost2_pos[,1])]<-apply(modelN1$sims.list$cost2,2,mean)
-    cost2_pos[,2][is.na(cost2_pos[,2])]<-apply(modelN1$sims.list$cost2,2,quantile,probs=prob[1])
-    cost2_pos[,3][is.na(cost2_pos[,3])]<-apply(modelN1$sims.list$cost2,2,quantile,probs=prob[2])
+    if(any(is.na(eff1))==TRUE){
+      eff1_pos[,1][is.na(eff1_pos[,1])]<-apply(modelN1$sims.list$eff1,2,mean)
+      eff1_pos[,2][is.na(eff1_pos[,2])]<-apply(modelN1$sims.list$eff1,2,quantile,probs=prob[1])
+      eff1_pos[,3][is.na(eff1_pos[,3])]<-apply(modelN1$sims.list$eff1,2,quantile,probs=prob[2])
+    }
+    if(any(is.na(eff2))==TRUE){
+      eff2_pos[,1][is.na(eff2_pos[,1])]<-apply(modelN1$sims.list$eff2,2,mean) 
+      eff2_pos[,2][is.na(eff2_pos[,2])]<-apply(modelN1$sims.list$eff2,2,quantile,probs=prob[1]) 
+      eff2_pos[,3][is.na(eff2_pos[,3])]<-apply(modelN1$sims.list$eff2,2,quantile,probs=prob[2]) 
+    }
+    if(any(is.na(cost1))==TRUE){
+      cost1_pos[,1][is.na(cost1_pos[,1])]<-apply(modelN1$sims.list$cost1,2,mean) 
+      cost1_pos[,2][is.na(cost1_pos[,2])]<-apply(modelN1$sims.list$cost1,2,quantile,probs=prob[1]) 
+      cost1_pos[,3][is.na(cost1_pos[,3])]<-apply(modelN1$sims.list$cost1,2,quantile,probs=prob[2]) 
+    }
+    if(any(is.na(cost2))==TRUE){
+      cost2_pos[,1][is.na(cost2_pos[,1])]<-apply(modelN1$sims.list$cost2,2,mean) 
+      cost2_pos[,2][is.na(cost2_pos[,2])]<-apply(modelN1$sims.list$cost2,2,quantile,probs=prob[1]) 
+      cost2_pos[,3][is.na(cost2_pos[,3])]<-apply(modelN1$sims.list$cost2,2,quantile,probs=prob[2]) 
+    }
   }
   if(ind==FALSE & dist_e=="norm" & dist_c=="norm"){theta<-modelN1$sims.list$theta}
   if(type=="MAR"){
@@ -429,12 +447,30 @@ run_bugs<-function(type,dist_e,dist_c,forward,inits)eval.parent(substitute({
     delta_c<-modelN1$sims.list$delta_c
   }
   #hide constant variables data if standard sampling
+  #adapt summary of results based on missingness in variables
+  if(any(params=="eff1")==TRUE){
+    index_eff1<-match("eff1",params)
+    params<-params[-index_eff1]}
+  if(any(params=="eff2")==TRUE){
+    index_eff2<-match("eff2",params)
+    params<-params[-index_eff2]}
+  if(any(params=="cost1")==TRUE){
+    index_cost1<-match("cost1",params)
+    params<-params[-index_cost1]}
+  if(any(params=="cost2")==TRUE){
+    index_cost2<-match("cost2",params)
+    params<-params[-index_cost2]}
   if(forward==FALSE){
-    if(n.chains>1){model_sum<-round(bugsresults(x=modelN1, params=c('eff1','eff2','cost1','cost2'), invert=TRUE),digits = 3)
+    if(n.chains>1){model_sum<-round(bugsresults(x=modelN1, params=params, invert=FALSE),digits = 3)
     }else{model_sum<-NULL}
   }else if(forward==TRUE){model_sum<-"default"}
   #save imputed outcome data if standard sampling else set it as null
   if(forward==FALSE){
+    #set colnames
+    colnames(eff1_pos)<-c("mean","LB","UB")
+    colnames(eff2_pos)<-c("mean","LB","UB")
+    colnames(cost1_pos)<-c("mean","LB","UB")
+    colnames(cost2_pos)<-c("mean","LB","UB")
     imputed<-list("effects1"=eff1_pos,"effects2"=eff2_pos,"costs1"=cost1_pos,"costs2"=cost2_pos)
   }else{imputed<-NULL}
   #define model output list

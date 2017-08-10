@@ -10,12 +10,12 @@
 #' in the package \code{ggplot2} and \code{ggthemes}.
 #' @keywords diagnostics MCMC convergence checks
 #' @param x An object of class "missingHE" containing the posterior results of a full Bayesian model implemented usgin the function \code{\link{run_model}}
-#' @param class type of diagnostic check to be plotted for model parameters, mostly taken from the packages \strong{ggmcmc} and \strong{mcmcplots}. Available choices include: 'histogram' for histrogram plots,
-#' 'denplot' for density plots, 'traceplot' for trace plots and 'autocorrplot' for autocorrelation plots, 'running' for running mean plots,
-#' 'compare' for comparing the distribution of the whole chain with only its last part, 'crosscorplot' for crosscorrelation plots, 'Rhat' for the potential scale reduction factor, 'geweke' for the geweke diagnostic,
+#' @param type type of diagnostic check to be plotted for model parameters, mostly taken from the packages \strong{ggmcmc} and \strong{mcmcplots}. Available choices include: 'histogram' for histrogram plots,
+#' 'denplot' for density plots, 'traceplot' for trace plots and 'acf' for autocorrelation plots, 'running' for running mean plots,
+#' 'compare' for comparing the distribution of the whole chain with only its last part, 'cross' for crosscorrelation plots, 'Rhat' for the potential scale reduction factor, 'geweke' for the geweke diagnostic,
 #' 'pairs' for posterior correlation among the parameters,'caterpillar' for caterpillar plots. In addition the class 'summary' provides an overview of some of the most popular
 #' diagnostic checks for each parameter selected.
-#' @param parm Name of the family of parameters to process, as given by a regular expression. For example the mean parameters 
+#' @param param Name of the family of parameters to process, as given by a regular expression. For example the mean parameters 
 #' for the effect and cost variables can be specified using 'mu.e' and 'mu.c', respectively. Different types of
 #' models may have different parameters depending on the assumed distributions and missing data mechanisms. 
 #' To see a complete list of all possible paraemters by types of models assumed see details.
@@ -25,12 +25,12 @@
 #' @return A \code{ggplot} object containing the plots specified in the argument \code{class}
 #' @seealso \code{\link[ggmcmc]{ggs}} \code{\link{run_model}}
 #' @details Depending on the types of plots specified in the argument \code{class} the output of \code{diagnostic_checks} can produce
-#' different combinations of MCMC visual posterior checks for the parameters of interest indicated in the argument \code{parm}.
+#' different combinations of MCMC visual posterior checks for the parameters of interest indicated in the argument \code{param}.
 #' For a full list of the available plots see the description of the argument \code{class} or see the corresponding plots in the package \strong{ggmcmc}.
 #' 
 #' The parameters that can be assessed through \code{diagnostic_checks} are only those inlcuded in the object \code{x} (see Arguments)
 #' and are related to different model aspects in the setting of cost-effectiveness analyses. Specifically, in order to assess each parameter,
-#' a different character name must be specified in the argument \code{parm}. The available names and the parameters associated with them are:
+#' a different character name must be specified in the argument \code{param}. The available names and the parameters associated with them are:
 #' \itemize{
 #' \item "mu.e" the mean parameters of the effect variables in the two treatment arms.
 #' \item "mu.c" the mean parameters of the cost variables in the two treatment arms.
@@ -71,13 +71,13 @@
 #' #
 #' #
 
-diagnostic_checks<-function(x,class="histogram",parm="all",theme=NULL,...){
+diagnostic_checks<-function(x,type="histogram",param="all",theme=NULL,...){
   #diagnostic posterior checks to assess convergence of chains
   #define additional inputs as a list
   exArgs <- list(...)
   #x can only be object of class missing
   if(class(x)!="missingHE"){
-    stop("Only objects of class 'missing' can be used")
+    stop("Only objects of class 'missingHE' can be used")
   }
   #load namespace of ggmcmc and mcmcplots else ask to install the packages
   if(!isTRUE(requireNamespace("ggmcmc"))|!isTRUE(requireNamespace("mcmcplots"))) {
@@ -94,19 +94,19 @@ diagnostic_checks<-function(x,class="histogram",parm="all",theme=NULL,...){
       stop("You must provide one of the available theme styles")
     }}
   #need to specify parameters available in the model
-  if(all(parm %in% c("all","mu.e","mu.c","sd.e","sd.c","corr",
+  if(all(param %in% c("all","mu.e","mu.c","sd.e","sd.c","corr",
                      "beta0.e","beta0.c","beta.e","beta.c",
-                     "gammao.e","gamma0.c","gamma.e","gamma.c","delta.e","delta.c"))==FALSE ){
+                     "gamma0.e","gamma0.c","gamma.e","gamma.c","delta.e","delta.c"))==FALSE ){
     stop("You must provide valid parameter names contained in the output of run_model")
   }
-  if(length(parm)!=1){
-    stop("You can only visualise diagnostic checks for one family of parameters at a time or for all parameters together \n setting the default value parm='all'")
+  if(length(param)!=1){
+    stop("You can only visualise diagnostic checks for one family of parameters at a time or for all parameters together \n setting the default value param='all'")
   }
   #need to specify type of checks among those available
-  if(!class %in% c("summary","histogram","running","denplot","compare","traceplot","autocorrplot","crosscorplot","Rhat","geweke","caterpillar","pairs")) {
-    stop("Classes available for use are 'summary','histogram','running','denplot','compare','traceplot','autocorrplot','crosscorplot','Rhat','geweke','caterpillar','pairs'")
+  if(!type %in% c("summary","histogram","running","denplot","compare","traceplot","acf","cross","Rhat","geweke","caterpillar","pairs")) {
+    stop("Types of diagnostics available for use are 'summary','histogram','running','denplot','compare','traceplot','acf','cross','Rhat','geweke','caterpillar','pairs'")
   }
-  labs <- parm
+  labs <- param
   labs[pmatch("corr",labs)] <- "theta"
   labs[pmatch("mu.e",labs)] <- "mu_e"
   labs[pmatch("mu.c",labs)] <- "mu_c"
@@ -129,7 +129,7 @@ diagnostic_checks<-function(x,class="histogram",parm="all",theme=NULL,...){
   #create mcmc object from model results
   mcmc_object<-coda::as.mcmc(x$model_output$`model summary`)
   #set type of parameters to call in the plots (either all or a family of parameters)
-  if(parm=="all"& class!="summary"){
+  if(param=="all"& type!="summary"){
     #exclude missing values from parameter plotting
     #get names of variables
     v_name<-coda::varnames(mcmc_object[,,drop=FALSE])
@@ -139,15 +139,15 @@ diagnostic_checks<-function(x,class="histogram",parm="all",theme=NULL,...){
     check_index_cost<-which(check_name_cost,TRUE)
     check_index<-c(check_index_cost,check_index_eff)
     #exclude all missing cost and effect data
-    param<-v_name[-check_index]
+    parameters<-v_name[-check_index]
     #assign a common pre-name to the parameters for plotting using family argument
-    param_all<-paste("model.",param,sep="")
+    param_all<-paste("model.",parameters,sep="")
     v_name[-check_index]<-param_all
     coda::varnames(mcmc_object)<-v_name
     #define data frame for change name displayed in the plots
     #P<-data.frame(
     #Parameter<-v_name,
-    #Label<-c(v_name[check_index],param))
+    #Label<-c(v_name[check_index],parameters))
     #colnames(P)<-c("Parameter","Label")
     ggmcmc_object<-ggmcmc::ggs(mcmc_object)
     family=c("model")
@@ -156,30 +156,30 @@ diagnostic_checks<-function(x,class="histogram",parm="all",theme=NULL,...){
   ggmcmc_object<-ggmcmc::ggs(mcmc_object)
   }
   #check whether additional inputs are specified or use default values
-  if(class=="summary"){
+  if(type=="summary"){
     #summary results html page 
-    if(parm=="all"){
+    if(param=="all"){
       v_name<-coda::varnames(mcmc_object[,,drop=FALSE])
       check_name_eff<-grepl("eff",v_name)
       check_index_eff<-which(check_name_eff,TRUE)
       check_name_cost<-grepl("cost",v_name)
       check_index_cost<-which(check_name_cost,TRUE)
       check_index<-c(check_index_cost,check_index_eff)
-      param<-v_name[-check_index]
-      check_index2<-unique(substr(param,1,4))
+      parameters<-v_name[-check_index]
+      check_index2<-unique(substr(parameters,1,4))
       check_index3<-gsub("\\[|\\]", "", check_index2)
-      param<-gsub("devi", "deviance", check_index3,fixed=TRUE)
+      parameters<-gsub("devi", "deviance", check_index3,fixed=TRUE)
       if(x$type=="MNAR_eff"|x$type=="MNAR_eff_cov"){
-      param<-gsub("delt", "delta_e", param,fixed=TRUE)
-      param<-gsub("gamm", "gamma0_e", param,fixed=TRUE)
+      parameters<-gsub("delt", "delta_e", parameters,fixed=TRUE)
+      parameters<-gsub("gamm", "gamma0_e", parameters,fixed=TRUE)
       } else if(x$type=="MNAR_cost"|x$type=="MNAR_cost_cov"){
-        param<-gsub("delt", "delta_c", param,fixed=TRUE)
-        param<-gsub("gamm", "gamma0_c", param,fixed=TRUE)
+        parameters<-gsub("delt", "delta_c", parameters,fixed=TRUE)
+        parameters<-gsub("gamm", "gamma0_c", parameters,fixed=TRUE)
       } else if(x$type=="MNAR"|x$type=="MNAR_cov"){
-        param<-c(gsub("delt", "delta_e", param,fixed=TRUE),"delta_c")
-        param<-c(gsub("gamm", "gamma0_e", param,fixed=TRUE),"gamma0_c")
+        parameters<-c(gsub("delt", "delta_e", parameters,fixed=TRUE),"delta_c")
+        parameters<-c(gsub("gamm", "gamma0_e", parameters,fixed=TRUE),"gamma0_c")
       }
-       } else {param=labs}
+       } else {parameters=labs}
     if(exists("regex",where=exArgs)) {regex=exArgs$regex} else {regex=NULL}
     if(exists("leaf.marker",where=exArgs)) {leaf.marker=exArgs$leaf.marker} else {leaf.marker= "[\\[_]"}
     if(exists("random",where=exArgs)) {random=exArgs$random} else {random=NULL}
@@ -193,60 +193,60 @@ diagnostic_checks<-function(x,class="histogram",parm="all",theme=NULL,...){
     if(exists("ylim",where=exArgs)) {ylim=exArgs$ylim} else {ylim=NULL}
     if(exists("style",where=exArgs)) {style=exArgs$style} else {style=c("gray", "plain")}
     if(exists("greek",where=exArgs)) {greek=exArgs$greek} else {greek=TRUE}
-    ggmcmc_out<-mcmcplots::mcmcplot(mcmc_object,parms = param,regex = regex,leaf.marker = leaf.marker,random = random,dir = dir,filename = filename,
+    ggmcmc_out<-mcmcplots::mcmcplot(mcmc_object,parms = parameters,regex = regex,leaf.marker = leaf.marker,random = random,dir = dir,filename = filename,
                                     extension = extension,title = title,col = col,lty = lty,xlim = xlim,ylim = ylim,style = style,greek = greek)
-  } else if(class=="histogram"){
+  } else if(type=="histogram"){
     #histogram plots
     if(exists("bins",where=exArgs)) {bins=exArgs$bins} else {bins=30}
     if(exists("greek",where=exArgs)) {greek=exArgs$greek} else {greek=FALSE}
     ggmcmc_out<-ggmcmc::ggs_histogram(ggmcmc_object,family=family,bins = bins,greek = greek)
-  } else if(class=="denplot"){
+  } else if(type=="denplot"){
     #density plots
     if(exists("rug",where=exArgs)) {rug=exArgs$rug} else {rug=FALSE}
     if(exists("greek",where=exArgs)) {greek=exArgs$greek} else {greek=FALSE}
     ggmcmc_out<-ggmcmc::ggs_density(ggmcmc_object,family=family,rug = rug,greek = greek)
-  } else if(class=="running"){
+  } else if(type=="running"){
     ##running mean plots
     if(exists("original_burnin",where=exArgs)) {original_burnin=exArgs$original_burnin} else {original_burnin=TRUE}
     if(exists("original_thin",where=exArgs)) {original_thin=exArgs$original_thin} else {original_thin=TRUE}
     if(exists("greek",where=exArgs)) {greek=exArgs$greek} else {greek=FALSE}
     ggmcmc_out<-ggmcmc::ggs_running(ggmcmc_object,family=family,original_burnin = original_burnin,original_thin = original_thin,greek = greek)
-  } else if(class=="compare"){
+  } else if(type=="compare"){
     #compare all chain with a fraction
     if(exists("partial",where=exArgs)) {partial=exArgs$partial} else {partial=0.1}
     if(exists("rug",where=exArgs)) {rug=exArgs$rug} else {rug=FALSE}
     if(exists("greek",where=exArgs)) {greek=exArgs$greek} else {greek=FALSE}
     ggmcmc_out<-ggmcmc::ggs_compare_partial(ggmcmc_object,family=family,partial = partial,rug = rug,greek = greek)
-  } else if(class=="traceplot"){
+  } else if(type=="traceplot"){
     #trace plots
     if(exists("original_burnin",where=exArgs)) {original_burnin=exArgs$original_burnin} else {original_burnin=TRUE}
     if(exists("original_thin",where=exArgs)) {original_thin=exArgs$original_thin} else {original_thin=TRUE}
     if(exists("simplify",where=exArgs)) {simplify=exArgs$simplify} else {simplify=NULL}
     if(exists("greek",where=exArgs)) {greek=exArgs$greek} else {greek=FALSE}
     ggmcmc_out<-ggmcmc::ggs_traceplot(ggmcmc_object,family=family,original_burnin = original_burnin,original_thin = original_thin,simplify = simplify,greek = greek)
-  } else if(class=="autocorrplot"){
+  } else if(type=="acf"){
     #autocorrelation plots
     if(exists("nLags",where=exArgs)) {nLags=exArgs$nLags} else {nLags=50}
     if(exists("greek",where=exArgs)) {greek=exArgs$greek} else {greek=FALSE}
     ggmcmc_out<-ggmcmc::ggs_autocorrelation(ggmcmc_object,family=family,nLags = nLags,greek = greek)
-  } else if(class=="crosscorplot"){
+  } else if(type=="cross"){
     #crosscorrelation plots
     if(exists("absolute_scale",where=exArgs)) {absolute_scale=exArgs$absolute_scale} else {absolute_scale=TRUE}
     if(exists("greek",where=exArgs)) {greek=exArgs$greek} else {greek=FALSE}
     ggmcmc_out<-ggmcmc::ggs_crosscorrelation(ggmcmc_object,family=family,absolute_scale = absolute_scale,greek = greek)
-  } else if(class=="Rhat"){
+  } else if(type=="Rhat"){
     #scale factor statistic plot
     if(exists("scaling",where=exArgs)) {scaling=exArgs$scaling} else {scaling=1.5}
     if(exists("greek",where=exArgs)) {greek=exArgs$greek} else {greek=FALSE}
     ggmcmc_out<-ggmcmc::ggs_Rhat(ggmcmc_object,family=family, scaling = scaling,greek = greek)+ ggplot2::xlab("R_hat")
-  } else if(class=="geweke"){
+  } else if(type=="geweke"){
     #geweke stat plot
     if(exists("frac1",where=exArgs)) {frac1=exArgs$frac1} else {frac1=0.1}
     if(exists("frac2",where=exArgs)) {frac2=exArgs$frac2} else {frac2=0.5}
     if(exists("shadow_limit",where=exArgs)) {shadow_limit=exArgs$shadow_limit} else {shadow_limit=TRUE}
     if(exists("greek",where=exArgs)) {greek=exArgs$greek} else {greek=FALSE}
     ggmcmc_out<-ggmcmc::ggs_geweke(ggmcmc_object,family=family, frac1 = frac1,frac2 = frac2,shadow_limit = shadow_limit,greek = greek)
-  } else if(class=="caterpillar"){
+  } else if(type=="caterpillar"){
     #caterpillar plots
     if(exists("X",where=exArgs)) {X=exArgs$X} else {X=NA}
     if(exists("thick_ci",where=exArgs)) {thick_ci=exArgs$thick_ci} else {thick_ci=c(0.05, 0.95)}
@@ -256,7 +256,7 @@ diagnostic_checks<-function(x,class="histogram",parm="all",theme=NULL,...){
     if(exists("model_labels",where=exArgs)) {model_labels=exArgs$model_labels} else {model_labels=NULL}
     if(exists("greek",where=exArgs)) {greek=exArgs$greek} else {greek=FALSE}
     ggmcmc_out<-ggmcmc::ggs_caterpillar(ggmcmc_object,family=family, X=X,thick_ci = thick_ci,thin_ci = thin_ci,line = line,horizontal = horizontal,model_labels = model_labels,greek = greek)
-  } else if(class=="pairs"){
+  } else if(type=="pairs"){
     #plot parameter summary checks by pairs
     if(exists("title",where=exArgs)) {title=exArgs$title} else {title=NULL}
     if(exists("upper",where=exArgs)) {upper=exArgs$upper} else {upper=list(continuous = "cor", combo = "box_no_facet", discrete = "facetbar", na = "na")}
@@ -272,7 +272,7 @@ diagnostic_checks<-function(x,class="histogram",parm="all",theme=NULL,...){
     ggmcmc_out<-ggmcmc::ggs_pairs(ggmcmc_object,family=family,greek = greek,title=title,upper=upper,lower=lower,diag=diag,xlab=xlab,ylab=ylab,
                                   axisLabels=axisLabels,labeller=labeller,showStrips=showStrips,legend=legend)
   }
-  if(length(theme)!=0 & class!="summary"){
+  if(length(theme)!=0 & type!="summary"){
     #call theme for ggplots
     if(theme=="base") ggmcmc_out<-ggmcmc_out+ggthemes::theme_base()
     if(theme=="calc") ggmcmc_out<-ggmcmc_out+ggthemes::theme_calc()

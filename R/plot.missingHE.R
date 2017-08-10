@@ -66,17 +66,12 @@ plot.missingHE<-function(x,prob=c(0.05,0.95),class="scatter",outcome="all",theme
   exArgs <- list(...)
   #x can only be object of class missing
   if(class(x)!="missingHE"){
-    stop("Only objects of class 'missing' can be used")
+    stop("Only objects of class 'missingHE' can be used")
   }
-  #verify that output is from bugs or jags model and check that imputed data are stored
-  if(x$model_output$type=="JAGS"){
-    if(is.null(x$model_output$`model summary`$BUGSoutput$sims.list$eff1)==TRUE){
-      stop("You must provide a model output object where imputed values have been saved. Run run_model with save_imp==TRUE")
-    }
-  } else if(x$model_output$type=="BUGS"){
-    if(is.null(x$model_output$`model summary`$sims.list$eff1)==TRUE){
-      stop("You must provide a model output object where imputed values have been saved. Run run_model with save_imp==TRUE")
-    }
+  #stop if no missing values
+  if(x$data_set$`N missing in comparator arm`[1]==0 & x$data_set$`N missing in comparator arm`[2]==0 &
+     x$data_set$`N missing in reference arm`[1]==0 & x$data_set$`N missing in reference arm`[2]==0){
+    stop("No missing value found in the data")
   }
   #quantile bounds must be valid
   if(length(prob)!=2|is.numeric(prob)==FALSE|any(prob<0)!=FALSE|any(prob>1)!=FALSE){
@@ -100,26 +95,45 @@ plot.missingHE<-function(x,prob=c(0.05,0.95),class="scatter",outcome="all",theme
     cost2_pos[,1]<-apply(x$model_output$`model summary`$BUGSoutput$sims.list$cost2,2,mean)
     cost2_pos[,2]<-apply(x$model_output$`model summary`$BUGSoutput$sims.list$cost2,2,quantile,probs=prob[1])
     cost2_pos[,3]<-apply(x$model_output$`model summary`$BUGSoutput$sims.list$cost2,2,quantile,probs=prob[2])
-    complete<-list("effects1"=eff1_pos,"effects2"=eff2_pos,"costs1"=cost1_pos,"costs2"=cost2_pos)
-  } else if(x$model_output$type=="BUGS"){
+    #set colnames
+    colnames(eff1_pos)<-c("mean","LB","UB")
+    colnames(eff2_pos)<-c("mean","LB","UB")
+    colnames(cost1_pos)<-c("mean","LB","UB")
+    colnames(cost2_pos)<-c("mean","LB","UB")
+    complete_labels<-complete<-list("effects1"=eff1_pos,"effects2"=eff2_pos,"costs1"=cost1_pos,"costs2"=cost2_pos)
+  }else if(x$model_output$type=="BUGS"){
     #obtain merged imputed and observed data (complete) from bugs output
     eff1_pos<-matrix(x$data_set$effects[[1]],x$data_set$`N in reference arm`,3)
     cost1_pos<-matrix(x$data_set$costs[[1]],x$data_set$`N in reference arm`,3)
     eff2_pos<-matrix(x$data_set$effects[[2]],x$data_set$`N in comparator arm`,3)
     cost2_pos<-matrix(x$data_set$costs[[2]],x$data_set$`N in comparator arm`,3)
+   if(any(is.na(x$data_set$effects[[1]]))==TRUE){
     eff1_pos[,1][is.na(eff1_pos[,1])]<-apply(x$model_output$`model summary`$sims.list$eff1,2,mean)
     eff1_pos[,2][is.na(eff1_pos[,2])]<-apply(x$model_output$`model summary`$sims.list$eff1,2,quantile,probs=prob[1])
-    eff1_pos[,3][is.na(eff1_pos[,3])]<-apply(x$model_output$`model summary`$sims.list$eff1,2,quantile,probs=prob[2])
-    eff2_pos[,1][is.na(eff2_pos[,1])]<-apply(x$model_output$`model summary`$sims.list$eff2,2,mean)
-    eff2_pos[,2][is.na(eff2_pos[,2])]<-apply(x$model_output$`model summary`$sims.list$eff2,2,quantile,probs=prob[1])
-    eff2_pos[,3][is.na(eff2_pos[,3])]<-apply(x$model_output$`model summary`$sims.list$eff2,2,quantile,probs=prob[2])
-    cost1_pos[,1][is.na(cost1_pos[,1])]<-apply(x$model_output$`model summary`$sims.list$cost1,2,mean)
-    cost1_pos[,2][is.na(cost1_pos[,2])]<-apply(x$model_output$`model summary`$sims.list$cost1,2,quantile,probs=prob[1])
-    cost1_pos[,3][is.na(cost1_pos[,3])]<-apply(x$model_output$`model summary`$sims.list$cost1,2,quantile,probs=prob[2])
-    cost2_pos[,1][is.na(cost2_pos[,1])]<-apply(x$model_output$`model summary`$sims.list$cost2,2,mean)
-    cost2_pos[,2][is.na(cost2_pos[,2])]<-apply(x$model_output$`model summary`$sims.list$cost2,2,quantile,probs=prob[1])
-    cost2_pos[,3][is.na(cost2_pos[,3])]<-apply(x$model_output$`model summary`$sims.list$cost2,2,quantile,probs=prob[2])
+    eff1_pos[,3][is.na(eff1_pos[,3])]<-apply(x$model_output$`model summary`$sims.list$eff1,2,quantile,probs=prob[2]) 
+   }
+    if(any(is.na(x$data_set$effects[[2]]))==TRUE){
+      eff2_pos[,1][is.na(eff2_pos[,1])]<-apply(x$model_output$`model summary`$sims.list$eff2,2,mean)
+      eff2_pos[,2][is.na(eff2_pos[,2])]<-apply(x$model_output$`model summary`$sims.list$eff2,2,quantile,probs=prob[1])
+      eff2_pos[,3][is.na(eff2_pos[,3])]<-apply(x$model_output$`model summary`$sims.list$eff2,2,quantile,probs=prob[2])
+    }
+    if(any(is.na(x$data_set$costs[[1]]))==TRUE){
+      cost1_pos[,1][is.na(cost1_pos[,1])]<-apply(x$model_output$`model summary`$sims.list$cost1,2,mean)
+      cost1_pos[,2][is.na(cost1_pos[,2])]<-apply(x$model_output$`model summary`$sims.list$cost1,2,quantile,probs=prob[1])
+      cost1_pos[,3][is.na(cost1_pos[,3])]<-apply(x$model_output$`model summary`$sims.list$cost1,2,quantile,probs=prob[2])
+    }
+    if(any(is.na(x$data_set$costs[[2]]))==TRUE){
+      cost2_pos[,1][is.na(cost2_pos[,1])]<-apply(x$model_output$`model summary`$sims.list$cost2,2,mean)
+      cost2_pos[,2][is.na(cost2_pos[,2])]<-apply(x$model_output$`model summary`$sims.list$cost2,2,quantile,probs=prob[1])
+      cost2_pos[,3][is.na(cost2_pos[,3])]<-apply(x$model_output$`model summary`$sims.list$cost2,2,quantile,probs=prob[2]) 
+    }
     complete<-list("effects1"=eff1_pos,"effects2"=eff2_pos,"costs1"=cost1_pos,"costs2"=cost2_pos)
+    #set colnames
+    colnames(eff1_pos)<-c("mean","LB","UB")
+    colnames(eff2_pos)<-c("mean","LB","UB")
+    colnames(cost1_pos)<-c("mean","LB","UB")
+    colnames(cost2_pos)<-c("mean","LB","UB")
+    complete_labels<-list("effects1"=eff1_pos,"effects2"=eff2_pos,"costs1"=cost1_pos,"costs2"=cost2_pos)
   }
   #obtain observed data
     observed<-list("effects1"=x$data_set$effects[[1]],"effects2"=x$data_set$effects[[2]],
@@ -148,6 +162,12 @@ plot.missingHE<-function(x,prob=c(0.05,0.95),class="scatter",outcome="all",theme
     cost2_imp<-sapply(1:3,function(j){cost2_imp[,j]<-unlist(cost2_imputed[j])})
     #obtain imputed data
     imputed<-list("effects1"= eff1_imp,"effects2"=eff2_imp,"costs1"=cost1_imp,"costs2"=cost2_imp)
+    #set colnames
+    colnames(eff1_imp)<-c("mean","LB","UB")
+    colnames(eff2_imp)<-c("mean","LB","UB")
+    colnames(cost1_imp)<-c("mean","LB","UB")
+    colnames(cost2_imp)<-c("mean","LB","UB")
+    imputed_labels<-list("effects1"= eff1_imp,"effects2"=eff2_imp,"costs1"=cost1_imp,"costs2"=cost2_imp)
     #group all three types of data in a single list object to be returned
     data<-list("observed"=observed,"imputed"=imputed,"complete"=complete)
     #create and define missing data indicators for each variable and arm
@@ -282,7 +302,7 @@ plot.missingHE<-function(x,prob=c(0.05,0.95),class="scatter",outcome="all",theme
       plot_cost1<-ggplot2::ggplot(plot.cost1.data, ggplot2::aes(x=costs, color=type))+ggplot2::geom_histogram(fill="white", position="dodge")+ggplot2::theme(legend.position="top")+
         ggplot2::scale_colour_manual(values = c("red","black"))+ggplot2::ggtitle("Imputed and observed costs \n in the control arm")
       } else if(any(is.na(x$data_set$costs[[1]]))==FALSE){
-        plot.cost1.data<-data.frame(Individuals=seq(1:length(complete$costs1[,1])),effects=complete$costs1[,1],type=m_cost1)
+        plot.cost1.data<-data.frame(Individuals=seq(1:length(complete$costs1[,1])),costs=complete$costs1[,1],type=m_cost1)
         plot_cost1<-ggplot2::ggplot(plot.cost1.data, ggplot2::aes(x=costs, color=type))+ggplot2::geom_histogram(fill="white", position="dodge")+ggplot2::theme(legend.position="top")+
           ggplot2::scale_colour_manual(values = c("black"))+ggplot2::ggtitle("Observed costs \n in the control arm")
       }
@@ -435,6 +455,6 @@ plot.missingHE<-function(x,prob=c(0.05,0.95),class="scatter",outcome="all",theme
       if(any(check_missing==TRUE)){n<-match(TRUE,check_missing)} else {n=1}
       suppressMessages(plot_output<-grid_arrange_shared_legend(plot_cost2,nrow = 1,ncol = 1))
     }
-    res_plot<-list("plot"=plot_output,"complete data"=complete,"observed data"=observed,"imputed data"=imputed)
+    res_plot<-list("plot"=plot_output,"complete data"=complete_labels,"observed data"=observed,"imputed data"=imputed_labels)
     return(res_plot)
 }
