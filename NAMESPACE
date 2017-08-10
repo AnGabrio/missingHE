@@ -1,4 +1,5 @@
 S3method(plot,missingHE)
+S3method(print,missingHE)
 S3method(summary,missingHE)
 export(bugsresults)
 export(diagnostic_checks)
