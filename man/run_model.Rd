@@ -178,12 +178,13 @@ data<-data.frame(e,c,t)
 
 #Run the model using run_model with JAGS assuming a MCAR missingness mechanism
 x<-run_model(data=data,dist_e="norm",dist_c="norm",type="MCAR",program="JAGS")
-#
+#print the results of the JAGS/BUGS model
+print(x)
 #
 #Assess model convergence using graphical tools
 #Produce histograms of the posterior samples for the mean effect
 #parameters in the two treatment arms. 
-diagnostic_checks(x,class = "histogram",parm = "mu.e")
+diagnostic_checks(x,type = "histogram",param = "mu.e")
 #
 #Compare observed outcome data with imputations from the model
 # (posteiror means and credible intervals)
@@ -197,7 +198,7 @@ summary(x)
 \references{
 Daniels, MJ. Hogan, JW. \emph{Missing Data in Longitudinal Studies: strategies for Bayesian modelling and sensitivity analysis}, CRC/Chapman Hall.
 
-Baio, G.(2012). \emph{Bayesian Methods in Health Economcis}. CRC/Chapman Hall, London.
+Baio, G.(2012). \emph{Bayesian Methods in Health Economics}. CRC/Chapman Hall, London.
 
 Gelman, A. Carlin, JB., Stern, HS. Rubin, DB.(2003). \emph{Bayesian Data Analysis, 2nd edition}, CRC Press.
 

@@ -4,18 +4,18 @@
 \alias{diagnostic_checks}
 \title{Diagnostic checks for assessing MCMC convergence}
 \usage{
-diagnostic_checks(x, class = "histogram", parm = "all", theme = NULL, ...)
+diagnostic_checks(x, type = "histogram", param = "all", theme = NULL, ...)
 }
 \arguments{
 \item{x}{An object of class "missingHE" containing the posterior results of a full Bayesian model implemented usgin the function \code{\link{run_model}}}
 
-\item{class}{type of diagnostic check to be plotted for model parameters, mostly taken from the packages \strong{ggmcmc} and \strong{mcmcplots}. Available choices include: 'histogram' for histrogram plots,
-'denplot' for density plots, 'traceplot' for trace plots and 'autocorrplot' for autocorrelation plots, 'running' for running mean plots,
-'compare' for comparing the distribution of the whole chain with only its last part, 'crosscorplot' for crosscorrelation plots, 'Rhat' for the potential scale reduction factor, 'geweke' for the geweke diagnostic,
+\item{type}{type of diagnostic check to be plotted for model parameters, mostly taken from the packages \strong{ggmcmc} and \strong{mcmcplots}. Available choices include: 'histogram' for histrogram plots,
+'denplot' for density plots, 'traceplot' for trace plots and 'acf' for autocorrelation plots, 'running' for running mean plots,
+'compare' for comparing the distribution of the whole chain with only its last part, 'cross' for crosscorrelation plots, 'Rhat' for the potential scale reduction factor, 'geweke' for the geweke diagnostic,
 'pairs' for posterior correlation among the parameters,'caterpillar' for caterpillar plots. In addition the class 'summary' provides an overview of some of the most popular
 diagnostic checks for each parameter selected.}
 
-\item{parm}{Name of the family of parameters to process, as given by a regular expression. For example the mean parameters 
+\item{param}{Name of the family of parameters to process, as given by a regular expression. For example the mean parameters 
 for the effect and cost variables can be specified using 'mu.e' and 'mu.c', respectively. Different types of
 models may have different parameters depending on the assumed distributions and missing data mechanisms. 
 To see a complete list of all possible paraemters by types of models assumed see details.}
@@ -40,12 +40,12 @@ in the package \code{ggplot2} and \code{ggthemes}.
 }
 \details{
 Depending on the types of plots specified in the argument \code{class} the output of \code{diagnostic_checks} can produce
-different combinations of MCMC visual posterior checks for the parameters of interest indicated in the argument \code{parm}.
+different combinations of MCMC visual posterior checks for the parameters of interest indicated in the argument \code{param}.
 For a full list of the available plots see the description of the argument \code{class} or see the corresponding plots in the package \strong{ggmcmc}.
 
 The parameters that can be assessed through \code{diagnostic_checks} are only those inlcuded in the object \code{x} (see Arguments)
 and are related to different model aspects in the setting of cost-effectiveness analyses. Specifically, in order to assess each parameter,
-a different character name must be specified in the argument \code{parm}. The available names and the parameters associated with them are:
+a different character name must be specified in the argument \code{param}. The available names and the parameters associated with them are:
 \itemize{
 \item "mu.e" the mean parameters of the effect variables in the two treatment arms.
 \item "mu.c" the mean parameters of the cost variables in the two treatment arms.
