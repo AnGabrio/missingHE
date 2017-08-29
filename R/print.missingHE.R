@@ -29,52 +29,27 @@ print.missingHE<-function(x,value.mis=FALSE,...){
   }
   #if forward sampling selected no missing values 
   if(x$model_class=="forward"){
-    if(value.mis==TRUE){
       stop("No missing values if model is run in forward sampling")
-    }
-    if(x$model_output$type=="JAGS"){
+  }
+  if(x$model_output$type=="JAGS"){
       if(x$model_output$`model summary`$BUGSoutput$n.chains>1){
-          round(print(x$model_output$`model summary`),digits = digits)
+        if(value.mis==FALSE){
+          print(x$model_output$summary,digits = digits)
+        }else if(value.mis==TRUE){
+          print(x$model_output$`model summary`,digits = digits)
+        }
       }else if(x$model_output$`model summary`$BUGSoutput$n.chains==1){
-        stop("no output if n.chain=1 and forward sampling selected")
+        stop("no output is available if n.chain=1")
       }
     }else if(x$model_output$type=="BUGS"){
       if(x$model_output$`model summary`$n.chains>1){
-          round(print(x$model_output$`model summary`),digits = digits)
+        if(value.mis==FALSE){
+          print(x$model_output$summary,digits = digits)
+        }else if(value.mis==TRUE){
+          print(x$model_output$`model summary`,digits = digits)
+        }
       }else if(x$model_output$`model summary`$n.chains==1){
-          stop("no output if n.chain=1 and forward sampling selected")
-      }
-    }
-  }
-  #print results from BUGS/JAGS model
-  #show or hide missing values from results
-  if(x$model_output$type=="JAGS"){
-    if(x$model_output$`model summary`$BUGSoutput$n.chains>1){
-      if(value.mis==FALSE){
-        round(print(x$model_output$summary),digits = digits)
-      }else if(value.mis==TRUE){
-        print(x$model_output$`model summary`)
-      }
-    }else if(x$model_output$`model summary`$BUGSoutput$n.chains==1){
-      if(value.mis==FALSE){
-        stop("results without missing values cannot be printed if n.chains=1")
-      }else if(value.mis==TRUE){
-        print(x$model_output$`model summary`)
-      }
-    }
-  }else if(x$model_output$type=="BUGS"){
-    if(x$model_output$`model summary`$n.chains>1){
-      if(value.mis==FALSE){
-        round(print(x$model_output$summary),digits = digits)
-      }else if(value.mis==TRUE){
-        print(x$model_output$`model summary`)
-      }
-    }else if(x$model_output$`model summary`$n.chains==1){
-      if(value.mis==FALSE){
-        stop("results without missing values cannot be printed if n.chains=1")
-      }else if(value.mis==TRUE){
-        print(x$model_output$`model summary`)
-      }
+          stop("no output is available if n.chain=1")
     }
   }
 }

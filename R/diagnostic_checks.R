@@ -36,14 +36,12 @@
 #' \item "mu.c" the mean parameters of the cost variables in the two treatment arms.
 #' \item "sd.e" the standard deviation parameters of the effect variables in the two treatment arms.
 #' \item "sd.c" the standard deviation parameters of the cost variables in the two treatment arms.
-#' \item "beta0.e" the marginal mean parameters for the effect variables in the two treatment arms (only when covariates were included in the model).
-#' \item "beta.e" the covariate coefficient parameters for the effect variables in the two treatment arms (only when covariates were included in the model).
-#' \item "beta0.c" the marginal mean parameters for the cost variables in the two treatment arms (only when covariates were included in the model).
-#' \item "beta.c" the covariate coefficient parameters for the cost variables in the two treatment arms (only when covariates were included in the model).
-#' \item "gamma0.e" the baseline parameters of the missingness mechanism for the effect variables in the two treatment arms.
-#' \item "gamma0.c" the baseline parameters of the missingness mechanism for the cost variables in the two treatment arms.
-#' \item "gamma.e" the covariate coefficient parameters of the missingness mechanism for the effect variables in the two treatment arms.
-#' \item "gamma.c" the covariate coefficient parameters of the missingness mechanism for the cost variables in the two treatment arms.
+#' \item "beta.e" the regression intercept and covariate coefficient parameters for the effect variables in the two treatment arms (only when covariates were included in the model).
+#' \item "beta.c" the regression intercept and covariate coefficient parameters for the cost variables in the two treatment arms (only when covariates were included in the model).
+#' \item "gamma0.e" the baseline parameters of the missingness mechanism for the effect variables in the two treatment arms (only when covariates were not included in the model).
+#' \item "gamma0.c" the baseline parameters of the missingness mechanism for the cost variables in the two treatment arms (only when covariates were not included in the model).
+#' \item "gamma.e" the regression intercept and covariate coefficient parameters of the missingness mechanism for the effect variables in the two treatment arms (only when covariates were included in the model).
+#' \item "gamma.c" the regression intercept and covariate coefficient parameters of the missingness mechanism for the cost variables in the two treatment arms (only when covariates were included in the model).
 #' \item "delta.e" the mnar parameters of the missingness mechanism for the effect variables in the two treatment arms.
 #' \item "delta.c" the mnar parameters of the missingness mechanism for the cost variables in the two treatment arms.
 #' \item "all" all available parameters stored in the object \code{x}.
@@ -95,8 +93,7 @@ diagnostic_checks<-function(x,type="histogram",param="all",theme=NULL,...){
     }}
   #need to specify parameters available in the model
   if(all(param %in% c("all","mu.e","mu.c","sd.e","sd.c","corr",
-                     "beta0.e","beta0.c","beta.e","beta.c",
-                     "gamma0.e","gamma0.c","gamma.e","gamma.c","delta.e","delta.c"))==FALSE ){
+                     "beta.e","beta.c","gamma0.e","gamma0.c","gamma.e","gamma.c","delta.e","delta.c"))==FALSE ){
     stop("You must provide valid parameter names contained in the output of run_model")
   }
   if(length(param)!=1){
@@ -114,8 +111,6 @@ diagnostic_checks<-function(x,type="histogram",param="all",theme=NULL,...){
   labs[pmatch("sd.c",labs)] <- "s_c"
   labs[pmatch("gamma0.e",labs)] <- "gamma0_e"
   labs[pmatch("gamma0.c",labs)] <- "gamma0_c"
-  labs[pmatch("beta0.e",labs)] <- "beta0_e"
-  labs[pmatch("beta0.c",labs)] <- "beta0_c"
   labs[pmatch("beta.e",labs)] <- "beta_e"
   labs[pmatch("beta.c",labs)] <- "beta_c"
   labs[pmatch("gamma.e",labs)] <- "gamma_e"

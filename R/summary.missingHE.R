@@ -20,7 +20,7 @@
 summary.missingHE<-function(object,...){
   #define additional inputs as a list
   exArgs <- list(...)
-  #x can only be object of class missing
+  #object can only be object of class missing
   if(class(object)!="missingHE"){
     stop("Only objects of class 'missingHE' can be used")
   }

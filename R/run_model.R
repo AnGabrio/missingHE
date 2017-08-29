@@ -4,14 +4,18 @@
 #' mechanism assumptions and using a variatey of alternative parametric distributions for the effect and cost variables and 
 #' using a selection model to specify the missingness mechanism. The analysis is performed using the \code{BUGS} language, 
 #' which is implemented either in \code{JAGS} or \code{OpenBUGS} using the functions \code{\link[R2jags]{jags}} and 
-#' \code{\link[R2OpenBUGS]{bugs}}, respectively. The output is stored in an object of class "missingHE".
+#' \code{\link[R2OpenBUGS]{bugs}}, respectively. The output is stored in an object of class 'missingHE'.
 #' 
-#' @param data A data frame with rows representing the individuals and with columns that must included 
-#' the following elements: a column named 'e' containing the effectiveness data for the individuals, a column named 'c'
-#' containing the cost data for the individuals, a column 't' representing the tretment arm allocation for each individual 
-#' (only two arms are supported with 1 being the control and 2 being the new intervention). Additional elements that could
-#' be provided are: a number of columns named 'X1,X2,...' each containing different covariate data for the individuals. 
-#' Covariate data must be fully observed and if categorical they must be provided as factor variables.      
+#' @param data A data frame in which to find variables supplied in \code{model.eff} and \code{model.cost}. Among these,
+#' effectiveness, cost and treatment indicator (only two arms) variables must always be provided and named 'e', 'c' and 't' respectively.
+#' @param model.eff A formula expression in conventional R linear modelling syntax. The response must be a health economics
+#'  effectiveness outcome ('e') whose name must correspond to that used in \code{data}, and 
+#'  any covariates are given on the right-hand side. If there are no covariates, specify \code{1} on the right hand side.
+#'  By default, covariates are placed on the "location" parameter of the distribution through a linear model.
+#' @param model.cost A formula expression in conventional R linear modelling syntax. The response must be a health economics
+#'  cost outcome ('c') whose name must correspond to that used in \code{data}, and any covariates are given on the right-hand side.
+#'  If there are no covariates, specify \code{1} on the right hand side. By default, covariates are placed on the "location" 
+#'  parameter of the distribution through a linear model.
 #' @param type Type of missingness mechanism assumed. Choices are: Missing Completely At Random (MCAR),
 #'  Missing At Random (MAR), Missing Not At Random (MNAR). Different 'MNAR' alternative versions are available 
 #'  depending on whether the mechanism for only one or both outcomes is considered. Specifically it is possible
@@ -37,13 +41,12 @@
 #' containing the user-provided hyperprior values and must be named with the name of the corresponding parameter. For example, the hyperprior
 #' values for the mean effect parameter, when a normal distribution is assumed, can be provided using \code{prior=list('mu.prior.e'=c(0,1))}.
 #' For more information about how to provide prior hypervalues for each model parameter see details. If \code{prior} is 'default' the default values will be used.  
-#' @param ... additional input parameters. Examples are \code{ind} (logical), \code{stand} (logical) and \code{transf}. When \code{ind} is \code{FALSE} 
-#' a joint model is run (only for bivariate normal), while when \code{stand} is \code{TRUE} outcomes are scaled so to have mean \code{0} and
+#' @param ... additional input parameters. Examples are \code{stand} (logical) and \code{transf}. When \code{stand} is \code{TRUE} outcomes are scaled so to have mean \code{0} and
 #' standard deviation \code{0.5} (only for bivariate normal). If \code{transf} is set to 'logit', mean effect variables are modelled on the log-odds scale 
 #' (only for beta distribution), while if 'log' is chosen, mean cost variables are modelled on the log scale (only for gamma distribution). If a beta-gamma
 #' model is selected both transformations can be carried out by setting \code{transf} equal to a vector that contains both transformation string names.
 #' Other additional arguments contained in the function \code{\link[BCEA]{bcea}} can be provided. 
-#' @return An object of the class "missingHE" containing the following elements
+#' @return An object of the class 'missingHE' containing the following elements
 #' \describe{
 #'   \item{data_set}{A list containing the original data set provided in \code{data} (see Arguments), the number of observed and missing individuals 
 #'   and the total number of individuals by treatment arm}
@@ -64,6 +67,7 @@
 #' }
 #' @seealso \code{\link[R2OpenBUGS]{bugs}}, \code{\link[R2jags]{jags}}, \code{\link[BCEA]{bcea}}
 #' @keywords CEA OpenBUGS JAGS Missingness
+#' @importFrom stats model.frame 
 #' @details Depending on the distributional assumptions specified for the outcome variables in the arguments \code{dist_e} and
 #' \code{dist_c} (Model of Analysis, MoA) and the type of missingness mechanism assumed in the argument \code{type} (Model of Missingness, MoM)
 #' , different types of models are built and run in the background by \code{run_model}.
@@ -117,7 +121,7 @@
 #' \item covariate parameters in the MoM (if covariate data provided) in the MoM: "gamma.prior.e"(effects) and/or "gamma.prior.c"(costs)
 #' \item mnar parameter in the MoM: "delta.prior.e"(effects) and/or "delta.prior.c"(costs)
 #' } 
-#' To notice that the marginal mean and covariate parameters can be provided only if covariate data are inlcuded in the model, with the
+#' To notice that the priors for the marginal mean and covariate parameters can be provided only if covariate data are inlcuded in the model, with the
 #' marginal mean parameter being a substitute of the location parameter under such model framework.
 #' 
 #' 
@@ -163,7 +167,8 @@
 #'data<-data.frame(e,c,t)
 #'
 #'#Run the model using run_model with JAGS assuming a MCAR missingness mechanism
-#'x<-run_model(data=data,dist_e="norm",dist_c="norm",type="MCAR",program="JAGS")
+#'x<-run_model(data=data,model.eff=e~1,model.cost=c~1,
+#'dist_e="norm",dist_c="norm",type="MCAR",program="JAGS")
 #'#print the results of the JAGS/BUGS model
 #'print(x)
 #'#
@@ -182,48 +187,31 @@
 #'#
 
 
-run_model<-function(data,dist_e,dist_c,type,program="JAGS",forward=FALSE,prob=c(0.05,0.95),
+run_model<-function(data,model.eff,model.cost,dist_e,dist_c,type,program="JAGS",forward=FALSE,prob=c(0.05,0.95),
                     n.chains=2,n.iter=20000,n.burnin=floor(n.iter/2),inits=NULL,n.thin=1,
                     save_model=FALSE,prior="default",...){
   #prevent global error message
   filein<-NULL
-  #need to provide data and they must be in data frame format
-  if(missing(data)){
-    stop(paste("data not provided"))
-  } else if(is.data.frame(data)==FALSE){
-    stop(paste("data must be in data frame format"))
+  if(is.data.frame(data)==FALSE){
+    stop("data must be in data frame format")
   }
-  if(any(colnames(data)%in% c("e"))==FALSE|
-     any(colnames(data)%in% c("c"))==FALSE|any(colnames(data)%in% c("t"))==FALSE){
-    stop("effect and cost data must be provided alongside with treatment arm indicator")
+  if(!any(c("e","c","t")%in% names(data))==TRUE){
+    stop("Please rename or provide variables in the data as 'e', 'c' and 't' for the effectiveness, cost and treatment indicator")
+  }
+  if(any(names(data)=="e")==TRUE & any(names(data)=="c")==TRUE){
+    e<-as.name("e")
+    c<-as.name("c")
+  }
+  cov_matrix<-subset(data, select = -c(e,c))
+  if(any(is.na(cov_matrix))==TRUE){
+    stop("no missing covariate or treatment indicator is allowed")
+  }
+  if(any(levels(as.factor(cov_matrix$t))!=c("1","2"))==TRUE){
+    stop("A two arm indicator variable must be provided")
   }
   #need to specify type of missingness mechanism among those available
   if(!type %in% c("MCAR","MAR","MNAR_eff","MNAR_cost","MNAR")) {
     stop("Types available for use are 'MCAR','MAR','MNAR_eff','MNAR_cost','MNAR'")
-  }
-  #if no covariate data provided then use MCAR or MNAR 
-  x_numb<-seq(1:1000)
-  if(any(colnames(data)%in% paste("X",x_numb,sep=""))==FALSE){
-    if(type=="MAR"){
-      type="MCAR"
-    }
-    #no missing covariate or treatment indicator accepted
-    not_ec_data<-data[, -which(colnames(data) %in% c("e", "c"))]
-    if(any(is.na(not_ec_data))==TRUE){
-      stop("All covariate data and treatment indicator must be fully observed")
-    }
-    #if covariate data provided then use MAR or MNAR_cov
-  } else if(any(colnames(data)%in% paste("X",x_numb,sep=""))==TRUE){
-    if(type=="MCAR"){
-      type="MAR"
-    } else if(type=="MNAR"|type=="MNAR_eff"|type=="MNAR_cost"){
-      type=paste(type,"cov",sep = "_")
-    }
-  }
-  #only two arms supported
-  trt_data<-data[, which(colnames(data) %in% c("t"))]
-  if(any(trt_data %in% c(1,2))==FALSE){
-    stop("only two-way treatment comparison supported between control (1) and intervention (2) groups")
   }
   #need to specify distributions for effects and costs among those available
   if(!dist_e %in% c("norm","beta")|!dist_c %in% c("norm","gamma")) {
@@ -243,61 +231,84 @@ run_model<-function(data,dist_e,dist_c,type,program="JAGS",forward=FALSE,prob=c(
     stop("You must provide valid lower/upper quantiles for the imputed data distribution")}
   #call read_data to read and output the variables to be modelled
   #and define each variable to be used in the model
-  data_read<-read_data(data=data)
-  N1<-length(data_read$data_stand$stand_effects[[1]])
-  N2<-length(data_read$data_stand$stand_effects[[2]])
+  data_read<-read_data(data=data,model.eff=model.eff,model.cost=model.cost)
+  N1<-data_read$data_raw$arm_lengths[1]
+  N2<-data_read$data_raw$arm_lengths[2]
   #number of predictors
-  p<-ncol(as.matrix(data_read$data_raw$covariates[[1]]))
+  pe<-ncol(data_read$data_raw$covariates_effects$Intervention)
+  pc<-ncol(data_read$data_raw$covariates_costs$Intervention)
+  if(pe==1 & pc==1){
+   if(type=="MCAR"|type=="MAR"){
+     type="MCAR"
+   }
+  }else if(pe>1 | pc>1){
+    if(type=="MNAR"|type=="MNAR_eff"|type=="MNAR_cost"){
+      type=paste(type,"cov",sep = "_")
+    }
+  }
   #missing data indicators
-  m_eff1<-data_read$data_raw$missing_effects[[1]]
-  m_eff2<-data_read$data_raw$missing_effects[[2]]
-  m_cost1<-data_read$data_raw$missing_costs[[1]]
-  m_cost2<-data_read$data_raw$missing_costs[[2]]
+  m_eff1<-data_read$data_raw$missing_effects$Control
+  m_eff2<-data_read$data_raw$missing_effects$Intervention
+  m_cost1<-data_read$data_raw$missing_costs$Control
+  m_cost2<-data_read$data_raw$missing_costs$Intervention
   #outcomes
-  eff1<-data_read$data_raw$raw_effects[[1]]
-  eff2<-data_read$data_raw$raw_effects[[2]]
-  cost1<-data_read$data_raw$raw_costs[[1]]
-  cost2<-data_read$data_raw$raw_costs[[2]]
+  eff1<-data_read$data_raw$raw_effects$Control
+  eff2<-data_read$data_raw$raw_effects$Intervention
+  cost1<-data_read$data_raw$raw_costs$Control
+  cost2<-data_read$data_raw$raw_costs$Intervention
   #standardised outcome
-  eff1_s<-data_read$data_stand$stand_effects[[1]]
-  eff2_s<-data_read$data_stand$stand_effects[[2]]
-  cost1_s<-data_read$data_stand$stand_costs[[1]]
-  cost2_s<-data_read$data_stand$stand_costs[[2]]
+  eff1_s<-data_read$data_stand$stand_effects$Control
+  eff2_s<-data_read$data_stand$stand_effects$Intervention
+  cost1_s<-data_read$data_stand$stand_costs$Control
+  cost2_s<-data_read$data_stand$stand_costs$Intervention
   mean_eff = data_read$data_stand$mean_effects
   mean_cost = data_read$data_stand$mean_costs
   sd_eff<-data_read$data_stand$sd_effects
   sd_cost<-data_read$data_stand$sd_costs
-  eff1_cc_s<-data_read$data_stand$stand_effects_cc[[1]]
-  eff2_cc_s<-data_read$data_stand$stand_effects_cc[[2]]
-  cost1_cc_s<-data_read$data_stand$stand_costs_cc[[1]]
-  cost2_cc_s<-data_read$data_stand$stand_costs_cc[[2]]
-  #numbe rof observations and missing data
+  eff1_cc_s<-data_read$data_stand$stand_effects_cc$Control
+  eff2_cc_s<-data_read$data_stand$stand_effects_cc$Intervention
+  cost1_cc_s<-data_read$data_stand$stand_costs_cc$Control
+  cost2_cc_s<-data_read$data_stand$stand_costs_cc$Intervention
+  #number of observations and missing data
   N1_cc<-data_read$data_raw$arm_lengths_cc[,1]
   N2_cc<-data_read$data_raw$arm_lengths_cc[,2]
   N1_mis<-data_read$data_raw$arm_missing_data[,1]
   N2_mis<-data_read$data_raw$arm_missing_data[,2]
-  #do the same for covariate data if provided
-  if(any(colnames(data)%in% paste("X",x_numb,sep=""))==TRUE){
-    X1_s<-as.matrix(data_read$data_stand$covariates[[1]])
-    X2_s<-as.matrix(data_read$data_stand$covariates[[2]])
-    X1<-as.matrix(data_read$data_raw$covariates[[1]])
-    X2<-as.matrix(data_read$data_raw$covariates[[2]])
-    mean_cov<-as.matrix(data_read$data_stand$mean_cov)
-    mean_cov1<-as.vector(mean_cov[1,])
-    mean_cov2<-as.vector(mean_cov[2,])
-    #mean on std scale for continuous + mode for binary or just for continuous
-    binary_check<-function(x){
-      length(unique(x))<=2
-    }
-    check_factor<-which(apply(as.matrix(X1),2,binary_check))
-    if(length(check_factor>0)){
-      mean_cov1_t<-as.vector(c(apply(as.matrix(X1_s[,-check_factor]),2,mean),mean_cov[1,check_factor]))
-      mean_cov2_t<-as.vector(c(apply(as.matrix(X2_s[,-check_factor]),2,mean),mean_cov[2,check_factor]))
-    }else{
-      mean_cov1_t<-as.vector(apply(as.matrix(X1_s),2,mean))
-      mean_cov2_t<-as.vector(apply(as.matrix(X2_s),2,mean))
-    }
+  #covariates (vectors of 1s if no variables)
+  #standardised
+  X1_es<-as.matrix(data_read$data_stand$covariates_effects$Control)
+  X2_es<-as.matrix(data_read$data_stand$covariates_effects$Intervention)
+  X1_cs<-as.matrix(data_read$data_stand$covariates_costs$Control)
+  X2_cs<-as.matrix(data_read$data_stand$covariates_costs$Intervention)
+  if(pe==1){
+    X1_es<-as.vector(X1_es)
+    X2_es<-as.vector(X2_es)
   }
+  if(pc==1){
+    X1_cs<-as.vector(X1_cs)
+    X2_cs<-as.vector(X2_cs)
+  }
+  mean_cov_e1_t<-as.vector(data_read$data_stand$mean_cov_effects$Control)
+  mean_cov_e2_t<-as.vector(data_read$data_stand$mean_cov_effects$Intervention)
+  mean_cov_c1_t<-as.vector(data_read$data_stand$mean_cov_costs$Control)
+  mean_cov_c2_t<-as.vector(data_read$data_stand$mean_cov_costs$Intervention)
+  #original
+  X1_e<-as.matrix(data_read$data_raw$covariates_effects$Control)
+  X2_e<-as.matrix(data_read$data_raw$covariates_effects$Intervention)
+  X1_c<-as.matrix(data_read$data_raw$covariates_costs$Control)
+  X2_c<-as.matrix(data_read$data_raw$covariates_costs$Intervention)
+  if(pe==1){
+    X1_e<-as.vector(X1_e)
+    X2_e<-as.vector(X2_e)
+  }
+  if(pc==1){
+    X1_c<-as.vector(X1_c)
+    X2_c<-as.vector(X2_c)
+  }
+  mean_cov_e1<-as.vector(data_read$data_raw$mean_cov_effects$Control)
+  mean_cov_e2<-as.vector(data_read$data_raw$mean_cov_effects$Intervention)
+  mean_cov_c1<-as.vector(data_read$data_raw$mean_cov_costs$Control)
+  mean_cov_c2<-as.vector(data_read$data_raw$mean_cov_costs$Intervention)
   #define additional inputs (prior changes) as a list
   exArgs <- list(...)
   #define additional inputs (prior changes) as a list
@@ -369,25 +380,25 @@ run_model<-function(data,dist_e,dist_c,type,program="JAGS",forward=FALSE,prob=c(
     if(exists("gamma.prior.c",where=prior)) {gamma.prior.c=prior$gamma.prior.c} else {gamma.prior.c=NULL}
   }
   #standardisation and joint assumption available for normal only
+  #default values for stand and ind in the case of normal assumptions
+  stand=FALSE
+  corr_assumption <- model.frame(formula=model.cost, data=data)
+  if("e"%in%names(corr_assumption)){
+  ind=FALSE  
+  } else{ind=TRUE}
   if(dist_e!="norm" | dist_c!="norm"){
     if(length(exArgs$stand)!=0){
     if(exists("stand",where=exArgs) & exArgs$stand!=FALSE) {
     stop("Standardised variables only available for bivariate normal distribution")
     }}
-    if(length(exArgs$ind)!=0){
-    if(exists("ind",where=exArgs) & exArgs$ind!=TRUE) {
+    if(ind==FALSE){
       stop("Joint assumption only available for bivariate normal distribution")
-    }}
+    }
    }
-  #default values for stand and ind in the case of normal assumptions
-  stand=FALSE
-  ind=TRUE
   #bivariate normal is assumed
   if(dist_e=="norm" & dist_c=="norm"){
     #either standardise or not all variables
     if(exists("stand",where=exArgs)) {stand=as.logical(exArgs$stand)} else {stand=FALSE}
-    #either model as independent or joint
-    if(exists("ind",where=exArgs)) {ind=as.logical(exArgs$ind)} else {ind=TRUE}
     #correlation parameter only if joint model
     if(exists("theta.prior",where=prior)) {theta.prior=prior$theta.prior} else {theta.prior=NULL}
     #variables are standardised before being modelled
@@ -396,7 +407,8 @@ run_model<-function(data,dist_e,dist_c,type,program="JAGS",forward=FALSE,prob=c(
       data_set<-list("effects"=data_read$data_raw$raw_effects,"effects_stand"=data_read$data_stand$stand_effects ,
                      "costs"=data_read$data_raw$raw_costs,"costs_stand"=data_read$data_stand$stand_costs,"N in reference arm"=N1,"N in comparator arm"=N2,
                      "N observed in reference arm"=N1_cc,"N observed in comparator arm"=N2_cc,"N missing in reference arm"=N1_mis,"N missing in comparator arm"=N2_mis,
-                     "covariates_stand"=data_read$data_stand$covariates,"covariates"=data_read$data_raw$covariates)
+                     "covariates_stand_effects"=data_read$data_stand$covariates_effects,"covariates_stand_costs"=data_read$data_stand$covariates_costs,
+                     "covariates_effects"=data_read$data_raw$covariates_effects,"covariates_costs"=data_read$data_raw$covariates_costs)
         #call run_jags to run the model in JAGS for each possible model setup 
         #call run_bugs to run the model in BUGS for each possible model setup 
         if(program=="JAGS"){
@@ -409,7 +421,7 @@ run_model<-function(data,dist_e,dist_c,type,program="JAGS",forward=FALSE,prob=c(
       #create list of natural scaled data output with total number of observed, missing and complete data
       data_set<-list("effects"=data_read$data_raw$raw_effects,"costs"=data_read$data_raw$raw_costs,"N in reference arm"=N1,"N in comparator arm"=N2,
                      "N observed in reference arm"=N1_cc,"N observed in comparator arm"=N2_cc,"N missing in reference arm"=N1_mis,"N missing in comparator arm"=N2_mis,
-                     "covariates"=data_read$data_raw$covariates)
+                     "covariates_effects"=data_read$data_raw$covariates_effects,"covariates_costs"=data_read$data_raw$covariates_costs)
         #call run_jags to run the model in JAGS for each possible model setup 
         #call run_bugs to run the model in BUGS for each possible model setup 
         if(program=="JAGS"){
@@ -424,7 +436,7 @@ run_model<-function(data,dist_e,dist_c,type,program="JAGS",forward=FALSE,prob=c(
     #create list of natural scaled data output with total number of observed, missing and complete data
     data_set<-list("effects"=data_read$data_raw$raw_effects,"costs"=data_read$data_raw$raw_costs,"N in reference arm"=N1,"N in comparator arm"=N2,
                    "N observed in reference arm"=N1_cc,"N observed in comparator arm"=N2_cc,"N missing in reference arm"=N1_mis,"N missing in comparator arm"=N2_mis,
-                   "covariates"=data_read$data_raw$covariates)
+                   "covariates_effects"=data_read$data_raw$covariates_effects,"covariates_costs"=data_read$data_raw$covariates_costs)
     #independence is assumed between effects and costs
     if(program=="JAGS"){
       #call run_jags to run the model in JAGS for each possible model setup 

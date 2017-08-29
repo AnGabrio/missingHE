@@ -64,24 +64,51 @@ run_jags<-function(type,dist_e,dist_c,forward,inits)eval.parent(substitute({
     if(stand==TRUE){
       if(forward==TRUE){
         datalist<-list("N1","N2","mean_eff","mean_cost","sd_eff","sd_cost",
-                       "p","X1_s","X2_s","mean_cov1_t","mean_cov2_t")
+                       "pe","pc","X1_es","X2_es","X1_cs","X2_cs","mean_cov_e1_t","mean_cov_e2_t","mean_cov_c1_t","mean_cov_c2_t")
+        if(pe==1){
+          pe_index<-match("pe",datalist)
+          datalist<-datalist[-pe_index]
+        }
+        if(pc==1){
+          pc_index<-match("pc",datalist)
+          datalist<-datalist[-pc_index]
+        }
       }else if(forward==FALSE){
-        datalist<-list("N1","N2","eff1_s","eff2_s","cost1_s","cost2_s","X1_s","X2_s","p",
-                       "mean_eff","sd_eff","mean_cost","sd_cost","m_eff1","m_eff2","m_cost1","m_cost2","mean_cov1_t","mean_cov2_t")
+        datalist<-list("N1","N2","eff1_s","eff2_s","cost1_s","cost2_s","X1_es","X2_es","X1_cs","X2_cs","pe","pc",
+                       "mean_eff","sd_eff","mean_cost","sd_cost","m_eff1","m_eff2","m_cost1","m_cost2","mean_cov_e1_t","mean_cov_e2_t","mean_cov_c1_t","mean_cov_c2_t")
+        if(pe==1){
+          pe_index<-match("pe",datalist)
+          datalist<-datalist[-pe_index]
+        }
+        if(pc==1){
+          pc_index<-match("pc",datalist)
+          datalist<-datalist[-pc_index]
+        }
       }
     }else if(stand==FALSE){
       if(forward==TRUE){
-        datalist<-list("N1","N2","p","X1","X2","mean_cov1","mean_cov2")
+        datalist<-list("N1","N2","pe","pc","X1_e","X2_e","X1_c","X2_c","mean_cov_e1","mean_cov_e2","mean_cov_c1","mean_cov_c2")
+        if(pe==1){
+          pe_index<-match("pe",datalist)
+          datalist<-datalist[-pe_index]
+        }
+        if(pc==1){
+          pc_index<-match("pc",datalist)
+          datalist<-datalist[-pc_index]
+        }
       }else if(forward==FALSE){
-        datalist<-list("N1","N2","eff1","eff2","cost1","cost2","m_eff1","m_eff2","m_cost1","m_cost2","X1","X2",
-                       "p","mean_cov1","mean_cov2")
+        datalist<-list("N1","N2","eff1","eff2","cost1","cost2","m_eff1","m_eff2","m_cost1","m_cost2",
+                       "pe","pc","X1_e","X2_e","X1_c","X2_c","mean_cov_e1","mean_cov_e2","mean_cov_c1","mean_cov_c2")
+        if(pe==1){
+          pe_index<-match("pe",datalist)
+          datalist<-datalist[-pe_index]
+        }
+        if(pc==1){
+          pc_index<-match("pc",datalist)
+          datalist<-datalist[-pc_index]
+        }
       }
     }
-  }
-  #remove p if p=1
-  if(p==1){
-    pos_p<-which(datalist[]=="p")
-    datalist[pos_p]<-NULL
   }
   #DIC is set to FALSE as no data provided
   DIC<-TRUE
@@ -91,10 +118,10 @@ run_jags<-function(type,dist_e,dist_c,forward,inits)eval.parent(substitute({
   if(type=="MNAR_eff"){params<-c("mu_e","mu_c","s_e","s_c","gamma0_e","delta_e")}
   if(type=="MNAR_cost"){params<-c("mu_e","mu_c","s_e","s_c","gamma0_c","delta_c")}
   if(type=="MNAR"){params<-c("mu_e","mu_c","s_e","s_c","gamma0_e","gamma0_c","delta_e","delta_c")}
-  if(type=="MAR"){params<-c("mu_e","mu_c","s_e","s_c","beta0_e","beta0_c","beta_e","beta_c")}
-  if(type=="MNAR_eff_cov"){params<-c("mu_e","mu_c","s_e","s_c","beta0_e","beta_e","gamma0_e","gamma_e","delta_e")}
-  if(type=="MNAR_cost_cov"){params<-c("mu_e","mu_c","s_e","s_c","beta0_c","beta_c","gamma0_c","gamma_c","delta_c")}
-  if(type=="MNAR_cov"){params<-c("mu_e","mu_c","s_e","s_c","beta0_e","beta0_c","beta_e","beta_c","gamma0_e","gamma0_c","gamma_e","gamma_c","delta_e","delta_c")}
+  if(type=="MAR"){params<-c("mu_e","mu_c","s_e","s_c","beta_e","beta_c")}
+  if(type=="MNAR_eff_cov"){params<-c("mu_e","mu_c","s_e","s_c","beta_e","gamma_e","delta_e")}
+  if(type=="MNAR_cost_cov"){params<-c("mu_e","mu_c","s_e","s_c","beta_c","gamma_c","delta_c")}
+  if(type=="MNAR_cov"){params<-c("mu_e","mu_c","s_e","s_c","beta_e","beta_c","gamma_e","gamma_c","delta_e","delta_c")}
   if(ind==FALSE & dist_e=="norm" & dist_c=="norm"){params<-c(params,"theta")}
   if(forward==FALSE){params<-c(params,"eff1","cost1","eff2","cost2")}
   #run model
@@ -132,8 +159,8 @@ run_jags<-function(type,dist_e,dist_c,forward,inits)eval.parent(substitute({
   }
   if(ind==FALSE & dist_e=="norm" & dist_c=="norm"){theta<-modelN1$BUGSoutput$sims.list$theta}
   if(type=="MAR"){
-    beta0_e<-modelN1$BUGSoutput$sims.list$beta0_e
-    beta0_c<-modelN1$BUGSoutput$sims.list$beta0_c
+    #beta0_e<-modelN1$BUGSoutput$sims.list$beta0_e
+    #beta0_c<-modelN1$BUGSoutput$sims.list$beta0_c
     beta_e<-modelN1$BUGSoutput$sims.list$beta_e
     beta_c<-modelN1$BUGSoutput$sims.list$beta_c
   }
@@ -152,27 +179,27 @@ run_jags<-function(type,dist_e,dist_c,forward,inits)eval.parent(substitute({
     delta_c<-modelN1$BUGSoutput$sims.list$delta_c
   }
   if(type=="MNAR_cov"){
-    beta0_e<-modelN1$BUGSoutput$sims.list$beta0_e
-    beta0_c<-modelN1$BUGSoutput$sims.list$beta0_c
-    gamma0_e<-modelN1$BUGSoutput$sims.list$gamma0_e
+    #beta0_e<-modelN1$BUGSoutput$sims.list$beta0_e
+    #beta0_c<-modelN1$BUGSoutput$sims.list$beta0_c
+    #gamma0_e<-modelN1$BUGSoutput$sims.list$gamma0_e
     beta_e<-modelN1$BUGSoutput$sims.list$beta_e
     gamma_e<-modelN1$BUGSoutput$sims.list$gamma_e
     delta_e<-modelN1$BUGSoutput$sims.list$delta_e
-    gamma0_c<-modelN1$BUGSoutput$sims.list$gamma0_c
+    #gamma0_c<-modelN1$BUGSoutput$sims.list$gamma0_c
     beta_c<-modelN1$BUGSoutput$sims.list$beta_c
     gamma_c<-modelN1$BUGSoutput$sims.list$gamma_c
     delta_c<-modelN1$BUGSoutput$sims.list$delta_c
   }
   if(type=="MNAR_eff_cov"){
-    beta0_e<-modelN1$BUGSoutput$sims.list$beta0_e
-    gamma0_e<-modelN1$BUGSoutput$sims.list$gamma0_e
+    #beta0_e<-modelN1$BUGSoutput$sims.list$beta0_e
+    #gamma0_e<-modelN1$BUGSoutput$sims.list$gamma0_e
     beta_e<-modelN1$BUGSoutput$sims.list$beta_e
     gamma_e<-modelN1$BUGSoutput$sims.list$gamma_e
     delta_e<-modelN1$BUGSoutput$sims.list$delta_e
   }
   if(type=="MNAR_cost_cov"){
-    beta0_c<-modelN1$BUGSoutput$sims.list$beta0_c
-    gamma0_c<-modelN1$BUGSoutput$sims.list$gamma0_c
+    #beta0_c<-modelN1$BUGSoutput$sims.list$beta0_c
+    #gamma0_c<-modelN1$BUGSoutput$sims.list$gamma0_c
     beta_c<-modelN1$BUGSoutput$sims.list$beta_c
     gamma_c<-modelN1$BUGSoutput$sims.list$gamma_c
     delta_c<-modelN1$BUGSoutput$sims.list$delta_c
@@ -197,7 +224,6 @@ run_jags<-function(type,dist_e,dist_c,forward,inits)eval.parent(substitute({
   }
   if(type=="MAR"){
     model_output_jags<-list("summary"=model_sum,"model summary"=modelN1,"mean_effects"=mu_e,"mean_costs"=mu_c,"sd_effects"=s_e,"sd_costs"=s_c,
-                            "baseline_parameter_effects"=beta0_e,"baseline_parameter_costs"=beta0_c,
                             "covariate_parameter_effects"=beta_e,"covariate_parameter_costs"=beta_c,"imputed"=imputed,"type"="JAGS")
   }
   if(type=="MNAR"){
@@ -215,23 +241,17 @@ run_jags<-function(type,dist_e,dist_c,forward,inits)eval.parent(substitute({
   }
   if(type=="MNAR_cov"){
     model_output_jags<-list("summary"=model_sum,"model summary"=modelN1,"mean_effects"=mu_e,"mean_costs"=mu_c,"sd_effects"=s_e,"sd_costs"=s_c,
-                            "baseline_parameter_effects"=beta0_e,"baseline_parameter_costs"=beta0_c,
-                                "baseline_parameter_effects"=gamma0_e,"baseline_parameter_costs"=gamma0_c,
                                 "covariate_parameter_miss_effects"=gamma_e,"covariate_parameter_miss_costs"=gamma_c,
                                 "covariate_parameter_effects"=beta_e,"covariate_parameter_costs"=beta_c,
                                 "MNAR_parameter_effects"=delta_e,"MNAR_parameter_costs"=delta_c,"type"="JAGS")
   }
   if(type=="MNAR_eff_cov"){
     model_output_jags<-list("summary"=model_sum,"model summary"=modelN1,"mean_effects"=mu_e,"mean_costs"=mu_c,"sd_effects"=s_e,"sd_costs"=s_c,
-                            "baseline_parameter_effects"=beta0_e,
-                                "baseline_parameter_effects"=gamma0_e,"covariate_parameter_miss_effects"=gamma_e,
-                                "covariate_parameter_effects"=beta_e,"MNAR_parameter_effects"=delta_e,"type"="JAGS")
+                            "covariate_parameter_miss_effects"=gamma_e,"covariate_parameter_effects"=beta_e,"MNAR_parameter_effects"=delta_e,"type"="JAGS")
   }
   if(type=="MNAR_cost_cov"){
     model_output_jags<-list("summary"=model_sum,"model summary"=modelN1,"mean_effects"=mu_e,"mean_costs"=mu_c,"sd_effects"=s_e,"sd_costs"=s_c,
-                            "baseline_parameter_costs"=beta0_c,
-                                "baseline_parameter_costs"=gamma0_c,"covariate_parameter_miss_costs"=gamma_c,
-                                "covariate_parameter_costs"=beta_c,"MNAR_parameter_costs"=delta_c,"type"="JAGS")
+    "covariate_parameter_miss_costs"=gamma_c,"covariate_parameter_costs"=beta_c,"MNAR_parameter_costs"=delta_c,"type"="JAGS")
   }
   if(forward==TRUE){model_output_jags$summary<-NULL}
   if(n.chains==1){model_output_jags<-model_output_jags[-1]}

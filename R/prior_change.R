@@ -23,6 +23,51 @@ prior_change<-function(type,dist_e,dist_c)eval.parent(substitute({
     #if provided, check whether or not it can be found in the model script created by the function write_model
     #match the distribution provided to the BUGS/STAN code and make the change in the model script
     #print out the updated model script to be called again by write_model
+  #MoM parameters for all types of  MoA
+  #baseline parameters
+  if(type=="MCAR"|type=="MNAR"|type=="MNAR_eff"|type=="MNAR_cost"){
+    if(is.null(gamma0.prior.e)==FALSE & grepl("gamma0_e",model_string_jags)==TRUE){
+      prior_gamma0e<-gamma0.prior.e
+      prior_gamma0e_str<-paste("gamma0_e~dlogis(",prior_gamma0e[1],",",prior_gamma0e[2])
+      model_string_jags<-gsub("gamma0_e~dlogis(0,1", prior_gamma0e_str, model_string_jags,fixed=TRUE)}
+    if(is.null(gamma0.prior.c)==FALSE & grepl("gamma0_c",model_string_jags)==TRUE){
+      prior_gamma0c<-gamma0.prior.c
+      prior_gamma0c_str<-paste("gamma0_c~dlogis(",prior_gamma0c[1],",",prior_gamma0c[2])
+      model_string_jags<-gsub("gamma0_c~dlogis(0,1", prior_gamma0c_str, model_string_jags,fixed=TRUE)}  
+  }
+  #parameters specific to MNAR without covariates
+  #MNAR parameters
+  if(type=="MNAR"|type=="MNAR_eff"|type=="MNAR_cov"|type=="MNAR_eff_cov"){
+    if(is.null(delta.prior.e)==FALSE & grepl("delta_e",model_string_jags)==TRUE){
+      prior_delta_e<-delta.prior.e
+      prior_delta_e_str<-paste("delta_e~dnorm(",prior_delta_e[1],",",prior_delta_e[2])
+      model_string_jags<-gsub("delta_e~dnorm(0,1", prior_delta_e_str, model_string_jags,fixed=TRUE)}
+  }
+  if(type=="MNAR"|type=="MNAR_cost"|type=="MNAR_cov"|type=="MNAR_cost_cov"){
+    if(is.null(delta.prior.c)==FALSE & grepl("delta_c",model_string_jags)==TRUE){
+      prior_delta_c<-delta.prior.c
+      prior_delta_c_str<-paste("delta_c~dnorm(",prior_delta_c[1],",",prior_delta_c[2])
+      model_string_jags<-gsub("delta_c~dnorm(0,1", prior_delta_c_str, model_string_jags,fixed=TRUE)}
+  }
+  #covariate parameters
+  if(type=="MAR"|type=="MNAR_cov"|type=="MNAR_eff_cov"|type=="MNAR_cost_cov"){
+    if(is.null(beta.prior.e)==FALSE & grepl("beta_e",model_string_jags)==TRUE){
+      prior_mu_e_betas<-beta.prior.e
+      prior_mu_e_betas_str<-paste("beta_e[j,t]~dnorm(",prior_mu_e_betas[1],",",prior_mu_e_betas[2])
+      model_string_jags<-gsub("beta_e[j,t]~dnorm(0,0.01", prior_mu_e_betas_str, model_string_jags,fixed=TRUE)}
+    if(is.null(beta.prior.c)==FALSE & grepl("beta_c",model_string_jags)==TRUE){
+      prior_mu_c_betas<-beta.prior.c
+      prior_mu_c_betas_str<-paste("beta_c[j,t]~dnorm(",prior_mu_c_betas[1],",",prior_mu_c_betas[2])
+      model_string_jags<-gsub("beta_c[j,t]~dnorm(0,0.01", prior_mu_c_betas_str, model_string_jags,fixed=TRUE)}
+    if(is.null(gamma.prior.e)==FALSE & grepl("gamma_e",model_string_jags)==TRUE){
+      prior_gammae<-gamma.prior.e
+      prior_gammae_str<-paste("gamma_e[j]~dnorm(",prior_gammae[1],",",prior_gammae[2])
+      model_string_jags<-gsub("gamma_e[j]~dnorm(0,1", prior_gammae_str, model_string_jags,fixed=TRUE)}
+    if(is.null(gamma.prior.c)==FALSE & grepl("gamma_c",model_string_jags)==TRUE){
+      prior_gammac<-gamma.prior.c
+      prior_gammac_str<-paste("gamma_c[j]~dnorm(",prior_gammac[1],",",prior_gammac[2])
+      model_string_jags<-gsub("gamma_c[j]~dnorm(0,1", prior_gammac_str, model_string_jags,fixed=TRUE)}
+  }
   #distribution-specific parameters of the MoA
   if(dist_e=="norm"){
     #standard deviations
@@ -45,14 +90,15 @@ prior_change<-function(type,dist_e,dist_c)eval.parent(substitute({
         prior_mu_e<-mu.prior.e
         prior_mu_e_str<-paste("mu_e_t[t]~dnorm(",prior_mu_e[1],",",prior_mu_e[2])
         model_string_jags<-gsub("mu_e_t[t]~dnorm(0,0.0001", prior_mu_e_str, model_string_jags,fixed=TRUE)}
-      if(type=="MAR"|type=="MNAR_cov"|type=="MNAR_eff_cov"|type=="MNAR_cost_cov"){
-        #marginal means if covariates included
-        if(is.null(beta0.prior.e)==FALSE & grepl("beta0_e",model_string_jags)==TRUE){
-          prior_mu_e_base<-beta0.prior.e
-          prior_mu_e_base_str<-paste("beta0_e[t]~dnorm(",prior_mu_e_base[1],",",prior_mu_e_base[2])
-          model_string_jags<-gsub("beta0_e[t]~dnorm(0,0.0001", prior_mu_e_base_str, model_string_jags,fixed=TRUE)}
-       }
-      }
+    }
+    if(type=="MAR"|type=="MNAR_cov"|type=="MNAR_eff_cov"|type=="MNAR_cost_cov"){
+      if(is.null(beta0.prior.e)==FALSE & grepl("beta_e",model_string_jags)==TRUE){
+        prior_beta0_e<-beta0.prior.e
+        prior_beta0_e_str1<-paste("beta_e[1,1]~dnorm(",prior_beta0_e[1],",",prior_beta0_e[2])
+        prior_beta0_e_str2<-paste("beta_e[1,2]~dnorm(",prior_beta0_e[1],",",prior_beta0_e[2])
+        model_string_jags<-gsub("beta_e[1,1]~dnorm(0,0.001", prior_beta0_e_str1, model_string_jags,fixed=TRUE)
+        model_string_jags<-gsub("beta_e[1,2]~dnorm(0,0.001", prior_beta0_e_str2, model_string_jags,fixed=TRUE)}
+    }
      }
   if(dist_c=="norm"){
     if(is.null(alpha.prior.c)==FALSE & grepl("ls_c",model_string_jags)==TRUE & grepl("ls_c_t",model_string_jags)==FALSE){
@@ -76,11 +122,12 @@ prior_change<-function(type,dist_e,dist_c)eval.parent(substitute({
       model_string_jags<-gsub("mu_c_t[t]~dnorm(0,0.0001", prior_mu_c_str, model_string_jags,fixed=TRUE)}
     }
     if(type=="MAR"|type=="MNAR_cov"|type=="MNAR_eff_cov"|type=="MNAR_cost_cov"){
-        #marginal means if covariates included
-        if(is.null(beta0.prior.c)==FALSE & grepl("beta0_c",model_string_jags)==TRUE){
-          prior_mu_c_base<-beta0.prior.c
-          prior_mu_c_base_str<-paste("beta0_c[t]~dnorm(",prior_mu_c_base[1],",",prior_mu_c_base[2])
-          model_string_jags<-gsub("beta0_c[t]~dnorm(0,0.0001", prior_mu_c_base_str, model_string_jags,fixed=TRUE)}
+      if(is.null(beta0.prior.c)==FALSE & grepl("beta_c",model_string_jags)==TRUE){
+        prior_beta0_c<-beta0.prior.c
+        prior_beta0_c_str1<-paste("beta_c[1,1]~dnorm(",prior_beta0_c[1],",",prior_beta0_c[2])
+        prior_beta0_c_str2<-paste("beta_c[1,2]~dnorm(",prior_beta0_c[1],",",prior_beta0_c[2])
+        model_string_jags<-gsub("beta_c[1,1]~dnorm(0,0.001", prior_beta0_c_str1, model_string_jags,fixed=TRUE)
+        model_string_jags<-gsub("beta_c[1,2]~dnorm(0,0.001", prior_beta0_c_str2, model_string_jags,fixed=TRUE)}
     }
   }
     #correlation only for joitn models
@@ -110,15 +157,18 @@ prior_change<-function(type,dist_e,dist_c)eval.parent(substitute({
          model_string_jags<-gsub("nu_e[t]~dnorm(0,0.001", prior_mu_e_str, model_string_jags,fixed=TRUE)}
      }
      if(type=="MAR"|type=="MNAR_cov"|type=="MNAR_eff_cov"|type=="MNAR_cost_cov"){
-       #marginal means if covariates included
-       if(is.null(beta0.prior.e)==FALSE & grepl("beta0_e",model_string_jags)==TRUE & any(transf=="default")==TRUE){
-         prior_mu_e_base<-beta0.prior.e
-         prior_mu_e_base_str<-paste("beta0_e[t]~dunif(",prior_mu_e_base[1],",",prior_mu_e_base[2])
-         model_string_jags<-gsub("beta0_e[t]~dunif(0,1", prior_mu_e_base_str, model_string_jags,fixed=TRUE)}
-       if(is.null(beta0.prior.e)==FALSE & grepl("beta0_e",model_string_jags)==TRUE & any(transf=="logit")==TRUE){
-         prior_mu_e_base<-beta0.prior.e
-         prior_mu_e_base_str<-paste("beta0_e[t]~dnorm(",prior_mu_e_base[1],",",prior_mu_e_base[2])
-         model_string_jags<-gsub("beta0_e[t]~dnorm(0,0.001", prior_mu_e_base_str, model_string_jags,fixed=TRUE)}
+       if(is.null(beta0.prior.e)==FALSE & grepl("beta_e",model_string_jags)==TRUE & any(transf=="default")==TRUE){
+         prior_beta0_e<-beta0.prior.e
+         prior_beta0_e_str1<-paste("beta_e[1,1]~dunif(",prior_beta0_e[1],",",prior_beta0_e[2])
+         prior_beta0_e_str2<-paste("beta_e[1,2]~dunif(",prior_beta0_e[1],",",prior_beta0_e[2])
+         model_string_jags<-gsub("beta_e[1,1]~dunif(0,1", prior_beta0_e_str1, model_string_jags,fixed=TRUE)
+         model_string_jags<-gsub("beta_e[1,2]~dunif(0,1", prior_beta0_e_str2, model_string_jags,fixed=TRUE)}
+       if(is.null(beta0.prior.e)==FALSE & grepl("beta_e",model_string_jags)==TRUE & any(transf=="logit")==TRUE){
+         prior_beta0_e<-beta0.prior.e
+         prior_beta0_e_str1<-paste("beta_e[1,1]~dnorm(",prior_beta0_e[1],",",prior_beta0_e[2])
+         prior_beta0_e_str2<-paste("beta_e[1,2]~dnorm(",prior_beta0_e[1],",",prior_beta0_e[2])
+         model_string_jags<-gsub("beta_e[1,1]~dnorm(0,0.001", prior_beta0_e_str1, model_string_jags,fixed=TRUE)
+         model_string_jags<-gsub("beta_e[1,2]~dnorm(0,0.001", prior_beta0_e_str2, model_string_jags,fixed=TRUE)}
      }
    }
   if(dist_c=="gamma"){
@@ -140,59 +190,19 @@ prior_change<-function(type,dist_e,dist_c)eval.parent(substitute({
         model_string_jags<-gsub("nu_c[t]~dnorm(0,0.001", prior_mu_c_str, model_string_jags,fixed=TRUE)}
     }
     if(type=="MAR"|type=="MNAR_cov"|type=="MNAR_eff_cov"|type=="MNAR_cost_cov"){
-      #marginal means if covariates included
-      if(is.null(beta0.prior.c)==FALSE & grepl("beta0_c",model_string_jags)==TRUE & any(transf=="default")==TRUE){
-        prior_mu_c_base<-beta0.prior.c
-        prior_mu_c_base_str<-paste("beta0_c[t]~dunif(",prior_mu_c_base[1],",",prior_mu_c_base[2])
-        model_string_jags<-gsub("beta0_c[t]~dunif(0,10000", prior_mu_c_base_str, model_string_jags,fixed=TRUE)}
-      if(is.null(beta0.prior.c)==FALSE & grepl("beta0_c",model_string_jags)==TRUE & any(transf=="log")==TRUE){
-        prior_mu_c_base<-beta0.prior.c
-        prior_mu_c_base_str<-paste("beta0_c[t]~dnorm(",prior_mu_c_base[1],",",prior_mu_c_base[2])
-        model_string_jags<-gsub("beta0_c[t]~dnorm(0,0.001", prior_mu_c_base_str, model_string_jags,fixed=TRUE)}
+      if(is.null(beta0.prior.c)==FALSE & grepl("beta_c",model_string_jags)==TRUE & any(transf=="default")==TRUE){
+        prior_beta0_c<-beta0.prior.e
+        prior_beta0_c_str1<-paste("beta_c[1,1]~dunif(",prior_beta0_c[1],",",prior_beta0_c[2])
+        prior_beta0_c_str2<-paste("beta_c[1,2]~dunif(",prior_beta0_c[1],",",prior_beta0_c[2])
+        model_string_jags<-gsub("beta_c[1,1]~dunif(0,1", prior_beta0_c_str1, model_string_jags,fixed=TRUE)
+        model_string_jags<-gsub("beta_c[1,2]~dunif(0,1", prior_beta0_c_str2, model_string_jags,fixed=TRUE)}
+      if(is.null(beta0.prior.c)==FALSE & grepl("beta_c",model_string_jags)==TRUE & any(transf=="log")==TRUE){
+        prior_beta0_c<-beta0.prior.c
+        prior_beta0_c_str1<-paste("beta_c[1,1]~dnorm(",prior_beta0_c[1],",",prior_beta0_c[2])
+        prior_beta0_c_str2<-paste("beta_c[1,2]~dnorm(",prior_beta0_c[1],",",prior_beta0_c[2])
+        model_string_jags<-gsub("beta_c[1,1]~dnorm(0,0.001", prior_beta0_c_str1, model_string_jags,fixed=TRUE)
+        model_string_jags<-gsub("beta_c[1,2]~dnorm(0,0.001", prior_beta0_c_str2, model_string_jags,fixed=TRUE)}
     }
-  }
-  #MoM parameters for all types of  MoA
-    #baseline parameters
-  if(is.null(gamma0.prior.e)==FALSE & grepl("gamma0_e",model_string_jags)==TRUE){
-    prior_gamma0e<-gamma0.prior.e
-    prior_gamma0e_str<-paste("gamma0_e~dlogis(",prior_gamma0e[1],",",prior_gamma0e[2])
-    model_string_jags<-gsub("gamma0_e~dlogis(0,1", prior_gamma0e_str, model_string_jags,fixed=TRUE)}
-  if(is.null(gamma0.prior.c)==FALSE & grepl("gamma0_c",model_string_jags)==TRUE){
-    prior_gamma0c<-gamma0.prior.c
-    prior_gamma0c_str<-paste("gamma0_c~dlogis(",prior_gamma0c[1],",",prior_gamma0c[2])
-    model_string_jags<-gsub("gamma0_c~dlogis(0,1", prior_gamma0c_str, model_string_jags,fixed=TRUE)}
-   #parameters specific to MNAR with or without covariates
-    #MNAR parameters
-  if(type=="MNAR"|type=="MNAR_eff"|type=="MNAR_cov"|type=="MNAR_eff_cov"){
-    if(is.null(delta.prior.e)==FALSE & grepl("delta_e",model_string_jags)==TRUE){
-      prior_delta_e<-delta.prior.e
-      prior_delta_e_str<-paste("delta_e~dnorm(",prior_delta_e[1],",",prior_delta_e[2])
-      model_string_jags<-gsub("delta_e~dnorm(0,1", prior_delta_e_str, model_string_jags,fixed=TRUE)}
-  }
-  if(type=="MNAR"|type=="MNAR_cost"|type=="MNAR_cov"|type=="MNAR_cost_cov"){
-    if(is.null(delta.prior.c)==FALSE & grepl("delta_c",model_string_jags)==TRUE){
-      prior_delta_c<-delta.prior.c
-      prior_delta_c_str<-paste("delta_c~dnorm(",prior_delta_c[1],",",prior_delta_c[2])
-      model_string_jags<-gsub("delta_c~dnorm(0,1", prior_delta_c_str, model_string_jags,fixed=TRUE)}
-  }
-    #covariate parameters
-  if(type=="MAR"|type=="MNAR_cov"|type=="MNAR_eff_cov"|type=="MNAR_cost_cov"){
-    if(is.null(beta.prior.e)==FALSE & grepl("beta_e",model_string_jags)==TRUE){
-      prior_mu_e_betas<-beta.prior.e
-      prior_mu_e_betas_str<-paste("beta_e[j,t]~dnorm(",prior_mu_e_betas[1],",",prior_mu_e_betas[2])
-      model_string_jags<-gsub("beta_e[j,t]~dnorm(0,0.01", prior_mu_e_betas_str, model_string_jags,fixed=TRUE)}
-    if(is.null(beta.prior.c)==FALSE & grepl("beta_c",model_string_jags)==TRUE){
-      prior_mu_c_betas<-beta.prior.c
-      prior_mu_c_betas_str<-paste("beta_c[j,t]~dnorm(",prior_mu_c_betas[1],",",prior_mu_c_betas[2])
-      model_string_jags<-gsub("beta_c[j,t]~dnorm(0,0.01", prior_mu_c_betas_str, model_string_jags,fixed=TRUE)}
-    if(is.null(gamma.prior.e)==FALSE & grepl("gamma_e",model_string_jags)==TRUE){
-      prior_gammae<-gamma.prior.e
-      prior_gammae_str<-paste("gamma_e[j]~dnorm(",prior_gammae[1],",",prior_gammae[2])
-      model_string_jags<-gsub("gamma_e[j]~dnorm(0,1", prior_gammae_str, model_string_jags,fixed=TRUE)}
-    if(is.null(gamma.prior.c)==FALSE & grepl("gamma_c",model_string_jags)==TRUE){
-      prior_gammac<-gamma.prior.c
-      prior_gammac_str<-paste("gamma_c[j]~dnorm(",prior_gammac[1],",",prior_gammac[2])
-      model_string_jags<-gsub("gamma_c[j]~dnorm(0,1", prior_gammac_str, model_string_jags,fixed=TRUE)}
   }
   #save updated model file after prior change
   model_string_prior<-model_string_jags
