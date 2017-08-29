@@ -51,14 +51,12 @@ a different character name must be specified in the argument \code{param}. The a
 \item "mu.c" the mean parameters of the cost variables in the two treatment arms.
 \item "sd.e" the standard deviation parameters of the effect variables in the two treatment arms.
 \item "sd.c" the standard deviation parameters of the cost variables in the two treatment arms.
-\item "beta0.e" the marginal mean parameters for the effect variables in the two treatment arms (only when covariates were included in the model).
-\item "beta.e" the covariate coefficient parameters for the effect variables in the two treatment arms (only when covariates were included in the model).
-\item "beta0.c" the marginal mean parameters for the cost variables in the two treatment arms (only when covariates were included in the model).
-\item "beta.c" the covariate coefficient parameters for the cost variables in the two treatment arms (only when covariates were included in the model).
-\item "gamma0.e" the baseline parameters of the missingness mechanism for the effect variables in the two treatment arms.
-\item "gamma0.c" the baseline parameters of the missingness mechanism for the cost variables in the two treatment arms.
-\item "gamma.e" the covariate coefficient parameters of the missingness mechanism for the effect variables in the two treatment arms.
-\item "gamma.c" the covariate coefficient parameters of the missingness mechanism for the cost variables in the two treatment arms.
+\item "beta.e" the regression intercept and covariate coefficient parameters for the effect variables in the two treatment arms (only when covariates were included in the model).
+\item "beta.c" the regression intercept and covariate coefficient parameters for the cost variables in the two treatment arms (only when covariates were included in the model).
+\item "gamma0.e" the baseline parameters of the missingness mechanism for the effect variables in the two treatment arms (only when covariates were not included in the model).
+\item "gamma0.c" the baseline parameters of the missingness mechanism for the cost variables in the two treatment arms (only when covariates were not included in the model).
+\item "gamma.e" the regression intercept and covariate coefficient parameters of the missingness mechanism for the effect variables in the two treatment arms (only when covariates were included in the model).
+\item "gamma.c" the regression intercept and covariate coefficient parameters of the missingness mechanism for the cost variables in the two treatment arms (only when covariates were included in the model).
 \item "delta.e" the mnar parameters of the missingness mechanism for the effect variables in the two treatment arms.
 \item "delta.c" the mnar parameters of the missingness mechanism for the cost variables in the two treatment arms.
 \item "all" all available parameters stored in the object \code{x}.

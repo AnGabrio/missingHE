@@ -2,20 +2,27 @@
 % Please edit documentation in R/read_data.R
 \name{read_data}
 \alias{read_data}
-\title{An internal function to read and re-arrange the data in different ways}
+\title{A function to read and re-arrange the data in different ways}
 \usage{
-read_data(data)
+read_data(data, model.eff = model.eff, model.cost = model.cost)
 }
 \arguments{
-\item{data}{a data frame with rows representing the individuals and with columns that must included 
-the following elements: a column named 'e' containing the effectiveness data for the individuals, a column named 'c'
-containing the cost data for the individuals, a column 't' representing the tretment arm allocation for each individual 
-(only two arms are supported with 1 being the control and 2 being the new intervention). Additional elements that could
-be provided are: a number of columns named 'X1,X2,...' each containing different covariate data for the individuals. 
-Covariate data must be fully observed and if categorical they must be provided as factor variables.}
+\item{data}{A data frame in which to find variables supplied in \code{model.eff} and \code{model.cost}. Among these,
+effectiveness, cost and treatment indicator (only two arms) variables must always be provided and named 'e', 'c' and 't' respectively.}
+
+\item{model.eff}{A formula expression in conventional R linear modelling syntax. The response must be a health economics
+effectiveness outcome ('e') whose name must correspond to that used in \code{data}, and 
+any covariates are given on the right-hand side. If there are no covariates, specify \code{1} on the right hand side.
+By default, covariates are placed on the "location" parameter of the distribution through a linear model.}
+
+\item{model.cost}{A formula expression in conventional R linear modelling syntax. The response must be a health economics
+cost outcome ('c') whose name must correspond to that used in \code{data}, and any covariates are given on the right-hand side.
+If there are no covariates, specify \code{1} on the right hand side. By default, covariates are placed on the "location" 
+parameter of the distribution through a linear model.}
 }
 \description{
-This function imports the data and outputs all types of information used to run the model.
+This internal function imports the data and outputs only those variables that are needed to run the model
+according to the information provided by the user.
 }
 \examples{
 \dontrun{

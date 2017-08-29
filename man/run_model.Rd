@@ -4,18 +4,24 @@
 \alias{run_model}
 \title{Full Bayesian Models to handle missingness in Health Economic Evaluations}
 \usage{
-run_model(data, dist_e, dist_c, type, program = "JAGS", forward = FALSE,
-  prob = c(0.05, 0.95), n.chains = 2, n.iter = 20000,
+run_model(data, model.eff, model.cost, dist_e, dist_c, type, program = "JAGS",
+  forward = FALSE, prob = c(0.05, 0.95), n.chains = 2, n.iter = 20000,
   n.burnin = floor(n.iter/2), inits = NULL, n.thin = 1,
   save_model = FALSE, prior = "default", ...)
 }
 \arguments{
-\item{data}{A data frame with rows representing the individuals and with columns that must included 
-the following elements: a column named 'e' containing the effectiveness data for the individuals, a column named 'c'
-containing the cost data for the individuals, a column 't' representing the tretment arm allocation for each individual 
-(only two arms are supported with 1 being the control and 2 being the new intervention). Additional elements that could
-be provided are: a number of columns named 'X1,X2,...' each containing different covariate data for the individuals. 
-Covariate data must be fully observed and if categorical they must be provided as factor variables.}
+\item{data}{A data frame in which to find variables supplied in \code{model.eff} and \code{model.cost}. Among these,
+effectiveness, cost and treatment indicator (only two arms) variables must always be provided and named 'e', 'c' and 't' respectively.}
+
+\item{model.eff}{A formula expression in conventional R linear modelling syntax. The response must be a health economics
+effectiveness outcome ('e') whose name must correspond to that used in \code{data}, and 
+any covariates are given on the right-hand side. If there are no covariates, specify \code{1} on the right hand side.
+By default, covariates are placed on the "location" parameter of the distribution through a linear model.}
+
+\item{model.cost}{A formula expression in conventional R linear modelling syntax. The response must be a health economics
+cost outcome ('c') whose name must correspond to that used in \code{data}, and any covariates are given on the right-hand side.
+If there are no covariates, specify \code{1} on the right hand side. By default, covariates are placed on the "location" 
+parameter of the distribution through a linear model.}
 
 \item{dist_e}{Distribution assumed for the effects. Current available chocies are: Normal ("norm") and Beta ("beta").}
 
@@ -55,15 +61,14 @@ containing the user-provided hyperprior values and must be named with the name o
 values for the mean effect parameter, when a normal distribution is assumed, can be provided using \code{prior=list('mu.prior.e'=c(0,1))}.
 For more information about how to provide prior hypervalues for each model parameter see details. If \code{prior} is 'default' the default values will be used.}
 
-\item{...}{additional input parameters. Examples are \code{ind} (logical), \code{stand} (logical) and \code{transf}. When \code{ind} is \code{FALSE} 
-a joint model is run (only for bivariate normal), while when \code{stand} is \code{TRUE} outcomes are scaled so to have mean \code{0} and
+\item{...}{additional input parameters. Examples are \code{stand} (logical) and \code{transf}. When \code{stand} is \code{TRUE} outcomes are scaled so to have mean \code{0} and
 standard deviation \code{0.5} (only for bivariate normal). If \code{transf} is set to 'logit', mean effect variables are modelled on the log-odds scale 
 (only for beta distribution), while if 'log' is chosen, mean cost variables are modelled on the log scale (only for gamma distribution). If a beta-gamma
 model is selected both transformations can be carried out by setting \code{transf} equal to a vector that contains both transformation string names.
 Other additional arguments contained in the function \code{\link[BCEA]{bcea}} can be provided.}
 }
 \value{
-An object of the class "missingHE" containing the following elements
+An object of the class 'missingHE' containing the following elements
 \describe{
   \item{data_set}{A list containing the original data set provided in \code{data} (see Arguments), the number of observed and missing individuals 
   and the total number of individuals by treatment arm}
@@ -88,7 +93,7 @@ Full Bayesian cost-effectiveness models to handle missing data in the outcomes u
 mechanism assumptions and using a variatey of alternative parametric distributions for the effect and cost variables and 
 using a selection model to specify the missingness mechanism. The analysis is performed using the \code{BUGS} language, 
 which is implemented either in \code{JAGS} or \code{OpenBUGS} using the functions \code{\link[R2jags]{jags}} and 
-\code{\link[R2OpenBUGS]{bugs}}, respectively. The output is stored in an object of class "missingHE".
+\code{\link[R2OpenBUGS]{bugs}}, respectively. The output is stored in an object of class 'missingHE'.
 }
 \details{
 Depending on the distributional assumptions specified for the outcome variables in the arguments \code{dist_e} and
@@ -144,7 +149,7 @@ Specifically, the names accepted by \strong{missingHE} are the following:
 \item covariate parameters in the MoM (if covariate data provided) in the MoM: "gamma.prior.e"(effects) and/or "gamma.prior.c"(costs)
 \item mnar parameter in the MoM: "delta.prior.e"(effects) and/or "delta.prior.c"(costs)
 } 
-To notice that the marginal mean and covariate parameters can be provided only if covariate data are inlcuded in the model, with the
+To notice that the priors for the marginal mean and covariate parameters can be provided only if covariate data are inlcuded in the model, with the
 marginal mean parameter being a substitute of the location parameter under such model framework.
 }
 \examples{
@@ -177,7 +182,8 @@ t<-c(t1,t2)
 data<-data.frame(e,c,t)
 
 #Run the model using run_model with JAGS assuming a MCAR missingness mechanism
-x<-run_model(data=data,dist_e="norm",dist_c="norm",type="MCAR",program="JAGS")
+x<-run_model(data=data,model.eff=e~1,model.cost=c~1,
+dist_e="norm",dist_c="norm",type="MCAR",program="JAGS")
 #print the results of the JAGS/BUGS model
 print(x)
 #
