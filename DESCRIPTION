@@ -19,3 +19,4 @@ Imports: R2OpenBUGS,
          grid,
          gridExtra,
          methods
+RoxygenNote: 6.0.1
