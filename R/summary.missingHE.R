@@ -105,5 +105,5 @@ summary.missingHE<-function(object,...){
   print(table2,quote = F, digits = 3, justify = "center")
   cat("\n Incremental results \n")
   print(table3,quote = F, digits = 3, justify = "center")
-  return("cea_table"=cea_table_list)
+  #return("cea_table"=cea_table_list)
   }

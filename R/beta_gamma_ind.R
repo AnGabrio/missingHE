@@ -420,7 +420,7 @@ beta_gamma_ind<-function(type)eval.parent(substitute({
       model_string_jags<-gsub("for(t in 1:2){beta_e[j,t]~dnorm(0,0.01)}", prior_beta_e, model_string_jags,fixed=TRUE)
       model_string_jags<-gsub("beta_e[1,1]~dunif(0,1)", prior_beta_e1_inter, model_string_jags,fixed=TRUE)
       model_string_jags<-gsub("beta_e[1,2]~dunif(0,1)", prior_beta_e2_inter, model_string_jags,fixed=TRUE)
-      if(transf=="logit"){
+      if(any(transf=="logit")==TRUE){
         inprod_mean_e1<-"ilogit(mean_cov_e1[]*beta_e[1])"
         inprod_mean_e2<-"ilogit(mean_cov_e2[]*beta_e[2])"
         prior_beta_e1_inter<-"beta_e[1]~dnorm(0,0.001)"
@@ -466,7 +466,7 @@ beta_gamma_ind<-function(type)eval.parent(substitute({
       model_string_jags<-gsub("for(t in 1:2){beta_c[j,t]~dnorm(0,0.01)}", prior_beta_c, model_string_jags,fixed=TRUE)
       model_string_jags<-gsub("beta_c[1,1]~dunif(0,10000)", prior_beta_c1_inter, model_string_jags,fixed=TRUE)
       model_string_jags<-gsub("beta_c[1,2]~dunif(0,10000)", prior_beta_c2_inter, model_string_jags,fixed=TRUE)
-      if(transf=="log"){
+      if(any(transf=="log")==TRUE){
         inprod_mean_c1<-"exp(mean_cov_c1[]*beta_c[1])"
         inprod_mean_c2<-"exp(mean_cov_c2[]*beta_c[2])"
         prior_beta_c1_inter<-"beta_c[1]~dnorm(0,0.001)"
