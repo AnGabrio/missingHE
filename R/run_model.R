@@ -244,6 +244,8 @@ run_model<-function(data,model.eff,model.cost,dist_e,dist_c,type,program="JAGS",
   }else if(pe>1 | pc>1){
     if(type=="MNAR"|type=="MNAR_eff"|type=="MNAR_cost"){
       type=paste(type,"cov",sep = "_")
+    }else if(type=="MCAR"){
+      type="MAR"
     }
   }
   #missing data indicators
