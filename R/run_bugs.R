@@ -13,7 +13,6 @@
 #' @param inits a list with elements equal to the number of chains selected; each element of the list is itself a list of starting values for the BUGS model, 
 #' or a function creating (possibly random) initial values. If inits is NULL, BUGS will generate initial values for parameters
 #' @keywords BUGS Bayesian model
-#' @importFrom R2OpenBUGS bugs
 #' @examples
 #' #Internal function only
 #' #No examples
