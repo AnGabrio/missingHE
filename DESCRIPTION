@@ -9,9 +9,7 @@ Depends: R (>= 3.3.0),
 License: GPL-2
 Encoding: UTF-8
 LazyData: true
-Imports: R2OpenBUGS,
-         R2jags,
-         mcmcplots,
+Imports: mcmcplots,
          ggmcmc,
          ggthemes,
          BCEA,
@@ -19,4 +17,6 @@ Imports: R2OpenBUGS,
          grid,
          gridExtra,
          methods
+Suggests: R2OpenBUGS,
+          R2jags
 RoxygenNote: 6.0.1
