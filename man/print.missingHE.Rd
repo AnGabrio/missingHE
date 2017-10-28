@@ -2,12 +2,12 @@
 % Please edit documentation in R/print.missingHE.R
 \name{print.missingHE}
 \alias{print.missingHE}
-\title{Print a summary of the \code{BUGS}/\code{JAGS} model fitted by \code{\link{run_model}}}
+\title{Print a summary of the \code{JAGS} model fitted by \code{\link{selection}} or \code{\link{hurdle}}}
 \usage{
 \method{print}{missingHE}(x, value.mis = FALSE, ...)
 }
 \arguments{
-\item{x}{A \code{missingHE} object containing the results of the Bayesian modelling.}
+\item{x}{A \code{missingHE} object containing the results of the Bayesian model run using the function \code{\link{selection}} or \code{\link{hurdle}}.}
 
 \item{value.mis}{Logical. If \code{value.mis} is \code{TRUE}, the model results displayed contain also the imputed values,
 else if \code{value.mis} is \code{FALSE} the missing values are hidden.}
@@ -18,21 +18,15 @@ significant digits to be shown in the printed table (default=3). Not available i
 \description{
 Prints the summary table for the model fitted, with the estimate of the parameters and/or missing values.
 }
-\details{
-If the argument \code{value.mis} is set to \code{TRUE}, the resulting table will differ based on whether 
-\code{JAGS} or \code{BUGS} were used to fit the model. Under \code{JAGS} the tables report the posterior results for both observed
-and imputed data, while under \code{BUGS} only the imputed data posterior results are shown.
-}
 \examples{
  
-#For examples see the function run_model 
+#For examples see the function selection or hurdle 
 # 
 # 
 }
 \author{
 Andrea Gabrio
 }
-\keyword{BUGS}
 \keyword{JAGS}
 \keyword{data}
 \keyword{missing}

@@ -12,15 +12,16 @@
 \item{...}{additional arguments affecting the summary produced.}
 }
 \value{
-Prints a summary table with some information on the health economic simulation model run with the 
-function \code{run_model}, and synthetic information on the main parameters of interests.
+Prints a table with some information on the health economic model based on the assumption
+selected for the missingness ('MAR'or 'MNAR') or structural values ('SCAR' or 'SAR') mechanism using the function \code{selection} or \code{hurdle}, respectively. 
+Summary information on the main parameters of interests is provided.
 }
 \description{
-Produces a table printout with some summary results of the health economic evaluation simulation model
- run using the function \code{\link{run_model}}.
+Produces a table printout with some summary results of the health economic evaluation probabilistic model
+run using the function \code{\link{selection}} or \code{\link{hurdle}}.
 }
 \examples{
-#For examples see the function run_model
+#For examples see the function selection or hurdle
 #
 #
 }
@@ -28,7 +29,7 @@ Produces a table printout with some summary results of the health economic evalu
 Baio, G.(2012). \emph{Bayesian Methods in Health Economcis}. CRC/Chapman Hall, London.
 }
 \seealso{
-\code{\link{run_model}} \code{\link{diagnostic_checks}} \code{\link{plot.missingHE}}
+\code{\link{selection}} \code{\link{hurdle}} \code{\link{diagnostic}} \code{\link{plot.missingHE}}
 }
 \author{
 Andrea Gabrio
