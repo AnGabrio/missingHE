@@ -90,17 +90,25 @@ diagnostic<-function(x,type="histogram",param="all",theme=NULL,...){
   par_hurdle_sar_e<-c("all","mu.e","mu.c","sd.e","sd.c","corr","beta.e","beta.c","p.e","p.c","gamma.e")
   par_hurdle_sar_c<-c("all","mu.e","mu.c","sd.e","sd.c","corr","beta.e","beta.c","p.e","p.c","gamma.c")
   par_hurdle_sar_ec<-c("all","mu.e","mu.c","sd.e","sd.c","corr","beta.e","beta.c","p.e","p.c","gamma.e","gamma.c")
-  par_selection<-c("all","mu.e","mu.c","sd.e","sd.c","corr","beta.e","beta.c","p.e","p.c","gamma.e","gamma.c","delta.e","delta.c")
+  par_selection_e<-c("all","mu.e","mu.c","sd.e","sd.c","corr","beta.e","beta.c","p.e","p.c","gamma.e","gamma.c","delta.e")
+  par_selection_c<-c("all","mu.e","mu.c","sd.e","sd.c","corr","beta.e","beta.c","p.e","p.c","gamma.e","gamma.c","delta.c")
+  par_selection_ec<-c("all","mu.e","mu.c","sd.e","sd.c","corr","beta.e","beta.c","p.e","p.c","gamma.e","gamma.c","delta.e","delta.c")
   if(x$model_output$ind==TRUE){
     corr_index<-match("corr",par_hurdle_scar)
     par_hurdle_scar<-par_hurdle_scar[-corr_index]
     par_hurdle_sar_e<-par_hurdle_sar_e[-corr_index]
     par_hurdle_sar_c<-par_hurdle_sar_c[-corr_index]
     par_hurdle_sar_ec<-par_hurdle_sar_ec[-corr_index]
-    par_selection<-par_selection[-corr_index]
+    par_selection_e<-par_selection_e[-corr_index]
+    par_selection_c<-par_selection_c[-corr_index]
+    par_selection_ec<-par_selection_ec[-corr_index]
   }
-  if(x$type=="MAR"|x$type=="MNAR"|x$type=="MNAR_eff"|x$type=="MNAR_cost"){
-    if(!param %in% par_selection){stop("You must provide valid parameter names contained in the output of selection")}
+  if(x$model_output$type=="SELECTION_e"){
+    if(!param %in% par_selection_e){stop("You must provide valid parameter names contained in the output of selection")}
+  }else if(x$model_output$type=="SELECTION_c"){
+    if(!param %in% par_selection_c){stop("You must provide valid parameter names contained in the output of selection")}
+  }else if(x$model_output$type=="SELECTION_ec"){
+    if(!param %in% par_selection_ec){stop("You must provide valid parameter names contained in the output of selection")}
   }
   if(x$model_output$type=="HURDLE_e"){
     if(!param %in% par_hurdle_sar_e){stop("You must provide valid parameter names contained in the output of hurdle")}
