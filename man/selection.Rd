@@ -37,8 +37,7 @@ If there are no covariates, specify \code{1} on the right hand side. By default,
 
 \item{dist_c}{distribution assumed for the costs. Current available chocies are: Normal ('norm') or Gamma ('gamma').}
 
-\item{type}{Type of missingness mechanism assumed. Choices are Missing At Random (MAR), Missing Not At Random for the effects (MNAR_eff),
-Missing Not At Random for the costs (MNAR_cost), and Missing Not At Random for both (MNAR)}
+\item{type}{Type of missingness mechanism assumed. Choices are Missing At Random (MAR) and Missing Not At Random (MNAR).}
 
 \item{prob}{A numeric vector of probabilities within the range (0,1), representing the upper and lower
 CI sample quantiles to be calculated and returned for the imputed values.}

@@ -29,8 +29,7 @@ If there are no covariates, specify \code{1} on the right hand side. By default,
 term 'mc'(missing costs) and any covariates used to estimate the probability of missing costs should be given on the right-hand side. 
 If there are no covariates, specify \code{1} on the right hand side. By default, covariates are placed on the "probability" parameter for the missing costs through a logistic-linear model.}
 
-\item{type}{Type of missingness mechanism assumed. Choices are Missing At Random (MAR), Missing Not At Random for the effects (MNAR_eff),
-Missing Not At Random for the costs (MNAR_cost), and Missing Not At Random for both (MNAR).}
+\item{type}{Type of missingness mechanism assumed. Choices are Missing At Random (MAR) and Missing Not At Random (MNAR).}
 }
 \description{
 This internal function imports the data and outputs only those variables that are needed to run the model
@@ -61,8 +60,9 @@ m_eff<-c(m_eff1,m_eff2)
 m_cost<-c(m_cost1,m_cost2)
 t<-c(t1,t2)
 data<-data.frame(e,c,t)
-#run the function
-date_rearranged<-read_data(data=data)
+#specify arguments of the function and run the function
+date_rearranged<-data_read_selection(data=data,model.eff=e~1,model.cost=c~1
+model.me=me~1,model.mc=mc~1,type="MAR")
 }
 #
 #
