@@ -23,8 +23,7 @@
 #' @param model.mc A formula expression in conventional R linear modelling syntax. The response must be indicated with the 
 #' term 'mc'(missing costs) and any covariates used to estimate the probability of missing costs should be given on the right-hand side. 
 #' If there are no covariates, specify \code{1} on the right hand side. By default, covariates are placed on the "probability" parameter for the missing costs through a logistic-linear model.
-#' @param type Type of missingness mechanism assumed. Choices are Missing At Random (MAR), Missing Not At Random for the effects (MNAR_eff),
-#' Missing Not At Random for the costs (MNAR_cost), and Missing Not At Random for both (MNAR)
+#' @param type Type of missingness mechanism assumed. Choices are Missing At Random (MAR) and Missing Not At Random (MNAR).
 #' @param dist_e distribution assumed for the effects. Current available chocies are: Normal ('norm') or Beta ('beta').
 #' @param dist_c distribution assumed for the costs. Current available chocies are: Normal ('norm') or Gamma ('gamma').
 #' @param save_model Logical. If \code{save_model} is \code{TRUE} a \code{txt} file containing the model code is printed
@@ -62,7 +61,7 @@
 #'   The stored imputed values represent the mean and the upper and lower quantiles of the posterior distribution for the
 #'   missing individuals according to the values defined in \code{prob} (see Arguments)}
 #'   \item{type}{A character variable that indicate which type of missingness mechanism has been used to run the model, 
-#'   either \code{MAR}, \code{MNAR_eff}, \code{MNAR_cost} or \code{MNAR} (see details)}
+#'   either \code{MAR} or \code{MNAR} (see details)}
 #' }
 #' @seealso \code{\link[R2jags]{jags}}, \code{\link[BCEA]{bcea}}
 #' @keywords CEA JAGS missing data Selection models
@@ -204,8 +203,8 @@ selection<-function(data,model.eff,model.cost,model.me=me~1,model.mc=mc~1,dist_e
     stop("A two arm indicator variable must be provided")
   }
   #need to specify type of missingness mechanism among those available
-  if(!type %in% c("MAR","MNAR_eff","MNAR_cost","MNAR")) {
-    stop("Types available for use are 'MAR','MNAR_eff','MNAR_cost'and 'MNAR'")
+  if(!type %in% c("MAR","MNAR")) {
+    stop("Types available for use are 'MAR' and 'MNAR'")
   }
   #need to specify distributions for effects and costs among those available
   if(!dist_e %in% c("norm","beta")|!dist_c %in% c("norm","gamma")) {
@@ -217,22 +216,22 @@ selection<-function(data,model.eff,model.cost,model.me=me~1,model.mc=mc~1,dist_e
   #call read_data to read and output the variables to be modelled
   #and define each variable to be used in the model
   data_read<-data_read_selection(data=data,model.eff=model.eff,model.cost=model.cost,model.me=model.me,model.mc=model.mc,type=type)
-  #define type of mechanism
-  type2<-"MAR"
+  #check type of mechanism with argument of the forumulas
   miss_eff_assumption <- model.frame(formula=model.me, data=data_read$data_ind)
   miss_cost_assumption <- model.frame(formula=model.mc, data=data_read$data_ind)
   if("e"%in%names(miss_eff_assumption)==TRUE & "c"%in%names(miss_cost_assumption)==FALSE){
-    type2="MNAR_eff"
+    if(type=="MAR"){stop("Please remove 'e' and/or 'c' from 'model.me' and/or 'mode.mc' if 'MAR' type selected")}
+    type="MNAR_eff"
   }else if("e"%in%names(miss_eff_assumption)==FALSE & "c"%in%names(miss_cost_assumption)==TRUE){
-    type2="MNAR_cost"
+    if(type=="MAR"){stop("Please remove 'e' and/or 'c' from 'model.me' and/or 'mode.mc' if 'MAR' type selected")}
+    type="MNAR_cost"
   }else if("e"%in%names(miss_eff_assumption)==TRUE & "c"%in%names(miss_cost_assumption)==TRUE){
-    type2="MNAR"
-  }else {type2=="MAR"}
-  if(type=="MNAR"|type=="MNAR_eff"|type=="MNAR_cost"){
-  if(type2!=type){stop("Please add 'e' and/or 'c' from 'model.me' and/or 'mode.mc' if 'MNAR' type selected")}
-  }else if(type=="MAR"){
-    if(type2!=type){stop("Please remove 'e' and/or 'c' from 'model.me' and/or 'mode.mc' if 'MAR' type selected")}
-  }
+    if(type=="MAR"){stop("Please remove 'e' and/or 'c' from 'model.me' and/or 'mode.mc' if 'MAR' type selected")}
+    type="MNAR"
+  }else if("e"%in%names(miss_eff_assumption)==FALSE & "c"%in%names(miss_cost_assumption)==FALSE){
+    if(type=="MNAR"){stop("Please add 'e' and/or 'c' to 'model.me' and/or 'mode.mc' if 'MNAR' type selected")}
+    type="MAR"
+    }
   #length arms
   N1<-data_read$arm_lengths[1]
   N2<-data_read$arm_lengths[2]

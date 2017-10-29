@@ -54,7 +54,7 @@
 #' data<-data.frame(e,c,t)
 #' #run the function
 #' date_rearranged<-data_read_hurdle(data=data,model.eff=e~1,model.cost=c~1,
-#' model.se=e~1,model.sc=c~1,se=1,sc=0)
+#' model.se=e~1,model.sc=c~1,se=1,sc=0,type="SCAR")
 #' }
 #' #
 #' #

@@ -18,8 +18,7 @@
 #' @param model.mc A formula expression in conventional R linear modelling syntax. The response must be indicated with the 
 #' term 'mc'(missing costs) and any covariates used to estimate the probability of missing costs should be given on the right-hand side. 
 #' If there are no covariates, specify \code{1} on the right hand side. By default, covariates are placed on the "probability" parameter for the missing costs through a logistic-linear model.
-#' @param type Type of missingness mechanism assumed. Choices are Missing At Random (MAR), Missing Not At Random for the effects (MNAR_eff),
-#' Missing Not At Random for the costs (MNAR_cost), and Missing Not At Random for both (MNAR).
+#' @param type Type of missingness mechanism assumed. Choices are Missing At Random (MAR) and Missing Not At Random (MNAR).
 #' @keywords read data
 #' @importFrom stats na.omit sd as.formula model.matrix model.frame model.response
 #' @export
@@ -48,8 +47,9 @@
 #' m_cost<-c(m_cost1,m_cost2)
 #' t<-c(t1,t2)
 #' data<-data.frame(e,c,t)
-#' #run the function
-#' date_rearranged<-read_data(data=data)
+#' #specify arguments of the function and run the function
+#' date_rearranged<-data_read_selection(data=data,model.eff=e~1,model.cost=c~1
+#' model.me=me~1,model.mc=mc~1,type="MAR")
 #' }
 #' #
 #' #
@@ -192,16 +192,8 @@ data_read_selection<-function(data,model.eff,model.cost,model.me,model.mc,type=t
   data2$e[is.na(data2$e)==TRUE]<--999999
   data2$c[is.na(data2$c)==TRUE]<--999999
   #create fake vectors to allow model.me and model.mc to depend on e and c when mechanism selected
-  if(type=="MAR"){
-    data2$me<-c(m_eff1,m_eff2)
-    data2$mc<-c(m_cost1,m_cost2)
-  }
-  if(type=="MNAR"|type=="MNAR_eff"|type=="MNAR_cost"){
-    data2$me<-c(m_eff1,m_eff2)
-  }
-  if(type=="MNAR"|type=="MNAR_cost"|type=="MNAR_eff"){
-    data2$mc<-c(m_cost1,m_cost2)
-  }
+  data2$me<-c(m_eff1,m_eff2)
+  data2$mc<-c(m_cost1,m_cost2)
   zf_e <- model.frame(formula=model.me, data=data2)
   zf_c <- model.frame(formula=model.mc, data=data2)
   if("c"%in%names(zf_e)){stop("only dependence on covariates and/or missing effects is allowed. Please remove 'c' from 'model.me'")}
