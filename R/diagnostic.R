@@ -125,7 +125,7 @@ diagnostic<-function(x,type="histogram",param="all",theme=NULL,...){
     stop("Types of diagnostics available for use are 'summary','histogram','running','denplot','compare','traceplot','acf','cross','Rhat','geweke','caterpillar','pairs'")
   }
   labs <- param
-  labs[pmatch("corr",labs)] <- "theta"
+  labs[pmatch("corr",labs)] <- "rho"
   labs[pmatch("mu.e",labs)] <- "mu_e"
   labs[pmatch("mu.c",labs)] <- "mu_c"
   labs[pmatch("sd.e",labs)] <- "s_e"
@@ -178,7 +178,7 @@ diagnostic<-function(x,type="histogram",param="all",theme=NULL,...){
       parameters<-gsub("devi", "deviance", check_index3,fixed=TRUE)
       parameters<-c(gsub("beta", "beta_e", parameters,fixed=TRUE),"beta_c")
       if(x$model_output$ind=="FALSE"){
-        parameters<-gsub("thet", "theta", parameters,fixed=TRUE)
+        parameters<-gsub("rho", "rho", parameters,fixed=TRUE)
       }
       if(x$type=="MAR"){
         parameters<-c(gsub("gamm", "gamma_e", parameters,fixed=TRUE),"gamma_c")

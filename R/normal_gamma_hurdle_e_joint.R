@@ -24,7 +24,7 @@ normal_gamma_hurdle_e_joint<-function(type)eval.parent(substitute({
     #obtain mean and sd
     tau_c1[i]<-mu_c1[i]/pow(s_c1,2)
     #mean regression
-    log(mu_c1[i])<-inprod(X1_c[i,],beta_c1[])+theta[1]*(eff1[i]-mu_e[1])
+    log(mu_c1[i])<-inprod(X1_c[i,],beta_c1[])+rho[1]*(eff1[i]-mu_e[1])
     mu_e1[i]<-inprod(X1_e[i,],beta_e1[,d_eff1[i]+1])    
     #structural values mechanism
     d_eff1[i]~dbern(pq_1[i])
@@ -39,7 +39,7 @@ normal_gamma_hurdle_e_joint<-function(type)eval.parent(substitute({
     #obtain mean and sd
     tau_c2[i]<-mu_c2[i]/pow(s_c2,2)
     #mean regression
-    log(mu_c2[i])<-inprod(X2_c[i,],beta_c2[])+theta[2]*(eff2[i]-mu_e[2])
+    log(mu_c2[i])<-inprod(X2_c[i,],beta_c2[])+rho[2]*(eff2[i]-mu_e[2])
     mu_e2[i]<-inprod(X2_e[i,],beta_e2[,d_eff2[i]+1])    
     #structural values mechanism
     d_eff2[i]~dbern(pq_2[i])
@@ -120,8 +120,8 @@ normal_gamma_hurdle_e_joint<-function(type)eval.parent(substitute({
     ls_e2[2]<-sde
 
     #correlation
-    theta[1]~dnorm(0,0.001)
-    theta[2]~dnorm(0,0.001)
+    rho[1]~dnorm(0,0.001)
+    rho[2]~dnorm(0,0.001)
     
     #priors on structural values mechanism
     for(t in 1:2){
@@ -143,7 +143,7 @@ normal_gamma_hurdle_e_joint<-function(type)eval.parent(substitute({
     #obtain mean and sd
     tau_c1[i]<-mu_c1[i]/pow(s_c1,2)
     #mean regression
-    log(mu_c1[i])<-inprod(X1_c[i,],beta_c1[])+theta[1]*(eff1[i]-mu_e[1])
+    log(mu_c1[i])<-inprod(X1_c[i,],beta_c1[])+rho[1]*(eff1[i]-mu_e[1])
     mu_e1[i]<-inprod(X1_e[i,],beta_e1[,d_eff1[i]+1])    
     #structural values mechanism
     d_eff1[i]~dbern(pq_1[i])
@@ -158,7 +158,7 @@ normal_gamma_hurdle_e_joint<-function(type)eval.parent(substitute({
     #obtain mean and sd
     tau_c2[i]<-mu_c2[i]/pow(s_c2,2)
     #mean regression
-    log(mu_c2[i])<-inprod(X2_c[i,],beta_c2[])+theta[2]*(eff2[i]-mu_e[2])
+    log(mu_c2[i])<-inprod(X2_c[i,],beta_c2[])+rho[2]*(eff2[i]-mu_e[2])
     mu_e2[i]<-inprod(X2_e[i,],beta_e2[,d_eff2[i]+1])    
     #structural values mechanism
     d_eff2[i]~dbern(pq_2[i])
@@ -241,8 +241,8 @@ normal_gamma_hurdle_e_joint<-function(type)eval.parent(substitute({
     ls_e2[2]<-sde
 
     #correlation
-    theta[1]~dnorm(0,0.001)
-    theta[2]~dnorm(0,0.001)
+    rho[1]~dnorm(0,0.001)
+    rho[2]~dnorm(0,0.001)
 
     #priors on structural values mechanism
       for (j in 2:ze) {#begin gamma priors effects

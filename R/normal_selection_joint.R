@@ -22,9 +22,9 @@ normal_selection_joint<-function(type)eval.parent(substitute({
     cost1[i]~dnorm(mu_c1[i],tau_c1[i])
     eff1[i]~dnorm(mu_e1[i],tau_e[1])
     #mean regression
-    mu_c1[i]<-inprod(X1_c[i,],beta_c[,1])+theta[1]*(eff1[i]-mu_e[1])
+    mu_c1[i]<-inprod(X1_c[i,],beta_c[,1])+rho[1]*(eff1[i]-mu_e[1])
     tau_c1[i]<-1/psi_c1[i]
-    psi_c1[i]<-ss_c[1]-ss_e[1]*pow(theta[1],2)
+    psi_c1[i]<-ss_c[1]-ss_e[1]*pow(rho[1],2)
     mu_e1[i]<-inprod(X1_e[i,],beta_e[,1])    
     #missing data mechanism
     m_eff1[i]~dbern(pq_1[i])
@@ -39,9 +39,9 @@ normal_selection_joint<-function(type)eval.parent(substitute({
     cost2[i]~dnorm(mu_c2[i],tau_c2[i])
     eff2[i]~dnorm(mu_e2[i],tau_e[2])
     #mean regression
-    mu_c2[i]<-inprod(X2_c[i,],beta_c[,2])+theta[2]*(eff2[i]-mu_e[2])
+    mu_c2[i]<-inprod(X2_c[i,],beta_c[,2])+rho[2]*(eff2[i]-mu_e[2])
     tau_c2[i]<-1/psi_c2[i]
-    psi_c2[i]<-ss_c[2]-ss_e[2]*pow(theta[2],2)
+    psi_c2[i]<-ss_c[2]-ss_e[2]*pow(rho[2],2)
     mu_e2[i]<-inprod(X2_e[i,],beta_e[,2])    
     #missing data mechanism
     m_eff2[i]~dbern(pq_2[i])
@@ -93,7 +93,7 @@ normal_selection_joint<-function(type)eval.parent(substitute({
     ls_e[t]~dunif(-5,10)
 
     #correlation
-    theta[t]~dnorm(0,0.001)
+    rho[t]~dnorm(0,0.001)
     }
     
     #priors on missing data mechanism
@@ -122,9 +122,9 @@ normal_selection_joint<-function(type)eval.parent(substitute({
     cost1[i]~dnorm(mu_c1[i],tau_c1[i])
     eff1[i]~dnorm(mu_e1[i],tau_e[1])
     #mean regression
-    mu_c1[i]<-inprod(X1_c[i,],beta_c[,1])+theta[1]*(eff1[i]-mu_e[1])
+    mu_c1[i]<-inprod(X1_c[i,],beta_c[,1])+rho[1]*(eff1[i]-mu_e[1])
     tau_c1[i]<-1/psi_c1[i]
-    psi_c1[i]<-ss_c[1]-ss_e[1]*pow(theta[1],2)
+    psi_c1[i]<-ss_c[1]-ss_e[1]*pow(rho[1],2)
     mu_e1[i]<-inprod(X1_e[i,],beta_e[,1])    
     #missing data mechanism
     m_eff1[i]~dbern(pq_1[i])
@@ -139,9 +139,9 @@ normal_selection_joint<-function(type)eval.parent(substitute({
     cost2[i]~dnorm(mu_c2[i],tau_c2[i])
     eff2[i]~dnorm(mu_e2[i],tau_e[2])
     #mean regression
-    mu_c2[i]<-inprod(X2_c[i,],beta_c[,2])+theta[2]*(eff2[i]-mu_e[2])
+    mu_c2[i]<-inprod(X2_c[i,],beta_c[,2])+rho[2]*(eff2[i]-mu_e[2])
     tau_c2[i]<-1/psi_c2[i]
-    psi_c2[i]<-ss_c[2]-ss_e[2]*pow(theta[2],2)
+    psi_c2[i]<-ss_c[2]-ss_e[2]*pow(rho[2],2)
     mu_e2[i]<-inprod(X2_e[i,],beta_e[,2])    
     #missing data mechanism
     m_eff2[i]~dbern(pq_2[i])
@@ -194,7 +194,7 @@ normal_selection_joint<-function(type)eval.parent(substitute({
     ls_e[t]~dunif(-5,10)
 
     #correlation
-    theta[t]~dnorm(0,0.001)
+    rho[t]~dnorm(0,0.001)
     }
     
     #priors on missing data mechanism

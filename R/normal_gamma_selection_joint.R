@@ -24,7 +24,7 @@ normal_gamma_selection_joint<-function(type)eval.parent(substitute({
     #obtain mean and sd
     tau_c1[i]<-mu_c1[i]/pow(s_c[1],2)
     #mean regression
-    log(mu_c1[i])<-inprod(X1_c[i,],beta_c[,1])+theta[1]*(eff1[i]-mu_e[1])
+    log(mu_c1[i])<-inprod(X1_c[i,],beta_c[,1])+rho[1]*(eff1[i]-mu_e[1])
     mu_e1[i]<-inprod(X1_e[i,],beta_e[,1])    
     #missing data mechanism
     m_eff1[i]~dbern(pq_1[i])
@@ -41,7 +41,7 @@ normal_gamma_selection_joint<-function(type)eval.parent(substitute({
     #obtain mean and sd
     tau_c2[i]<-mu_c2[i]/pow(s_c[2],2)
     #mean regression
-    log(mu_c2[i])<-inprod(X2_c[i,],beta_c[,2])+theta[2]*(eff2[i]-mu_e[2])
+    log(mu_c2[i])<-inprod(X2_c[i,],beta_c[,2])+rho[2]*(eff2[i]-mu_e[2])
     mu_e2[i]<-inprod(X2_e[i,],beta_e[,2])    
     #missing data mechanism
     m_eff2[i]~dbern(pq_2[i])
@@ -91,7 +91,7 @@ normal_gamma_selection_joint<-function(type)eval.parent(substitute({
     ls_e[t]~dunif(-5,10)
 
     #correlation
-    theta[t]~dnorm(0,0.001)
+    rho[t]~dnorm(0,0.001)
     }
     
     #priors on missing data mechanism
@@ -122,7 +122,7 @@ normal_gamma_selection_joint<-function(type)eval.parent(substitute({
     #obtain mean and sd
     tau_c1[i]<-mu_c1[i]/pow(s_c[1],2)
     #mean regression
-    log(mu_c1[i])<-inprod(X1_c[i,],beta_c[,1])+theta[1]*(eff1[i]-mu_e[1])
+    log(mu_c1[i])<-inprod(X1_c[i,],beta_c[,1])+rho[1]*(eff1[i]-mu_e[1])
     mu_e1[i]<-inprod(X1_e[i,],beta_e[,1])    
     #missing data mechanism
     m_eff1[i]~dbern(pq_1[i])
@@ -139,7 +139,7 @@ normal_gamma_selection_joint<-function(type)eval.parent(substitute({
     #obtain mean and sd
     tau_c2[i]<-mu_c2[i]/pow(s_c[2],2)
     #mean regression
-    log(mu_c2[i])<-inprod(X2_c[i,],beta_c[,2])+theta[2]*(eff2[i]-mu_e[2])
+    log(mu_c2[i])<-inprod(X2_c[i,],beta_c[,2])+rho[2]*(eff2[i]-mu_e[2])
     mu_e2[i]<-inprod(X2_e[i,],beta_e[,2])    
     #missing data mechanism
     m_eff2[i]~dbern(pq_2[i])
@@ -189,7 +189,7 @@ normal_gamma_selection_joint<-function(type)eval.parent(substitute({
     ls_e[t]~dunif(-5,10)
 
     #correlation
-    theta[t]~dnorm(0,0.001)
+    rho[t]~dnorm(0,0.001)
     }
     
     #priors on missing data mechanism

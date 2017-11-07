@@ -176,7 +176,7 @@ run_hurdle<-function(type,dist_e,dist_c,inits,se=se,sc=sc,sde=sde,sdc=sdc)eval.p
   if(is.null(sc)==TRUE){params<-c("eff1","eff2","cost1","cost2","mu_e","mu_c","s_e","s_c","p_e","beta_c","beta_e","gamma_e")}
   if(is.null(se)==FALSE & is.null(sc)==FALSE){
   params<-c("eff1","eff2","cost1","cost2","mu_e","mu_c","s_e","s_c","p_e","p_c","beta_c","beta_e","gamma_e","gamma_c")}
-  if(ind==FALSE){params<-c(params,"theta")}
+  if(ind==FALSE){params<-c(params,"rho")}
   #run model
   modelN1<-R2jags::jags(data=datalist,inits=inits,parameters.to.save=params,model.file=filein,n.chains=n.chains,
                         n.iter=n.iter,n.burnin = n.burnin,DIC=DIC,n.thin=n.thin)
@@ -217,7 +217,7 @@ run_hurdle<-function(type,dist_e,dist_c,inits,se=se,sc=sc,sde=sde,sdc=sdc)eval.p
     cost2_pos[,1]<-apply(modelN1$BUGSoutput$sims.list$cost2,2,mean)
     cost2_pos[,2]<-apply(modelN1$BUGSoutput$sims.list$cost2,2,quantile,probs=prob[1])
     cost2_pos[,3]<-apply(modelN1$BUGSoutput$sims.list$cost2,2,quantile,probs=prob[2])
-  if(ind==FALSE){theta<-modelN1$BUGSoutput$sims.list$theta}
+  if(ind==FALSE){rho<-modelN1$BUGSoutput$sims.list$rho}
   #hide constant variables
    if(n.chains>1){model_sum<-round(jagsresults(x=modelN1, params=c('eff1','eff2','cost1','cost2'), invert=TRUE),digits = 3)
    }else{model_sum<-NULL}

@@ -25,7 +25,7 @@ beta_gamma_hurdle_c_joint<-function(type)eval.parent(substitute({
     tau_e1[i]<-(mu_e1[i]*(1-mu_e1[i])/pow(s_e1,2)-1)
     tau_c1[i]<-mu_c1[i]/pow(s_c1[d_cost1[i]+1],2)
     #mean regression
-    log(mu_c1[i])<-inprod(X1_c[i,],beta_c1[,d_cost1[i]+1])+theta1[d_cost1[i]+1]*(eff1[i]-mu_e[1])
+    log(mu_c1[i])<-inprod(X1_c[i,],beta_c1[,d_cost1[i]+1])+rho1[d_cost1[i]+1]*(eff1[i]-mu_e[1])
     logit(mu_e1[i])<-inprod(X1_e[i,],beta_e1[])    
     #structural values mechanism
     d_cost1[i]~dbern(pc_1[i])
@@ -41,7 +41,7 @@ beta_gamma_hurdle_c_joint<-function(type)eval.parent(substitute({
     tau_e2[i]<-(mu_e2[i]*(1-mu_e2[i])/pow(s_e2,2)-1)
     tau_c2[i]<-mu_c2[i]/pow(s_c2[d_cost2[i]+1],2)
     #mean regression
-    log(mu_c2[i])<-inprod(X2_c[i,],beta_c2[,d_cost2[i]+1])+theta2[d_cost2[i]+1]*(eff2[i]-mu_e[2])
+    log(mu_c2[i])<-inprod(X2_c[i,],beta_c2[,d_cost2[i]+1])+rho2[d_cost2[i]+1]*(eff2[i]-mu_e[2])
     logit(mu_e2[i])<-inprod(X2_e[i,],beta_e2[])    
     #structural values mechanism
     d_cost2[i]~dbern(pc_2[i])
@@ -111,13 +111,13 @@ beta_gamma_hurdle_c_joint<-function(type)eval.parent(substitute({
     s_c2[2]<-sdc
 
     #correlation
-    theta1[1]~dnorm(0,0.001)
-    theta2[1]~dnorm(0,0.001)
-    theta1[2]<-0
-    theta2[2]<-0
+    rho1[1]~dnorm(0,0.001)
+    rho2[1]~dnorm(0,0.001)
+    rho1[2]<-0
+    rho2[2]<-0
     
-    theta[1]<-theta1[1]
-    theta[2]<-theta2[1]
+    rho[1]<-rho1[1]
+    rho[2]<-rho2[1]
 
     #priors on structural values mechanism
     for(t in 1:2){
@@ -140,7 +140,7 @@ beta_gamma_hurdle_c_joint<-function(type)eval.parent(substitute({
     tau_e1[i]<-(mu_e1[i]*(1-mu_e1[i])/pow(s_e1,2)-1)
     tau_c1[i]<-mu_c1[i]/pow(s_c1[d_cost1[i]+1],2)
     #mean regression
-    log(mu_c1[i])<-inprod(X1_c[i,],beta_c1[,d_cost1[i]+1])+theta1[d_cost1[i]+1]*(eff1[i]-mu_e[1])
+    log(mu_c1[i])<-inprod(X1_c[i,],beta_c1[,d_cost1[i]+1])+rho1[d_cost1[i]+1]*(eff1[i]-mu_e[1])
     logit(mu_e1[i])<-inprod(X1_e[i,],beta_e1[])    
     #structural values mechanism
     d_cost1[i]~dbern(pc_1[i])
@@ -156,7 +156,7 @@ beta_gamma_hurdle_c_joint<-function(type)eval.parent(substitute({
     tau_e2[i]<-(mu_e2[i]*(1-mu_e2[i])/pow(s_e2,2)-1)
     tau_c2[i]<-mu_c2[i]/pow(s_c2[d_cost2[i]+1],2)
     #mean regression
-    log(mu_c2[i])<-inprod(X2_c[i,],beta_c2[,d_cost2[i]+1])+theta2[d_cost2[i]+1]*(eff2[i]-mu_e[2])
+    log(mu_c2[i])<-inprod(X2_c[i,],beta_c2[,d_cost2[i]+1])+rho2[d_cost2[i]+1]*(eff2[i]-mu_e[2])
     logit(mu_e2[i])<-inprod(X2_e[i,],beta_e2[])    
     #structural values mechanism
     d_cost2[i]~dbern(pc_2[i])
@@ -225,13 +225,13 @@ beta_gamma_hurdle_c_joint<-function(type)eval.parent(substitute({
     s_c2[2]<-sdc
 
     #correlation
-    theta1[1]~dnorm(0,0.001)
-    theta2[1]~dnorm(0,0.001)
-    theta1[2]<-0
-    theta2[2]<-0
+    rho1[1]~dnorm(0,0.001)
+    rho2[1]~dnorm(0,0.001)
+    rho1[2]<-0
+    rho2[2]<-0
     
-    theta[1]<-theta1[1]
-    theta[2]<-theta2[1]
+    rho[1]<-rho1[1]
+    rho[2]<-rho2[1]
 
       for (j in 2:zc) {#begin gamma priors costs
       for(t in 1:2){gamma_c[j,t]~dnorm(0,0.01)}

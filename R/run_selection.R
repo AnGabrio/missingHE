@@ -51,7 +51,7 @@ run_selection<-function(type,dist_e,dist_c,inits)eval.parent(substitute({
   DIC<-TRUE
   #define all parameters to monitor
   params<-c("eff1","eff2","cost1","cost2","mu_e","mu_c","s_e","s_c","p_e","p_c","beta_c","beta_e","gamma_e","gamma_c","delta_e","delta_c")
-  if(ind==FALSE){params<-c(params,"theta")}
+  if(ind==FALSE){params<-c(params,"rho")}
   if(type=="MNAR_cost"|type=="MAR"){deltae_index<-match("delta_e",params)
   params<-params[-deltae_index]}
   if(type=="MNAR_eff"|type=="MAR"){deltac_index<-match("delta_c",params)
@@ -88,7 +88,7 @@ run_selection<-function(type,dist_e,dist_c,inits)eval.parent(substitute({
     cost2_pos[,1]<-apply(modelN1$BUGSoutput$sims.list$cost2,2,mean)
     cost2_pos[,2]<-apply(modelN1$BUGSoutput$sims.list$cost2,2,quantile,probs=prob[1])
     cost2_pos[,3]<-apply(modelN1$BUGSoutput$sims.list$cost2,2,quantile,probs=prob[2])
-  if(ind==FALSE & dist_e=="norm" & dist_c=="norm"){theta<-modelN1$BUGSoutput$sims.list$theta}
+  if(ind==FALSE & dist_e=="norm" & dist_c=="norm"){rho<-modelN1$BUGSoutput$sims.list$rho}
   if(type=="MNAR"){
     delta_e<-modelN1$BUGSoutput$sims.list$delta_e
     delta_c<-modelN1$BUGSoutput$sims.list$delta_c

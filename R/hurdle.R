@@ -361,26 +361,26 @@ hurdle<-function(data,model.eff,model.cost,model.se=se~1,model.sc=sc~1,se=1,sc=0
       stop("all user-supplied priors should be in vector format")
     }
     #set of all possible parameters to which priors can be assigned
-    par_prior<-c("mu.prior.e","mu.prior.c","alpha.prior.e","alpha.prior.c","gamma.prior.e","gamma.prior.c",
-                 "beta.prior.e","beta.prior.c","p.prior.e","p.prior.c","se.prior","sc.prior","theta.prior")
+    par_prior<-c("beta0.prior.e","beta0.prior.c","sigma.prior.e","sigma.prior.c","gamma.prior.e","gamma.prior.c",
+                 "beta.prior.e","beta.prior.c","gamma0.prior.e","gamma0.prior.c","se.prior","sc.prior","rho.prior")
     #stop message
     stop_mes<-"priors can be assigned only using specific string parameter names depending on the type of model assumed. 
     Type ''help(hurdle)'' for more details"
     if(!any(names(list_check_vector) %in% par_prior[c(1:13)]==TRUE)){stop(stop_mes)}
         if(ind==TRUE){
-          if("theta.prior" %in% names(list_check_vector)){stop(stop_mes)}}
+          if("rho.prior" %in% names(list_check_vector)){stop(stop_mes)}}
     }
   #set prior input names and if not provided set the values to null
-    if(exists("alpha.prior.e",where=prior)) {alpha.prior.e=prior$alpha.prior.e} else {alpha.prior.e=NULL}
-    if(exists("alpha.prior.c",where=prior)) {alpha.prior.c=prior$alpha.prior.c} else {alpha.prior.c=NULL}
-    if(exists("mu.prior.e",where=prior)) {mu.prior.e=prior$mu.prior.e} else {mu.prior.e=NULL}
-    if(exists("mu.prior.c",where=prior)) {mu.prior.c=prior$mu.prior.c} else {mu.prior.c=NULL}
+    if(exists("sigma.prior.e",where=prior)) {sigma.prior.e=prior$sigma.prior.e} else {sigma.prior.e=NULL}
+    if(exists("sigma.prior.c",where=prior)) {sigma.prior.c=prior$sigma.prior.c} else {sigma.prior.c=NULL}
+    if(exists("beta0.prior.e",where=prior)) {beta0.prior.e=prior$beta0.prior.e} else {beta0.prior.e=NULL}
+    if(exists("beta0.prior.c",where=prior)) {beta0.prior.c=prior$beta0.prior.c} else {beta0.prior.c=NULL}
     if(exists("beta.prior.e",where=prior)) {beta.prior.e=prior$beta.prior.e} else {beta.prior.e=NULL}
     if(exists("beta.prior.c",where=prior)) {beta.prior.c=prior$beta.prior.c} else {beta.prior.c=NULL}
     if(exists("gamma.prior.e",where=prior)) {gamma.prior.e=prior$gamma.prior.e} else {gamma.prior.e=NULL}
     if(exists("gamma.prior.c",where=prior)) {gamma.prior.c=prior$gamma.prior.c} else {gamma.prior.c=NULL}
-    if(exists("p.prior.e",where=prior)) {p.prior.e=prior$p.prior.e} else {p.prior.e=NULL}
-    if(exists("p.prior.c",where=prior)) {p.prior.c=prior$p.prior.c} else {p.prior.c=NULL}
+    if(exists("gamma0.prior.e",where=prior)) {gamma0.prior.e=prior$gamma0.prior.e} else {gamma0.prior.e=NULL}
+    if(exists("gamma0.prior.c",where=prior)) {gamma0.prior.c=prior$gamma0.prior.c} else {gamma0.prior.c=NULL}
   #set default std parameters for structural components
   if(exists("se.prior",where=prior)) {se.prior=prior$se.prior} else {se.prior=0.0000001}
   if(exists("sc.prior",where=prior)) {sc.prior=prior$sc.prior} else {sc.prior=0.0000001}
@@ -391,11 +391,11 @@ hurdle<-function(data,model.eff,model.cost,model.se=se~1,model.sc=sc~1,se=1,sc=0
   #stop if se or sc set to NULL but prior provided
   if(is.list(prior)==TRUE){
       if(is.null(se)==TRUE){
-        if(is.null(prior$p.prior.e)==FALSE|is.null(prior$gamma.prior.e)==FALSE|is.null(prior$se.prior)==FALSE){
+        if(is.null(prior$gamma0.prior.e)==FALSE|is.null(prior$gamma.prior.e)==FALSE|is.null(prior$se.prior)==FALSE){
           stop("You cannot provide priors for structural values for e if se=NULL")}
       }
     if(is.null(sc)==TRUE){
-      if(is.null(prior$p.prior.c)==FALSE|is.null(prior$gamma.prior.c)==FALSE|is.null(prior$sc.prior)==FALSE){
+      if(is.null(prior$gamma0.prior.c)==FALSE|is.null(prior$gamma.prior.c)==FALSE|is.null(prior$sc.prior)==FALSE){
         stop("You cannot provide priors for structural values for c if sc=NULL")}
      }
   }
@@ -419,7 +419,7 @@ hurdle<-function(data,model.eff,model.cost,model.se=se~1,model.sc=sc~1,se=1,sc=0
     data_read$structural_costs[[2]]<-d_cost2
   }
     #correlation parameter only if joint model
-    if(exists("theta.prior",where=prior)) {theta.prior=prior$theta.prior} else {theta.prior=NULL}
+    if(exists("rho.prior",where=prior)) {rho.prior=prior$rho.prior} else {rho.prior=NULL}
       #create list of data output with total number of observed, missing and complete data
     if(is.null(sc)==TRUE & is.null(se)==FALSE){
       data_set<-list("effects"=data_read$raw_effects,"costs"=data_read$raw_costs,"N in reference arm"=N1,"N in comparator arm"=N2,

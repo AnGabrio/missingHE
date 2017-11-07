@@ -22,9 +22,9 @@ normal_hurdle_c_joint<-function(type)eval.parent(substitute({
     cost1[i]~dnorm(mu_c1[i],tau_c1[i])
     eff1[i]~dnorm(mu_e1[i],tau_e1)
     #mean regression
-    mu_c1[i]<-inprod(X1_c[i,],beta_c1[,d_cost1[i]+1])+theta1[d_cost1[i]+1]*(eff1[i]-mu_e[1])
+    mu_c1[i]<-inprod(X1_c[i,],beta_c1[,d_cost1[i]+1])+rho1[d_cost1[i]+1]*(eff1[i]-mu_e[1])
     tau_c1[i]<-1/psi_c1[i]
-    psi_c1[i]<-ss_c1[d_cost1[i]+1]-ss_e1*pow(theta1[d_cost1[i]+1],2)
+    psi_c1[i]<-ss_c1[d_cost1[i]+1]-ss_e1*pow(rho1[d_cost1[i]+1],2)
     mu_e1[i]<-inprod(X1_e[i,],beta_e1[])    
     #structural values mechanism
     d_cost1[i]~dbern(pc_1[i])
@@ -37,9 +37,9 @@ normal_hurdle_c_joint<-function(type)eval.parent(substitute({
     cost2[i]~dnorm(mu_c2[i],tau_c2[i])
     eff2[i]~dnorm(mu_e2[i],tau_e2)
     #mean regression
-    mu_c2[i]<-inprod(X2_c[i,],beta_c2[,d_cost2[i]+1])+theta2[d_cost2[i]+1]*(eff2[i]-mu_e[2])
+    mu_c2[i]<-inprod(X2_c[i,],beta_c2[,d_cost2[i]+1])+rho2[d_cost2[i]+1]*(eff2[i]-mu_e[2])
     tau_c2[i]<-1/psi_c2[i]
-    psi_c2[i]<-ss_c2[d_cost2[i]+1]-ss_e2*pow(theta2[d_cost2[i]+1],2)
+    psi_c2[i]<-ss_c2[d_cost2[i]+1]-ss_e2*pow(rho2[d_cost2[i]+1],2)
     mu_e2[i]<-inprod(X2_e[i,],beta_e2[])    
     #structural values mechanism
     d_cost2[i]~dbern(pc_2[i])
@@ -124,13 +124,13 @@ normal_hurdle_c_joint<-function(type)eval.parent(substitute({
     ls_c2[2]<-sdc
 
     #correlation
-    theta1[1]~dnorm(0,0.001)
-    theta2[1]~dnorm(0,0.001)
-    theta1[2]<-0
-    theta2[2]<-0
+    rho1[1]~dnorm(0,0.001)
+    rho2[1]~dnorm(0,0.001)
+    rho1[2]<-0
+    rho2[2]<-0
     
-    theta[1]<-theta1[1]
-    theta[2]<-theta2[1]
+    rho[1]<-rho1[1]
+    rho[2]<-rho2[1]
 
     #priors on structural values mechanism
     for(t in 1:2){
@@ -150,9 +150,9 @@ normal_hurdle_c_joint<-function(type)eval.parent(substitute({
     cost1[i]~dnorm(mu_c1[i],tau_c1[i])
     eff1[i]~dnorm(mu_e1[i],tau_e1)
     #mean regression
-    mu_c1[i]<-inprod(X1_c[i,],beta_c1[,d_cost1[i]+1])+theta1[d_cost1[i]+1]*(eff1[i]-mu_e[1])
+    mu_c1[i]<-inprod(X1_c[i,],beta_c1[,d_cost1[i]+1])+rho1[d_cost1[i]+1]*(eff1[i]-mu_e[1])
     tau_c1[i]<-1/psi_c1[i]
-    psi_c1[i]<-ss_c1[d_cost1[i]+1]-ss_e1*pow(theta1[d_cost1[i]+1],2)
+    psi_c1[i]<-ss_c1[d_cost1[i]+1]-ss_e1*pow(rho1[d_cost1[i]+1],2)
     mu_e1[i]<-inprod(X1_e[i,],beta_e1[])    
     #structural values mechanism
     d_cost1[i]~dbern(pc_1[i])
@@ -165,9 +165,9 @@ normal_hurdle_c_joint<-function(type)eval.parent(substitute({
     cost2[i]~dnorm(mu_c2[i],tau_c2[i])
     eff2[i]~dnorm(mu_e2[i],tau_e2)
     #mean regression
-    mu_c2[i]<-inprod(X2_c[i,],beta_c2[,d_cost2[i]+1])+theta2[d_cost2[i]+1]*(eff2[i]-mu_e[2])
+    mu_c2[i]<-inprod(X2_c[i,],beta_c2[,d_cost2[i]+1])+rho2[d_cost2[i]+1]*(eff2[i]-mu_e[2])
     tau_c2[i]<-1/psi_c2[i]
-    psi_c2[i]<-ss_c2[d_cost2[i]+1]-ss_e2*pow(theta2[d_cost2[i]+1],2)
+    psi_c2[i]<-ss_c2[d_cost2[i]+1]-ss_e2*pow(rho2[d_cost2[i]+1],2)
     mu_e2[i]<-inprod(X2_e[i,],beta_e2[])    
     #structural values mechanism
     d_cost2[i]~dbern(pc_2[i])
@@ -254,13 +254,13 @@ normal_hurdle_c_joint<-function(type)eval.parent(substitute({
     ls_c2[2]<-sdc
 
     #correlation
-    theta1[1]~dnorm(0,0.001)
-    theta2[1]~dnorm(0,0.001)
-    theta1[2]<-0
-    theta2[2]<-0
+    rho1[1]~dnorm(0,0.001)
+    rho2[1]~dnorm(0,0.001)
+    rho1[2]<-0
+    rho2[2]<-0
     
-    theta[1]<-theta1[1]
-    theta[2]<-theta2[1]
+    rho[1]<-rho1[1]
+    rho[2]<-rho2[1]
 
       for (j in 2:zc) {#begin gamma priors costs
       for(t in 1:2){gamma_c[j,t]~dnorm(0,0.01)}
