@@ -84,7 +84,7 @@ An object of the class 'missingHE' containing the following elements
   The stored imputed values represent the mean and the upper and lower quantiles of the posterior distribution for the
   missing individuals according to the values defined in \code{prob} (see Arguments)}
   \item{type}{A character variable that indicate which type of missingness mechanism has been used to run the model, 
-  either \code{MAR}, \code{MNAR_eff}, \code{MNAR_cost} or \code{MNAR} (see details)}
+  either \code{MAR} or \code{MNAR} (see details)}
 }
 }
 \description{
