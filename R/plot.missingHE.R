@@ -187,12 +187,12 @@ plot.missingHE<-function(x,prob=c(0.05,0.95),class="scatter",outcome="all",theme
       plot_eff1<-ggplot2::ggplot(plot.eff1.data,ggplot2::aes(colour=type, x=Individuals,y=effects))+ggplot2::geom_point(position = pd,na.rm = TRUE)+ 
         ggplot2::geom_pointrange(data=plot.eff1.data, mapping=ggplot2::aes(x=Individuals, y=mean, ymin=upper, ymax=lower),na.rm = TRUE)+
         ggplot2::scale_colour_manual(values = c("red","black"),guide = ggplot2::guide_legend(override.aes = list(shape = c(16, 16),linetype=c(1,0))))+
-        ggplot2::ggtitle("Imputed and observed effects \n in the control arm")
+        ggplot2::ggtitle("effects (control)")
       } else if(any(is.na(x$data_set$effects[[1]]))==FALSE){
         plot.eff1.data<-data.frame(Individuals=seq(1:length(complete$effects1[,1])),effects=observed$effects1,type=m_eff1)
         plot_eff1<-ggplot2::ggplot(plot.eff1.data,ggplot2::aes(colour=type, x=Individuals,y=effects))+ggplot2::geom_point(position = pd,na.rm = TRUE)+
           ggplot2::scale_colour_manual(values = c("black"),guide = ggplot2::guide_legend(override.aes = list(shape = c(16),linetype=c(0))))+
-          ggplot2::ggtitle("Observed effects \n in the control arm")
+          ggplot2::ggtitle("effects (control)")
       }
       if(any(is.na(x$data_set$effects[[2]]))==TRUE){
       plot.eff2.data<-data.frame(Individuals=seq(1:length(complete$effects2[,1])),effects=observed$effects2,mean=imputed$effects2[,1],
@@ -200,12 +200,12 @@ plot.missingHE<-function(x,prob=c(0.05,0.95),class="scatter",outcome="all",theme
       plot_eff2<-ggplot2::ggplot(plot.eff2.data,ggplot2::aes(colour=type, x=Individuals,y=effects))+ggplot2::geom_point(position = pd,na.rm = TRUE)+ 
         ggplot2::geom_pointrange(data=plot.eff2.data, mapping=ggplot2::aes(x=Individuals, y=mean, ymin=upper, ymax=lower),na.rm = TRUE)+
         ggplot2::scale_colour_manual(values = c("red","black"),guide = ggplot2::guide_legend(override.aes = list(shape = c(16, 16),linetype=c(1,0))))+
-        ggplot2::ggtitle("Imputed and observed effects \n in the intervention arm")
+        ggplot2::ggtitle("effects (intervention)")
       } else if(any(is.na(x$data_set$effects[[2]]))==FALSE){
         plot.eff2.data<-data.frame(Individuals=seq(1:length(complete$effects2[,1])),effects=observed$effects2,type=m_eff2)
         plot_eff2<-ggplot2::ggplot(plot.eff2.data,ggplot2::aes(colour=type, x=Individuals,y=effects))+ggplot2::geom_point(position = pd,na.rm = TRUE)+
           ggplot2::scale_colour_manual(values = c("black"),guide = ggplot2::guide_legend(override.aes = list(shape = c(16),linetype=c(0))))+
-          ggplot2::ggtitle("Observed effects \n in the intervention arm")
+          ggplot2::ggtitle("effects (intervention)")
       }
       if(any(is.na(x$data_set$costs[[1]]))==TRUE){
       plot.cost1.data<-data.frame(Individuals=seq(1:length(complete$costs1[,1])),costs=observed$costs1,mean=imputed$costs1[,1],
@@ -213,12 +213,12 @@ plot.missingHE<-function(x,prob=c(0.05,0.95),class="scatter",outcome="all",theme
       plot_cost1<-ggplot2::ggplot(plot.cost1.data,ggplot2::aes(colour=type, x=Individuals,y=costs))+ggplot2::geom_point(position = pd,na.rm = TRUE)+ 
         ggplot2::geom_pointrange(data=plot.cost1.data, mapping=ggplot2::aes(x=Individuals, y=mean, ymin=upper, ymax=lower),na.rm = TRUE)+
         ggplot2::scale_colour_manual(values = c("red","black"),guide = ggplot2::guide_legend(override.aes = list(shape = c(16, 16),linetype=c(1,0))))+
-        ggplot2::ggtitle("Imputed and observed costs \n in the control arm")
+        ggplot2::ggtitle("costs (control)")
       } else if(any(is.na(x$data_set$costs[[1]]))==FALSE){
         plot.cost1.data<-data.frame(Individuals=seq(1:length(complete$costs1[,1])),costs=observed$costs1,type=m_cost1)
         plot_cost1<-ggplot2::ggplot(plot.cost1.data,ggplot2::aes(colour=type, x=Individuals,y=costs))+ggplot2::geom_point(position = pd,na.rm = TRUE)+
           ggplot2::scale_colour_manual(values = c("black"),guide = ggplot2::guide_legend(override.aes = list(shape = c(16),linetype=c(0))))+
-          ggplot2::ggtitle("Observed costs \n in the control arm")
+          ggplot2::ggtitle("costs (control)")
       }
       if(any(is.na(x$data_set$costs[[2]]))==TRUE){
       plot.cost2.data<-data.frame(Individuals=seq(1:length(complete$costs2[,1])),costs=observed$costs2,mean=imputed$costs2[,1],
@@ -226,12 +226,12 @@ plot.missingHE<-function(x,prob=c(0.05,0.95),class="scatter",outcome="all",theme
       plot_cost2<-ggplot2::ggplot(plot.cost2.data,ggplot2::aes(colour=type, x=Individuals,y=costs))+ggplot2::geom_point(position = pd,na.rm = TRUE)+ 
         ggplot2::geom_pointrange(data=plot.cost2.data, mapping=ggplot2::aes(x=Individuals, y=mean, ymin=upper, ymax=lower),na.rm = TRUE)+
         ggplot2::scale_colour_manual(values = c("red","black"),guide = ggplot2::guide_legend(override.aes = list(shape = c(16, 16),linetype=c(1,0))))+
-        ggplot2::ggtitle("Imputed and observed costs \n in the control arm")
+        ggplot2::ggtitle("costs (intervention)")
       } else if(any(is.na(x$data_set$costs[[2]]))==FALSE){
         plot.cost2.data<-data.frame(Individuals=seq(1:length(complete$costs2[,1])),costs=observed$costs2,type=m_cost2)
         plot_cost2<-ggplot2::ggplot(plot.cost2.data,ggplot2::aes(colour=type, x=Individuals,y=costs))+ggplot2::geom_point(position = pd,na.rm = TRUE)+
           ggplot2::scale_colour_manual(values = c("black"),guide = ggplot2::guide_legend(override.aes = list(shape = c(16),linetype=c(0))))+
-          ggplot2::ggtitle("Observed costs \n in the intervention arm")
+          ggplot2::ggtitle("costs (intervention)")
       }
     } else if(class=="histogram"){
       #histogram plots of observed vs imputed for each outcome type and arm (use only posterior means for imputations)
@@ -240,41 +240,41 @@ plot.missingHE<-function(x,prob=c(0.05,0.95),class="scatter",outcome="all",theme
       plot.eff1.data<-data.frame(Individuals=seq(1:length(complete$effects1[,1])),effects=complete$effects1[,1],
                                  lower=complete$effects1[,2],upper=complete$effects1[,3],type=m_eff1)
       plot_eff1<-ggplot2::ggplot(plot.eff1.data, ggplot2::aes(x=effects, color=type))+ggplot2::geom_histogram(fill="white", position="dodge")+ggplot2::theme(legend.position="top")+
-        ggplot2::scale_colour_manual(values = c("red","black"))+ggplot2::ggtitle("Imputed and observed effects \n in the control arm")
+        ggplot2::scale_colour_manual(values = c("red","black"))+ggplot2::ggtitle("effects (control)")
       } else if(any(is.na(x$data_set$effects[[1]]))==FALSE){
         plot.eff1.data<-data.frame(Individuals=seq(1:length(complete$effects1[,1])),effects=complete$effects1[,1],type=m_eff1)
         plot_eff1<-ggplot2::ggplot(plot.eff1.data, ggplot2::aes(x=effects, color=type))+ggplot2::geom_histogram(fill="white", position="dodge")+ggplot2::theme(legend.position="top")+
-          ggplot2::scale_colour_manual(values = c("black"))+ggplot2::ggtitle("Observed effects \n in the control arm")
+          ggplot2::scale_colour_manual(values = c("black"))+ggplot2::ggtitle("effects (control)")
       }
       if(any(is.na(x$data_set$effects[[2]]))==TRUE){
       plot.eff2.data<-data.frame(Individuals=seq(1:length(complete$effects2[,1])),effects=complete$effects2[,1],
                                  lower=complete$effects2[,2],upper=complete$effects2[,3],type=m_eff2)
       plot_eff2<-ggplot2::ggplot(plot.eff2.data, ggplot2::aes(x=effects, color=type))+ggplot2::geom_histogram(fill="white", position="dodge")+ggplot2::theme(legend.position="top")+
-        ggplot2::scale_colour_manual(values = c("red","black"))+ggplot2::ggtitle("Imputed and observed effects \n in the intervention arm")
+        ggplot2::scale_colour_manual(values = c("red","black"))+ggplot2::ggtitle("effects (intervention)")
       } else if(any(is.na(x$data_set$effects[[2]]))==FALSE){
         plot.eff2.data<-data.frame(Individuals=seq(1:length(complete$effects1[,2])),effects=complete$effects1[,2],type=m_eff1)
         plot_eff2<-ggplot2::ggplot(plot.eff2.data, ggplot2::aes(x=effects, color=type))+ggplot2::geom_histogram(fill="white", position="dodge")+ggplot2::theme(legend.position="top")+
-          ggplot2::scale_colour_manual(values = c("black"))+ggplot2::ggtitle("Observed effects \n in the intervention arm")
+          ggplot2::scale_colour_manual(values = c("black"))+ggplot2::ggtitle("effects (intervention)")
       }
       if(any(is.na(x$data_set$costs[[1]]))==TRUE){
       plot.cost1.data<-data.frame(Individuals=seq(1:length(complete$costs1[,1])),costs=complete$costs1[,1],
                                  lower=complete$costs1[,2],upper=complete$costs1[,3],type=m_cost1)
       plot_cost1<-ggplot2::ggplot(plot.cost1.data, ggplot2::aes(x=costs, color=type))+ggplot2::geom_histogram(fill="white", position="dodge")+ggplot2::theme(legend.position="top")+
-        ggplot2::scale_colour_manual(values = c("red","black"))+ggplot2::ggtitle("Imputed and observed costs \n in the control arm")
+        ggplot2::scale_colour_manual(values = c("red","black"))+ggplot2::ggtitle("costs (control)")
       } else if(any(is.na(x$data_set$costs[[1]]))==FALSE){
         plot.cost1.data<-data.frame(Individuals=seq(1:length(complete$costs1[,1])),costs=complete$costs1[,1],type=m_cost1)
         plot_cost1<-ggplot2::ggplot(plot.cost1.data, ggplot2::aes(x=costs, color=type))+ggplot2::geom_histogram(fill="white", position="dodge")+ggplot2::theme(legend.position="top")+
-          ggplot2::scale_colour_manual(values = c("black"))+ggplot2::ggtitle("Observed costs \n in the control arm")
+          ggplot2::scale_colour_manual(values = c("black"))+ggplot2::ggtitle("costs (control)")
       }
       if(any(is.na(x$data_set$costs[[2]]))==TRUE){
       plot.cost2.data<-data.frame(Individuals=seq(1:length(complete$costs2[,1])),costs=complete$costs2[,1],
                                   lower=complete$costs2[,2],upper=complete$costs2[,3],type=m_cost2)
       plot_cost2<-ggplot2::ggplot(plot.cost2.data, ggplot2::aes(x=costs, color=type))+ggplot2::geom_histogram(fill="white", position="dodge")+ggplot2::theme(legend.position="top")+
-        ggplot2::scale_colour_manual(values = c("red","black"))+ggplot2::ggtitle("Imputed and observed costs \n in the intervention arm")
+        ggplot2::scale_colour_manual(values = c("red","black"))+ggplot2::ggtitle("costs (intervention)")
       } else if(any(is.na(x$data_set$costs[[2]]))==FALSE){
         plot.cost2.data<-data.frame(Individuals=seq(1:length(complete$costs2[,1])),costs=complete$costs2[,1],type=m_cost2)
         plot_cost2<-ggplot2::ggplot(plot.cost2.data, ggplot2::aes(x=costs, color=type))+ggplot2::geom_histogram(fill="white", position="dodge")+ggplot2::theme(legend.position="top")+
-          ggplot2::scale_colour_manual(values = c("black"))+ggplot2::ggtitle("Observed costs \n in the intervention arm")
+          ggplot2::scale_colour_manual(values = c("black"))+ggplot2::ggtitle("costs (intervention)")
       }
      }
     if(theme=="base"){
