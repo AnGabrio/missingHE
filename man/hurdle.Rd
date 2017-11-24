@@ -14,22 +14,22 @@ hurdle(data, model.eff, model.cost, model.se = se ~ 1, model.sc = sc ~ 1,
 and \code{model.se}, \code{model.sc} (model formulas for the structural effect and cost models) . Among these,
 effectiveness, cost and treatment indicator (only two arms) variables must always be provided and named 'e', 'c' and 't' respectively.}
 
-\item{model.eff}{A formula expression in conventional R linear modelling syntax. The response must be a health economics
+\item{model.eff}{A formula expression in conventional \code{R} linear modelling syntax. The response must be a health economics
 effectiveness outcome ('e') whose name must correspond to that used in \code{data}, and 
 any covariates are given on the right-hand side. If there are no covariates, specify \code{1} on the right hand side.
 By default, covariates are placed on the "location" parameter of the distribution through a linear model.}
 
-\item{model.cost}{A formula expression in conventional R linear modelling syntax. The response must be a health economics
+\item{model.cost}{A formula expression in conventional \code{R} linear modelling syntax. The response must be a health economics
 cost outcome ('c') whose name must correspond to that used in \code{data}, and any covariates are given on the right-hand side.
 If there are no covariates, specify \code{1} on the right hand side. By default, covariates are placed on the "location" 
 parameter of the distribution through a linear model. A joint bivariate distribution for effects and costs can be specified by
 including 'e' in the model for the costs.}
 
-\item{model.se}{A formula expression in conventional R linear modelling syntax.  The response must be indicated with the 
+\item{model.se}{A formula expression in conventional \code{R} linear modelling syntax.  The response must be indicated with the 
 term 'se'(structural effects) and any covariates used to estimate the probability of structural effects are given on the right-hand side. 
 If there are no covariates, specify \code{1} on the right hand side. By default, covariates are placed on the "probability" parameter for the structural effects through a logistic-linear model.}
 
-\item{model.sc}{A formula expression in conventional R linear modelling syntax. The response must be indicated with the 
+\item{model.sc}{A formula expression in conventional \code{R} linear modelling syntax. The response must be indicated with the 
 term 'sc'(structural costs) and any covariates used to estimate the probability of structural costs should be given on the right-hand side. 
 If there are no covariates, specify \code{1} on the right hand side. By default, covariates are placed on the "probability" parameter for the structural costs through a logistic-linear model.}
 
@@ -44,7 +44,7 @@ no structural value is chosen and a standard model for the costs is run.}
 \item{dist_c}{distribution assumed for the costs. Current available chocies are: Normal ('norm') or Gamma ('gamma').}
 
 \item{type}{Type of structural value mechanism assumed. Choices are Structural Completely At Random (SCAR),
-and Structural At Random (MNAR).}
+and Structural At Random (SAR).}
 
 \item{prob}{A numeric vector of probabilities within the range (0,1), representing the upper and lower
 CI sample quantiles to be calculated and returned for the imputed values.}
@@ -111,99 +111,97 @@ is a mass distribution at the spike, while the second is a parametric model appl
 Usually, a logistic regression is used to estimate the probability of incurring a "structural" value (e.g. 0 for the costs, or 1 for the
 effects); this is then used to weigh the mean of the "non-structural" values estimated in the second component. A simple example can be used
 to show how Hurdle models are specified. 
-Consider a data set comprising a response variable \eqn{y} and a set of centered covariate \eqn{X^*_j}.Specifically, for each subject in the trial \eqn{i = 1,...,n}
+Consider a data set comprising a response variable \eqn{y} and a set of centered covariate \eqn{X_j}.Specifically, for each subject in the trial \eqn{i = 1,...,n}
 we define an indicator variable \eqn{d_i} taking value \code{1} if the \eqn{i}-th individual is associated with a structural value and \code{0} otherwise.
 This is modelled as:
 \deqn{d_i ~ Bernoulli(\pi_i)}
-\deqn{logit(\pi_i)=\gamma_0+\sum\gamma_j X^*_j}
+\deqn{logit(\pi_i)=\gamma_0+\sum\gamma_j X_j}
 where
 \itemize{
 \item \eqn{\pi_i} is the individual probability of a structural value in \eqn{y}
 \item \eqn{\gamma_0} represents the marginal probability of a structural value in \eqn{y} on the logit scale.
-\item \eqn{\gamma_j} represents the impact on the probability of a structural value in \eqn{y} of the centered covariates \eqn{X^*_j}.
+\item \eqn{\gamma_j} represents the impact on the probability of a structural value in \eqn{y} of the centered covariates \eqn{X_j}.
 }
 
-When \eqn{\gamma_j=0} the model assumes a 'SCAR' mechanism, while when \eqn{\gamma_j!=0} the mechanism is 'SAR'.
-
-It is important to keep in mind the model structure when providing user-defined hyperprior values for the parameters using the argument \code{prior} 
-in the function \code{hurdle}. Specifically, for the non-structural component the default prior distributions that can be overwritten by the user are the following:
-\itemize{
-\item Normal. Priors can be supplied for the location (mean) and auxiliary (log-sd) parameter with default values: \eqn{\mu_0 ~ Normal(0,0.0001), \alpha~Uniform(-5,10)}
-\item Beta.  Priors can be supplied for the location (logit-mean) and auxiliary (sd) parameter with default values: \eqn{logit(\mu_0) ~ Normal(0,0.0001), \alpha~Uniform(0,\sqrt\mu(1-\mu))}
-\item Gamma.  Priors can be supplied for the location (log-mean) and auxiliary (sd) parameter with default values: \eqn{log(\mu_0) ~ Normal(0,0.0001), \alpha~Uniform(0,1000)}
-}
-When covariate data are included in the model with a generalised linear regression to the mean of the outcome variable, rather than of specifying priors on \eqn{\mu} 
-it is necessary to define the priors on the coefficient parameters of the generalised linear regression such as
-\deqn{g(\mu)=\beta_0+\sum\beta_j X^*_j}
-where g() is a general link function (e.g. identity, log or logit), \eqn{\beta_0} is the marginal mean defined on the scale of g(), while
-\eqn{\beta_j} are the coefficients associated with the centeres covariates \eqn{X^*_j}, with defualt priors that are the same for all \eqn{j}: \eqn{\beta_j~Normal(0,0.0001)}. 
+When \eqn{\gamma_j = 0} the model assumes a 'SCAR' mechanism, while when \eqn{\gamma_j!=0} the mechanism is 'SAR'.
 For the parameters indexing the structural value model, the default prior distributions assumed are the following:
 \itemize{
-\item \eqn{\gamma_0~Logisitc(0,1)}
-\item \eqn{\gamma_j~Normal(0,0.0001)}
+\item \eqn{\gamma_0 ~ Logisitc(0,1)}
+\item \eqn{\gamma_j ~ Normal(0,0.0001)}
 }
 When user-defined hyperprior values are supplied via the argument \code{prior} in the function \code{hurdle}, the elements of this list (see Arguments)
 must be vectors of length \code{2} containing the user-provided hyperprior values and must take specific names according to the parameters they are associated with. 
 Specifically, the names accepted by \strong{missingHE} are the following:
 \itemize{
-\item location parameters \eqn{\beta_0}: "mean.prior.e"(effects) and/or "mean.prior.c"(costs)
-\item auxiliary parameters \eqn{\alpha}: "alpha.prior.e"(effects) and/or "alpha.prior.c"(costs)
-\item covariate parameters (if covariate data provided) \eqn{\beta_j}: "beta.prior.e"(effects) and/or "beta.prior.c"(costs)
+\item location parameters \eqn{\alpha_0, \beta_0}: "mean.prior.e"(effects) and/or "mean.prior.c"(costs)
+\item auxiliary parameters \eqn{\sigma}: "sigma.prior.e"(effects) and/or "sigma.prior.c"(costs)
+\item covariate parameters \eqn{\apha_j, \beta_j}: "alpha.prior"(effects) and/or "beta.prior"(costs)
 \item marginal probability of structural values \eqn{\gamma_0}: "p.prior.e"(effects) and/or "p.prior.c"(costs)
 \item covariate parameters in the model of the structural values \eqn{\gamma_j} (if covariate data provided): "gamma.prior.e"(effects) and/or "gamma.prior.c"(costs)
 } 
-For simplicity, here we have assumed that the set of covariates \eqn{X^*_j} used in the models for the effects/costs and in the 
+For simplicity, here we have assumed that the set of covariates \eqn{X_j} used in the models for the effects/costs and in the 
 model of the structural effect/cost values is the same. However, it is possible to specify different sets of covariates for each model
 using the arguments in the function \code{hurdle} (see Arguments).
 }
 \examples{
 #Simple example to simulate and analyse a data set
 #Define the number of individuals fer treatment arm
-N1<-150
-N2<-100
+N1 <- 150
+N2 <- 100
+
 #Simulate data from normal distributions for both arms
-eff1<-rnorm(N1,0.5,0.5)
-eff2<-rnorm(N2,0.5,0.5)
-cost1<-rnorm(N1,90,20)
-cost2<-rnorm(N2,90,20)
+eff1 <- rnorm(N1, 0.5, 0.5)
+eff2 <- rnorm(N2, 0.5, 0.5)
+cost1 <- rnorm(N1, 90, 20)
+cost2 <- rnorm(N2, 90, 20)
+
 #introduce structural values
 #ones for the effects
-se=1
-eff1[1:10]<-1
-eff2[1:10]<-1
+se = 1
+eff1[1:10] <- 1
+eff2[1:10] <- 1
+
 #zeros for the costs
-sc=0
-cost1[1:10]<-0
-cost2[1:10]<-0
+sc = 0
+cost1[1:10] <- 0
+cost2[1:10] <- 0
+
 #add missing values
-eff1[20:30]<-NA
-eff2[20:30]<-NA
-cost1[20:30]<-NA
-cost2[20:30]<-NA
+eff1[20:30] <- NA
+eff2[20:30] <- NA
+cost1[20:30] <- NA
+cost2[20:30] <- NA
+
 #Create treatment arm indicators
-t1<-rep(1,length(eff1))
-t2<-rep(2,length(eff2))
+t1 <- rep(1, length(eff1))
+t2 <- rep(2, length(eff2))
+
 #Combine variables and define a data set
-e<-c(eff1,eff2)
-c<-c(cost1,cost2)
-t<-c(t1,t2)
-data<-data.frame(e,c,t)
+e <- c(eff1, eff2)
+c <- c(cost1, cost2)
+t <- c(t1, t2)
+data <- data.frame(e, c, t)
 
 #Run the model using the hurdle function assuming a SCAR mechanism
-x<-hurdle(data=data,model.eff=e~1,model.cost=c~1,model.se=se~1,model.sc=sc~1,
-se=1,sc=0,dist_e="norm",dist_c="norm",type="SCAR")
+x <- hurdle(data = data, model.eff = e ~ 1, model.cost = c ~ 1, 
+model.se = se ~ 1, model.sc = sc ~ 1, se = 1, sc = 0, 
+dist_e = "norm", dist_c = "norm", type = "SCAR")
+
 #print the results of the JAGS model
 print(x)
 #
+
 #Assess model convergence using graphical tools
 #Produce histograms of the posterior samples for the mean effect
 #parameters in the two treatment arms. 
-diagnostic(x,type = "histogram",param = "mu.e")
+diagnostic(x, type = "histogram", param = "mu.e")
 #
+
 #Compare observed outcome data with imputations from the model
 # (posteiror means and credible intervals)
-plot(x,class="scatter",outcome="all")
+plot(x, class = "scatter", outcome = "all")
 #
+
 #Summarise the CEA information from model results
 summary(x)
 #

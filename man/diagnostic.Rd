@@ -48,8 +48,8 @@ must be specified in the argument \code{param}. The available names and the para
 \item "mu.c" the mean parameters of the cost variables in the two treatment arms.
 \item "sd.e" the standard deviation parameters of the effect variables in the two treatment arms.
 \item "sd.c" the standard deviation parameters of the cost variables in the two treatment arms.
-\item "beta.e" the regression intercept and covariate coefficient parameters for the effect variables in the two treatment arms.
-\item "beta.c" the regression intercept and covariate coefficient parameters for the cost variables in the two treatment arms.
+\item "alpha" the regression intercept and covariate coefficient parameters for the effect variables in the two treatment arms.
+\item "beta" the regression intercept and covariate coefficient parameters for the cost variables in the two treatment arms.
 \item "p.e" the probability parameters of the missingness or structural values mechanism for the effect variables in the two treatment arms.
 \item "p.c" the probability parameters of the missingness or structural values mechanism for the cost variables in the two treatment arms.
 \item "gamma.e" the regression intercept and covariate coefficient parameters of the missingness or structural values mechanism for the effect variables in the two treatment arms.

@@ -5,16 +5,28 @@
 \title{An internal function to change the hyperprior parameters in the hurdle model provided by the user depending on the type of
 structural value mechanism and outcome distributions assumed}
 \usage{
-prior_hurdle(type, dist_e, dist_c)
+prior_hurdle(type, dist_e, dist_c, pe, pc, ze, zc, se, sc)
 }
 \arguments{
 \item{type}{Type of structural value mechanism assumed. Choices are Structural Completely At Random (SCAR),
-and Structural At Random (MNAR). For a complete list of all available hyper parameters 
+and Structural At Random (SAR). For a complete list of all available hyper parameters 
 and types of models see the manual.}
 
 \item{dist_e}{distribution assumed for the effects. Current available chocies are: Normal ('norm') or Beta ('beta').}
 
 \item{dist_c}{distribution assumed for the costs. Current available chocies are: Normal ('norm') or Gamma ('gamma').}
+
+\item{pe}{Number of covariates for the effectiveness model}
+
+\item{pc}{Number of cvoariates for the cost model}
+
+\item{ze}{Number of covariates or the structural indicators model for the effectiveness}
+
+\item{zc}{Number of covariates or the structural indicators model for the costs}
+
+\item{se}{Structural value for the effectiveness}
+
+\item{sc}{Structural value for the costs}
 }
 \description{
 This function modifies default hyper prior parameter values in the type of hurdle model selected according 

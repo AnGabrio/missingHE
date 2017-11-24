@@ -7,15 +7,25 @@ Alternatives vary depending on the type of distribution assumed for the effect a
 type of missingness mechanism assumed and independence or joint modelling
 This function selects which type of model to execute.}
 \usage{
-write_selection(type, dist_e, dist_c)
+write_selection(dist_e, dist_c, ind, type, pe, pc, ze, zc)
 }
 \arguments{
+\item{dist_e}{Distribution assumed for the effects. Current available chocies are: Normal ('norm') or Beta ('beta')}
+
+\item{dist_c}{Distribution assumed for the costs. Current available chocies are: Normal ('norm') or Gamma ('gamma')}
+
+\item{ind}{Logical; if TRUE independence between effectiveness and costs is assumed, else correlation is accounted for}
+
 \item{type}{Type of missingness mechanism assumed. Choices are Missing At Random (MAR), Missing Not At Random for the effects (MNAR_eff),
 Missing Not At Random for the costs (MNAR_cost), and Missing Not At Random for both (MNAR)}
 
-\item{dist_e}{distribution assumed for the effects. Current available chocies are: Normal ('norm') or Beta ('beta').}
+\item{pe}{Number of covariates for the effectiveness model}
 
-\item{dist_c}{distribution assumed for the costs. Current available chocies are: Normal ('norm') or Gamma ('gamma').}
+\item{pc}{Number of cvoariates for the cost model}
+
+\item{ze}{Number of covariates or the missingness indicators model for the effectiveness}
+
+\item{zc}{Number of covariates or the missingness indicators model for the costs}
 }
 \description{
 An internal function to select which type of selection model to execute. 

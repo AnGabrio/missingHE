@@ -9,7 +9,7 @@ run_hurdle(type, dist_e, dist_c, inits, se = se, sc = sc, sde = sde,
 }
 \arguments{
 \item{type}{Type of structural value mechanism assumed. Choices are Structural Completely At Random (SCAR),
-and Structural At Random (MNAR).}
+and Structural At Random (SAR).}
 
 \item{dist_e}{distribution assumed for the effects. Current available chocies are: Normal ('norm') or Beta ('beta').}
 

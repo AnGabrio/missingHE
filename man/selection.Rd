@@ -14,22 +14,22 @@ selection(data, model.eff, model.cost, model.me = me ~ 1, model.mc = mc ~ 1,
 and \code{model.me}, \code{model.mc} (model formulas for the missing effect and cost models) . Among these,
 effectiveness, cost and treatment indicator (only two arms) variables must always be provided and named 'e', 'c' and 't' respectively.}
 
-\item{model.eff}{A formula expression in conventional R linear modelling syntax. The response must be a health economics
+\item{model.eff}{A formula expression in conventional \code{R} linear modelling syntax. The response must be a health economics
 effectiveness outcome ('e') whose name must correspond to that used in \code{data}, and 
 any covariates are given on the right-hand side. If there are no covariates, specify \code{1} on the right hand side.
 By default, covariates are placed on the "location" parameter of the distribution through a linear model.}
 
-\item{model.cost}{A formula expression in conventional R linear modelling syntax. The response must be a health economics
+\item{model.cost}{A formula expression in conventional \code{R} linear modelling syntax. The response must be a health economics
 cost outcome ('c') whose name must correspond to that used in \code{data}, and any covariates are given on the right-hand side.
 If there are no covariates, specify \code{1} on the right hand side. By default, covariates are placed on the "location" 
 parameter of the distribution through a linear model. A joint bivariate distribution for effects and costs can be specified by
 including 'e' in the model for the costs.}
 
-\item{model.me}{A formula expression in conventional R linear modelling syntax.  The response must be indicated with the 
+\item{model.me}{A formula expression in conventional \code{R} linear modelling syntax.  The response must be indicated with the 
 term 'me'(missing effects) and any covariates used to estimate the probability of missing effects are given on the right-hand side. 
 If there are no covariates, specify \code{1} on the right hand side. By default, covariates are placed on the "probability" parameter for the missing effects through a logistic-linear model.}
 
-\item{model.mc}{A formula expression in conventional R linear modelling syntax. The response must be indicated with the 
+\item{model.mc}{A formula expression in conventional \code{R} linear modelling syntax. The response must be indicated with the 
 term 'mc'(missing costs) and any covariates used to estimate the probability of missing costs should be given on the right-hand side. 
 If there are no covariates, specify \code{1} on the right hand side. By default, covariates are placed on the "probability" parameter for the missing costs through a logistic-linear model.}
 
@@ -98,34 +98,20 @@ Depending on the distributional assumptions specified for the outcome variables 
 \code{dist_c} and the type of missingness mechanism assumed in the argument \code{type}, different types of selection models
 are built and run in the background by the function \code{selection}. These models consist in logistic regressions that are used to estimate
 the probability of missingness in either or both the outcomes. A simple example can be used to show how Selection models are specified. 
-Consider a data set comprising a response variable \eqn{y} and a set of centered covariate \eqn{X^*_j}.Specifically, for each subject in the trial \eqn{i = 1,...,n}
+Consider a data set comprising a response variable \eqn{y} and a set of centered covariate \eqn{X_j}. For each subject in the trial \eqn{i = 1,...,n}
 we define an indicator variable \eqn{m_i} taking value \code{1} if the \eqn{i}-th individual is associated with a missing value and \code{0} otherwise.
 This is modelled as:
 \deqn{m_i ~ Bernoulli(\pi_i)}
-\deqn{logit(\pi_i)=\gamma_0+\sum\gamma_j X^*_j +\delta(y)}
+\deqn{logit(\pi_i)=\gamma_0+\sum\gamma_j X_j +\delta(y)}
 where
 \itemize{
 \item \eqn{\pi_i} is the individual probability of a missing value in \eqn{y}
 \item \eqn{\gamma_0} represents the marginal probability of a missing value in \eqn{y} on the logit scale.
-\item \eqn{\gamma_j} represents the impact on the probability of a missing value in \eqn{y} of the centered covariates \eqn{X^*_j}.
+\item \eqn{\gamma_j} represents the impact on the probability of a missing value in \eqn{y} of the centered covariates \eqn{X_j}.
 \item \eqn{\delta} represents the impact on the probability of a missing value in \eqn{y} of the missing value itself
 }
-
-When \eqn{\delta=0} the model assumes a 'MAR' mechanism, while when \eqn{\delta!=0} the mechanism is 'MNAR'.
-
-It is important to keep in mind the model structure when providing user-defined hyperprior values for the parameters using the argument \code{prior} 
-in the function \code{selection}. Specifically, the default prior distributions that can be overwritten by the user are the following:
-\itemize{
-\item Normal. Priors can be supplied for the location (mean) and auxiliary (log-sd) parameter with default values: \eqn{\mu_0 ~ Normal(0,0.0001), \alpha~Uniform(-5,10)}
-\item Beta.  Priors can be supplied for the location (logit-mean) and auxiliary (sd) parameter with default values: \eqn{logit(\mu_0) ~ Normal(0,0.0001), \alpha~Uniform(0,\sqrt\mu(1-\mu))}
-\item Gamma.  Priors can be supplied for the location (log-mean) and auxiliary (sd) parameter with default values: \eqn{log(\mu_0) ~ Normal(0,0.0001), \alpha~Uniform(0,1000)}
-}
-When covariate data are included in the model with a generalised linear regression to the mean of the outcome variable, rather than of specifying priors on \eqn{\mu} 
-it is necessary to define the priors on the coefficient parameters of the generalised linear regression such as
-\deqn{g(\mu)=\beta_0+\sum\beta_j X^*_j}
-where g() is a general link function (e.g. identity, log or logit), \eqn{\beta_0} is the marginal mean defined on the scale of g(), while
-\eqn{\beta_j} are the coefficients associated with the centeres covariates \eqn{X^*_j}, with defualt priors that are the same for all \eqn{j}: \eqn{\beta_j~Normal(0,0.0001)}. 
-For the parameters indexing the missingness model, the default prior distributions assumed are the following:
+When \eqn{\delta=0} the model assumes a 'MAR' mechanism, while when \eqn{\delta!=0} the mechanism is 'MNAR'. For the parameters indexing the missingness model, 
+the default prior distributions assumed are the following:
 \itemize{
 \item \eqn{\gamma_0~Logisitc(0,1)}
 \item \eqn{\gamma_j~Normal(0,0.0001)}
@@ -133,65 +119,75 @@ For the parameters indexing the missingness model, the default prior distributio
 }
 When user-defined hyperprior values are supplied via the argument \code{prior} in the function \code{selection}, the elements of this list (see Arguments)
 must be vectors of length \code{2} containing the user-provided hyperprior values and must take specific names according to the parameters they are associated with. 
-Specifically, the names accepted by \strong{missingHE} are the following:
+Specifically, the names for the parameters indexing the MoA and MoM accepted by \strong{missingHE} are the following:
 \itemize{
-\item location parameters \eqn{\beta_0}: "mean.prior.e"(effects) and/or "mean.prior.c"(costs)
-\item auxiliary parameters \eqn{\alpha}: "alpha.prior.e"(effects) and/or "alpha.prior.c"(costs)
-\item covariate parameters (if covariate data provided) \eqn{\beta_j}: "beta.prior.e"(effects) and/or "beta.prior.c"(costs)
+\item location parameters \eqn{\alpha_0} and \eqn{\beta_0}: "mean.prior.e"(effects) and/or "mean.prior.c"(costs)
+\item auxiliary parameters \eqn{\sigma}: "sigma.prior.e"(effects) and/or "sigma.prior.c"(costs)
+\item covariate parameters \eqn{\alpha_j} and \eqn{\beta_j}: "alpha.prior"(effects) and/or "beta.prior"(costs)
 \item marginal probability of missing values \eqn{\gamma_0}: "p.prior.e"(effects) and/or "p.prior.c"(costs)
 \item covariate parameters in the model of the structural values \eqn{\gamma_j} (if covariate data provided): "gamma.prior.e"(effects) and/or "gamma.prior.c"(costs)
 \item mnar parameter \eqn{\delta}: "delta.prior.e"(effects) and/or "delta.prior.c"(costs)
 } 
-For simplicity, here we have assumed that the set of covariates \eqn{X^*_j} used in the models for the effects/costs and in the 
+For simplicity, here we have assumed that the set of covariates \eqn{X_j} used in the models for the effects/costs and in the 
 model of the missing effect/cost values is the same. However, it is possible to specify different sets of covariates for each model
 using the arguments in the function \code{selection} (see Arguments).
 }
 \examples{
 #Simple example to simulate and analyse a data set
 #Define the number of individuals fer treatment arm
-N1<-150
-N2<-100
-#Create the misisngness indicators totally random (MCAR mechanism)
-m_eff1<-m_cost1<-rbinom(N1,1,0.25)
-m_eff2<-m_cost2<-rbinom(N2,1,0.25)
-#Simulate data from normal distributions for both arms
-eff1<-rnorm(N1,0.5,0.5)
-eff2<-rnorm(N2,0.5,0.5)
-cost1<-rnorm(N1,90,20)
-cost2<-rnorm(N2,90,20)
-#Set value missing if indicator is 1
-eff1[m_eff1==1]<-NA
-eff2[m_eff2==1]<-NA
-cost1[m_cost1==1]<-NA
-cost2[m_cost2==1]<-NA
-#Create treatment arm indicators
-t1<-rep(1,length(eff1))
-t2<-rep(2,length(eff2))
-#Combine variables and define a data set
-e<-c(eff1,eff2)
-c<-c(cost1,cost2)
-m_eff<-c(m_eff1,m_eff2)
-m_cost<-c(m_cost1,m_cost2)
-t<-c(t1,t2)
-data<-data.frame(e,c,t)
+N1 <- 150
+N2 <- 100
 
-#Run the model using run_model with JAGS assuming a MCAR missingness mechanism
-x<-selection(data=data,model.eff=e~1,model.cost=c~1,model.me=me~1,model.mc=mc~1,
-dist_e="norm",dist_c="norm",type="MAR")
+#Create the misisngness indicators totally random (MCAR mechanism)
+m_eff1 <- m_cost1 <- rbinom(N1,1,0.25)
+m_eff2 <- m_cost2 <- rbinom(N2,1,0.25)
+
+#Simulate data from normal distributions for both arms
+eff1 <- rnorm(N1, 0.5, 0.5)
+eff2 <- rnorm(N2, 0.5, 0.5)
+cost1 <- rnorm(N1, 90, 20)
+cost2 <- rnorm(N2, 90, 20)
+
+#Set value missing if indicator is 1
+eff1[m_eff1 == 1] <- NA
+eff2[m_eff2 == 1] <- NA
+cost1[m_cost1 == 1] <- NA
+cost2[m_cost2 == 1] <- NA
+
+#Create treatment arm indicators
+t1 <- rep(1, length(eff1))
+t2 <- rep(2, length(eff2))
+
+#Combine variables and define a data set
+e <- c(eff1, eff2)
+c <- c(cost1, cost2)
+m_eff <- c(m_eff1, m_eff2)
+m_cost <- c(m_cost1, m_cost2)
+t <- c(t1, t2)
+data <- data.frame(e, c, t)
+
+#Run the model using selection with JAGS assuming a MCAR missingness mechanism
+x <- selection(data = data, model.eff = e ~ 1, model.cost = c ~ 1, 
+model.me = me ~ 1, model.mc = mc ~ 1, dist_e = "norm", dist_c = "norm", type = "MAR")
+
 #print the results of the JAGS model
 print(x)
+
 #
 #Assess model convergence using graphical tools
 #Produce histograms of the posterior samples for the mean effect
 #parameters in the two treatment arms. 
-diagnostic(x,type = "histogram",param = "mu.e")
+diagnostic(x, type = "histogram", param = "mu.e")
+
 #
 #Compare observed outcome data with imputations from the model
 # (posteiror means and credible intervals)
-plot(x,class="scatter",outcome="all")
+plot(x, class = "scatter", outcome = "all")
+
 #
 #Summarise the CEA information from model results
 summary(x)
+
 #
 #
 }

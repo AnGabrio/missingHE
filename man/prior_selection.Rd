@@ -5,7 +5,7 @@
 \title{An internal function to change the hyperprior parameters in the selection model provided by the user depending on the type of
 missingness mechanism and outcome distributions assumed}
 \usage{
-prior_selection(type, dist_e, dist_c)
+prior_selection(type, dist_e, dist_c, pe, pc, ze, zc)
 }
 \arguments{
 \item{type}{Type of missingness mechanism assumed. Choices are Missing At Random (MAR), Missing Not At Random for the effects (MNAR_eff),
@@ -15,6 +15,14 @@ and types of models see the manual.}
 \item{dist_e}{distribution assumed for the effects. Current available chocies are: Normal ('norm') or Beta ('beta').}
 
 \item{dist_c}{distribution assumed for the costs. Current available chocies are: Normal ('norm') or Gamma ('gamma').}
+
+\item{pe}{Number of covariates for the effectiveness model}
+
+\item{pc}{Number of cvoariates for the cost model}
+
+\item{ze}{Number of covariates or the missingness indicators model for the effectiveness}
+
+\item{zc}{Number of covariates or the missingness indicators model for the costs}
 }
 \description{
 This function modifies default hyper prior parameter values in the type of selection model selected according 
