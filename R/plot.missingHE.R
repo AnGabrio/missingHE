@@ -38,383 +38,345 @@
 #' #
 #' #
 
-plot.missingHE<-function(x,prob=c(0.05,0.95),class="scatter",outcome="all",theme=NULL,...){
-  #plot imputed and observed values with credible intervals
-  #load namespace of gridExtra, grid and ggplot2 else ask to install the packages
-  if(!isTRUE(requireNamespace("gridExtra"))|!isTRUE(requireNamespace("grid"))|!isTRUE(requireNamespace("ggplot2"))) {
+plot.missingHE <- function(x, prob = c(0.05, 0.95), class = "scatter", outcome = "all", theme = NULL, ...) {
+  if(!isTRUE(requireNamespace("gridExtra")) | !isTRUE(requireNamespace("grid")) | !isTRUE(requireNamespace("ggplot2"))) {
     stop("You need to install the R packages 'gridExtra', 'grid' and 'ggplot2'. Please run in your R terminal:\n install.packages('gridExtra', 'grid', 'ggplot2')")
   }
-  #only types of themes available
-  if(is.null(theme)==TRUE){theme="base"}
-  if(!theme %in% c("base","calc","economist","excel","few","538","gdocs","hc","par","pander","solarized","stata","tufte","wsj")){
+  if(is.null(theme) == TRUE) {theme = "base" }
+  if(!theme %in% c("base", "calc", "economist", "excel", "few", "538", "gdocs", "hc", "par", "pander", "solarized", "stata", "tufte", "wsj")) {
     stop("You must provide a valid theme type among those available")
   }
-  #only types of plots available
-  if(!class %in% c("scatter","histogram")){
+  if(!class %in% c("scatter", "histogram")) {
     stop("You must provide a plot class among those available")
   }
-  #plot effects and costs joint or independent and by arm or by category
-  if(!outcome %in% c("all","effects","costs","arm1","arm2","effects_arm1","costs_arm1","effects_arm2","costs_arm2")){
+  if(!outcome %in% c("all", "effects", "costs", "arm1", "arm2", "effects_arm1", "costs_arm1", "effects_arm2", "costs_arm2")) {
     stop("You must provide a plot outcome among those available")
   }
-  #define additional inputs as a list
   exArgs <- list(...)
-  #x can only be object of class missing
-  if(class(x)!="missingHE"){
+  if(class(x) != "missingHE") {
     stop("Only objects of class 'missingHE' can be used")
   }
-  #stop if no missing values
   if(x$data_set$`N missing in comparator arm`[1]==0 & x$data_set$`N missing in comparator arm`[2]==0 &
-     x$data_set$`N missing in reference arm`[1]==0 & x$data_set$`N missing in reference arm`[2]==0){
+     x$data_set$`N missing in reference arm`[1]==0 & x$data_set$`N missing in reference arm`[2]==0) {
     stop("No missing value found in the data")
   }
-  #quantile bounds must be valid
-  if(length(prob)!=2|is.numeric(prob)==FALSE|any(prob<0)!=FALSE|any(prob>1)!=FALSE){
-    stop("You must provide valid lower/upper quantiles for the imputed data distribution")}
-  #differentiate based on buggs or jags output
-  #obtain merged imputed and observed data (complete) from jags output
-    eff1_pos<-matrix(x$data_set$effects[[1]],x$data_set$`N in reference arm`,3)
-    cost1_pos<-matrix(x$data_set$costs[[1]],x$data_set$`N in reference arm`,3)
-    eff2_pos<-matrix(x$data_set$effects[[2]],x$data_set$`N in comparator arm`,3)
-    cost2_pos<-matrix(x$data_set$costs[[2]],x$data_set$`N in comparator arm`,3)
-    eff1_pos[,1]<-apply(x$model_output$`model summary`$BUGSoutput$sims.list$eff1,2,mean)
-    eff1_pos[,2]<-apply(x$model_output$`model summary`$BUGSoutput$sims.list$eff1,2,quantile,probs=prob[1])
-    eff1_pos[,3]<-apply(x$model_output$`model summary`$BUGSoutput$sims.list$eff1,2,quantile,probs=prob[2])
-    eff2_pos[,1]<-apply(x$model_output$`model summary`$BUGSoutput$sims.list$eff2,2,mean)
-    eff2_pos[,2]<-apply(x$model_output$`model summary`$BUGSoutput$sims.list$eff2,2,quantile,probs=prob[1])
-    eff2_pos[,3]<-apply(x$model_output$`model summary`$BUGSoutput$sims.list$eff2,2,quantile,probs=prob[2])
-    cost1_pos[,1]<-apply(x$model_output$`model summary`$BUGSoutput$sims.list$cost1,2,mean)
-    cost1_pos[,2]<-apply(x$model_output$`model summary`$BUGSoutput$sims.list$cost1,2,quantile,probs=prob[1])
-    cost1_pos[,3]<-apply(x$model_output$`model summary`$BUGSoutput$sims.list$cost1,2,quantile,probs=prob[2])
-    cost2_pos[,1]<-apply(x$model_output$`model summary`$BUGSoutput$sims.list$cost2,2,mean)
-    cost2_pos[,2]<-apply(x$model_output$`model summary`$BUGSoutput$sims.list$cost2,2,quantile,probs=prob[1])
-    cost2_pos[,3]<-apply(x$model_output$`model summary`$BUGSoutput$sims.list$cost2,2,quantile,probs=prob[2])
-    #set colnames
-    colnames(eff1_pos)<-c("mean","LB","UB")
-    colnames(eff2_pos)<-c("mean","LB","UB")
-    colnames(cost1_pos)<-c("mean","LB","UB")
-    colnames(cost2_pos)<-c("mean","LB","UB")
-    complete_labels<-complete<-list("effects1"=eff1_pos,"effects2"=eff2_pos,"costs1"=cost1_pos,"costs2"=cost2_pos)
-  #obtain observed data
-    observed<-list("effects1"=x$data_set$effects[[1]],"effects2"=x$data_set$effects[[2]],
-                   "costs1"=x$data_set$costs[[1]],"costs2"=x$data_set$costs[[2]])
-  #obtain imputed data by substituting the imputed values based on posterior mean, lower and upper quantiles into the observed value vector if NA 
-    eff1_imp<-matrix(NA,length(complete$effects1[,1]),3)
-    cost1_imp<-matrix(NA,length(complete$costs1[,1]),3)
-    eff2_imp<-matrix(NA,length(complete$effects2[,1]),3)
-    cost2_imp<-matrix(NA,length(complete$costs2[,1]),3)
-    eff1_imputed<-lapply(1:3,function(j){
-      unlist(lapply(1:length(complete$effects1[,j]),function(i){
-      if(is.na(observed$effects1[i])==TRUE){eff1_imp[i]<-complete$effects1[i,j]} else {eff1_imp[i]<-NA}}))})
-    eff2_imputed<-lapply(1:3,function(j){
-      unlist(lapply(1:length(complete$effects2[,j]),function(i){
-        if(is.na(observed$effects2[i])==TRUE){eff2_imp[i]<-complete$effects2[i,j]} else {eff2_imp[i]<-NA}}))})
-    cost1_imputed<-lapply(1:3,function(j){
-      unlist(lapply(1:length(complete$costs1[,j]),function(i){
-        if(is.na(observed$costs1[i])==TRUE){cost1_imp[i]<-complete$costs1[i,j]} else {cost1_imp[i]<-NA}}))})
-    cost2_imputed<-lapply(1:3,function(j){
-      unlist(lapply(1:length(complete$costs2[,j]),function(i){
-        if(is.na(observed$costs2[i])==TRUE){cost2_imp[i]<-complete$costs2[i,j]} else {cost2_imp[i]<-NA}}))})
-    #put imputed values into matrix form where row=individual, column=type of imputed values (mean,lower,upper quantile)
-    eff1_imp<-sapply(1:3,function(j){eff1_imp[,j]<-unlist(eff1_imputed[j])})
-    eff2_imp<-sapply(1:3,function(j){eff2_imp[,j]<-unlist(eff2_imputed[j])})
-    cost1_imp<-sapply(1:3,function(j){cost1_imp[,j]<-unlist(cost1_imputed[j])})
-    cost2_imp<-sapply(1:3,function(j){cost2_imp[,j]<-unlist(cost2_imputed[j])})
-    #obtain imputed data
-    imputed<-list("effects1"= eff1_imp,"effects2"=eff2_imp,"costs1"=cost1_imp,"costs2"=cost2_imp)
-    #set colnames
-    colnames(eff1_imp)<-c("mean","LB","UB")
-    colnames(eff2_imp)<-c("mean","LB","UB")
-    colnames(cost1_imp)<-c("mean","LB","UB")
-    colnames(cost2_imp)<-c("mean","LB","UB")
-    imputed_labels<-list("effects1"= eff1_imp,"effects2"=eff2_imp,"costs1"=cost1_imp,"costs2"=cost2_imp)
-    #group all three types of data in a single list object to be returned
-    data<-list("observed"=observed,"imputed"=imputed,"complete"=complete)
-    #create and define missing data indicators for each variable and arm
-    indic<-function(x){
-      w=NULL
-      if (is.na(x)==TRUE)
-        w="missing"
-      else w="observed"
+  if(length(prob) != 2 | is.numeric(prob) == FALSE | any(prob < 0) != FALSE | any(prob > 1) != FALSE) {
+    stop("You must provide valid lower/upper quantiles for the imputed data distribution")
+    }
+    eff1_pos <- matrix(x$data_set$effects[[1]], x$data_set$`N in reference arm`, 3)
+    cost1_pos <- matrix(x$data_set$costs[[1]], x$data_set$`N in reference arm`, 3)
+    eff2_pos <- matrix(x$data_set$effects[[2]], x$data_set$`N in comparator arm`, 3)
+    cost2_pos <- matrix(x$data_set$costs[[2]], x$data_set$`N in comparator arm`, 3)
+    eff1_pos[,1] <- apply(x$model_output$`model summary`$BUGSoutput$sims.list$eff1, 2, mean)
+    eff1_pos[,2] <- apply(x$model_output$`model summary`$BUGSoutput$sims.list$eff1, 2, quantile, probs = prob[1])
+    eff1_pos[,3] <- apply(x$model_output$`model summary`$BUGSoutput$sims.list$eff1, 2, quantile, probs = prob[2])
+    eff2_pos[,1] <- apply(x$model_output$`model summary`$BUGSoutput$sims.list$eff2, 2, mean)
+    eff2_pos[,2] <- apply(x$model_output$`model summary`$BUGSoutput$sims.list$eff2, 2, quantile, probs = prob[1])
+    eff2_pos[,3] <- apply(x$model_output$`model summary`$BUGSoutput$sims.list$eff2, 2, quantile, probs = prob[2])
+    cost1_pos[,1] <- apply(x$model_output$`model summary`$BUGSoutput$sims.list$cost1, 2, mean)
+    cost1_pos[,2] <- apply(x$model_output$`model summary`$BUGSoutput$sims.list$cost1, 2, quantile, probs = prob[1])
+    cost1_pos[,3] <- apply(x$model_output$`model summary`$BUGSoutput$sims.list$cost1, 2, quantile, probs = prob[2])
+    cost2_pos[,1] <- apply(x$model_output$`model summary`$BUGSoutput$sims.list$cost2, 2, mean)
+    cost2_pos[,2] <- apply(x$model_output$`model summary`$BUGSoutput$sims.list$cost2, 2, quantile, probs = prob[1])
+    cost2_pos[,3] <- apply(x$model_output$`model summary`$BUGSoutput$sims.list$cost2, 2, quantile, probs = prob[2])
+    colnames(eff1_pos) <- c("mean", "LB", "UB")
+    colnames(eff2_pos) <- c("mean", "LB", "UB")
+    colnames(cost1_pos) <- c("mean", "LB", "UB")
+    colnames(cost2_pos) <- c("mean", "LB", "UB")
+    complete_labels <- complete <- list("effects1" = eff1_pos, "effects2" = eff2_pos, "costs1" = cost1_pos, "costs2" = cost2_pos)
+    observed<-list("effects1" = x$data_set$effects[[1]], "effects2" = x$data_set$effects[[2]],
+                   "costs1" = x$data_set$costs[[1]], "costs2" = x$data_set$costs[[2]])
+    eff1_imp <- matrix(NA, length(complete$effects1[, 1]), 3)
+    cost1_imp <- matrix(NA, length(complete$costs1[, 1]), 3)
+    eff2_imp <- matrix(NA, length(complete$effects2[, 1]), 3)
+    cost2_imp <- matrix(NA, length(complete$costs2[, 1]), 3)
+    eff1_imputed <- lapply(1:3, function(j) {
+      unlist(lapply(1:length(complete$effects1[, j]), function(i) {
+      if(is.na(observed$effects1[i]) == TRUE) {eff1_imp[i] <- complete$effects1[i, j]} else {eff1_imp[i] <- NA } } )) })
+    eff2_imputed <- lapply(1:3, function(j){
+      unlist(lapply(1:length(complete$effects2[, j]), function(i) {
+        if(is.na(observed$effects2[i]) == TRUE) {eff2_imp[i] <- complete$effects2[i, j]} else {eff2_imp[i] <- NA } })) })
+    cost1_imputed <- lapply(1:3, function(j) {
+      unlist(lapply(1:length(complete$costs1[, j]), function(i) {
+        if(is.na(observed$costs1[i]) == TRUE){cost1_imp[i] <- complete$costs1[i, j]} else {cost1_imp[i] <- NA } })) })
+    cost2_imputed <- lapply(1:3, function(j) {
+      unlist(lapply(1:length(complete$costs2[, j]), function(i) {
+        if(is.na(observed$costs2[i]) == TRUE) {cost2_imp[i] <- complete$costs2[i, j]} else {cost2_imp[i] <- NA } })) })
+    eff1_imp <- sapply(1:3, function(j) {eff1_imp[, j] <- unlist(eff1_imputed[j]) })
+    eff2_imp <- sapply(1:3, function(j) {eff2_imp[, j] <- unlist(eff2_imputed[j]) })
+    cost1_imp <- sapply(1:3, function(j) {cost1_imp[, j] <- unlist(cost1_imputed[j]) })
+    cost2_imp <- sapply(1:3, function(j) {cost2_imp[, j] <- unlist(cost2_imputed[j]) })
+    imputed <- list("effects1"= eff1_imp, "effects2" = eff2_imp, "costs1" = cost1_imp, "costs2" = cost2_imp)
+    colnames(eff1_imp) <- c("mean", "LB", "UB")
+    colnames(eff2_imp) <- c("mean", "LB", "UB")
+    colnames(cost1_imp) <- c("mean", "LB", "UB")
+    colnames(cost2_imp) <- c("mean", "LB", "UB")
+    imputed_labels <- list("effects1"= eff1_imp, "effects2" = eff2_imp, "costs1" = cost1_imp, "costs2" = cost2_imp)
+    data <- list("observed" = observed, "imputed" = imputed, "complete" = complete)
+    indic <- function(x) {
+      w = NULL
+      if (is.na(x) == TRUE)
+        w = "missing"
+      else w = "observed"
       return(w)
     }
-    #obtain categorical variable "missing,observed" for each individual and outcome type to use in the plots
-    m_eff1<-m_eff2<-m_cost1<-m_cost2<-c()
-    bound_m_eff1<-matrix(0,length(observed$effects1),3)
-    m_eff1<-sapply(observed$effects1,indic)
-    bound_m_eff1<-
-      sapply(2:3,function(j){
-      sapply(1:length(m_eff1),function(i){
-      if(m_eff1[i]=="observed"){
-        bound_m_eff1[i,j]=0
-      } else if(m_eff1[i]=="missing"){
-        bound_m_eff1[i,j]=imputed$effects1[i,j]}})})
-    bound_m_eff2<-matrix(0,length(observed$effects2),3)
-    m_eff2<-sapply(observed$effects2,indic)
-    bound_m_eff2<-
-      sapply(2:3,function(j){
-        sapply(1:length(m_eff2),function(i){
-          if(m_eff2[i]=="observed"){
-            bound_m_eff2[i,j]=0
-          } else if(m_eff2[i]=="missing"){
-            bound_m_eff2[i,j]=imputed$effects2[i,j]}})})    
-    bound_m_cost1<-matrix(0,length(observed$costs1),3)
-    m_cost1<-sapply(observed$costs1,indic)
-    bound_m_cost1<-
-      sapply(2:3,function(j){
-        sapply(1:length(m_cost1),function(i){
-          if(m_cost1[i]=="observed"){
-            bound_m_cost1[i,j]=0
-          } else if(m_cost1[i]=="missing"){
-            bound_m_cost1[i,j]=imputed$costs1[i,j]}})})    
-    bound_m_cost2<-matrix(0,length(observed$costs2),3)
-    m_cost2<-sapply(observed$costs2,indic)
-    bound_m_cost2<-
-      sapply(2:3,function(j){
-        sapply(1:length(m_cost2),function(i){
-          if(m_cost2[i]=="observed"){
-            bound_m_cost2[i,j]=0
-          } else if(m_cost2[i]=="missing"){
-            bound_m_cost2[i,j]=imputed$costs2[i,j]}})}) 
-    #scatterplot output of observed vs imputed for each outcome type and arm
-    #for each outcome define type of plot based on whether missing values are present or not
-    effects<-costs<-upper<-lower<-Individuals<-type<-NULL
-    if(class=="scatter"){
+    m_eff1 <- m_eff2 <- m_cost1 <- m_cost2 <- c()
+    bound_m_eff1 <- matrix(0, length(observed$effects1), 3)
+    m_eff1 <- sapply(observed$effects1, indic)
+    bound_m_eff1 <- sapply(2:3, function(j) {
+      sapply(1:length(m_eff1), function(i) {
+      if(m_eff1[i] == "observed") {
+        bound_m_eff1[i, j] = 0 
+      } else if(m_eff1[i] == "missing") {
+        bound_m_eff1[i, j] = imputed$effects1[i, j] } }) })
+    bound_m_eff2 <- matrix(0, length(observed$effects2), 3)
+    m_eff2 <- sapply(observed$effects2, indic)
+    bound_m_eff2 <- sapply(2:3, function(j) {
+        sapply(1:length(m_eff2), function(i) {
+          if(m_eff2[i] == "observed") {
+            bound_m_eff2[i, j] = 0
+          } else if(m_eff2[i] == "missing") {
+            bound_m_eff2[i, j] = imputed$effects2[i,j] } }) })    
+    bound_m_cost1 <- matrix(0, length(observed$costs1), 3)
+    m_cost1 <- sapply(observed$costs1, indic)
+    bound_m_cost1 <- sapply(2:3, function(j) {
+        sapply(1:length(m_cost1), function(i) {
+          if(m_cost1[i] == "observed") {
+            bound_m_cost1[i, j] = 0
+          } else if(m_cost1[i] == "missing") {
+            bound_m_cost1[i, j] = imputed$costs1[i, j] } }) })    
+    bound_m_cost2 <- matrix(0, length(observed$costs2), 3)
+    m_cost2 <- sapply(observed$costs2, indic)
+    bound_m_cost2 <- sapply(2:3, function(j) {
+        sapply(1:length(m_cost2), function(i) {
+          if(m_cost2[i] == "observed") {
+            bound_m_cost2[i, j] = 0
+          } else if(m_cost2[i] == "missing") {
+            bound_m_cost2[i, j] = imputed$costs2[i, j] } }) }) 
+    effects <- costs <- upper <- lower <- Individuals <- type <- NULL
+    if(class == "scatter") {
       pd <- ggplot2::position_dodge(0.1)
-      if(any(is.na(x$data_set$effects[[1]]))==TRUE){
-      plot.eff1.data<-data.frame(Individuals=seq(1:length(complete$effects1[,1])),effects=observed$effects1,mean=imputed$effects1[,1],
-                    lower=imputed$effects1[,2],upper=imputed$effects1[,3],type=m_eff1)
-      plot_eff1<-ggplot2::ggplot(plot.eff1.data,ggplot2::aes(colour=type, x=Individuals,y=effects))+ggplot2::geom_point(position = pd,na.rm = TRUE)+ 
-        ggplot2::geom_pointrange(data=plot.eff1.data, mapping=ggplot2::aes(x=Individuals, y=mean, ymin=upper, ymax=lower),na.rm = TRUE)+
-        ggplot2::scale_colour_manual(values = c("red","black"),guide = ggplot2::guide_legend(override.aes = list(shape = c(16, 16),linetype=c(1,0))))+
+      if(any(is.na(x$data_set$effects[[1]])) == TRUE) {
+      plot.eff1.data <- data.frame(Individuals = seq(1:length(complete$effects1[, 1])), effects = observed$effects1, mean = imputed$effects1[, 1], 
+                                   lower = imputed$effects1[, 2], upper = imputed$effects1[, 3], type = m_eff1)
+      plot_eff1 <- ggplot2::ggplot(plot.eff1.data,ggplot2::aes(colour = type, x = Individuals, y = effects)) + ggplot2::geom_point(position = pd,na.rm = TRUE) + 
+        ggplot2::geom_pointrange(data = plot.eff1.data, mapping = ggplot2::aes(x = Individuals, y = mean, ymin = upper, ymax = lower), na.rm = TRUE) +
+        ggplot2::scale_colour_manual(values = c("red", "black"), guide = ggplot2::guide_legend(override.aes = list(shape = c(16, 16), linetype = c(1, 0)))) +
         ggplot2::ggtitle("effects (control)")
-      } else if(any(is.na(x$data_set$effects[[1]]))==FALSE){
-        plot.eff1.data<-data.frame(Individuals=seq(1:length(complete$effects1[,1])),effects=observed$effects1,type=m_eff1)
-        plot_eff1<-ggplot2::ggplot(plot.eff1.data,ggplot2::aes(colour=type, x=Individuals,y=effects))+ggplot2::geom_point(position = pd,na.rm = TRUE)+
-          ggplot2::scale_colour_manual(values = c("black"),guide = ggplot2::guide_legend(override.aes = list(shape = c(16),linetype=c(0))))+
+      } else if(any(is.na(x$data_set$effects[[1]])) == FALSE) {
+        plot.eff1.data<-data.frame(Individuals = seq(1:length(complete$effects1[, 1])), effects = observed$effects1, type = m_eff1)
+        plot_eff1 <- ggplot2::ggplot(plot.eff1.data,ggplot2::aes(colour = type, x = Individuals, y = effects)) + ggplot2::geom_point(position = pd, na.rm = TRUE) +
+          ggplot2::scale_colour_manual(values = c("black"), guide = ggplot2::guide_legend(override.aes = list(shape = c(16), linetype = c(0)))) +
           ggplot2::ggtitle("effects (control)")
       }
-      if(any(is.na(x$data_set$effects[[2]]))==TRUE){
-      plot.eff2.data<-data.frame(Individuals=seq(1:length(complete$effects2[,1])),effects=observed$effects2,mean=imputed$effects2[,1],
-                                 lower=imputed$effects2[,2],upper=imputed$effects2[,3],type=m_eff2)
-      plot_eff2<-ggplot2::ggplot(plot.eff2.data,ggplot2::aes(colour=type, x=Individuals,y=effects))+ggplot2::geom_point(position = pd,na.rm = TRUE)+ 
-        ggplot2::geom_pointrange(data=plot.eff2.data, mapping=ggplot2::aes(x=Individuals, y=mean, ymin=upper, ymax=lower),na.rm = TRUE)+
-        ggplot2::scale_colour_manual(values = c("red","black"),guide = ggplot2::guide_legend(override.aes = list(shape = c(16, 16),linetype=c(1,0))))+
+      if(any(is.na(x$data_set$effects[[2]])) == TRUE) {
+      plot.eff2.data <- data.frame(Individuals = seq(1:length(complete$effects2[, 1])), effects = observed$effects2, mean = imputed$effects2[, 1], 
+                                   lower = imputed$effects2[,2], upper = imputed$effects2[, 3], type = m_eff2)
+      plot_eff2 <- ggplot2::ggplot(plot.eff2.data,ggplot2::aes(colour = type, x = Individuals, y = effects)) + ggplot2::geom_point(position = pd, na.rm = TRUE) + 
+        ggplot2::geom_pointrange(data = plot.eff2.data, mapping = ggplot2::aes(x = Individuals, y = mean, ymin = upper, ymax = lower), na.rm = TRUE) +
+        ggplot2::scale_colour_manual(values = c("red", "black"), guide = ggplot2::guide_legend(override.aes = list(shape = c(16, 16), linetype = c(1, 0)))) +
         ggplot2::ggtitle("effects (intervention)")
-      } else if(any(is.na(x$data_set$effects[[2]]))==FALSE){
-        plot.eff2.data<-data.frame(Individuals=seq(1:length(complete$effects2[,1])),effects=observed$effects2,type=m_eff2)
-        plot_eff2<-ggplot2::ggplot(plot.eff2.data,ggplot2::aes(colour=type, x=Individuals,y=effects))+ggplot2::geom_point(position = pd,na.rm = TRUE)+
-          ggplot2::scale_colour_manual(values = c("black"),guide = ggplot2::guide_legend(override.aes = list(shape = c(16),linetype=c(0))))+
+      } else if(any(is.na(x$data_set$effects[[2]])) == FALSE) {
+        plot.eff2.data <- data.frame(Individuals = seq(1:length(complete$effects2[, 1])), effects = observed$effects2, type = m_eff2)
+        plot_eff2 <- ggplot2::ggplot(plot.eff2.data,ggplot2::aes(colour = type, x = Individuals, y = effects)) + ggplot2::geom_point(position = pd, na.rm = TRUE) +
+          ggplot2::scale_colour_manual(values = c("black"), guide = ggplot2::guide_legend(override.aes = list(shape = c(16), linetype = c(0)))) +
           ggplot2::ggtitle("effects (intervention)")
       }
-      if(any(is.na(x$data_set$costs[[1]]))==TRUE){
-      plot.cost1.data<-data.frame(Individuals=seq(1:length(complete$costs1[,1])),costs=observed$costs1,mean=imputed$costs1[,1],
-                                 lower=imputed$costs1[,2],upper=imputed$costs1[,3],type=m_cost1)
-      plot_cost1<-ggplot2::ggplot(plot.cost1.data,ggplot2::aes(colour=type, x=Individuals,y=costs))+ggplot2::geom_point(position = pd,na.rm = TRUE)+ 
-        ggplot2::geom_pointrange(data=plot.cost1.data, mapping=ggplot2::aes(x=Individuals, y=mean, ymin=upper, ymax=lower),na.rm = TRUE)+
-        ggplot2::scale_colour_manual(values = c("red","black"),guide = ggplot2::guide_legend(override.aes = list(shape = c(16, 16),linetype=c(1,0))))+
+      if(any(is.na(x$data_set$costs[[1]])) == TRUE) {
+      plot.cost1.data <- data.frame(Individuals = seq(1:length(complete$costs1[, 1])), costs = observed$costs1, mean = imputed$costs1[, 1], 
+                                    lower = imputed$costs1[, 2], upper = imputed$costs1[, 3], type = m_cost1)
+      plot_cost1 <- ggplot2::ggplot(plot.cost1.data, ggplot2::aes(colour = type, x = Individuals, y = costs)) + ggplot2::geom_point(position = pd, na.rm = TRUE) + 
+        ggplot2::geom_pointrange(data = plot.cost1.data, mapping = ggplot2::aes(x = Individuals, y = mean, ymin = upper, ymax = lower), na.rm = TRUE) +
+        ggplot2::scale_colour_manual(values = c("red", "black"), guide = ggplot2::guide_legend(override.aes = list(shape = c(16, 16), linetype=c(1, 0)))) +
         ggplot2::ggtitle("costs (control)")
-      } else if(any(is.na(x$data_set$costs[[1]]))==FALSE){
-        plot.cost1.data<-data.frame(Individuals=seq(1:length(complete$costs1[,1])),costs=observed$costs1,type=m_cost1)
-        plot_cost1<-ggplot2::ggplot(plot.cost1.data,ggplot2::aes(colour=type, x=Individuals,y=costs))+ggplot2::geom_point(position = pd,na.rm = TRUE)+
-          ggplot2::scale_colour_manual(values = c("black"),guide = ggplot2::guide_legend(override.aes = list(shape = c(16),linetype=c(0))))+
+      } else if(any(is.na(x$data_set$costs[[1]])) == FALSE) {
+        plot.cost1.data <- data.frame(Individuals = seq(1:length(complete$costs1[, 1])), costs = observed$costs1, type = m_cost1)
+        plot_cost1 <- ggplot2::ggplot(plot.cost1.data, ggplot2::aes(colour = type, x = Individuals, y = costs)) + ggplot2::geom_point(position = pd, na.rm = TRUE) +
+          ggplot2::scale_colour_manual(values = c("black"), guide = ggplot2::guide_legend(override.aes = list(shape = c(16), linetype = c(0)))) +
           ggplot2::ggtitle("costs (control)")
       }
-      if(any(is.na(x$data_set$costs[[2]]))==TRUE){
-      plot.cost2.data<-data.frame(Individuals=seq(1:length(complete$costs2[,1])),costs=observed$costs2,mean=imputed$costs2[,1],
-                                  lower=imputed$costs2[,2],upper=imputed$costs2[,3],type=m_cost2)
-      plot_cost2<-ggplot2::ggplot(plot.cost2.data,ggplot2::aes(colour=type, x=Individuals,y=costs))+ggplot2::geom_point(position = pd,na.rm = TRUE)+ 
-        ggplot2::geom_pointrange(data=plot.cost2.data, mapping=ggplot2::aes(x=Individuals, y=mean, ymin=upper, ymax=lower),na.rm = TRUE)+
-        ggplot2::scale_colour_manual(values = c("red","black"),guide = ggplot2::guide_legend(override.aes = list(shape = c(16, 16),linetype=c(1,0))))+
+      if(any(is.na(x$data_set$costs[[2]])) == TRUE) {
+      plot.cost2.data <- data.frame(Individuals = seq(1:length(complete$costs2[, 1])),costs = observed$costs2, mean = imputed$costs2[, 1], 
+                                    lower = imputed$costs2[, 2], upper = imputed$costs2[, 3], type = m_cost2)
+      plot_cost2 <- ggplot2::ggplot(plot.cost2.data, ggplot2::aes(colour = type, x = Individuals, y = costs)) + ggplot2::geom_point(position = pd, na.rm = TRUE) + 
+        ggplot2::geom_pointrange(data = plot.cost2.data, mapping = ggplot2::aes(x = Individuals, y = mean, ymin = upper, ymax = lower), na.rm = TRUE) +
+        ggplot2::scale_colour_manual(values = c("red", "black"), guide = ggplot2::guide_legend(override.aes = list(shape = c(16, 16), linetype = c(1, 0)))) +
         ggplot2::ggtitle("costs (intervention)")
-      } else if(any(is.na(x$data_set$costs[[2]]))==FALSE){
-        plot.cost2.data<-data.frame(Individuals=seq(1:length(complete$costs2[,1])),costs=observed$costs2,type=m_cost2)
-        plot_cost2<-ggplot2::ggplot(plot.cost2.data,ggplot2::aes(colour=type, x=Individuals,y=costs))+ggplot2::geom_point(position = pd,na.rm = TRUE)+
-          ggplot2::scale_colour_manual(values = c("black"),guide = ggplot2::guide_legend(override.aes = list(shape = c(16),linetype=c(0))))+
+      } else if(any(is.na(x$data_set$costs[[2]])) == FALSE) {
+        plot.cost2.data <- data.frame(Individuals = seq(1:length(complete$costs2[,1])), costs = observed$costs2, type = m_cost2)
+        plot_cost2 <- ggplot2::ggplot(plot.cost2.data,ggplot2::aes(colour = type, x = Individuals, y = costs)) + ggplot2::geom_point(position = pd, na.rm = TRUE) +
+          ggplot2::scale_colour_manual(values = c("black"), guide = ggplot2::guide_legend(override.aes = list(shape = c(16), linetype = c(0)))) +
           ggplot2::ggtitle("costs (intervention)")
       }
-    } else if(class=="histogram"){
-      #histogram plots of observed vs imputed for each outcome type and arm (use only posterior means for imputations)
-      #for each outcome define type of plot based on whether missing values are present or not
-      if(any(is.na(x$data_set$effects[[1]]))==TRUE){
-      plot.eff1.data<-data.frame(Individuals=seq(1:length(complete$effects1[,1])),effects=complete$effects1[,1],
-                                 lower=complete$effects1[,2],upper=complete$effects1[,3],type=m_eff1)
-      plot_eff1<-ggplot2::ggplot(plot.eff1.data, ggplot2::aes(x=effects, color=type))+ggplot2::geom_histogram(fill="white", position="dodge")+ggplot2::theme(legend.position="top")+
-        ggplot2::scale_colour_manual(values = c("red","black"))+ggplot2::ggtitle("effects (control)")
-      } else if(any(is.na(x$data_set$effects[[1]]))==FALSE){
-        plot.eff1.data<-data.frame(Individuals=seq(1:length(complete$effects1[,1])),effects=complete$effects1[,1],type=m_eff1)
-        plot_eff1<-ggplot2::ggplot(plot.eff1.data, ggplot2::aes(x=effects, color=type))+ggplot2::geom_histogram(fill="white", position="dodge")+ggplot2::theme(legend.position="top")+
-          ggplot2::scale_colour_manual(values = c("black"))+ggplot2::ggtitle("effects (control)")
+    } else if(class == "histogram") {
+      if(any(is.na(x$data_set$effects[[1]])) == TRUE) {
+      plot.eff1.data <- data.frame(Individuals = seq(1:length(complete$effects1[, 1])), effects = complete$effects1[, 1], 
+                                   lower = complete$effects1[, 2], upper = complete$effects1[, 3], type = m_eff1)
+      plot_eff1 <- ggplot2::ggplot(plot.eff1.data, ggplot2::aes(x = effects, color = type)) + ggplot2::geom_histogram(fill = "white", position = "dodge") + 
+        ggplot2::theme(legend.position = "top") + ggplot2::scale_colour_manual(values = c("red","black")) + ggplot2::ggtitle("effects (control)")
+      } else if(any(is.na(x$data_set$effects[[1]])) == FALSE) {
+        plot.eff1.data <- data.frame(Individuals = seq(1:length(complete$effects1[,1])), effects = complete$effects1[,1], type = m_eff1)
+        plot_eff1 <- ggplot2::ggplot(plot.eff1.data, ggplot2::aes(x = effects, color = type)) + ggplot2::geom_histogram(fill = "white", position = "dodge") + 
+          ggplot2::theme(legend.position = "top") + ggplot2::scale_colour_manual(values = c("black")) + ggplot2::ggtitle("effects (control)")
       }
-      if(any(is.na(x$data_set$effects[[2]]))==TRUE){
-      plot.eff2.data<-data.frame(Individuals=seq(1:length(complete$effects2[,1])),effects=complete$effects2[,1],
-                                 lower=complete$effects2[,2],upper=complete$effects2[,3],type=m_eff2)
-      plot_eff2<-ggplot2::ggplot(plot.eff2.data, ggplot2::aes(x=effects, color=type))+ggplot2::geom_histogram(fill="white", position="dodge")+ggplot2::theme(legend.position="top")+
-        ggplot2::scale_colour_manual(values = c("red","black"))+ggplot2::ggtitle("effects (intervention)")
-      } else if(any(is.na(x$data_set$effects[[2]]))==FALSE){
-        plot.eff2.data<-data.frame(Individuals=seq(1:length(complete$effects1[,2])),effects=complete$effects1[,2],type=m_eff1)
-        plot_eff2<-ggplot2::ggplot(plot.eff2.data, ggplot2::aes(x=effects, color=type))+ggplot2::geom_histogram(fill="white", position="dodge")+ggplot2::theme(legend.position="top")+
-          ggplot2::scale_colour_manual(values = c("black"))+ggplot2::ggtitle("effects (intervention)")
+      if(any(is.na(x$data_set$effects[[2]])) == TRUE) {
+      plot.eff2.data <- data.frame(Individuals = seq(1:length(complete$effects2[, 1])), effects = complete$effects2[, 1], 
+                                   lower = complete$effects2[, 2], upper = complete$effects2[, 3], type = m_eff2)
+      plot_eff2 <- ggplot2::ggplot(plot.eff2.data, ggplot2::aes(x = effects, color = type)) + ggplot2::geom_histogram(fill = "white", position = "dodge") + 
+        ggplot2::theme(legend.position = "top") + ggplot2::scale_colour_manual(values = c("red", "black")) + ggplot2::ggtitle("effects (intervention)")
+      } else if(any(is.na(x$data_set$effects[[2]])) == FALSE) {
+        plot.eff2.data <- data.frame(Individuals = seq(1:length(complete$effects1[, 2])), effects = complete$effects1[, 2], type = m_eff1)
+        plot_eff2 <- ggplot2::ggplot(plot.eff2.data, ggplot2::aes(x = effects, color = type)) + ggplot2::geom_histogram(fill = "white", position = "dodge") + 
+          ggplot2::theme(legend.position = "top") + ggplot2::scale_colour_manual(values = c("black")) + ggplot2::ggtitle("effects (intervention)")
       }
-      if(any(is.na(x$data_set$costs[[1]]))==TRUE){
-      plot.cost1.data<-data.frame(Individuals=seq(1:length(complete$costs1[,1])),costs=complete$costs1[,1],
-                                 lower=complete$costs1[,2],upper=complete$costs1[,3],type=m_cost1)
-      plot_cost1<-ggplot2::ggplot(plot.cost1.data, ggplot2::aes(x=costs, color=type))+ggplot2::geom_histogram(fill="white", position="dodge")+ggplot2::theme(legend.position="top")+
-        ggplot2::scale_colour_manual(values = c("red","black"))+ggplot2::ggtitle("costs (control)")
-      } else if(any(is.na(x$data_set$costs[[1]]))==FALSE){
-        plot.cost1.data<-data.frame(Individuals=seq(1:length(complete$costs1[,1])),costs=complete$costs1[,1],type=m_cost1)
-        plot_cost1<-ggplot2::ggplot(plot.cost1.data, ggplot2::aes(x=costs, color=type))+ggplot2::geom_histogram(fill="white", position="dodge")+ggplot2::theme(legend.position="top")+
-          ggplot2::scale_colour_manual(values = c("black"))+ggplot2::ggtitle("costs (control)")
+      if(any(is.na(x$data_set$costs[[1]])) == TRUE) {
+      plot.cost1.data <- data.frame(Individuals = seq(1:length(complete$costs1[, 1])), costs = complete$costs1[, 1], 
+                                    lower = complete$costs1[, 2], upper = complete$costs1[, 3], type = m_cost1)
+      plot_cost1 <- ggplot2::ggplot(plot.cost1.data, ggplot2::aes(x = costs, color = type)) + ggplot2::geom_histogram(fill = "white", position = "dodge") + 
+        ggplot2::theme(legend.position = "top") + ggplot2::scale_colour_manual(values = c("red", "black")) + ggplot2::ggtitle("costs (control)")
+      } else if(any(is.na(x$data_set$costs[[1]])) == FALSE) {
+        plot.cost1.data <- data.frame(Individuals = seq(1:length(complete$costs1[, 1])), costs = complete$costs1[, 1], type = m_cost1)
+        plot_cost1 <- ggplot2::ggplot(plot.cost1.data, ggplot2::aes(x = costs, color = type)) + ggplot2::geom_histogram(fill = "white", position = "dodge") + 
+          ggplot2::theme(legend.position = "top") + ggplot2::scale_colour_manual(values = c("black")) + ggplot2::ggtitle("costs (control)")
       }
-      if(any(is.na(x$data_set$costs[[2]]))==TRUE){
-      plot.cost2.data<-data.frame(Individuals=seq(1:length(complete$costs2[,1])),costs=complete$costs2[,1],
-                                  lower=complete$costs2[,2],upper=complete$costs2[,3],type=m_cost2)
-      plot_cost2<-ggplot2::ggplot(plot.cost2.data, ggplot2::aes(x=costs, color=type))+ggplot2::geom_histogram(fill="white", position="dodge")+ggplot2::theme(legend.position="top")+
-        ggplot2::scale_colour_manual(values = c("red","black"))+ggplot2::ggtitle("costs (intervention)")
-      } else if(any(is.na(x$data_set$costs[[2]]))==FALSE){
-        plot.cost2.data<-data.frame(Individuals=seq(1:length(complete$costs2[,1])),costs=complete$costs2[,1],type=m_cost2)
-        plot_cost2<-ggplot2::ggplot(plot.cost2.data, ggplot2::aes(x=costs, color=type))+ggplot2::geom_histogram(fill="white", position="dodge")+ggplot2::theme(legend.position="top")+
-          ggplot2::scale_colour_manual(values = c("black"))+ggplot2::ggtitle("costs (intervention)")
+      if(any(is.na(x$data_set$costs[[2]])) == TRUE) {
+      plot.cost2.data <- data.frame(Individuals = seq(1:length(complete$costs2[, 1])), costs = complete$costs2[, 1], lower = complete$costs2[, 2], upper = complete$costs2[, 3], type = m_cost2)
+      plot_cost2 <- ggplot2::ggplot(plot.cost2.data, ggplot2::aes(x = costs, color = type)) + ggplot2::geom_histogram(fill = "white", position = "dodge") + 
+        ggplot2::theme(legend.position = "top") + ggplot2::scale_colour_manual(values = c("red", "black")) + ggplot2::ggtitle("costs (intervention)")
+      } else if(any(is.na(x$data_set$costs[[2]])) == FALSE) {
+        plot.cost2.data <- data.frame(Individuals = seq(1:length(complete$costs2[, 1])), costs = complete$costs2[, 1], type = m_cost2)
+        plot_cost2 <- ggplot2::ggplot(plot.cost2.data, ggplot2::aes(x = costs, color = type)) + ggplot2::geom_histogram(fill = "white", position = "dodge") + 
+          ggplot2::theme(legend.position = "top") + ggplot2::scale_colour_manual(values = c("black")) + ggplot2::ggtitle("costs (intervention)")
       }
      }
-    if(theme=="base"){
-      #define type of theme
-      plot_eff1<-plot_eff1+ggplot2::theme(panel.border = ggplot2::element_rect(colour = "black", fill=NA),panel.background = ggplot2::element_blank(),
-                                          panel.grid.major = ggplot2::element_blank(),panel.grid.minor = ggplot2::element_blank(),
-                                          plot.title = ggplot2::element_text(hjust = 0.5))
-      plot_eff2<-plot_eff2+ggplot2::theme(panel.border = ggplot2::element_rect(colour = "black", fill=NA),panel.background = ggplot2::element_blank(),
-                                          panel.grid.major = ggplot2::element_blank(),panel.grid.minor = ggplot2::element_blank(),
-                                          plot.title = ggplot2::element_text(hjust = 0.5))
-      plot_cost1<-plot_cost1+ggplot2::theme(panel.border = ggplot2::element_rect(colour = "black", fill=NA),panel.background = ggplot2::element_blank(),
-                                            panel.grid.major = ggplot2::element_blank(),panel.grid.minor = ggplot2::element_blank(),
-                                            plot.title = ggplot2::element_text(hjust = 0.5))
-      plot_cost2<-plot_cost2+ggplot2::theme(panel.border = ggplot2::element_rect(colour = "black", fill=NA),panel.background = ggplot2::element_blank(),
-                                            panel.grid.major = ggplot2::element_blank(),panel.grid.minor = ggplot2::element_blank(),
-                                            plot.title = ggplot2::element_text(hjust = 0.5))
-    } else if(theme=="calc"){
-      plot_eff1<-plot_eff1+ggthemes::theme_calc()+ ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
-      plot_eff2<-plot_eff2+ggthemes::theme_calc()+ ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
-      plot_cost1<-plot_cost1+ggthemes::theme_calc()+ ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
-      plot_cost2<-plot_cost2+ggthemes::theme_calc()+ ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
-    } else if(theme=="economist"){
-      plot_eff1<-plot_eff1+ggthemes::theme_economist()+ ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
-      plot_eff2<-plot_eff2+ggthemes::theme_economist()+ ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
-      plot_cost1<-plot_cost1+ggthemes::theme_economist()+ ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
-      plot_cost2<-plot_cost2+ggthemes::theme_economist()+ ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
-    } else if(theme=="excel"){
-      plot_eff1<-plot_eff1+ggthemes::theme_excel()+ ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
-      plot_eff2<-plot_eff2+ggthemes::theme_excel()+ ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
-      plot_cost1<-plot_cost1+ggthemes::theme_excel()+ ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
-      plot_cost2<-plot_cost2+ggthemes::theme_excel()+ ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
-    } else if(theme=="few"){
-      plot_eff1<-plot_eff1+ggthemes::theme_few()+ ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
-      plot_eff2<-plot_eff2+ggthemes::theme_few()+ ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
-      plot_cost1<-plot_cost1+ggthemes::theme_few()+ ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
-      plot_cost2<-plot_cost2+ggthemes::theme_few()+ ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
-    } else if(theme=="538"){
-      plot_eff1<-plot_eff1+ggthemes::theme_fivethirtyeight()+ ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
-      plot_eff2<-plot_eff2+ggthemes::theme_fivethirtyeight()+ ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
-      plot_cost1<-plot_cost1+ggthemes::theme_fivethirtyeight()+ ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
-      plot_cost2<-plot_cost2+ggthemes::theme_fivethirtyeight()+ ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
-    } else if(theme=="gdocs"){
-      plot_eff1<-plot_eff1+ggthemes::theme_gdocs()+ ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
-      plot_eff2<-plot_eff2+ggthemes::theme_gdocs()+ ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
-      plot_cost1<-plot_cost1+ggthemes::theme_gdocs()+ ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
-      plot_cost2<-plot_cost2+ggthemes::theme_gdocs()+ ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
-    } else if(theme=="hc"){
-      plot_eff1<-plot_eff1+ggthemes::theme_hc()+ ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
-      plot_eff2<-plot_eff2+ggthemes::theme_hc()+ ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
-      plot_cost1<-plot_cost1+ggthemes::theme_hc()+ ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
-      plot_cost2<-plot_cost2+ggthemes::theme_hc()+ ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
-    } else if(theme=="par"){
-      plot_eff1<-plot_eff1+ggthemes::theme_par()+ ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
-      plot_eff2<-plot_eff2+ggthemes::theme_par()+ ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
-      plot_cost1<-plot_cost1+ggthemes::theme_par()+ ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
-      plot_cost2<-plot_cost2+ggthemes::theme_par()+ ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
-    } else if(theme=="solarized"){
-      plot_eff1<-plot_eff1+ggthemes::theme_solarized()+ ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
-      plot_eff2<-plot_eff2+ggthemes::theme_solarized()+ ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
-      plot_cost1<-plot_cost1+ggthemes::theme_solarized()+ ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
-      plot_cost2<-plot_cost2+ggthemes::theme_solarized()+ ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
-    } else if(theme=="pander"){
-      plot_eff1<-plot_eff1+ggthemes::theme_pander()+ ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
-      plot_eff2<-plot_eff2+ggthemes::theme_pander()+ ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
-      plot_cost1<-plot_cost1+ggthemes::theme_pander()+ ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
-      plot_cost2<-plot_cost2+ggthemes::theme_pander()+ ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
-    } else if(theme=="stata"){
-      plot_eff1<-plot_eff1+ggthemes::theme_stata()+ ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
-      plot_eff2<-plot_eff2+ggthemes::theme_stata()+ ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
-      plot_cost1<-plot_cost1+ggthemes::theme_stata()+ ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
-      plot_cost2<-plot_cost2+ggthemes::theme_stata()+ ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
-    } else if(theme=="tufte"){
-      plot_eff1<-plot_eff1+ggthemes::theme_tufte()+ ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
-      plot_eff2<-plot_eff2+ggthemes::theme_tufte()+ ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
-      plot_cost1<-plot_cost1+ggthemes::theme_tufte()+ ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
-      plot_cost2<-plot_cost2+ggthemes::theme_tufte()+ ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
-    } else if(theme=="wsj"){
-      plot_eff1<-plot_eff1+ggthemes::theme_wsj()+ ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
-      plot_eff2<-plot_eff2+ggthemes::theme_wsj()+ ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
-      plot_cost1<-plot_cost1+ggthemes::theme_wsj()+ ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
-      plot_cost2<-plot_cost2+ggthemes::theme_wsj()+ ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
+    if(theme == "base") {
+      plot_eff1 <- plot_eff1 + ggplot2::theme(panel.border = ggplot2::element_rect(colour = "black", fill = NA), panel.background = ggplot2::element_blank(), 
+                                              panel.grid.major = ggplot2::element_blank(), panel.grid.minor = ggplot2::element_blank(), plot.title = ggplot2::element_text(hjust = 0.5))
+      plot_eff2 <- plot_eff2 + ggplot2::theme(panel.border = ggplot2::element_rect(colour = "black", fill = NA), panel.background = ggplot2::element_blank(), 
+                                              panel.grid.major = ggplot2::element_blank(), panel.grid.minor = ggplot2::element_blank(), plot.title = ggplot2::element_text(hjust = 0.5))
+      plot_cost1 <- plot_cost1 + ggplot2::theme(panel.border = ggplot2::element_rect(colour = "black", fill = NA), panel.background = ggplot2::element_blank(), 
+                                                panel.grid.major = ggplot2::element_blank(),panel.grid.minor = ggplot2::element_blank(), plot.title = ggplot2::element_text(hjust = 0.5))
+      plot_cost2 <- plot_cost2 + ggplot2::theme(panel.border = ggplot2::element_rect(colour = "black", fill = NA), panel.background = ggplot2::element_blank(), 
+                                            panel.grid.major = ggplot2::element_blank(), panel.grid.minor = ggplot2::element_blank(), plot.title = ggplot2::element_text(hjust = 0.5))
+    } else if(theme == "calc") {
+      plot_eff1 <- plot_eff1 + ggthemes::theme_calc() + ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
+      plot_eff2 <- plot_eff2 + ggthemes::theme_calc() + ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
+      plot_cost1 <- plot_cost1 + ggthemes::theme_calc() + ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
+      plot_cost2 <- plot_cost2 + ggthemes::theme_calc() + ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
+    } else if(theme == "economist") {
+      plot_eff1 <- plot_eff1 + ggthemes::theme_economist() + ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
+      plot_eff2 <- plot_eff2 + ggthemes::theme_economist() + ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
+      plot_cost1 <- plot_cost1 + ggthemes::theme_economist() + ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
+      plot_cost2 <- plot_cost2 + ggthemes::theme_economist() + ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
+    } else if(theme == "excel") {
+      plot_eff1 <- plot_eff1 + ggthemes::theme_excel() + ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
+      plot_eff2 <- plot_eff2 + ggthemes::theme_excel() + ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
+      plot_cost1 <- plot_cost1 + ggthemes::theme_excel() + ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
+      plot_cost2 <- plot_cost2 + ggthemes::theme_excel() + ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
+    } else if(theme == "few") {
+      plot_eff1 <- plot_eff1 + ggthemes::theme_few() + ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
+      plot_eff2 <- plot_eff2 + ggthemes::theme_few() + ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
+      plot_cost1 <- plot_cost1 + ggthemes::theme_few() + ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
+      plot_cost2 <- plot_cost2 + ggthemes::theme_few() + ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
+    } else if(theme == "538") {
+      plot_eff1 <- plot_eff1 + ggthemes::theme_fivethirtyeight() + ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
+      plot_eff2 <- plot_eff2 + ggthemes::theme_fivethirtyeight() + ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
+      plot_cost1 <- plot_cost1 + ggthemes::theme_fivethirtyeight() + ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
+      plot_cost2 <- plot_cost2 + ggthemes::theme_fivethirtyeight() + ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
+    } else if(theme == "gdocs"){
+      plot_eff1 <- plot_eff1 + ggthemes::theme_gdocs() + ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
+      plot_eff2 <- plot_eff2 + ggthemes::theme_gdocs() + ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
+      plot_cost1 <- plot_cost1 + ggthemes::theme_gdocs() + ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
+      plot_cost2 <- plot_cost2 + ggthemes::theme_gdocs() + ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
+    } else if(theme == "hc") {
+      plot_eff1 <- plot_eff1 + ggthemes::theme_hc() + ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
+      plot_eff2 <- plot_eff2 + ggthemes::theme_hc() + ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
+      plot_cost1 <- plot_cost1 + ggthemes::theme_hc() + ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
+      plot_cost2 <- plot_cost2 + ggthemes::theme_hc() + ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
+    } else if(theme == "par") {
+      plot_eff1 <- plot_eff1 + ggthemes::theme_par() + ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
+      plot_eff2 <- plot_eff2 + ggthemes::theme_par() + ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
+      plot_cost1 <- plot_cost1 + ggthemes::theme_par() + ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
+      plot_cost2 <- plot_cost2 + ggthemes::theme_par() + ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
+    } else if(theme == "solarized") {
+      plot_eff1 <- plot_eff1 + ggthemes::theme_solarized() + ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
+      plot_eff2 <- plot_eff2 + ggthemes::theme_solarized() + ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
+      plot_cost1 <- plot_cost1 + ggthemes::theme_solarized() + ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
+      plot_cost2 <- plot_cost2 + ggthemes::theme_solarized() + ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
+    } else if(theme == "pander") {
+      plot_eff1 <- plot_eff1 + ggthemes::theme_pander() + ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
+      plot_eff2 <- plot_eff2 + ggthemes::theme_pander() + ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
+      plot_cost1 <- plot_cost1 + ggthemes::theme_pander() + ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
+      plot_cost2 <- plot_cost2 + ggthemes::theme_pander() + ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
+    } else if(theme == "stata") {
+      plot_eff1 <- plot_eff1 + ggthemes::theme_stata() + ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
+      plot_eff2 <- plot_eff2 + ggthemes::theme_stata() + ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
+      plot_cost1 <- plot_cost1 + ggthemes::theme_stata() + ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
+      plot_cost2 <- plot_cost2 + ggthemes::theme_stata() + ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
+    } else if(theme == "tufte") {
+      plot_eff1 <- plot_eff1 + ggthemes::theme_tufte() + ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
+      plot_eff2 <- plot_eff2 + ggthemes::theme_tufte() + ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
+      plot_cost1 <- plot_cost1 + ggthemes::theme_tufte() + ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
+      plot_cost2 <- plot_cost2 + ggthemes::theme_tufte() + ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
+    } else if(theme == "wsj") {
+      plot_eff1 <- plot_eff1 + ggthemes::theme_wsj() + ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
+      plot_eff2 <- plot_eff2 + ggthemes::theme_wsj() + ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
+      plot_cost1 <- plot_cost1 + ggthemes::theme_wsj() + ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
+      plot_cost2 <- plot_cost2 + ggthemes::theme_wsj() + ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
     }
-    #define function to wrap up different numbers of plots in ggplot
-    grid_arrange_shared_legend <- function(..., nrow = 1, ncol = length(list(...)), position = c("bottom", "right"),n=1) {
+    grid_arrange_shared_legend <- function(..., nrow = 1, ncol = length(list(...)), position = c("bottom", "right"), n = 1) {
       plots <- list(...)
       position <- match.arg(position)
-      #take legend of plot with both missing and observed values or any legend if only observed data
       g <- ggplot2::ggplotGrob(plots[[n]] + ggplot2::theme(legend.position = position))$grobs
       legend <- g[[which(sapply(g, function(x) x$name) == "guide-box")]]
       lheight <- sum(legend$height)
       lwidth <- sum(legend$width)
       gl <- lapply(plots, function(x) x + ggplot2::theme(legend.position = "none"))
       gl <- c(gl, nrow = nrow, ncol = ncol)
-      combined <- switch(position,"bottom" = gridExtra::arrangeGrob(do.call(gridExtra::arrangeGrob, gl),
-                                                                    legend,ncol = 1,heights = grid::unit.c(grid::unit(1, "npc") - lheight, lheight)),
-                         "right" = gridExtra::arrangeGrob(do.call(gridExtra::arrangeGrob, gl),
-                                                          legend,ncol = 2,widths = grid::unit.c(grid::unit(1, "npc") - lwidth, lwidth)))
+      combined <- switch(position,"bottom" = gridExtra::arrangeGrob(do.call(gridExtra::arrangeGrob, gl), legend,ncol = 1, 
+                                                                    heights = grid::unit.c(grid::unit(1, "npc") - lheight, lheight)), 
+                         "right" = gridExtra::arrangeGrob(do.call(gridExtra::arrangeGrob, gl), legend, ncol = 2, widths = grid::unit.c(grid::unit(1, "npc") - lwidth, lwidth)))
       grid::grid.newpage()
       grid::grid.draw(combined)
     }
-    #define how many plots to be returned
-    #and choose correct legend to display
-    if(outcome=="all"){
-      suppressWarnings(check_missing<-c(any(is.na(x$data_set$effetcs[[1]])),any(is.na(x$data_set$effects[[2]])),
-                                        any(is.na(x$data_set$costs[[1]])),any(is.na(x$data_set$costs[[2]]))))
-      if(any(check_missing==TRUE)){n<-match(TRUE,check_missing)} else {n=1}
-      suppressMessages(plot_output<-grid_arrange_shared_legend(plot_eff1,plot_eff2,plot_cost1,plot_cost2,nrow = 2,ncol = 2,n=n))
-    } else if(outcome=="effects"){
-      suppressWarnings(check_missing<-c(any(is.na(x$data_set$effetcs[[1]])),any(is.na(x$data_set$effects[[2]]))))
-      if(any(check_missing==TRUE)){n<-match(TRUE,check_missing)} else {n=1}
-      suppressMessages(plot_output<-grid_arrange_shared_legend(plot_eff1,plot_eff2,nrow = 1,ncol = 2,n=n))
-    } else if(outcome=="costs"){
-      suppressWarnings(check_missing<-c(any(is.na(x$data_set$costs[[1]])),any(is.na(x$data_set$costs[[2]]))))
-      if(any(check_missing==TRUE)){n<-match(TRUE,check_missing)} else {n=1}
-      suppressMessages(plot_output<-grid_arrange_shared_legend(plot_cost1,plot_cost2,nrow = 1,ncol = 2,n=n))
-    } else if(outcome=="arm1"){
-      suppressWarnings(check_missing<-c(any(is.na(x$data_set$effetcs[[1]])),any(is.na(x$data_set$costs[[1]]))))
-      if(any(check_missing==TRUE)){n<-match(TRUE,check_missing)} else {n=1}
-      suppressMessages(plot_output<-grid_arrange_shared_legend(plot_eff1,plot_cost1,nrow = 1,ncol = 2,n=n))
-    } else if(outcome=="arm2"){
-      suppressWarnings(check_missing<-c(any(is.na(x$data_set$effetcs[[2]])),any(is.na(x$data_set$costs[[2]]))))
-      if(any(check_missing==TRUE)){n<-match(TRUE,check_missing)} else {n=1}
-      suppressMessages(plot_output<-grid_arrange_shared_legend(plot_eff2,plot_cost2,nrow = 1,ncol = 2,n=n))
-    } else if(outcome=="effects_arm1"){
-      suppressWarnings(check_missing<-any(is.na(x$data_set$effetcs[[1]])))
-      if(any(check_missing==TRUE)){n<-match(TRUE,check_missing)} else {n=1}
-      suppressMessages(plot_output<-grid_arrange_shared_legend(plot_eff1,nrow = 1,ncol = 1,n=n))
-    } else if(outcome=="effects_arm2"){
-      suppressWarnings(check_missing<-any(is.na(x$data_set$effetcs[[2]])))
-      if(any(check_missing==TRUE)){n<-match(TRUE,check_missing)} else {n=1}
-      suppressMessages(plot_output<-grid_arrange_shared_legend(plot_eff2,nrow = 1,ncol = 1))
-    } else if(outcome=="costs_arm1"){
-      suppressWarnings(check_missing<-any(is.na(x$data_set$costs[[1]])))
-      if(any(check_missing==TRUE)){n<-match(TRUE,check_missing)} else {n=1}
-      suppressMessages(plot_output<-grid_arrange_shared_legend(plot_cost1,nrow = 1,ncol = 1))
-    } else if(outcome=="costs_arm2"){
-      suppressWarnings(check_missing<-any(is.na(x$data_set$costs[[1]])))
-      if(any(check_missing==TRUE)){n<-match(TRUE,check_missing)} else {n=1}
-      suppressMessages(plot_output<-grid_arrange_shared_legend(plot_cost2,nrow = 1,ncol = 1))
+    if(outcome == "all") {
+      suppressWarnings(check_missing <- c(any(is.na(x$data_set$effetcs[[1]])), any(is.na(x$data_set$effects[[2]])), 
+                                          any(is.na(x$data_set$costs[[1]])), any(is.na(x$data_set$costs[[2]]))))
+      if(any(check_missing == TRUE)) {n <- match(TRUE, check_missing) } else {n = 1 }
+      suppressMessages(plot_output <- grid_arrange_shared_legend(plot_eff1, plot_eff2, plot_cost1, plot_cost2, nrow = 2, ncol = 2, n = n))
+    } else if(outcome == "effects") {
+      suppressWarnings(check_missing <- c(any(is.na(x$data_set$effetcs[[1]])), any(is.na(x$data_set$effects[[2]]))))
+      if(any(check_missing == TRUE)) {n <- match(TRUE, check_missing) } else {n = 1 }
+      suppressMessages(plot_output <- grid_arrange_shared_legend(plot_eff1, plot_eff2, nrow = 1, ncol = 2, n = n))
+    } else if(outcome == "costs") {
+      suppressWarnings(check_missing <- c(any(is.na(x$data_set$costs[[1]])), any(is.na(x$data_set$costs[[2]]))))
+      if(any(check_missing==TRUE)) {n <- match(TRUE, check_missing) } else {n = 1 }
+      suppressMessages(plot_output <- grid_arrange_shared_legend(plot_cost1, plot_cost2, nrow = 1, ncol = 2, n = n))
+    } else if(outcome == "arm1") {
+      suppressWarnings(check_missing <- c(any(is.na(x$data_set$effetcs[[1]])), any(is.na(x$data_set$costs[[1]]))))
+      if(any(check_missing == TRUE)) {n <- match(TRUE, check_missing) } else {n = 1 }
+      suppressMessages(plot_output <- grid_arrange_shared_legend(plot_eff1, plot_cost1, nrow = 1, ncol = 2, n = n))
+    } else if(outcome == "arm2") {
+      suppressWarnings(check_missing <- c(any(is.na(x$data_set$effetcs[[2]])), any(is.na(x$data_set$costs[[2]]))))
+      if(any(check_missing == TRUE)) {n <- match(TRUE, check_missing) } else {n = 1 }
+      suppressMessages(plot_output <- grid_arrange_shared_legend(plot_eff2, plot_cost2, nrow = 1, ncol = 2, n = n))
+    } else if(outcome == "effects_arm1") {
+      suppressWarnings(check_missing <- any(is.na(x$data_set$effetcs[[1]])))
+      if(any(check_missing == TRUE)) {n <- match(TRUE, check_missing) } else {n = 1 }
+      suppressMessages(plot_output <- grid_arrange_shared_legend(plot_eff1, nrow = 1, ncol = 1, n = n))
+    } else if(outcome == "effects_arm2") {
+      suppressWarnings(check_missing <- any(is.na(x$data_set$effetcs[[2]])))
+      if(any(check_missing == TRUE)) {n <- match(TRUE, check_missing) } else {n = 1}
+      suppressMessages(plot_output <- grid_arrange_shared_legend(plot_eff2, nrow = 1, ncol = 1))
+    } else if(outcome == "costs_arm1") {
+      suppressWarnings(check_missing <- any(is.na(x$data_set$costs[[1]])))
+      if(any(check_missing == TRUE)) {n <- match(TRUE, check_missing) } else {n = 1 }
+      suppressMessages(plot_output <- grid_arrange_shared_legend(plot_cost1, nrow = 1, ncol = 1))
+    } else if(outcome == "costs_arm2") {
+      suppressWarnings(check_missing <- any(is.na(x$data_set$costs[[1]])))
+      if(any(check_missing==TRUE)) {n <- match(TRUE, check_missing) } else {n = 1 }
+      suppressMessages(plot_output <- grid_arrange_shared_legend(plot_cost2, nrow = 1, ncol = 1))
     }
-    res_plot<-list("plot"=plot_output,"complete data"=complete_labels,"observed data"=observed,"imputed data"=imputed_labels)
+    res_plot <- list("plot" = plot_output, "complete data" = complete_labels, "observed data" = observed, "imputed data" = imputed_labels)
     return(res_plot)
 }

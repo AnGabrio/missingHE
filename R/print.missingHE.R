@@ -15,26 +15,22 @@
 #' # 
 
 
-print.missingHE<-function(x,value.mis=FALSE,...){
-  #define additional inputs as a list
+print.missingHE <- function(x, value.mis = FALSE, ...) {
   exArgs <- list(...)
-  #number of digits as additional option
-  if(exists("digits",where=exArgs)) {digits=exArgs$digits} else {digits=3}
-  #x can only be object of class missingHE 
-  if(class(x)!="missingHE"){ 
+  if(exists("digits", where = exArgs)) {digits = exArgs$digits} else {digits = 3}
+  if(class(x) != "missingHE") { 
     stop("Only objects of class 'missingHE' can be used") 
   }
-  if(x$model_output$`model summary`$BUGSoutput$n.chains==1){
+  if(x$model_output$`model summary`$BUGSoutput$n.chains == 1){
     stop("no output is available if n.chain=1")
   }
-  #redefine output
-  x_print_sum<-x$model_output$summary[,c(1:3,7:9)]
-  x_print_sum2<-x$model_output$`model summary`$BUGSoutput$summary[,c(1:3,7:9)]
-    if(x$model_output$`model summary`$BUGSoutput$n.chains>1){
-        if(value.mis==FALSE){
-          print(x_print_sum,digits = digits)
-        }else if(value.mis==TRUE){
-          print(x_print_sum2,digits = digits)
+  x_print_sum <- x$model_output$summary[, c(1:3, 7:9)]
+  x_print_sum2 <- x$model_output$`model summary`$BUGSoutput$summary[, c(1:3, 7:9)]
+    if(x$model_output$`model summary`$BUGSoutput$n.chains > 1) {
+        if(value.mis == FALSE) {
+          print(x_print_sum, digits = digits)
+        } else if(value.mis == TRUE) {
+          print(x_print_sum2, digits = digits)
         }
       }
 }

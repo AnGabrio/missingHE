@@ -123,14 +123,14 @@ jagsresults <-
       rhat_neff <- x$BUGSoutput$summary[i, c('Rhat', 'n.eff'), drop=FALSE]
       out <- cbind(t(apply(
         samp, 3, function(x) 
-          c(mean=mean(x), sd=sd(x), quantile(x, probs=probs)))), rhat_neff)
-    } else if(any(is(x)=='mcmc.list')) {
+          c(mean = mean(x), sd = sd(x), quantile(x, probs = probs)))), rhat_neff)
+    } else if(any(is(x) == 'mcmc.list')) {
       nm <- colnames(x[[1]])
-      i <- grep(params, nm, invert=invert, ...)
-      if(length(i) == 0) stop("No parameters match 'params'", call.=FALSE)
+      i <- grep(params, nm, invert = invert, ...)
+      if(length(i) == 0) stop("No parameters match 'params'", call. = FALSE)
       out <- t(apply(do.call(rbind, x), 2, function(z) {
-        c(mean=mean(z), sd=sd(z), quantile(z, probs))
-      }))[i, , drop=FALSE]
+        c(mean = mean(z), sd = sd(z), quantile(z, probs))
+      }))[i, , drop = FALSE]
     } else {
       stop("x must be an 'mcmc.list' or 'rjags'  object.")
     }
