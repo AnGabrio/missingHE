@@ -223,6 +223,8 @@ write_hurdle <- function(dist_e , dist_c, ind, type, pe, pc, ze, zc, se, sc) eva
       model_string_jags <- gsub("ls_c2[1] ~ dunif(-5, 10)", "s_c2[1] ~ dunif(0, 1000)", model_string_jags, fixed = TRUE)
       model_string_jags <- gsub("ls_c1[2] <- sdc", "s_c1[2] <- sdc", model_string_jags, fixed = TRUE)
       model_string_jags <- gsub("ls_c2[2] <- sdc", "s_c2[2] <- sdc", model_string_jags, fixed = TRUE)
+      model_string_jags <- gsub("mu_c[1] <- nu_c[1] * (1 - p_c[1]) + sc * p_c[1]", "mu_c[1] <- nu_c[1] * (1 - p_c[1]) + exp(sc) * p_c[1]", model_string_jags, fixed = TRUE)
+      model_string_jags <- gsub("mu_c[2] <- nu_c[2] * (1 - p_c[2]) + sc * p_c[2]", "mu_c[2] <- nu_c[2] * (1 - p_c[2]) + exp(sc) * p_c[2]", model_string_jags, fixed = TRUE)
      }
      if(dist_e == "norm") {
        model_string_jags <- gsub("#derive mean and std effects1", "", model_string_jags, fixed = TRUE)
@@ -248,6 +250,8 @@ write_hurdle <- function(dist_e , dist_c, ind, type, pe, pc, ze, zc, se, sc) eva
        model_string_jags <- gsub("ls_e2[1] ~ dunif(-5, 10)", "s_e2[1] ~ dunif(0, sqrt(nu_e[2] * (1 - nu_e[2])))", model_string_jags, fixed = TRUE)
        model_string_jags <- gsub("ls_e1[2] <- sde", "s_e1[2] <- sde", model_string_jags, fixed = TRUE)
        model_string_jags <- gsub("ls_e2[2] <- sde", "s_e2[2] <- sde", model_string_jags, fixed = TRUE)
+       model_string_jags <- gsub("mu_e[1] <- nu_e[1] * (1 - p_e[1]) + se * p_e[1]", "mu_e[1] <- nu_e[1] * (1 - p_e[1]) + ilogit(se) * p_e[1]", model_string_jags, fixed = TRUE)
+       model_string_jags <- gsub("mu_e[2] <- nu_e[2] * (1 - p_e[2]) + se * p_e[2]", "mu_e[2] <- nu_e[2] * (1 - p_e[2]) + ilogit(se) * p_e[2]", model_string_jags, fixed = TRUE)
      }
      if(dist_e == "beta" & dist_c == "gamma") {
        model_string_jags <- gsub("#transformation of parameters", "", model_string_jags, fixed = TRUE)
@@ -443,6 +447,8 @@ write_hurdle <- function(dist_e , dist_c, ind, type, pe, pc, ze, zc, se, sc) eva
       model_string_jags <- gsub("ls_c2[1] ~ dunif(-5, 10)", "s_c2[1] ~ dunif(0, 1000)", model_string_jags, fixed = TRUE)
       model_string_jags <- gsub("ls_c1[2] <- sdc", "s_c1[2] <- sdc", model_string_jags, fixed = TRUE)
       model_string_jags <- gsub("ls_c2[2] <- sdc", "s_c2[2] <- sdc", model_string_jags, fixed = TRUE)
+      model_string_jags <- gsub("mu_c[1] <- nu_c[1] * (1 - p_c[1]) + sc * p_c[1]", "mu_c[1] <- nu_c[1] * (1 - p_c[1]) + exp(sc) * p_c[1]", model_string_jags, fixed = TRUE)
+      model_string_jags <- gsub("mu_c[2] <- nu_c[2] * (1 - p_c[2]) + sc * p_c[2]", "mu_c[2] <- nu_c[2] * (1 - p_c[2]) + exp(sc) * p_c[2]", model_string_jags, fixed = TRUE)
     }
     if(dist_e == "norm") {
       model_string_jags <- gsub("#derive mean and std effects1", "", model_string_jags, fixed = TRUE)
@@ -682,6 +688,8 @@ write_hurdle <- function(dist_e , dist_c, ind, type, pe, pc, ze, zc, se, sc) eva
        model_string_jags <- gsub("ls_e2[1] ~ dunif(-5, 10)", "s_e2[1] ~ dunif(0, sqrt(nu_e[2] * (1 - nu_e[2])))", model_string_jags, fixed = TRUE)
        model_string_jags <- gsub("ls_e1[2] <- sde", "s_e1[2] <- sde", model_string_jags, fixed = TRUE)
        model_string_jags <- gsub("ls_e2[2] <- sde", "s_e2[2] <- sde", model_string_jags, fixed = TRUE)
+       model_string_jags <- gsub("mu_e[1] <- nu_e[1] * (1 - p_e[1]) + se * p_e[1]", "mu_e[1] <- nu_e[1] * (1 - p_e[1]) + ilogit(se) * p_e[1]", model_string_jags, fixed = TRUE)
+       model_string_jags <- gsub("mu_e[2] <- nu_e[2] * (1 - p_e[2]) + se * p_e[2]", "mu_e[2] <- nu_e[2] * (1 - p_e[2]) + ilogit(se) * p_e[2]", model_string_jags, fixed = TRUE)
      }
      if(dist_e == "beta" & dist_c == "gamma") {
        model_string_jags <- gsub("#transformation of parameters", "", model_string_jags, fixed = TRUE)
