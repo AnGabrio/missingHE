@@ -30,7 +30,7 @@
 #' @param type Type of structural value mechanism assumed. Choices are Structural Completely At Random (SCAR),
 #' and Structural At Random (SAR).
 #' @param dist_e distribution assumed for the effects. Current available chocies are: Normal ('norm') or Beta ('beta').
-#' @param dist_c distribution assumed for the costs. Current available chocies are: Normal ('norm') or Gamma ('gamma').
+#' @param dist_c distribution assumed for the costs. Current available chocies are: Normal ('norm'), Gamma ('gamma') or LogNormal ('lnorm')
 #' @param save_model Logical. If \code{save_model} is \code{TRUE} a \code{txt} file containing the model code is printed
 #'  in the current working directory.
 #' @param prob A numeric vector of probabilities within the range (0,1), representing the upper and lower
@@ -85,7 +85,7 @@
 #' we define an indicator variable \eqn{d_i} taking value \code{1} if the \eqn{i}-th individual is associated with a structural value and \code{0} otherwise.
 #' This is modelled as:
 #' \deqn{d_i ~ Bernoulli(\pi_i)}
-#' \deqn{logit(\pi_i)=\gamma_0+\sum\gamma_j X_j}
+#' \deqn{logit(\pi_i) = \gamma_0 + \sum\gamma_j X_j}
 #' where
 #' \itemize{
 #' \item \eqn{\pi_i} is the individual probability of a structural value in \eqn{y}
@@ -93,11 +93,11 @@
 #' \item \eqn{\gamma_j} represents the impact on the probability of a structural value in \eqn{y} of the centered covariates \eqn{X_j}.
 #' }
 #' 
-#' When \eqn{\gamma_j = 0} the model assumes a 'SCAR' mechanism, while when \eqn{\gamma_j!=0} the mechanism is 'SAR'.
+#' When \eqn{\gamma_j = 0} the model assumes a 'SCAR' mechanism, while when \eqn{\gamma_j != 0} the mechanism is 'SAR'.
 #' For the parameters indexing the structural value model, the default prior distributions assumed are the following:
 #' \itemize{
-#' \item \eqn{\gamma_0 ~ Logisitc(0,1)}
-#' \item \eqn{\gamma_j ~ Normal(0,0.0001)}
+#' \item \eqn{\gamma_0 ~ Logisitc(0, 1)}
+#' \item \eqn{\gamma_j ~ Normal(0, 0.0001)}
 #' }
 #' When user-defined hyperprior values are supplied via the argument \code{prior} in the function \code{hurdle}, the elements of this list (see Arguments)
 #' must be vectors of length \code{2} containing the user-provided hyperprior values and must take specific names according to the parameters they are associated with. 
@@ -213,8 +213,8 @@ hurdle <- function(data, model.eff, model.cost, model.se = se ~ 1, model.sc = sc
     stop("A two arm indicator variable must be provided")
   }
   if(!type %in% c("SCAR", "SAR")) {stop("Types available for use are 'SCAR'and 'SAR'") }
-  if(!dist_e %in% c("norm", "beta") | !dist_c %in% c("norm", "gamma")) {
-    stop("Distributions available for use are 'norm' or 'beta' for the effects and 'norm'or'gamma' for the costs")
+  if(!dist_e %in% c("norm", "beta") | !dist_c %in% c("norm", "gamma", "lnorm")) {
+    stop("Distributions available for use are 'norm' or 'beta' for the effects and 'norm', 'gamma', 'lnorm' for the costs")
   }
   if(length(prob) != 2 | is.numeric(prob) == FALSE | any(prob < 0) != FALSE | any(prob > 1) != FALSE) {
     stop("You must provide valid lower/upper quantiles for the imputed data distribution") }

@@ -25,7 +25,7 @@
 #' If there are no covariates, specify \code{1} on the right hand side. By default, covariates are placed on the "probability" parameter for the missing costs through a logistic-linear model.
 #' @param type Type of missingness mechanism assumed. Choices are Missing At Random (MAR) and Missing Not At Random (MNAR).
 #' @param dist_e distribution assumed for the effects. Current available chocies are: Normal ('norm') or Beta ('beta').
-#' @param dist_c distribution assumed for the costs. Current available chocies are: Normal ('norm') or Gamma ('gamma').
+#' @param dist_c Distribution assumed for the costs. Current available chocies are: Normal ('norm'), Gamma ('gamma') or LogNormal ('lnorm')
 #' @param save_model Logical. If \code{save_model} is \code{TRUE} a \code{txt} file containing the model code is printed
 #'  in the current working directory.
 #' @param prob A numeric vector of probabilities within the range (0,1), representing the upper and lower
@@ -74,7 +74,7 @@
 #' we define an indicator variable \eqn{m_i} taking value \code{1} if the \eqn{i}-th individual is associated with a missing value and \code{0} otherwise.
 #' This is modelled as:
 #' \deqn{m_i ~ Bernoulli(\pi_i)}
-#' \deqn{logit(\pi_i)=\gamma_0+\sum\gamma_j X_j +\delta(y)}
+#' \deqn{logit(\pi_i)=\gamma_0 + \sum\gamma_j X_j + \delta(y)}
 #' where
 #' \itemize{
 #' \item \eqn{\pi_i} is the individual probability of a missing value in \eqn{y}
@@ -85,9 +85,9 @@
 #' When \eqn{\delta=0} the model assumes a 'MAR' mechanism, while when \eqn{\delta!=0} the mechanism is 'MNAR'. For the parameters indexing the missingness model, 
 #' the default prior distributions assumed are the following:
 #' \itemize{
-#' \item \eqn{\gamma_0~Logisitc(0,1)}
-#' \item \eqn{\gamma_j~Normal(0,0.0001)}
-#' \item \eqn{\delta~Normal(0,1)}
+#' \item \eqn{\gamma_0 ~ Logisitc(0, 1)}
+#' \item \eqn{\gamma_j ~ Normal(0, 0.0001)}
+#' \item \eqn{\delta ~ Normal(0, 1)}
 #' }
 #' When user-defined hyperprior values are supplied via the argument \code{prior} in the function \code{selection}, the elements of this list (see Arguments)
 #' must be vectors of length \code{2} containing the user-provided hyperprior values and must take specific names according to the parameters they are associated with. 
@@ -199,8 +199,8 @@ selection <- function(data, model.eff, model.cost, model.me = me ~ 1, model.mc =
   if(!type %in% c("MAR", "MNAR")) {
     stop("Types available for use are 'MAR' and 'MNAR'")
   }
-  if(!dist_e %in% c("norm","beta") | !dist_c %in% c("norm", "gamma")) {
-    stop("Distributions available for use are 'norm','beta' for the effects and 'norm','gamma' for the costs")
+  if(!dist_e %in% c("norm", "beta") | !dist_c %in% c("norm", "gamma", "lnorm")) {
+    stop("Distributions available for use are 'norm', 'beta' for the effects and 'norm', 'gamma', 'lnorm' for the costs")
   }
   if(length(prob) != 2 | is.numeric(prob) == FALSE | any(prob < 0) != FALSE | any(prob > 1) != FALSE) {
     stop("You must provide valid lower/upper quantiles for the imputed data distribution")}

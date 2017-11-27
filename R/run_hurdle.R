@@ -4,7 +4,7 @@
 #' @param type Type of structural value mechanism assumed. Choices are Structural Completely At Random (SCAR),
 #' and Structural At Random (SAR).
 #' @param dist_e distribution assumed for the effects. Current available chocies are: Normal ('norm') or Beta ('beta').
-#' @param dist_c distribution assumed for the costs. Current available chocies are: Normal ('norm') or Gamma ('gamma').
+#' @param dist_c distribution assumed for the costs. Current available chocies are: Normal ('norm'), Gamma ('gamma') or LogNormal ('lnorm')
 #' @param se Structural value to be found in the effect data. If set to \code{NULL}, 
 #' no structural value is chosen and a standard model for the effects is run.
 #' @param sc Structural value to be found in the cost data. If set to \code{NULL}, 
@@ -27,18 +27,18 @@ run_hurdle <- function(type, dist_e, dist_c, inits, se = se, sc = sc, sde = sde,
   if(!isTRUE(requireNamespace("R2jags", quietly = TRUE))) {
     stop("You need to install the R package 'R2jags'. Please run in your R terminal:\n install.packages('R2jags')")
   }
-  if(!dist_e %in% c("norm", "beta") | !dist_c %in% c("norm", "gamma")) {
-    stop("Distributions available for use are 'norm' or 'beta' for the effects and 'norm'or'gamma' for the costs")
+  if(!dist_e %in% c("norm", "beta") | !dist_c %in% c("norm", "gamma", "lnorm")) {
+    stop("Distributions available for use are 'norm' or 'beta' for the effects and 'norm', 'gamma', 'lnorm' for the costs")
   }
   if(!type %in% c("SCAR", "SAR")) {
-    stop("Types available for use are 'SCAR','SAR'")
+    stop("Types available for use are 'SCAR', 'SAR'")
   }
   if(is.null(inits) == FALSE) {inits = inits }
   model <- write_hurdle(type = type , dist_e = dist_e, dist_c = dist_c, ind = ind , pe = pe, pc = pc, ze = ze, zc = zc , se = se, sc = sc)
   filein <- model
   if(dist_e == "norm") {sde <- log(sde) }
   if(dist_c == "norm") {sdc <- log(sdc) }
-  if(dist_c == "gamma") {
+  if(dist_c == "gamma" | dist_c == "lnorm") {
   if(is.null(sc) == FALSE) {
     if(sc == 0) {
       sc = log(0.000001)
@@ -206,7 +206,7 @@ run_hurdle <- function(type, dist_e, dist_c, inits, se = se, sc = sc, sde = sde,
     cost2_pos[, 3] <- apply(modelN1$BUGSoutput$sims.list$cost2, 2, quantile, probs = prob[2])
   if(ind == FALSE){
     beta_f <- modelN1$BUGSoutput$sims.list$beta_f
-    beta <- cbind(beta,beta_f)
+    beta <- list("beta" = beta, "beta_f" = beta_f)
   }
    if(n.chains >1 ) {model_sum <- round(jagsresults(x = modelN1, params = c('eff1', 'eff2', 'cost1', 'cost2'), invert = TRUE), digits = 3)
    } else{model_sum <- NULL }

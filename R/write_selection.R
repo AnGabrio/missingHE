@@ -6,7 +6,7 @@
 #' This function selects which type of model to execute.
 #' @keywords JAGS Selection models
 #' @param dist_e Distribution assumed for the effects. Current available chocies are: Normal ('norm') or Beta ('beta')
-#' @param dist_c Distribution assumed for the costs. Current available chocies are: Normal ('norm') or Gamma ('gamma')
+#' @param dist_c Distribution assumed for the costs. Current available chocies are: Normal ('norm'), Gamma ('gamma') or LogNormal ('lnorm')
 #' @param ind Logical; if TRUE independence between effectiveness and costs is assumed, else correlation is accounted for
 #' @param type Type of missingness mechanism assumed. Choices are Missing At Random (MAR), Missing Not At Random for the effects (MNAR_eff),
 #' Missing Not At Random for the costs (MNAR_cost), and Missing Not At Random for both (MNAR)
@@ -71,6 +71,7 @@ write_selection <- function(dist_e , dist_c, ind, type, pe, pc, ze, zc) eval.par
   tau_c[t] <- 1 / ss_c[t]
   ss_c[t] <- s_c[t] * s_c[t]
   s_c[t] <- exp(ls_c[t])
+  #mean for lnorm
   tau_e[t] <- 1 / ss_e[t]
   ss_e[t] <- s_e[t] * s_e[t]
   s_e[t] <- exp(ls_e[t])
@@ -169,6 +170,7 @@ write_selection <- function(dist_e , dist_c, ind, type, pe, pc, ze, zc) eval.par
  if(dist_c == "norm") {
    model_string_jags <- gsub("#derive mean and std costs1", "", model_string_jags, fixed = TRUE)
    model_string_jags <- gsub("#derive mean and std costs2", "", model_string_jags, fixed = TRUE)
+   model_string_jags <- gsub("#mean for lnorm", "", model_string_jags, fixed = TRUE)
  }
  if(dist_c == "gamma") {
   model_string_jags <- gsub("cost1[i] ~ dnorm(mu_c1[i], tau_c[1])", "cost1[i] ~ dgamma(mu_c1[i] * tau_c1[i], tau_c1[i])", model_string_jags, fixed = TRUE)
@@ -183,6 +185,20 @@ write_selection <- function(dist_e , dist_c, ind, type, pe, pc, ze, zc) eval.par
   model_string_jags <- gsub("mu_c[1] <- inprod(mean_cov_c1[], beta[, 1])", "mu_c[1] <- exp(inprod(mean_cov_c1[], beta[, 1]))", model_string_jags, fixed = TRUE)
   model_string_jags <- gsub("mu_c[2] <- inprod(mean_cov_c2[], beta[, 2])", "mu_c[2] <- exp(inprod(mean_cov_c2[], beta[, 2]))", model_string_jags, fixed = TRUE)
   model_string_jags <- gsub("ls_c[t] ~ dunif(-5, 10)", "s_c[t] ~ dunif(0, 1000)", model_string_jags, fixed = TRUE)
+  model_string_jags <- gsub("#mean for lnorm", "", model_string_jags, fixed = TRUE)
+ } else if(dist_c == "lnorm") {
+   model_string_jags <- gsub("cost1[i] ~ dnorm(mu_c1[i], tau_c[1])", "cost1[i] ~ dlnorm(lmu_c1[i], ltau_c[1])", model_string_jags, fixed = TRUE)
+   model_string_jags <- gsub("#derive mean and std costs1", "", model_string_jags, fixed = TRUE)
+   model_string_jags <- gsub("mu_c1[i] <- ", "lmu_c1[i] <- ", model_string_jags, fixed = TRUE)
+   model_string_jags <- gsub("cost2[i] ~ dnorm(mu_c2[i], tau_c[2])", "cost2[i] ~ dlnorm(lmu_c2[i], ltau_c[2])", model_string_jags, fixed = TRUE)
+   model_string_jags <- gsub("#derive mean and std costs2", "", model_string_jags, fixed = TRUE)
+   model_string_jags <- gsub("mu_c2[i] <- ", "lmu_c2[i] <- ", model_string_jags, fixed = TRUE)
+   model_string_jags <- gsub("tau_c[t] <- 1 / ss_c[t]", "ltau_c[t] <- 1 / lss_c[t]", model_string_jags, fixed = TRUE)
+   model_string_jags <- gsub("ss_c[t] <- s_c[t] * s_c[t]", "lss_c[t] <- ls_c[t] * ls_c[t]", model_string_jags, fixed = TRUE)
+   model_string_jags <- gsub("s_c[t] <- exp(ls_c[t])", "s_c[t] <- sqrt(exp(2 * lmu_c[t] + lss_c[t]) * (exp(lss_c[t]) - 1))", model_string_jags, fixed = TRUE)
+   model_string_jags <- gsub("mu_c[1] <- inprod(mean_cov_c1[], beta[, 1])", "lmu_c[1] <- inprod(mean_cov_c1[], beta[, 1])", model_string_jags, fixed = TRUE)
+   model_string_jags <- gsub("mu_c[2] <- inprod(mean_cov_c2[], beta[, 2])", "lmu_c[2] <- inprod(mean_cov_c2[], beta[, 2])", model_string_jags, fixed = TRUE)
+   model_string_jags <- gsub("#mean for lnorm", "mu_c[t] <- exp(lmu_c[t] + lss_c[t] / 2)", model_string_jags, fixed = TRUE)
  }
  if(dist_e == "norm") {
    model_string_jags <- gsub("#derive mean and std effects1", "", model_string_jags, fixed = TRUE)

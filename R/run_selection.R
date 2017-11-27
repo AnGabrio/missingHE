@@ -4,7 +4,7 @@
 #' @param type Type of missingness mechanism assumed. Choices are Missing At Random (MAR), Missing Not At Random for the effects (MNAR_eff),
 #' Missing Not At Random for the costs (MNAR_cost), and Missing Not At Random for both (MNAR)
 #' @param dist_e distribution assumed for the effects. Current available chocies are: Normal ('norm') or Beta ('beta').
-#' @param dist_c distribution assumed for the costs. Current available chocies are: Normal ('norm') or Gamma ('gamma').
+#' @param dist_c Distribution assumed for the costs. Current available chocies are: Normal ('norm'), Gamma ('gamma') or LogNormal ('lnorm')
 #' @param inits a list with elements equal to the number of chains selected; each element of the list is itself a list of starting values for the BUGS model, 
 #' or a function creating (possibly random) initial values. If inits is NULL, JAGS will generate initial values for parameters
 #' @keywords JAGS Bayesian hurdle models 
@@ -19,11 +19,11 @@ run_selection <- function(type, dist_e, dist_c, inits) eval.parent(substitute( {
   if(!isTRUE(requireNamespace("R2jags", quietly = TRUE))) {
     stop("You need to install the R package 'R2jags'. Please run in your R terminal:\n install.packages('R2jags')")
   }
-  if(!dist_e %in% c("norm","beta") | !dist_c %in% c("norm", "gamma")) {
-    stop("Distributions available for use are 'norm','beta' for the effects and 'norm','gamma' for the costs")
+  if(!dist_e %in% c("norm", "beta") | !dist_c %in% c("norm", "gamma", "lnorm")) {
+    stop("Distributions available for use are 'norm', 'beta' for the effects and 'norm', 'gamma', 'lnorm' for the costs")
   }
   if(!type %in% c("MAR", "MNAR", "MNAR_eff", "MNAR_cost")) {
-    stop("Types available for use are 'MAR','MNAR_eff','MNAR_cost'and 'MNAR'")
+    stop("Types available for use are 'MAR', 'MNAR_eff', 'MNAR_cost'and 'MNAR'")
   }
   if(is.null(inits) == FALSE) {inits = inits }
   model <- write_selection(type = type , dist_e = dist_e, dist_c = dist_c, pe = pe, pc = pc, ze = ze, zc = zc, ind = ind)
@@ -76,7 +76,7 @@ run_selection <- function(type, dist_e, dist_c, inits) eval.parent(substitute( {
     cost2_pos[, 3] <- apply(modelN1$BUGSoutput$sims.list$cost2, 2, quantile, probs = prob[2])
   if(ind == FALSE & dist_e == "norm" & dist_c == "norm") {
     beta_f <- modelN1$BUGSoutput$sims.list$beta_f
-    beta <- cbind(beta, beta_f)
+    beta <- list("beta" = beta, "beta_f" = beta_f)
   }
   if(type == "MNAR") {
     delta_e <- modelN1$BUGSoutput$sims.list$delta_e

@@ -8,7 +8,7 @@
 #' and Structural At Random (SAR). For a complete list of all available hyper parameters 
 #' and types of models see the manual.
 #' @param dist_e distribution assumed for the effects. Current available chocies are: Normal ('norm') or Beta ('beta').
-#' @param dist_c distribution assumed for the costs. Current available chocies are: Normal ('norm') or Gamma ('gamma').
+#' @param dist_c distribution assumed for the costs. Current available chocies are: Normal ('norm'), Gamma ('gamma') or LogNormal ('lnorm')
 #' @param pe Number of covariates for the effectiveness model
 #' @param pc Number of cvoariates for the cost model
 #' @param ze Number of covariates or the structural indicators model for the effectiveness
@@ -179,7 +179,7 @@ prior_hurdle <- function(type, dist_e, dist_c, pe, pc, ze, zc, se, sc) eval.pare
         model_string_jags <- gsub("s_e2 ~ dunif(0, sqrt(nu_e[2] * (1 - nu_e[2]))", prior_alphae_str, model_string_jags, fixed = TRUE) }
     }
   }
-  if(dist_c == "norm") {
+  if(dist_c == "norm" | dist_c == "lnorm") {
   if(is.null(sc) == FALSE) {
     if(is.null(sigma.prior.c) == FALSE & grepl("ls_c1[1] ~ ", model_string_jags, fixed = TRUE) == TRUE & grepl("ls_c2[1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
       if(length(sigma.prior.c) != 2) {stop("provide correct hyper prior values") }
