@@ -12,7 +12,7 @@ write_hurdle(dist_e, dist_c, ind, type, pe, pc, ze, zc, se, sc)
 \arguments{
 \item{dist_e}{Distribution assumed for the effects. Current available chocies are: Normal ('norm') or Beta ('beta')}
 
-\item{dist_c}{Distribution assumed for the costs. Current available chocies are: Normal ('norm') or Gamma ('gamma')}
+\item{dist_c}{Distribution assumed for the costs. Current available chocies are: Normal ('norm'), Gamma ('gamma') or LogNormal ('lnorm')}
 
 \item{ind}{Logical; if TRUE independence between effectiveness and costs is assumed, else correlation is accounted for}
 

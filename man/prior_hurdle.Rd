@@ -14,7 +14,7 @@ and types of models see the manual.}
 
 \item{dist_e}{distribution assumed for the effects. Current available chocies are: Normal ('norm') or Beta ('beta').}
 
-\item{dist_c}{distribution assumed for the costs. Current available chocies are: Normal ('norm') or Gamma ('gamma').}
+\item{dist_c}{distribution assumed for the costs. Current available chocies are: Normal ('norm'), Gamma ('gamma') or LogNormal ('lnorm')}
 
 \item{pe}{Number of covariates for the effectiveness model}
 

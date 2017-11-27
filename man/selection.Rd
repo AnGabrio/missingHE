@@ -35,7 +35,7 @@ If there are no covariates, specify \code{1} on the right hand side. By default,
 
 \item{dist_e}{distribution assumed for the effects. Current available chocies are: Normal ('norm') or Beta ('beta').}
 
-\item{dist_c}{distribution assumed for the costs. Current available chocies are: Normal ('norm') or Gamma ('gamma').}
+\item{dist_c}{Distribution assumed for the costs. Current available chocies are: Normal ('norm'), Gamma ('gamma') or LogNormal ('lnorm')}
 
 \item{type}{Type of missingness mechanism assumed. Choices are Missing At Random (MAR) and Missing Not At Random (MNAR).}
 
@@ -102,7 +102,7 @@ Consider a data set comprising a response variable \eqn{y} and a set of centered
 we define an indicator variable \eqn{m_i} taking value \code{1} if the \eqn{i}-th individual is associated with a missing value and \code{0} otherwise.
 This is modelled as:
 \deqn{m_i ~ Bernoulli(\pi_i)}
-\deqn{logit(\pi_i)=\gamma_0+\sum\gamma_j X_j +\delta(y)}
+\deqn{logit(\pi_i)=\gamma_0 + \sum\gamma_j X_j + \delta(y)}
 where
 \itemize{
 \item \eqn{\pi_i} is the individual probability of a missing value in \eqn{y}
@@ -113,9 +113,9 @@ where
 When \eqn{\delta=0} the model assumes a 'MAR' mechanism, while when \eqn{\delta!=0} the mechanism is 'MNAR'. For the parameters indexing the missingness model, 
 the default prior distributions assumed are the following:
 \itemize{
-\item \eqn{\gamma_0~Logisitc(0,1)}
-\item \eqn{\gamma_j~Normal(0,0.0001)}
-\item \eqn{\delta~Normal(0,1)}
+\item \eqn{\gamma_0 ~ Logisitc(0, 1)}
+\item \eqn{\gamma_j ~ Normal(0, 0.0001)}
+\item \eqn{\delta ~ Normal(0, 1)}
 }
 When user-defined hyperprior values are supplied via the argument \code{prior} in the function \code{selection}, the elements of this list (see Arguments)
 must be vectors of length \code{2} containing the user-provided hyperprior values and must take specific names according to the parameters they are associated with. 

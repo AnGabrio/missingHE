@@ -41,7 +41,7 @@ no structural value is chosen and a standard model for the costs is run.}
 
 \item{dist_e}{distribution assumed for the effects. Current available chocies are: Normal ('norm') or Beta ('beta').}
 
-\item{dist_c}{distribution assumed for the costs. Current available chocies are: Normal ('norm') or Gamma ('gamma').}
+\item{dist_c}{distribution assumed for the costs. Current available chocies are: Normal ('norm'), Gamma ('gamma') or LogNormal ('lnorm')}
 
 \item{type}{Type of structural value mechanism assumed. Choices are Structural Completely At Random (SCAR),
 and Structural At Random (SAR).}
@@ -115,7 +115,7 @@ Consider a data set comprising a response variable \eqn{y} and a set of centered
 we define an indicator variable \eqn{d_i} taking value \code{1} if the \eqn{i}-th individual is associated with a structural value and \code{0} otherwise.
 This is modelled as:
 \deqn{d_i ~ Bernoulli(\pi_i)}
-\deqn{logit(\pi_i)=\gamma_0+\sum\gamma_j X_j}
+\deqn{logit(\pi_i) = \gamma_0 + \sum\gamma_j X_j}
 where
 \itemize{
 \item \eqn{\pi_i} is the individual probability of a structural value in \eqn{y}
@@ -123,11 +123,11 @@ where
 \item \eqn{\gamma_j} represents the impact on the probability of a structural value in \eqn{y} of the centered covariates \eqn{X_j}.
 }
 
-When \eqn{\gamma_j = 0} the model assumes a 'SCAR' mechanism, while when \eqn{\gamma_j!=0} the mechanism is 'SAR'.
+When \eqn{\gamma_j = 0} the model assumes a 'SCAR' mechanism, while when \eqn{\gamma_j != 0} the mechanism is 'SAR'.
 For the parameters indexing the structural value model, the default prior distributions assumed are the following:
 \itemize{
-\item \eqn{\gamma_0 ~ Logisitc(0,1)}
-\item \eqn{\gamma_j ~ Normal(0,0.0001)}
+\item \eqn{\gamma_0 ~ Logisitc(0, 1)}
+\item \eqn{\gamma_j ~ Normal(0, 0.0001)}
 }
 When user-defined hyperprior values are supplied via the argument \code{prior} in the function \code{hurdle}, the elements of this list (see Arguments)
 must be vectors of length \code{2} containing the user-provided hyperprior values and must take specific names according to the parameters they are associated with. 

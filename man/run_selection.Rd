@@ -12,7 +12,7 @@ Missing Not At Random for the costs (MNAR_cost), and Missing Not At Random for b
 
 \item{dist_e}{distribution assumed for the effects. Current available chocies are: Normal ('norm') or Beta ('beta').}
 
-\item{dist_c}{distribution assumed for the costs. Current available chocies are: Normal ('norm') or Gamma ('gamma').}
+\item{dist_c}{Distribution assumed for the costs. Current available chocies are: Normal ('norm'), Gamma ('gamma') or LogNormal ('lnorm')}
 
 \item{inits}{a list with elements equal to the number of chains selected; each element of the list is itself a list of starting values for the BUGS model, 
 or a function creating (possibly random) initial values. If inits is NULL, JAGS will generate initial values for parameters}
