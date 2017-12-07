@@ -682,6 +682,8 @@ write_hurdle <- function(dist_e , dist_c, ind, type, pe, pc, ze, zc, se, sc) eva
      model_string_jags <- gsub("beta_f2[1] ~ dnorm(0, 0.001)", "beta_f[2] ~ dnorm(0, 0.001)", model_string_jags, fixed = TRUE)
      model_string_jags <- gsub("beta_f1[2] <- 0", "", model_string_jags, fixed = TRUE)
      model_string_jags <- gsub("beta_f2[2] <- 0", "", model_string_jags, fixed = TRUE)
+     model_string_jags <- gsub("beta_f[1] <- beta_f1[1]", "", model_string_jags, fixed = TRUE)
+     model_string_jags <- gsub("beta_f[2] <- beta_f2[1]", "", model_string_jags, fixed = TRUE)
      if(type == "SCAR") {
        model_string_jags <- gsub("logit(pq_1[i]) <- inprod(Z1_e[i, ], gamma_e[, 1])", "logit(pq_1[i]) <- gamma_e[1]", model_string_jags, fixed = TRUE)
        model_string_jags <- gsub("logit(pq_2[i]) <- inprod(Z2_e[i, ], gamma_e[, 2])", "logit(pq_2[i]) <- gamma_e[2]", model_string_jags, fixed = TRUE)

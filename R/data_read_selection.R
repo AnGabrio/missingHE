@@ -59,9 +59,6 @@
 
 
 data_read_selection <- function(data, model.eff, model.cost, model.me, model.mc, type = type) {
-  if(!any(c("e", "c", "t") %in% names(data)) == TRUE) {
-    stop("Please rename or provide variables in the data frame as 'e', 'c' and 't' for the effectiveness, cost and treatment indicator")
-  }
   if(any(names(data) == "e") == TRUE & any(names(data) == "c") == TRUE) {
     e <- as.name("e")
     c <- as.name("c")
@@ -70,8 +67,28 @@ data_read_selection <- function(data, model.eff, model.cost, model.me, model.mc,
   if(any(is.na(cov_matrix)) == TRUE) {
     stop("no missing covariate or treatment indicator is allowed")
   }
-  if(any(levels(as.factor(cov_matrix$t)) != c("1", "2")) == TRUE) {
-    stop("A two arm indicator variable must be provided")
+  is.formula<-function (x) { inherits(x, "formula") }
+  if(is.formula(model.eff) == FALSE | is.formula(model.cost) == FALSE) {
+    stop("model.eff and/or model.cost must be formula objects")
+  }
+  if(all(names(model.frame(model.eff)) %in% names(data)) == FALSE | 
+     all(names(model.frame(model.cost)) %in% names(data)) == FALSE) {
+    stop("you must provide names in the formula that correspond to those in the data")
+  }
+  if("e" %in% labels(terms(model.eff)) | "c" %in% labels(terms(model.cost))) {
+    stop("please remove 'e' from the right hand side of model.eff and/or 'c' from the right hand side of model.cost")
+  }
+  if(names(model.frame(model.eff)[1]) != "e") {
+    stop("you must set 'e' as the response in the formula model.eff")
+  }
+  if("c" %in% names(model.frame(model.eff))) {
+    stop("dependence allowed only through the cost model; please remove 'c' from model.eff")
+  }
+  if(names(model.frame(model.cost)[1]) != "c") {
+    stop("you must set 'c' as the response in the formula model.cost")
+  }
+  if("t" %in% names(model.frame(model.cost)) | "t" %in% names(model.frame(model.eff))) {
+    stop("treatment indicator must be provided only in the data. Please remove 't' from 'model.eff' and/or 'model.cost'")
   }
   index_mis_e <- which(is.na(data$e))
   index_mis_c <- which(is.na(data$c))
@@ -79,19 +96,8 @@ data_read_selection <- function(data, model.eff, model.cost, model.me, model.mc,
   data$e[is.na(data$e) == TRUE] <- -999999
   data$c[is.na(data$c) == TRUE] <- -999999
   mf_e <- model.frame(formula = model.eff, data = data)
-  if("c" %in% names(mf_e)) {
-    stop("only dependence of costs on effectiveness is allowed. Please remove 'c' from 'model.eff'")
-  }
-  if(!any(names(mf_e) %in% names(data)) == TRUE) {
-    stop("you must provide names in the formula that correspond to those in the data")
-  }
   mf_c <- model.frame(formula = model.cost, data = data)
-  if(!any(names(mf_c) %in% names(data)) == TRUE){
-    stop("you must provide names in the formula that correspond to those in the data")
-  }
-  if("t" %in% names(mf_e) | "t" %in% names(mf_c)) {
-    stop("treatment indicator must be provided only in the data. Please remove 't' from 'model.eff' and/or 'model.cost'")
-  }
+  terms <- NULL
   x_e <- model.matrix(attr(mf_e, "terms"), data = mf_e)
   x_c <- model.matrix(attr(mf_c, "terms"), data = mf_c)
   if("e" %in% names(mf_c)){
@@ -185,15 +191,27 @@ data_read_selection <- function(data, model.eff, model.cost, model.me, model.mc,
   data2$c[is.na(data2$c) == TRUE] <- -999999
   data2$me <- c(m_eff1, m_eff2)
   data2$mc <- c(m_cost1, m_cost2)
+  if(is.formula(model.me) == FALSE | is.formula(model.mc) == FALSE) {
+    stop("model.me and/or model.mc must be formula objects")
+  }
+  if(all(names(model.frame(model.me, data = data2)) %in% names(data2)) == FALSE | 
+     all(names(model.frame(model.mc, data = data2)) %in% names(data2)) == FALSE) {
+    stop("you must provide names in the formula that correspond to those in the data")
+  }
+  if(names(model.frame(model.me, data = data2)[1]) != "me") {
+    stop("you must set 'me' as the response in the formula model.me")
+  }
+  if(names(model.frame(model.mc, data = data2)[1]) != "mc") {
+    stop("you must set 'mc' as the response in the formula model.mc")
+  }
+  if("t" %in% names(model.frame(model.mc, data = data2)) | "t" %in% names(model.frame(model.me, data = data2))) {
+    stop("treatment indicator must be provided only in the data. Please remove 't' from 'model.me' and/or 'model.mc'")
+  }
+  if("c" %in% names(model.frame(model.me, data = data2)) | "e" %in% names(model.frame(model.mc, data = data2))) {
+    stop("please remove 'e' from model.mc and/or remove 'c' from model.me")
+  }
   zf_e <- model.frame(formula = model.me, data = data2)
   zf_c <- model.frame(formula = model.mc, data = data2)
-  if("c" %in% names(zf_e)) { stop("only dependence on covariates and/or missing effects is allowed. Please remove 'c' from 'model.me'") }
-  if("e" %in% names(zf_c)) { stop("only dependence on covariates and/or missing costs is allowed. Please remove 'e' from 'model.mc'") }
-  if(!any(names(zf_e) %in% names(data2)) == TRUE) { stop("you must provide names in the formula that correspond to those in the data") }
-  if(!any(names(zf_c) %in% names(data2)) == TRUE) { stop("you must provide names in the formula that correspond to those in the data") }
-  if("t" %in% names(zf_e) | "t" %in% names(zf_c)) {
-    stop("treatment indicator must be provided only in the data. Please remove 't' from 'model.eff' and/or 'model.cost'")
-  }
   z_e <- model.matrix(attr(zf_e, "terms"), data = zf_e)
   z_c <- model.matrix(attr(zf_c, "terms"), data = zf_c)
   z_e_hold <- z_e

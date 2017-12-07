@@ -65,9 +65,6 @@
 
 
 data_read_hurdle <- function(data, model.eff, model.cost, model.se, model.sc, se, sc, type = type) {
-  if(!any(c("e", "c", "t") %in% names(data)) == TRUE) {
-    stop("Please rename or provide variables in the data frame as 'e', 'c' and 't' for the effectiveness, cost and treatment indicator")
-  }
   if(any(names(data) == "e") == TRUE & any(names(data) == "c") == TRUE) {
     e <- as.name("e")
     c <- as.name("c")
@@ -76,8 +73,28 @@ data_read_hurdle <- function(data, model.eff, model.cost, model.se, model.sc, se
   if(any(is.na(cov_matrix)) == TRUE) {
     stop("no missing covariate or treatment indicator is allowed")
   }
-  if(any(levels(as.factor(cov_matrix$t)) != c("1", "2")) == TRUE) {
-    stop("A two arm indicator variable must be provided")
+  is.formula<-function (x) { inherits(x, "formula") }
+  if(is.formula(model.eff) == FALSE | is.formula(model.cost) == FALSE) {
+    stop("model.eff and/or model.cost must be formula objects")
+  }
+  if(all(names(model.frame(model.eff)) %in% names(data)) == FALSE | 
+     all(names(model.frame(model.cost)) %in% names(data)) == FALSE) {
+    stop("you must provide names in the formula that correspond to those in the data")
+  }
+  if("e" %in% labels(terms(model.eff)) | "c" %in% labels(terms(model.cost))) {
+    stop("please remove 'e' from the right hand side of model.eff and/or 'c' from the right hand side of model.cost")
+  }
+  if(names(model.frame(model.eff)[1]) != "e") {
+    stop("you must set 'e' as the response in the formula model.eff")
+  }
+  if("c" %in% names(model.frame(model.eff))) {
+    stop("dependence allowed only through the cost model; please remove 'c' from model.eff")
+  }
+  if(names(model.frame(model.cost)[1]) != "c") {
+    stop("you must set 'c' as the response in the formula model.cost")
+  }
+  if("t" %in% names(model.frame(model.cost)) | "t" %in% names(model.frame(model.eff))) {
+    stop("treatment indicator must be provided only in the data. Please remove 't' from 'model.eff' and/or 'model.cost'")
   }
   index_mis_e <- index_mis2_e <- which(is.na(data$e))
   index_mis_c <- index_mis2_c <- which(is.na(data$c))
@@ -85,19 +102,8 @@ data_read_hurdle <- function(data, model.eff, model.cost, model.se, model.sc, se
   data$e[is.na(data$e) == TRUE] <- -999999
   data$c[is.na(data$c) == TRUE] <- -999999
   mf_e <- model.frame(formula = model.eff, data = data)
-  if("c" %in% names(mf_e)) {
-    stop("only dependence of costs on effectiveness is allowed. Please remove 'c' from 'model.eff'")
-  }
-  if(!any(names(mf_e) %in% names(data)) == TRUE) {
-    stop("you must provide names in the formula that correspond to those in the data")
-  }
   mf_c <- model.frame(formula = model.cost, data = data)
-  if(!any(names(mf_c) %in% names(data)) == TRUE) {
-    stop("you must provide names in the formula that correspond to those in the data")
-  }
-  if("t" %in% names(mf_e) | "t" %in% names(mf_c)) {
-    stop("treatment indicator must be provided only in the data. Please remove 't' from 'model.eff' and/or 'model.cost'")
-  }
+  terms <- NULL
   x_e <- model.matrix(attr(mf_e, "terms"), data = mf_e)
   x_c <- model.matrix(attr(mf_c, "terms"), data = mf_c)
   if("e" %in% names(mf_c)) {
@@ -193,15 +199,28 @@ data_read_hurdle <- function(data, model.eff, model.cost, model.se, model.sc, se
     data2$se <- c(m_eff1, m_eff2)
     data2$sc <- c(m_cost1, m_cost2)
   }
-  zf_e <- model.frame(formula = model.se, data = data2)
-  if("e" %in% names(zf_e) | "c" %in% names(zf_e)) { stop("only dependence on covariates is allowed. Please remove 'e' or 'c' from 'model.se'") }
-  if(!any(names(zf_e) %in% names(data2)) == TRUE) { stop("you must provide names in the formula that correspond to those in the data") }
-  zf_c <- model.frame(formula = model.sc, data = data2)
-  if("c" %in% names(zf_c) | "e" %in% names(zf_c)) { stop("only dependence on covariates is allowed. Please remove 'c' or 'e' from 'model.sc'") }
-  if(!any(names(zf_c) %in% names(data2)) == TRUE) { stop("you must provide names in the formula that correspond to those in the data") }
-  if("t" %in% names(zf_e) | "t" %in% names(zf_c)) {
-    stop("treatment indicator must be provided only in the data. Please remove 't' from 'model.eff' and/or 'model.cost'")
+  if(is.formula(model.se) == FALSE | is.formula(model.sc) == FALSE) {
+    stop("model.se and/or model.sc must be formula objects")
   }
+  if(all(names(model.frame(model.se, data = data2)) %in% names(data2)) == FALSE | 
+     all(names(model.frame(model.sc, data = data2)) %in% names(data2)) == FALSE) {
+    stop("you must provide names in the formula that correspond to those in the data")
+  }
+  if(names(model.frame(model.se, data = data2)[1]) != "se") {
+    stop("you must set 'se' as the response in the formula model.se")
+  }
+  if(names(model.frame(model.sc, data = data2)[1]) != "sc") {
+    stop("you must set 'sc' as the response in the formula model.sc")
+  }
+  if("t" %in% names(model.frame(model.sc, data = data2)) | "t" %in% names(model.frame(model.se, data = data2))) {
+    stop("treatment indicator must be provided only in the data. Please remove 't' from 'model.se' and/or 'model.sc'")
+  }
+  if(any(c("c", "e") %in% names(model.frame(model.se, data = data2))) == TRUE | 
+     any(c("e", "c") %in% names(model.frame(model.sc, data = data2))) == TRUE) {
+    stop("please remove 'e' and/or 'c' from model.se and/or model.sc")
+  }
+  zf_e <- model.frame(formula = model.se, data = data2)
+  zf_c <- model.frame(formula = model.sc, data = data2)
   z_e <- model.matrix(attr(zf_e, "terms"), data = zf_e)
   z_c <- model.matrix(attr(zf_c, "terms"), data = zf_c)
   y_e <- model.response(mf_e)
@@ -210,8 +229,7 @@ data_read_hurdle <- function(data, model.eff, model.cost, model.se, model.sc, se
   y_c[index_mis2_c] <- NA
   data2$e[index_mis2_e] <- NA
   data2$c[index_mis2_c] <- NA
-  if(is.null(se) == TRUE & is.null(sc) == TRUE) { stop("Structural values in at least one outcome variable are required, 
-                                                       please provide the structural value") }
+  if(is.null(se) == TRUE & is.null(sc) == TRUE) { stop("Structural values in at least one outcome variable are required, please provide the structural value") }
   if(is.null(se) == FALSE) {
   index_str_e <- ifelse(y_e == se, 1, 0)
   if(any(na.omit(index_str_e) == 1) == FALSE) { stop("Provide structural values that are present in the data") }

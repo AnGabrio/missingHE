@@ -198,26 +198,44 @@ hurdle <- function(data, model.eff, model.cost, model.se = se ~ 1, model.sc = sc
   if(is.data.frame(data) == FALSE) {
     stop("data must be in data frame format")
   }
-  if(!any(c("e", "c", "t") %in% names(data)) == TRUE) {
+  if(!all(c("e", "c", "t") %in% names(data)) == TRUE) {
     stop("Please rename or provide variables in the data as 'e', 'c' and 't' for the effectiveness, cost and treatment indicator")
   }
   if(any(names(data) == "e") == TRUE & any(names(data) == "c") == TRUE) {
     e <- as.name("e")
     c <- as.name("c")
   }
+  if(is.numeric(data$e) == FALSE | is.numeric(data$c) == FALSE) {
+    stop("Effectiveness and cost data must be numeric")
+  }
   cov_matrix <- subset(data, select = -c(e, c))
   if(any(is.na(cov_matrix)) == TRUE) {
     stop("no missing covariate or treatment indicator is allowed")
   }
-  if(any(levels(as.factor(cov_matrix$t)) != c("1", "2")) == TRUE) {
-    stop("A two arm indicator variable must be provided")
+  if(!all(levels(as.factor(cov_matrix$t)) %in% c("1", "2")) == TRUE) {
+    stop("A two arm indicator variable must be provided with '1' for the control and '2' for the other intervention")
   }
-  if(!type %in% c("SCAR", "SAR")) {stop("Types available for use are 'SCAR'and 'SAR'") }
+  if(is.character(type) == FALSE | is.character(dist_e) == FALSE | is.character(dist_c) == FALSE) {
+    stop("you must provide character names for the objects 'type', 'dist_e' and 'dist_c'")
+  }
+  dist_e <- tolower(dist_e)
+  dist_c <- tolower(dist_c)
+  if(dist_e == "normal") { dist_e <- "norm" }
+  if(dist_c == "normal") { dist_c <- "norm" }
+  if(dist_c == "lognormal") { dist_c <- "lnorm" }
   if(!dist_e %in% c("norm", "beta") | !dist_c %in% c("norm", "gamma", "lnorm")) {
     stop("Distributions available for use are 'norm' or 'beta' for the effects and 'norm', 'gamma', 'lnorm' for the costs")
   }
+  type <- toupper(type)
+  if(!type %in% c("SCAR", "SAR")) {
+    stop("Types available for use are 'SCAR' and 'SAR'")
+  }
   if(length(prob) != 2 | is.numeric(prob) == FALSE | any(prob < 0) != FALSE | any(prob > 1) != FALSE) {
-    stop("You must provide valid lower/upper quantiles for the imputed data distribution") }
+    stop("You must provide valid lower/upper quantiles for the imputed data distribution")
+  }
+  if(is.logical(save_model) == FALSE) {
+    stop("ssave_model should be either TRUE or FALSE")
+  }
   data_read <- data_read_hurdle(data = data, model.eff = model.eff, model.cost = model.cost, 
                                 model.se = model.se, model.sc = model.sc, se = se, sc = sc, type = type)
   str_eff_assumption <- model.frame(formula = model.se, data = data_read$data_ind)
@@ -329,6 +347,9 @@ hurdle <- function(data, model.eff, model.cost, model.se = se ~ 1, model.sc = sc
     ind = FALSE  
   } else{ind = TRUE }
   exArgs <- list(...)
+  if(anyDuplicated(names(prior)) > 0) {
+    stop("you cannot provide multiple priors with the same name") 
+  }
   if(any(prior == "default") == TRUE) {
     prior <- list(default = "default")
     } else if(any(prior == "default") == FALSE) {
@@ -339,35 +360,44 @@ hurdle <- function(data, model.eff, model.cost, model.se = se ~ 1, model.sc = sc
     par_prior <- c("alpha0.prior", "beta0.prior", "sigma.prior.e", "sigma.prior.c", "gamma.prior.e", "gamma.prior.c", 
                    "alpha.prior", "beta.prior", "gamma0.prior.e", "gamma0.prior.c", "se.prior", "sc.prior", "beta_f.prior")
     stop_mes <- "priors can be assigned only using specific string parameter names depending on the type of model assumed. Type ''help(hurdle)'' for more details"
-    if(!any(names(list_check_vector) %in% par_prior[c(1:13)] == TRUE)) {stop(stop_mes) }
-        if(ind == TRUE) {
-          if("beta_f.prior" %in% names(list_check_vector)) {stop(stop_mes) } }
+    if(!all(names(list_check_vector) %in% par_prior == TRUE)) {stop(stop_mes) }
+    if(is.vector(X1_e) == TRUE & identical(X1_e,rep(1,N1))) {
+      if("alpha.prior" %in% names(list_check_vector)) {stop(stop_mes) }
     }
-    if(exists("sigma.prior.e", where = prior)) {sigma.prior.e = prior$sigma.prior.e} else {sigma.prior.e = NULL }
-    if(exists("sigma.prior.c", where = prior)) {sigma.prior.c = prior$sigma.prior.c} else {sigma.prior.c = NULL }
-    if(exists("alpha0.prior", where = prior)) {alpha0.prior = prior$alpha0.prior} else {alpha0.prior = NULL }
-    if(exists("beta0.prior", where = prior)) {beta0.prior = prior$beta0.prior} else {beta0.prior = NULL }
-    if(exists("alpha.prior", where = prior)) {alpha.prior = prior$alpha.prior} else {alpha.prior = NULL }
-    if(exists("beta.prior", where = prior)) {beta.prior = prior$beta.prior} else {beta.prior = NULL }
-    if(exists("gamma.prior.e", where = prior)) {gamma.prior.e = prior$gamma.prior.e} else {gamma.prior.e = NULL }
-    if(exists("gamma.prior.c", where = prior)) {gamma.prior.c = prior$gamma.prior.c} else {gamma.prior.c = NULL }
-    if(exists("gamma0.prior.e", where = prior)) {gamma0.prior.e = prior$gamma0.prior.e} else {gamma0.prior.e = NULL }
-    if(exists("gamma0.prior.c", where = prior)) {gamma0.prior.c = prior$gamma0.prior.c} else {gamma0.prior.c = NULL }
+    if(is.vector(X1_c) == TRUE & identical(X1_c,rep(1,N1))) {
+      if("beta.prior" %in% names(list_check_vector)) {stop(stop_mes) }
+    }
+    if(length(names(str_eff_assumption)) == 1) {
+      if("gamma.prior.e" %in% names(list_check_vector)) {stop(stop_mes) }
+    }
+    if(length(names(str_cost_assumption)) == 1) {
+      if("gamma.prior.c" %in% names(list_check_vector)) {stop(stop_mes) }
+    }
+    if(is.null(se) == TRUE) {
+      if("se.prior" %in% names(list_check_vector)) {stop(stop_mes) }
+    } else if(is.null(sc) == TRUE) {
+      if("sc.prior" %in% names(list_check_vector)) {stop(stop_mes) }
+    }
+    if(ind == TRUE) {
+      if("beta_f.prior" %in% names(list_check_vector)) {stop(stop_mes) } 
+    }
+  }
+  if(exists("sigma.prior.e", where = prior)) {sigma.prior.e = prior$sigma.prior.e} else {sigma.prior.e = NULL }
+  if(exists("sigma.prior.c", where = prior)) {sigma.prior.c = prior$sigma.prior.c} else {sigma.prior.c = NULL }
+  if(exists("alpha0.prior", where = prior)) {alpha0.prior = prior$alpha0.prior} else {alpha0.prior = NULL }
+  if(exists("beta0.prior", where = prior)) {beta0.prior = prior$beta0.prior} else {beta0.prior = NULL }
+  if(exists("alpha.prior", where = prior)) {alpha.prior = prior$alpha.prior} else {alpha.prior = NULL }
+  if(exists("beta.prior", where = prior)) {beta.prior = prior$beta.prior} else {beta.prior = NULL }
+  if(exists("gamma.prior.e", where = prior)) {gamma.prior.e = prior$gamma.prior.e} else {gamma.prior.e = NULL }
+  if(exists("gamma.prior.c", where = prior)) {gamma.prior.c = prior$gamma.prior.c} else {gamma.prior.c = NULL }
+  if(exists("gamma0.prior.e", where = prior)) {gamma0.prior.e = prior$gamma0.prior.e} else {gamma0.prior.e = NULL }
+  if(exists("gamma0.prior.c", where = prior)) {gamma0.prior.c = prior$gamma0.prior.c} else {gamma0.prior.c = NULL }
   if(exists("se.prior", where = prior)) {se.prior = prior$se.prior} else {se.prior = 0.0000001 }
   if(exists("sc.prior", where = prior)) {sc.prior = prior$sc.prior} else {sc.prior = 0.0000001 }
+  if(exists("beta_f.prior", where = prior)) {beta_f.prior = prior$beta_f.prior} else {beta_f.prior = NULL }
   sde <- se.prior
   sdc <- sc.prior
-  if(length(sde) != 1 | length(sdc) != 1) {stop("Single value priors on std for structural values must be provided") }
-  if(is.list(prior) == TRUE) {
-      if(is.null(se) == TRUE) {
-        if(is.null(prior$gamma0.prior.e) == FALSE | is.null(prior$gamma.prior.e) == FALSE | is.null(prior$se.prior) == FALSE) {
-          stop("You cannot provide priors for structural values for e if se = NULL") }
-      }
-    if(is.null(sc) == TRUE) {
-      if(is.null(prior$gamma0.prior.c) == FALSE | is.null(prior$gamma.prior.c) == FALSE | is.null(prior$sc.prior) == FALSE) {
-        stop("You cannot provide priors for structural values for c if sc = NULL") }
-     }
-  }
+  if(length(sde) != 1 | length(sdc) != 1) {stop("single value priors on std for structural values must be provided") }
   if(exists("d_e", where = exArgs)) {d_e = as.vector(exArgs$d_e) } else {d_e = NULL }
   if(is.null(d_e) == FALSE) {
     if(length(d_e) != length(data$e)) {stop("please provide valid structural value indicator vector") }
@@ -376,7 +406,7 @@ hurdle <- function(data, model.eff, model.cost, model.se = se ~ 1, model.sc = sc
     if(is.null(se) == TRUE) {stop("no structural value provided") }
     data_read$structural_effects[[1]] <- d_eff1
     data_read$structural_effects[[2]] <- d_eff2
-    }
+  }
   if(exists("d_c", where = exArgs)) {d_c = as.vector(exArgs$d_c) } else {d_c = NULL }
   if(is.null(d_c) == FALSE) {
     if(length(d_c) != length(data$c)) {stop("please provide valid structural value indicator vector") }
@@ -386,7 +416,6 @@ hurdle <- function(data, model.eff, model.cost, model.se = se ~ 1, model.sc = sc
     data_read$structural_costs[[1]] <- d_cost1
     data_read$structural_costs[[2]] <- d_cost2
   }
-    if(exists("beta_f.prior", where = prior)) {beta_f.prior = prior$beta_f.prior} else {beta_f.prior = NULL }
     if(is.null(sc) == TRUE & is.null(se) == FALSE) {
       data_set <- list("effects" = data_read$raw_effects, "costs" = data_read$raw_costs, "N in reference arm" = N1, "N in comparator arm" = N2, 
                        "N observed in reference arm" = N1_cc, "N observed in comparator arm" = N2_cc, "N missing in reference arm" = N1_mis, "N missing in comparator arm" = N2_mis, 

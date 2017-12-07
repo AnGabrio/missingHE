@@ -1,3 +1,4 @@
+
 #' Full Bayesian Models to handle missingness in Health Economic Evaluations (Selection Models)
 #' 
 #' Full Bayesian cost-effectiveness models to handle missing data in the outcomes under different missing data 
@@ -182,29 +183,45 @@ selection <- function(data, model.eff, model.cost, model.me = me ~ 1, model.mc =
   if(is.data.frame(data) == FALSE) {
     stop("data must be in data frame format")
   }
-  if(!any(c("e", "c", "t") %in% names(data)) == TRUE) {
+  if(!all(c("e", "c", "t") %in% names(data)) == TRUE) {
     stop("Please rename or provide variables in the data as 'e', 'c' and 't' for the effectiveness, cost and treatment indicator")
   }
   if(any(names(data) == "e") == TRUE & any(names(data) == "c") == TRUE) {
     e <- as.name("e")
     c <- as.name("c")
   }
+  if(is.numeric(data$e) == FALSE | is.numeric(data$c) == FALSE) {
+    stop("Effectiveness and cost data must be numeric")
+  }
   cov_matrix <- subset(data, select = -c(e, c))
   if(any(is.na(cov_matrix)) == TRUE) {
     stop("no missing covariate or treatment indicator is allowed")
   }
-  if(any(levels(as.factor(cov_matrix$t)) != c("1", "2")) == TRUE) {
-    stop("A two arm indicator variable must be provided")
+  if(!all(levels(as.factor(cov_matrix$t)) %in% c("1", "2")) == TRUE) {
+    stop("A two arm indicator variable must be provided with '1' for the control and '2' for the other intervention")
   }
-  if(!type %in% c("MAR", "MNAR")) {
-    stop("Types available for use are 'MAR' and 'MNAR'")
+  if(is.character(type) == FALSE | is.character(dist_e) == FALSE | is.character(dist_c) == FALSE) {
+    stop("you must provide character names for the objects 'type', 'dist_e' and 'dist_c'")
   }
+  dist_e <- tolower(dist_e)
+  dist_c <- tolower(dist_c)
+  if(dist_e == "normal") { dist_e <- "norm" }
+  if(dist_c == "normal") { dist_c <- "norm" }
+  if(dist_c == "lognormal") { dist_c <- "lnorm" }
   if(!dist_e %in% c("norm", "beta") | !dist_c %in% c("norm", "gamma", "lnorm")) {
     stop("Distributions available for use are 'norm', 'beta' for the effects and 'norm', 'gamma', 'lnorm' for the costs")
   }
+  type <- toupper(type)
+  if(!type %in% c("MAR", "MNAR")) {
+    stop("Types available for use are 'MAR' and 'MNAR'")
+  }
   if(length(prob) != 2 | is.numeric(prob) == FALSE | any(prob < 0) != FALSE | any(prob > 1) != FALSE) {
-    stop("You must provide valid lower/upper quantiles for the imputed data distribution")}
-  data_read <- data_read_selection(data = data,model.eff = model.eff, model.cost = model.cost, model.me = model.me, model.mc = model.mc, type = type)
+    stop("You must provide valid lower/upper quantiles for the imputed data distribution")
+  }
+  if(is.logical(save_model) == FALSE) {
+    stop("ssave_model should be either TRUE or FALSE")
+  }
+  data_read <- data_read_selection(data = data, model.eff = model.eff, model.cost = model.cost, model.me = model.me, model.mc = model.mc, type = type)
   miss_eff_assumption <- model.frame(formula = model.me, data = data_read$data_ind)
   miss_cost_assumption <- model.frame(formula = model.mc, data = data_read$data_ind)
   if("e" %in% names(miss_eff_assumption) == TRUE & "c" %in% names(miss_cost_assumption) == FALSE) {
@@ -278,6 +295,9 @@ selection <- function(data, model.eff, model.cost, model.me = me ~ 1, model.mc =
     ind = FALSE  
   } else{ind = TRUE}
   exArgs <- list(...)
+  if(anyDuplicated(names(prior)) > 0) {
+    stop("you cannot provide multiple priors with the same name") 
+  }
   if(any(prior == "default") == TRUE) {
     prior <- list(default = "default")
   } else if(any(prior == "default") == FALSE) {
@@ -287,10 +307,30 @@ selection <- function(data, model.eff, model.cost, model.me = me ~ 1, model.mc =
     }
     par_prior <- c("alpha0.prior", "beta0.prior", "sigma.prior.e", "sigma.prior.c", "gamma.prior.e", "gamma.prior.c", 
                    "alpha.prior", "beta.prior", "gamma0.prior.e", "gamma0.prior.c", "delta.prior.e", "delta.prior.c", "beta_f.prior")
-    stop_mes <- "priors can be assigned only using specific string parameter names depending on the type of model assumed.  Type ''help(selection)'' for more details"
-    if(!any(names(list_check_vector) %in% par_prior[c(1:13)] == TRUE)) {stop(stop_mes) }
-      if(ind == TRUE) {
-        if("beta_f.prior" %in% names(list_check_vector)) {stop(stop_mes) } }
+    stop_mes <- "priors can be assigned only using specific character names depending on the type of model assumed. Type ''help(selection)'' for more details"
+    if(!all(names(list_check_vector) %in% par_prior == TRUE)) {stop(stop_mes) }
+    if(is.vector(X1_e) == TRUE & identical(X1_e,rep(1,N1))) {
+      if("alpha.prior" %in% names(list_check_vector)) {stop(stop_mes) }
+    }
+    if(is.vector(X1_c) == TRUE & identical(X1_c,rep(1,N1))) {
+      if("beta.prior" %in% names(list_check_vector)) {stop(stop_mes) }
+    }
+    if(is.vector(Z1_e) == TRUE & identical(Z1_e,rep(1,N1))) {
+      if("gamma.prior.e" %in% names(list_check_vector)) {stop(stop_mes) }
+    }
+    if(is.vector(Z1_c) == TRUE & identical(Z1_c,rep(1,N1))) {
+      if("gamma.prior.c" %in% names(list_check_vector)) {stop(stop_mes) }
+    }
+    if(type == "MAR") {
+      if("delta.prior.c" %in% names(list_check_vector) | "delta.prior.e" %in% names(list_check_vector)) {stop(stop_mes) }
+    } else if(type == "MNAR_eff" & "delta.prior.c" %in% names(list_check_vector)) {
+      stop(stop_mes)
+    } else if(type == "MNAR_cost" & "delta.prior.e" %in% names(list_check_vector)) {
+      stop(stop_mes)
+    }
+    if(ind == TRUE) {
+      if("beta_f.prior" %in% names(list_check_vector)) {stop(stop_mes) } 
+    }
   }
   if(exists("sigma.prior.e", where=prior)) {sigma.prior.e = prior$sigma.prior.e} else {sigma.prior.e = NULL }
   if(exists("sigma.prior.c", where=prior)) {sigma.prior.c = prior$sigma.prior.c} else {sigma.prior.c = NULL }
@@ -304,14 +344,6 @@ selection <- function(data, model.eff, model.cost, model.me = me ~ 1, model.mc =
   if(exists("gamma0.prior.c", where=prior)) {gamma0.prior.c = prior$gamma0.prior.c} else {gamma0.prior.c = NULL }
   if(exists("delta.prior.e", where=prior)) {delta.prior.e = prior$delta.prior.e} else {delta.prior.e = NULL }
   if(exists("delta.prior.c", where=prior)) {delta.prior.c = prior$delta.prior.c} else {delta.prior.c = NULL }
-  if(type == "MAR" | type == "MNAR_cost") {
-    if(is.null(prior$delta.prior.e) == FALSE) {
-      stop("You cannot provide priors for mnar parameters if type is MAR or if MNAR assumed only for the other outcome") }
-  }
-  if(type == "MAR" | type == "MNAR_eff") {
-    if(is.null(prior$delta.prior.c) == FALSE) {
-      stop("You cannot provide priors for mnar parameters if type is MAR or if MNAR assumed only for the other outcome") }
-  }
   if(exists("beta_f.prior", where = prior)) {beta_f.prior = prior$beta_f.prior} else {beta_f.prior = NULL }
   data_set <- list("effects" = data_read$raw_effects, "costs" = data_read$raw_costs, "N in reference arm" = N1, "N in comparator arm" = N2, 
                    "N observed in reference arm" = N1_cc, "N observed in comparator arm" = N2_cc, "N missing in reference arm" = N1_mis, "N missing in comparator arm"=N2_mis, 
