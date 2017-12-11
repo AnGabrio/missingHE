@@ -105,7 +105,7 @@
 #' \itemize{
 #' \item location parameters \eqn{\alpha_0, \beta_0}: "mean.prior.e"(effects) and/or "mean.prior.c"(costs)
 #' \item auxiliary parameters \eqn{\sigma}: "sigma.prior.e"(effects) and/or "sigma.prior.c"(costs)
-#' \item covariate parameters \eqn{\apha_j, \beta_j}: "alpha.prior"(effects) and/or "beta.prior"(costs)
+#' \item covariate parameters \eqn{\alpha_j, \beta_j}: "alpha.prior"(effects) and/or "beta.prior"(costs)
 #' \item marginal probability of structural values \eqn{\gamma_0}: "p.prior.e"(effects) and/or "p.prior.c"(costs)
 #' \item covariate parameters in the model of the structural values \eqn{\gamma_j} (if covariate data provided): "gamma.prior.e"(effects) and/or "gamma.prior.c"(costs)
 #' } 
@@ -234,7 +234,7 @@ hurdle <- function(data, model.eff, model.cost, model.se = se ~ 1, model.sc = sc
     stop("You must provide valid lower/upper quantiles for the imputed data distribution")
   }
   if(is.logical(save_model) == FALSE) {
-    stop("ssave_model should be either TRUE or FALSE")
+    stop("save_model should be either TRUE or FALSE")
   }
   data_read <- data_read_hurdle(data = data, model.eff = model.eff, model.cost = model.cost, 
                                 model.se = model.se, model.sc = model.sc, se = se, sc = sc, type = type)
