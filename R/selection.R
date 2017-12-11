@@ -219,7 +219,7 @@ selection <- function(data, model.eff, model.cost, model.me = me ~ 1, model.mc =
     stop("You must provide valid lower/upper quantiles for the imputed data distribution")
   }
   if(is.logical(save_model) == FALSE) {
-    stop("ssave_model should be either TRUE or FALSE")
+    stop("save_model should be either TRUE or FALSE")
   }
   data_read <- data_read_selection(data = data, model.eff = model.eff, model.cost = model.cost, model.me = model.me, model.mc = model.mc, type = type)
   miss_eff_assumption <- model.frame(formula = model.me, data = data_read$data_ind)
