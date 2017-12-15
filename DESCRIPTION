@@ -17,5 +17,6 @@ Imports: mcmcplots,
          grid,
          gridExtra,
          methods,
-          R2jags
+         R2jags,
+         loo 
 RoxygenNote: 6.0.1
