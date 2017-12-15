@@ -172,8 +172,12 @@ model.me = me ~ 1, model.mc = mc ~ 1, dist_e = "norm", dist_c = "norm", type = "
 
 #print the results of the JAGS model
 print(x)
-
 #
+
+#use information criteria to assess model fit
+pic <- pic(x, criterion = "dic", module = "total")
+#
+
 #Assess model convergence using graphical tools
 #Produce histograms of the posterior samples for the mean effect
 #parameters in the two treatment arms. 

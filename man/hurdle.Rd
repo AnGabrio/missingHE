@@ -191,6 +191,10 @@ dist_e = "norm", dist_c = "norm", type = "SCAR")
 print(x)
 #
 
+#use information criteria to assess model fit
+pic <- pic(x, criterion = "dic", module = "total")
+#
+
 #Assess model convergence using graphical tools
 #Produce histograms of the posterior samples for the mean effect
 #parameters in the two treatment arms. 
