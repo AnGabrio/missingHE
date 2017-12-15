@@ -41,6 +41,7 @@ run_selection <- function(type, dist_e, dist_c, inits) eval.parent(substitute( {
   datalist <- datalist[-zc_index] }
   DIC <- TRUE
   params <- c("eff1", "eff2", "cost1", "cost2", "mu_e", "mu_c", "s_e", "s_c", "p_e", "p_c", "beta", "alpha", "gamma_e", "gamma_c", "delta_e", "delta_c")
+  params <- c(params, "loglik_e1", "loglik_e2", "loglik_c1", "loglik_c2", "loglik_me1", "loglik_me2", "loglik_mc1", "loglik_mc2")
   if(ind == FALSE) {params <- c(params, "beta_f") }
   if(type == "MNAR_cost" | type == "MAR") {deltae_index <- match("delta_e", params)
   params <- params[-deltae_index] }
@@ -74,6 +75,14 @@ run_selection <- function(type, dist_e, dist_c, inits) eval.parent(substitute( {
     cost2_pos[, 1] <- apply(modelN1$BUGSoutput$sims.list$cost2, 2, mean)
     cost2_pos[, 2] <- apply(modelN1$BUGSoutput$sims.list$cost2, 2, quantile, probs = prob[1])
     cost2_pos[, 3] <- apply(modelN1$BUGSoutput$sims.list$cost2, 2, quantile, probs = prob[2])
+    loglik_e1 <- modelN1$BUGSoutput$sims.list$loglik_e1
+    loglik_e2 <- modelN1$BUGSoutput$sims.list$loglik_e2
+    loglik_c1 <- modelN1$BUGSoutput$sims.list$loglik_c1
+    loglik_c2 <- modelN1$BUGSoutput$sims.list$loglik_c2
+    loglik_me1 <- modelN1$BUGSoutput$sims.list$loglik_me1
+    loglik_me2 <- modelN1$BUGSoutput$sims.list$loglik_me2
+    loglik_mc1 <- modelN1$BUGSoutput$sims.list$loglik_mc1
+    loglik_mc2 <- modelN1$BUGSoutput$sims.list$loglik_mc2
   if(ind == FALSE & dist_e == "norm" & dist_c == "norm") {
     beta_f <- modelN1$BUGSoutput$sims.list$beta_f
     beta <- list("beta" = beta, "beta_f" = beta_f)
@@ -86,8 +95,16 @@ run_selection <- function(type, dist_e, dist_c, inits) eval.parent(substitute( {
   } else if(type == "MNAR_cost") {
     delta_c <- modelN1$BUGSoutput$sims.list$delta_c
   }
-   if(n.chains > 1) {model_sum <- round(jagsresults(x = modelN1, params = c('eff1', 'eff2', 'cost1', 'cost2'), invert = TRUE), digits = 3)
+   if(n.chains > 1) {
+     model_sum <- round(jagsresults(x = modelN1, params = c('eff1', 'eff2', 'cost1', 'cost2', 'loglik_e1', 'loglik_e2',
+                                                            'loglik_c1', 'loglik_c2', 'loglik_me1', 'loglik_me2',
+                                                            'loglik_mc1', 'loglik_mc2'), invert = TRUE), digits = 3)
    } else{model_sum <- NULL }
+    loglik_e <- list("control" = loglik_e1, "intervention" = loglik_e2)
+    loglik_c <- list("control" = loglik_c1, "intervention" = loglik_c2)
+    loglik_me <- list("control" = loglik_me1, "intervention" = loglik_me2)
+    loglik_mc <- list("control" = loglik_mc1, "intervention" = loglik_mc2)
+    loglik <- list("effects" = loglik_e, "costs" = loglik_c, "missing indicators effects" = loglik_me, "missing indicators costs" = loglik_mc)
     colnames(eff1_pos) <- c("mean", "LB", "UB")
     colnames(eff2_pos) <- c("mean", "LB", "UB")
     colnames(cost1_pos) <- c("mean", "LB", "UB")
@@ -97,22 +114,22 @@ run_selection <- function(type, dist_e, dist_c, inits) eval.parent(substitute( {
       model_output_jags <- list("summary" = model_sum, "model summary" = modelN1, "mean_effects" = mu_e, "mean_costs" = mu_c, "sd_effects" = s_e, "sd_costs" = s_c, 
                                 "covariate_parameter_effects" = alpha, "covariate_parameter_costs" = beta, "missingness_probability_effects" = p_e, 
                                 "missingness_parameter_effects" = gamma_e, "missingness_probability_costs" = p_c, "missingness_parameter_costs" = gamma_c, 
-                                "imputed" = imputed, "type" = "SELECTION", "ind" = ind)
+                                "imputed" = imputed, "loglik" = loglik,"type" = "SELECTION", "ind" = ind)
     } else if(type == "MNAR") {
       model_output_jags <- list("summary" = model_sum, "model summary" = modelN1, "mean_effects" = mu_e, "mean_costs" = mu_c, "sd_effects" = s_e, "sd_costs" = s_c, 
                                 "covariate_parameter_effects" = alpha, "covariate_parameter_costs" = beta, "missingness_probability_effects" = p_e, 
                                 "missingness_parameter_effects" = gamma_e, "missingness_probability_costs" = p_c, "missingness_parameter_costs" = gamma_c, 
-                                "mnar_parameter_effects" = delta_e, "mnar_parameter_costs" = delta_c, "imputed" = imputed, "type" = "SELECTION_ec", "ind" = ind)
+                                "mnar_parameter_effects" = delta_e, "mnar_parameter_costs" = delta_c, "imputed" = imputed, "loglik" = loglik, "type" = "SELECTION_ec", "ind" = ind)
     } else if(type == "MNAR_eff") {
       model_output_jags <- list("summary" = model_sum, "model summary" = modelN1, "mean_effects" = mu_e, "mean_costs" = mu_c, "sd_effects" = s_e, "sd_costs" = s_c, 
                                 "covariate_parameter_effects" = alpha, "covariate_parameter_costs" = beta, "missingness_probability_effects" = p_e, 
                                 "missingness_parameter_effects" = gamma_e, "missingness_probability_costs" = p_c, "missingness_parameter_costs" = gamma_c, 
-                                "mnar_parameter_effects" = delta_e, "imputed" = imputed, "type" = "SELECTION_e", "ind" = ind)
+                                "mnar_parameter_effects" = delta_e, "imputed" = imputed, "loglik" = loglik, "type" = "SELECTION_e", "ind" = ind)
     } else if(type == "MNAR_cost") {
       model_output_jags <- list("summary" = model_sum, "model summary" = modelN1, "mean_effects" = mu_e, "mean_costs" = mu_c, "sd_effects" = s_e, "sd_costs" = s_c, 
                                 "covariate_parameter_effects" = alpha, "covariate_parameter_costs" = beta, "missingness_probability_effects" = p_e, 
                                 "missingness_parameter_effects" = gamma_e, "missingness_probability_costs" = p_c, "missingness_parameter_costs" = gamma_c, 
-                                "mnar_parameter_costs" = delta_c, "imputed" = imputed, "type" = "SELECTION_c", "ind" = ind)
+                                "mnar_parameter_costs" = delta_c, "imputed" = imputed, "loglik" = loglik, "type" = "SELECTION_c", "ind" = ind)
     }
   if(n.chains == 1) {model_output_jags <- model_output_jags[-1] }
   return(model_output_jags = model_output_jags)

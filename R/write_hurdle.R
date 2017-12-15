@@ -44,6 +44,12 @@ write_hurdle <- function(dist_e , dist_c, ind, type, pe, pc, ze, zc, se, sc) eva
   logit(pq_1[i]) <- inprod(Z1_e[i, ], gamma_e[, 1])
   d_cost1[i] ~ dbern(pc_1[i])
   logit(pc_1[i]) <- inprod(Z1_c[i, ], gamma_c[, 1])
+
+  #loglikelihood
+  loglik_e1[i] <- logdensity.norm(eff1[i], mu_e1[i], tau_e1[d_eff1[i] + 1])
+  loglik_c1[i] <- logdensity.norm(cost1[i], mu_c1[i], tau_c1[d_cost1[i] + 1])
+  loglik_de1[i] <- logdensity.bern(d_eff1[i], pq_1[i])
+  loglik_dc1[i] <- logdensity.bern(d_cost1[i], pc_1[i])
   }
   
 
@@ -65,6 +71,12 @@ write_hurdle <- function(dist_e , dist_c, ind, type, pe, pc, ze, zc, se, sc) eva
   logit(pq_2[i]) <- inprod(Z2_e[i, ], gamma_e[, 2])
   d_cost2[i] ~ dbern(pc_2[i])
   logit(pc_2[i]) <- inprod(Z2_c[i, ], gamma_c[, 2])
+
+  #loglikelihood
+  loglik_e2[i] <- logdensity.norm(eff2[i], mu_e2[i], tau_e2[d_eff2[i] + 1])
+  loglik_c2[i] <- logdensity.norm(cost2[i], mu_c2[i], tau_c2[d_cost2[i] + 1])
+  loglik_de2[i] <- logdensity.bern(d_eff2[i], pq_2[i])
+  loglik_dc2[i] <- logdensity.bern(d_cost2[i], pc_2[i])
   }
   
   #transformation of parameters
@@ -231,6 +243,8 @@ write_hurdle <- function(dist_e , dist_c, ind, type, pe, pc, ze, zc, se, sc) eva
       model_string_jags <- gsub("mu_c[2] <- nu_c[2] * (1 - p_c[2]) + sc * p_c[2]", "mu_c[2] <- nu_c[2] * (1 - p_c[2]) + exp(sc) * p_c[2]", model_string_jags, fixed = TRUE)
       model_string_jags <- gsub("#mean for lnorm1", "", model_string_jags, fixed = TRUE)
       model_string_jags <- gsub("#mean for lnorm2", "", model_string_jags, fixed = TRUE)
+      model_string_jags <- gsub("loglik_c1[i] <- logdensity.norm(cost1[i], mu_c1[i], tau_c1[d_cost1[i] + 1])", "loglik_c1[i] <- logdensity.gamma(cost1[i], mu_c1[i] * tau_c1[i], tau_c1[i])", model_string_jags, fixed = TRUE)
+      model_string_jags <- gsub("loglik_c2[i] <- logdensity.norm(cost2[i], mu_c2[i], tau_c2[d_cost2[i] + 1])", "loglik_c2[i] <- logdensity.gamma(cost2[i], mu_c2[i] * tau_c2[i], tau_c2[i])", model_string_jags, fixed = TRUE)
      } else if(dist_c == "lnorm") {
        model_string_jags <- gsub("cost1[i] ~ dnorm(mu_c1[i], tau_c1[d_cost1[i] + 1])", "cost1[i] ~ dlnorm(lmu_c1[i], ltau_c1[d_cost1[i] + 1])", model_string_jags, fixed = TRUE)
        model_string_jags <- gsub("#derive mean and std costs1", "", model_string_jags, fixed = TRUE)
@@ -252,6 +266,8 @@ write_hurdle <- function(dist_e , dist_c, ind, type, pe, pc, ze, zc, se, sc) eva
        model_string_jags <- gsub("#mean for lnorm2", "nu_c[2] <- exp(lnu_c[2] + lss_c2[1] / 2)", model_string_jags, fixed = TRUE)
        model_string_jags <- gsub("s_c[1] <- s_c1[1]", "s_c[1] <- sqrt(exp(2 * lnu_c[1] + lss_c1[1]) * (exp(lss_c1[1]) - 1))",model_string_jags, fixed = TRUE)
        model_string_jags <- gsub("s_c[2] <- s_c2[1]", "s_c[2] <- sqrt(exp(2 * lnu_c[2] + lss_c2[1]) * (exp(lss_c2[1]) - 1))",model_string_jags, fixed = TRUE)
+       model_string_jags <- gsub("loglik_c1[i] <- logdensity.norm(cost1[i], mu_c1[i], tau_c1[d_cost1[i] + 1])", "loglik_c1[i] <- logdensity.lnorm(cost1[i], lmu_c1[i], ltau_c1[d_cost1[i] + 1])", model_string_jags, fixed = TRUE)
+       model_string_jags <- gsub("loglik_c2[i] <- logdensity.norm(cost2[i], mu_c2[i], tau_c2[d_cost2[i] + 1])", "loglik_c2[i] <- logdensity.lnorm(cost2[i], lmu_c2[i], ltau_c2[d_cost2[i] + 1])", model_string_jags, fixed = TRUE)
      }
      if(dist_e == "norm") {
        model_string_jags <- gsub("#derive mean and std effects1", "", model_string_jags, fixed = TRUE)
@@ -279,6 +295,8 @@ write_hurdle <- function(dist_e , dist_c, ind, type, pe, pc, ze, zc, se, sc) eva
        model_string_jags <- gsub("ls_e2[2] <- sde", "s_e2[2] <- sde", model_string_jags, fixed = TRUE)
        model_string_jags <- gsub("mu_e[1] <- nu_e[1] * (1 - p_e[1]) + se * p_e[1]", "mu_e[1] <- nu_e[1] * (1 - p_e[1]) + ilogit(se) * p_e[1]", model_string_jags, fixed = TRUE)
        model_string_jags <- gsub("mu_e[2] <- nu_e[2] * (1 - p_e[2]) + se * p_e[2]", "mu_e[2] <- nu_e[2] * (1 - p_e[2]) + ilogit(se) * p_e[2]", model_string_jags, fixed = TRUE)
+       model_string_jags <- gsub("loglik_e1[i] <- logdensity.norm(eff1[i], mu_e1[i], tau_e1[d_eff1[i] + 1])", "loglik_e1[i] <- logdensity.beta(eff1[i], mu_e1[i] * tau_e1[i], (1 - mu_e1[i]) * tau_e1[i])", model_string_jags, fixed = TRUE)
+       model_string_jags <- gsub("loglik_e2[i] <- logdensity.norm(eff2[i], mu_e2[i], tau_e2[d_eff2[i] + 1])", "loglik_e2[i] <- logdensity.beta(eff2[i], mu_e2[i] * tau_e2[i], (1 - mu_e2[i]) * tau_e2[i])", model_string_jags, fixed = TRUE)
      }
      if(dist_e == "beta" & dist_c == "gamma") {
        model_string_jags <- gsub("#transformation of parameters", "", model_string_jags, fixed = TRUE)
@@ -439,6 +457,10 @@ write_hurdle <- function(dist_e , dist_c, ind, type, pe, pc, ze, zc, se, sc) eva
      model_string_jags <- gsub("}#end gamma priors effects", "", model_string_jags, fixed = TRUE)
      model_string_jags <- gsub("gamma_e[1, 1] ~ dlogis(0, 1)", "", model_string_jags, fixed = TRUE)
      model_string_jags <- gsub("gamma_e[1, 2] ~ dlogis(0, 1)", "", model_string_jags, fixed = TRUE)
+     model_string_jags <- gsub("loglik_e1[i] <- logdensity.norm(eff1[i], mu_e1[i], tau_e1[d_eff1[i] + 1])", "loglik_e1[i] <- logdensity.norm(eff1[i], mu_e1[i], tau_e1)", model_string_jags, fixed = TRUE)
+     model_string_jags <- gsub("loglik_e2[i] <- logdensity.norm(eff2[i], mu_e2[i], tau_e2[d_eff2[i] + 1])", "loglik_e2[i] <- logdensity.norm(eff2[i], mu_e2[i], tau_e2)", model_string_jags, fixed = TRUE)
+     model_string_jags <- gsub("loglik_de1[i] <- logdensity.bern(d_eff1[i], pq_1[i])", "", model_string_jags, fixed = TRUE)
+     model_string_jags <- gsub("loglik_de2[i] <- logdensity.bern(d_eff2[i], pq_2[i])", "", model_string_jags, fixed = TRUE)
      if(type == "SCAR") {
        model_string_jags <- gsub("logit(pc_1[i]) <- inprod(Z1_c[i, ], gamma_c[, 1])", "logit(pc_1[i]) <- gamma_c[1]", model_string_jags, fixed = TRUE)
        model_string_jags <- gsub("logit(pc_2[i]) <- inprod(Z2_c[i, ], gamma_c[, 2])", "logit(pc_2[i]) <- gamma_c[2]", model_string_jags, fixed = TRUE)
@@ -480,6 +502,8 @@ write_hurdle <- function(dist_e , dist_c, ind, type, pe, pc, ze, zc, se, sc) eva
       model_string_jags <- gsub("mu_c[2] <- nu_c[2] * (1 - p_c[2]) + sc * p_c[2]", "mu_c[2] <- nu_c[2] * (1 - p_c[2]) + exp(sc) * p_c[2]", model_string_jags, fixed = TRUE)
       model_string_jags <- gsub("#mean for lnorm1", "", model_string_jags, fixed = TRUE)
       model_string_jags <- gsub("#mean for lnorm2", "", model_string_jags, fixed = TRUE)
+      model_string_jags <- gsub("loglik_c1[i] <- logdensity.norm(cost1[i], mu_c1[i], tau_c1[d_cost1[i] + 1])", "loglik_c1[i] <- logdensity.gamma(cost1[i], mu_c1[i] * tau_c1[i], tau_c1[i])", model_string_jags, fixed = TRUE)
+      model_string_jags <- gsub("loglik_c2[i] <- logdensity.norm(cost2[i], mu_c2[i], tau_c2[d_cost2[i] + 1])", "loglik_c2[i] <- logdensity.gamma(cost2[i], mu_c2[i] * tau_c2[i], tau_c2[i])", model_string_jags, fixed = TRUE)
     } else if(dist_c == "lnorm") {
       model_string_jags <- gsub("cost1[i] ~ dnorm(mu_c1[i], tau_c1[d_cost1[i] + 1])", "cost1[i] ~ dlnorm(lmu_c1[i], ltau_c1[d_cost1[i] + 1])", model_string_jags, fixed = TRUE)
       model_string_jags <- gsub("#derive mean and std costs1", "", model_string_jags, fixed = TRUE)
@@ -501,6 +525,8 @@ write_hurdle <- function(dist_e , dist_c, ind, type, pe, pc, ze, zc, se, sc) eva
       model_string_jags <- gsub("#mean for lnorm2", "nu_c[2] <- exp(lnu_c[2] + lss_c2[1] / 2)", model_string_jags, fixed = TRUE)
       model_string_jags <- gsub("s_c[1] <- s_c1[1]", "s_c[1] <- sqrt(exp(2 * lnu_c[1] + lss_c1[1]) * (exp(lss_c1[1]) - 1))",model_string_jags, fixed = TRUE)
       model_string_jags <- gsub("s_c[2] <- s_c2[1]", "s_c[2] <- sqrt(exp(2 * lnu_c[2] + lss_c2[1]) * (exp(lss_c2[1]) - 1))",model_string_jags, fixed = TRUE)
+      model_string_jags <- gsub("loglik_c1[i] <- logdensity.norm(cost1[i], mu_c1[i], tau_c1[d_cost1[i] + 1])", "loglik_c1[i] <- logdensity.lnorm(cost1[i], lmu_c1[i], ltau_c1[d_cost1[i] + 1])", model_string_jags, fixed = TRUE)
+      model_string_jags <- gsub("loglik_c2[i] <- logdensity.norm(cost2[i], mu_c2[i], tau_c2[d_cost2[i] + 1])", "loglik_c2[i] <- logdensity.lnorm(cost2[i], lmu_c2[i], ltau_c2[d_cost2[i] + 1])", model_string_jags, fixed = TRUE)
     }
     if(dist_e == "norm") {
       model_string_jags <- gsub("#derive mean and std effects1", "", model_string_jags, fixed = TRUE)
@@ -524,6 +550,8 @@ write_hurdle <- function(dist_e , dist_c, ind, type, pe, pc, ze, zc, se, sc) eva
       model_string_jags <- gsub("nu_e[2] <- inprod(mean_cov_e2[], alpha2[])", "nu_e[2] <- ilogit(inprod(mean_cov_e2[], alpha2[]))", model_string_jags, fixed = TRUE)
       model_string_jags <- gsub("ls_e1 ~ dunif(-5, 10)", "s_e1 ~ dunif(0, sqrt(nu_e[1] * (1 - nu_e[1])))", model_string_jags, fixed = TRUE)
       model_string_jags <- gsub("ls_e2 ~ dunif(-5, 10)", "s_e2 ~ dunif(0, sqrt(nu_e[2] * (1 - nu_e[2])))", model_string_jags, fixed = TRUE)
+      model_string_jags <- gsub("loglik_e1[i] <- logdensity.norm(eff1[i], mu_e1[i], tau_e1)", "loglik_e1[i] <- logdensity.beta(eff1[i], mu_e1[i] * tau_e1[i], (1 - mu_e1[i]) * tau_e1[i])", model_string_jags, fixed = TRUE)
+      model_string_jags <- gsub("loglik_e2[i] <- logdensity.norm(eff2[i], mu_e2[i], tau_e2)", "loglik_e2[i] <- logdensity.beta(eff2[i], mu_e2[i] * tau_e2[i], (1 - mu_e2[i]) * tau_e2[i])", model_string_jags, fixed = TRUE)
     }
      if(dist_e == "beta" & dist_c == "gamma") {
        model_string_jags <- gsub("#transformation of parameters", "", model_string_jags, fixed = TRUE)
@@ -684,6 +712,10 @@ write_hurdle <- function(dist_e , dist_c, ind, type, pe, pc, ze, zc, se, sc) eva
      model_string_jags <- gsub("beta_f2[2] <- 0", "", model_string_jags, fixed = TRUE)
      model_string_jags <- gsub("beta_f[1] <- beta_f1[1]", "", model_string_jags, fixed = TRUE)
      model_string_jags <- gsub("beta_f[2] <- beta_f2[1]", "", model_string_jags, fixed = TRUE)
+     model_string_jags <- gsub("loglik_c1[i] <- logdensity.norm(cost1[i], mu_c1[i], tau_c1[d_cost1[i] + 1])", "loglik_c1[i] <- logdensity.norm(cost1[i], mu_c1[i], tau_c1)", model_string_jags, fixed = TRUE)
+     model_string_jags <- gsub("loglik_c2[i] <- logdensity.norm(cost2[i], mu_c2[i], tau_c2[d_cost2[i] + 1])", "loglik_c2[i] <- logdensity.norm(cost2[i], mu_c2[i], tau_c2)", model_string_jags, fixed = TRUE)
+     model_string_jags <- gsub("loglik_dc1[i] <- logdensity.bern(d_cost1[i], pc_1[i])", "", model_string_jags, fixed = TRUE)
+     model_string_jags <- gsub("loglik_dc2[i] <- logdensity.bern(d_cost2[i], pc_2[i])", "", model_string_jags, fixed = TRUE)
      if(type == "SCAR") {
        model_string_jags <- gsub("logit(pq_1[i]) <- inprod(Z1_e[i, ], gamma_e[, 1])", "logit(pq_1[i]) <- gamma_e[1]", model_string_jags, fixed = TRUE)
        model_string_jags <- gsub("logit(pq_2[i]) <- inprod(Z2_e[i, ], gamma_e[, 2])", "logit(pq_2[i]) <- gamma_e[2]", model_string_jags, fixed = TRUE)
@@ -721,8 +753,10 @@ write_hurdle <- function(dist_e , dist_c, ind, type, pe, pc, ze, zc, se, sc) eva
        model_string_jags <- gsub("ls_c2 ~ dunif(-5, 10)", "s_c2 ~ dunif(0, 1000)", model_string_jags, fixed = TRUE)
        model_string_jags <- gsub("#mean for lnorm1", "", model_string_jags, fixed = TRUE)
        model_string_jags <- gsub("#mean for lnorm2", "", model_string_jags, fixed = TRUE)
+       model_string_jags <- gsub("loglik_c1[i] <- logdensity.norm(cost1[i], mu_c1[i], tau_c1)", "loglik_c1[i] <- logdensity.gamma(cost1[i], mu_c1[i] * tau_c1[i], tau_c1[i])", model_string_jags, fixed = TRUE)
+       model_string_jags <- gsub("loglik_c2[i] <- logdensity.norm(cost2[i], mu_c2[i], tau_c2)", "loglik_c2[i] <- logdensity.gamma(cost2[i], mu_c2[i] * tau_c2[i], tau_c2[i])", model_string_jags, fixed = TRUE)
      } else if(dist_c == "lnorm") {
-       model_string_jags <- gsub("cost1[i] ~ dnorm(mu_c1[i], tau_c1)", "cost1[i] ~ dlnorm(lmu_c1[i], ltau_c2)", model_string_jags, fixed = TRUE)
+       model_string_jags <- gsub("cost1[i] ~ dnorm(mu_c1[i], tau_c1)", "cost1[i] ~ dlnorm(lmu_c1[i], ltau_c1)", model_string_jags, fixed = TRUE)
        model_string_jags <- gsub("#derive mean and std costs1", "", model_string_jags, fixed = TRUE)
        model_string_jags <- gsub("mu_c1[i] <- ","lmu_c1[i] <- ", model_string_jags, fixed = TRUE)
        model_string_jags <- gsub("cost2[i] ~ dnorm(mu_c2[i], tau_c2)", "cost2[i] ~ dlnorm(lmu_c2[i], ltau_c2)", model_string_jags, fixed = TRUE)
@@ -742,6 +776,8 @@ write_hurdle <- function(dist_e , dist_c, ind, type, pe, pc, ze, zc, se, sc) eva
        model_string_jags <- gsub("#mean for lnorm2", "mu_c[2] <- exp(lnu_c[2] + lss_c2 / 2)", model_string_jags, fixed = TRUE)
        model_string_jags <- gsub("mu_c[1] <- nu_c[1]","", model_string_jags, fixed = TRUE)
        model_string_jags <- gsub("mu_c[2] <- nu_c[2]","", model_string_jags, fixed = TRUE)
+       model_string_jags <- gsub("loglik_c1[i] <- logdensity.norm(cost1[i], mu_c1[i], tau_c1)", "loglik_c1[i] <- logdensity.lnorm(cost1[i], lmu_c1[i], ltau_c1)", model_string_jags, fixed = TRUE)
+       model_string_jags <- gsub("loglik_c2[i] <- logdensity.norm(cost2[i], mu_c2[i], tau_c2)", "loglik_c2[i] <- logdensity.lnorm(cost2[i], lmu_c2[i], ltau_c2)", model_string_jags, fixed = TRUE)
      }
      if(dist_e == "norm") {
        model_string_jags <- gsub("#derive mean and std effects1", "", model_string_jags, fixed = TRUE)
@@ -769,6 +805,8 @@ write_hurdle <- function(dist_e , dist_c, ind, type, pe, pc, ze, zc, se, sc) eva
        model_string_jags <- gsub("ls_e2[2] <- sde", "s_e2[2] <- sde", model_string_jags, fixed = TRUE)
        model_string_jags <- gsub("mu_e[1] <- nu_e[1] * (1 - p_e[1]) + se * p_e[1]", "mu_e[1] <- nu_e[1] * (1 - p_e[1]) + ilogit(se) * p_e[1]", model_string_jags, fixed = TRUE)
        model_string_jags <- gsub("mu_e[2] <- nu_e[2] * (1 - p_e[2]) + se * p_e[2]", "mu_e[2] <- nu_e[2] * (1 - p_e[2]) + ilogit(se) * p_e[2]", model_string_jags, fixed = TRUE)
+       model_string_jags <- gsub("loglik_e1[i] <- logdensity.norm(eff1[i], mu_e1[i], tau_e1[d_eff1[i] + 1])", "loglik_e1[i] <- logdensity.beta(eff1[i], mu_e1[i] * tau_e1[i], (1 - mu_e1[i]) * tau_e1[i])", model_string_jags, fixed = TRUE)
+       model_string_jags <- gsub("loglik_e2[i] <- logdensity.norm(eff2[i], mu_e2[i], tau_e2[d_eff2[i] + 1])", "loglik_e2[i] <- logdensity.beta(eff2[i], mu_e2[i] * tau_e2[i], (1 - mu_e2[i]) * tau_e2[i])", model_string_jags, fixed = TRUE)       
      }
      if(dist_e == "beta" & dist_c == "gamma") {
        model_string_jags <- gsub("#transformation of parameters", "", model_string_jags, fixed = TRUE)

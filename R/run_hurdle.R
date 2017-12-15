@@ -163,10 +163,14 @@ run_hurdle <- function(type, dist_e, dist_c, inits, se = se, sc = sc, sde = sde,
     }
   }
   DIC <- TRUE
-  if(is.null(se) == TRUE) {params <- c("eff1", "eff2", "cost1", "cost2", "mu_e", "mu_c", "s_e", "s_c", "p_c", "beta", "alpha", "gamma_c") }
-  if(is.null(sc) == TRUE) {params <- c("eff1", "eff2", "cost1", "cost2", "mu_e", "mu_c", "s_e", "s_c", "p_e", "beta", "alpha", "gamma_e") }
+  if(is.null(se) == TRUE) {params <- c("eff1", "eff2", "cost1", "cost2", "mu_e", "mu_c", "s_e", "s_c", "p_c", "beta", "alpha", "gamma_c", 
+                                       "loglik_e1", "loglik_e2", "loglik_c1", "loglik_c2", "loglik_dc1", "loglik_dc2") }
+  if(is.null(sc) == TRUE) {params <- c("eff1", "eff2", "cost1", "cost2", "mu_e", "mu_c", "s_e", "s_c", "p_e", "beta", "alpha", "gamma_e", 
+                                       "loglik_e1", "loglik_e2", "loglik_c1", "loglik_c2", "loglik_de1", "loglik_de2") }
   if(is.null(se) == FALSE & is.null(sc) == FALSE) {
-  params <- c("eff1", "eff2", "cost1", "cost2", "mu_e", "mu_c", "s_e", "s_c", "p_e", "p_c", "beta", "alpha", "gamma_e", "gamma_c") }
+  params <- c("eff1", "eff2", "cost1", "cost2", "mu_e", "mu_c", "s_e", "s_c", "p_e", "p_c", "beta", "alpha", "gamma_e", "gamma_c", 
+              "loglik_e1", "loglik_e2", "loglik_c1", "loglik_c2", "loglik_de1", "loglik_de2", "loglik_dc1", "loglik_dc2") 
+  }
   if(ind == FALSE) {params <- c(params, "beta_f") }
   modelN1 <- R2jags::jags(data = datalist, inits = inits, parameters.to.save = params, model.file = filein, n.chains = n.chains, 
                           n.iter = n.iter, n.burnin = n.burnin, DIC = DIC, n.thin = n.thin)
@@ -176,17 +180,29 @@ run_hurdle <- function(type, dist_e, dist_c, inits, se = se, sc = sc, sde = sde,
     s_c <- modelN1$BUGSoutput$sims.list$s_c
     alpha <- modelN1$BUGSoutput$sims.list$alpha
     beta <- modelN1$BUGSoutput$sims.list$beta
+    loglik_e1 <- modelN1$BUGSoutput$sims.list$loglik_e1
+    loglik_e2 <- modelN1$BUGSoutput$sims.list$loglik_e2
+    loglik_c1 <- modelN1$BUGSoutput$sims.list$loglik_c1
+    loglik_c2 <- modelN1$BUGSoutput$sims.list$loglik_c2
     if(is.null(se) == TRUE & is.null(sc) == FALSE) {
       p_c <- modelN1$BUGSoutput$sims.list$p_c
       gamma_c <- modelN1$BUGSoutput$sims.list$gamma_c
+      loglik_dc1 <- modelN1$BUGSoutput$sims.list$loglik_dc1
+      loglik_dc2 <- modelN1$BUGSoutput$sims.list$loglik_dc2
     } else if(is.null(sc) == TRUE & is.null(se) == FALSE) {
       p_e <- modelN1$BUGSoutput$sims.list$p_e
       gamma_e <- modelN1$BUGSoutput$sims.list$gamma_e
+      loglik_de1 <- modelN1$BUGSoutput$sims.list$loglik_de1
+      loglik_de2 <- modelN1$BUGSoutput$sims.list$loglik_de2
     } else if(is.null(se) == FALSE & is.null(sc) == FALSE) {
       p_c <- modelN1$BUGSoutput$sims.list$p_c
       gamma_c <- modelN1$BUGSoutput$sims.list$gamma_c
       p_e <- modelN1$BUGSoutput$sims.list$p_e
       gamma_e <- modelN1$BUGSoutput$sims.list$gamma_e
+      loglik_dc1 <- modelN1$BUGSoutput$sims.list$loglik_dc1
+      loglik_dc2 <- modelN1$BUGSoutput$sims.list$loglik_dc2
+      loglik_de1 <- modelN1$BUGSoutput$sims.list$loglik_de1
+      loglik_de2 <- modelN1$BUGSoutput$sims.list$loglik_de2
     }
     eff1_pos <- matrix(eff1, N1, 3)
     cost1_pos <- matrix(cost1, N1, 3)
@@ -208,8 +224,34 @@ run_hurdle <- function(type, dist_e, dist_c, inits, se = se, sc = sc, sde = sde,
     beta_f <- modelN1$BUGSoutput$sims.list$beta_f
     beta <- list("beta" = beta, "beta_f" = beta_f)
   }
-   if(n.chains >1 ) {model_sum <- round(jagsresults(x = modelN1, params = c('eff1', 'eff2', 'cost1', 'cost2'), invert = TRUE), digits = 3)
+  if(is.null(se) == FALSE & is.null(sc) == FALSE){
+   if(n.chains >1 ) {
+     model_sum <- round(jagsresults(x = modelN1, params = c('eff1', 'eff2', 'cost1', 'cost2', 'loglik_e1', 'loglik_e2',
+                                                            'loglik_c1', 'loglik_c2', 'loglik_de1', 'loglik_de2',
+                                                            'loglik_dc1', 'loglik_dc2'), invert = TRUE), digits = 3)
    } else{model_sum <- NULL }
+  } else if(is.null(se) == TRUE & is.null(sc) == FALSE) {
+    if(n.chains >1 ) {
+      model_sum <- round(jagsresults(x = modelN1, params = c('eff1', 'eff2', 'cost1', 'cost2', 'loglik_e1', 'loglik_e2',
+                                                             'loglik_c1', 'loglik_c2','loglik_dc1', 'loglik_dc2'), invert = TRUE), digits = 3)
+    } else{model_sum <- NULL }
+  } else if(is.null(se) == FALSE & is.null(sc) == TRUE) {
+    if(n.chains >1 ) {
+      model_sum <- round(jagsresults(x = modelN1, params = c('eff1', 'eff2', 'cost1', 'cost2', 'loglik_e1', 'loglik_e2',
+                                                             'loglik_c1', 'loglik_c2','loglik_de1', 'loglik_de2'), invert = TRUE), digits = 3)
+    } else{model_sum <- NULL }
+  }
+    loglik_e <- list("control" = loglik_e1, "intervention" = loglik_e2)
+    loglik_c <- list("control" = loglik_c1, "intervention" = loglik_c2)
+    loglik_de <- NULL
+    loglik_dc <- NULL
+    if(is.null(se) == FALSE) {
+      loglik_de <- list("control" = loglik_de1, "intervention" = loglik_de2)
+    }
+    if(is.null(sc) == FALSE) {
+      loglik_dc <- list("control" = loglik_dc1, "intervention" = loglik_dc2)
+    }
+    loglik <- list("effects" = loglik_e, "costs" = loglik_c, "structural indicators effects" = loglik_de, "structural indicators costs" = loglik_dc)
     colnames(eff1_pos) <- c("mean", "LB", "UB")
     colnames(eff2_pos) <- c("mean", "LB", "UB")
     colnames(cost1_pos) <- c("mean", "LB", "UB")
@@ -218,16 +260,16 @@ run_hurdle <- function(type, dist_e, dist_c, inits, se = se, sc = sc, sde = sde,
     if(is.null(se) == TRUE) {
       model_output_jags <- list("summary" = model_sum, "model summary" = modelN1, "mean_effects" = mu_e, "mean_costs" = mu_c, "sd_effects" = s_e, "sd_costs" = s_c, 
                                 "covariate_parameter_effects" = alpha, "covariate_parameter_costs" = beta, "structural_probability_costs" = p_c, 
-                                "structural_parameter_costs" = gamma_c, "imputed" = imputed, "type" = "HURDLE_c", "ind" = ind)
+                                "structural_parameter_costs" = gamma_c, "loglik" = loglik, "imputed" = imputed, "type" = "HURDLE_c", "ind" = ind)
     } else if(is.null(sc) == TRUE) {
       model_output_jags <- list("summary" = model_sum, "model summary" = modelN1, "mean_effects" = mu_e, "mean_costs" = mu_c, "sd_effects" = s_e, "sd_costs" = s_c, 
                                 "covariate_parameter_effects" = alpha, "covariate_parameter_costs" = beta, "structural_probability_effects" = p_e, 
-                                "structural_parameter_effects" = gamma_e, "imputed" = imputed, "type" = "HURDLE_e", "ind" = ind)
+                                "structural_parameter_effects" = gamma_e, "loglik" = loglik, "imputed" = imputed, "type" = "HURDLE_e", "ind" = ind)
     } else if(is.null(se) == FALSE & is.null(sc) == FALSE) {
       model_output_jags <- list("summary" = model_sum, "model summary" = modelN1, "mean_effects" = mu_e, "mean_costs" = mu_c, "sd_effects" = s_e, "sd_costs" = s_c, 
                                 "covariate_parameter_effects" = alpha, "covariate_parameter_costs" = beta, "structural_probability_effects" = p_e, 
                                 "structural_parameter_effects" = gamma_e, "structural_probability_costs" = p_c, "structural_parameter_costs" = gamma_c, 
-                                "imputed" = imputed, "type" = "HURDLE_ec", "ind" = ind)
+                                "loglik" = loglik, "imputed" = imputed, "type" = "HURDLE_ec", "ind" = ind)
     }
   if(n.chains == 1) {model_output_jags <- model_output_jags[-1] }
   return(model_output_jags = model_output_jags)
