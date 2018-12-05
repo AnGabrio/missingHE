@@ -1,4 +1,5 @@
-#' Predictive information criteria for Bayesian models fitted in \code{JAGS} using the funciton \code{\link{selection}} or \code{\link{hurdle}}
+
+#' Predictive information criteria for Bayesian models fitted in \code{JAGS} using the funciton \code{\link{selection}}, \code{\link{pattern}} or \code{\link{hurdle}}
 #' 
 #' Efficient approximate leave-one-out cross validation (LOO), deviance information criterion (DIC) and widely applicable criterion (WAIC) for Bayesian models, 
 #' calculated on the observed data.
@@ -56,7 +57,7 @@
 #' 
 #' @export
 #' @examples  
-#' #For examples see the function selection or hurdle 
+#' #For examples see the function selection, pattern or hurdle 
 #' # 
 #' # 
 
@@ -81,7 +82,6 @@ pic <- function(x, criterion = "dic", module = "total") {
   if(!module %in% c("total", "e", "c", "both")) {
     stop("you must select a character name among those available. For details type 'help(pic)'")
   }
-  if(x$type == "MAR" | x$type == "MNAR") {
   m_e1 <- x$data_set$missing_effects$Control
   loglik_e1 <- x$model_output$loglik$effects$control[, m_e1 == 0]
   m_e2 <- x$data_set$missing_effects$Intervention
@@ -90,6 +90,8 @@ pic <- function(x, criterion = "dic", module = "total") {
   loglik_c1 <- x$model_output$loglik$costs$control[, m_c1 == 0]
   m_c2 <- x$data_set$missing_costs$Intervention
   loglik_c2 <- x$model_output$loglik$costs$intervention[, m_c2 == 0]
+  if(x$model_output$type == "SELECTION" | x$model_output$type == "SELECTION_e" | 
+     x$model_output$type == "SELECTION_c" | x$model_output$type == "SELECTION_ec" ) {
   loglik_me1 <- x$model_output$loglik$`missing indicators effects`$control
   loglik_me2 <- x$model_output$loglik$`missing indicators effects`$intervention
   loglik_mc1 <- x$model_output$loglik$`missing indicators costs`$control
@@ -109,26 +111,42 @@ pic <- function(x, criterion = "dic", module = "total") {
     loglik_e_c <- cbind(loglik_e, loglik_c)
     loglik_total <- cbind(loglik_e_c, loglik_me, loglik_mc)
    }
-  } else if(x$type == "SCAR" | x$type == "SAR") {
-    m_e1 <- ifelse(is.na(x$data_set$effects$Control) == TRUE, 1, 0)
-    loglik_e1 <- x$model_output$loglik$effects$control[, m_e1 == 0]
-    m_e2 <- ifelse(is.na(x$data_set$effects$Intervention) == TRUE, 1, 0)
-    loglik_e2 <- x$model_output$loglik$effects$intervention[, m_e2 == 0]
-    m_c1 <- ifelse(is.na(x$data_set$costs$Control) == TRUE, 1, 0)
-    loglik_c1 <- x$model_output$loglik$costs$control[, m_c1 == 0]
-    m_c2 <- ifelse(is.na(x$data_set$costs$Intervention) == TRUE, 1, 0)
-    loglik_c2 <- x$model_output$loglik$costs$intervention[, m_c2 == 0]
+  }
+  if(x$model_output$type == "PATTERN" | x$model_output$type == "PATTERN_e" | 
+     x$model_output$type == "PATTERN_c" | x$model_output$type == "PATTERN_ec" ) {
+  loglik_d1 <- x$model_output$loglik$`pattern indicators`$control
+  loglik_d2 <- x$model_output$loglik$`pattern indicators`$intervention
+  if(criterion == "dic") {
+    loglik_e <- rowSums(cbind(loglik_e1, loglik_e2))
+    loglik_c <- rowSums(cbind(loglik_c1, loglik_c2))
+    loglik_d <- rowSums(cbind(loglik_d1, loglik_d2))
+    loglik_e_c <- rowSums(cbind(loglik_e, loglik_c))
+    loglik_total <- rowSums(cbind(loglik_e_c, loglik_d))
+  } else if(criterion == "looic" | criterion == "waic"){
+    loglik_e <- cbind(loglik_e1, loglik_e2)
+    loglik_c <- cbind(loglik_c1, loglik_c2)
+    loglik_d <- cbind(loglik_d1, loglik_d2)
+    loglik_e_c <- cbind(loglik_e, loglik_c)
+    loglik_total <- cbind(loglik_e_c, loglik_d)
+   }
+  }
+  if(x$model_output$type == "HURDLE" | x$model_output$type == "HURDLE_e" | 
+     x$model_output$type == "HURDLE_c" | x$model_output$type == "HURDLE_ec") {
     if(x$model_output$type == "HURDLE_ec" | x$model_output$type == "HURDLE_e") {
     m_de1 <- ifelse(is.na(x$data_set$structural_effects$Control) == TRUE, 1, 0)
-    loglik_de1 <- x$model_output$loglik$`structural indicators effects`$control[, m_de1 == 0]
+    loglik_e1 <- x$model_output$loglik$effects$control[, m_e1 == 0]
+    loglik_de1 <- x$model_output$loglik$`structural indicators effects`$control[, m_e1 == 0]
     m_de2 <- ifelse(is.na(x$data_set$structural_effects$Intervention) == TRUE, 1, 0)
-    loglik_de2 <- x$model_output$loglik$`structural indicators effects`$intervention[, m_de2 == 0]
+    loglik_e2 <- x$model_output$loglik$effects$intervention[, m_e2 == 0]
+    loglik_de2 <- x$model_output$loglik$`structural indicators effects`$intervention[, m_e2 == 0]
     } 
     if(x$model_output$type == "HURDLE_ec" | x$model_output$type == "HURDLE_c") {
     m_dc1 <- ifelse(is.na(x$data_set$structural_costs$Control) == TRUE, 1, 0)
-    loglik_dc1 <- x$model_output$loglik$`structural indicators costs`$control[, m_dc1 == 0]
+    loglik_c1 <- x$model_output$loglik$costs$control[, m_c1 == 0]
+    loglik_dc1 <- x$model_output$loglik$`structural indicators costs`$control[, m_c1 == 0]
     m_dc2 <- ifelse(is.na(x$data_set$structural_costs$Intervention) == TRUE, 1, 0)
-    loglik_dc2 <- x$model_output$loglik$`structural indicators costs`$intervention[, m_dc2 == 0]
+    loglik_c2 <- x$model_output$loglik$costs$intervention[, m_c2 == 0]
+    loglik_dc2 <- x$model_output$loglik$`structural indicators costs`$intervention[, m_c2 == 0]
     }
     if(criterion == "dic") {
       loglik_e <- rowSums(cbind(loglik_e1, loglik_e2))
@@ -180,24 +198,24 @@ pic <- function(x, criterion = "dic", module = "total") {
   }
   if(criterion == "waic") {
     waic_l <- suppressWarnings(loo::waic(loglik))
-    elpd <- waic_l$elpd_waic
-    elpd_se <- waic_l$se_elpd_waic
-    p <- waic_l$p_waic
-    p_se <- waic_l$se_p_waic
-    waic <- waic_l$waic
-    waic_se <- waic_l$se_waic
+    elpd <- waic_l$estimates[1, 1]
+    elpd_se <- waic_l$estimates[1, 2]
+    p <- waic_l$estimates[2, 1]
+    p_se <- waic_l$estimates[2, 2]
+    waic <- waic_l$estimates[3, 1]
+    waic_se <- waic_l$estimates[3, 2]
     pointwise <- waic_l$pointwise
     ic <- list("elpd" = elpd, "elpd_se" = elpd_se, "p" = p, "p_se" = p_se, 
                "waic" = waic, "waic_se" = waic_se, "pointwise" = pointwise)
   }
   if(criterion == "looic") {
     loo_l <- suppressWarnings(loo::loo(loglik))
-    elpd <- loo_l$elpd_loo
-    elpd_se <- loo_l$se_elpd_loo
-    p <- loo_l$p_loo
-    p_se <- loo_l$se_p_loo
-    looic <- loo_l$looic
-    looic_se <- loo_l$se_looic
+    elpd <- loo_l$estimates[1, 1]
+    elpd_se <- loo_l$estimates[1, 2]
+    p <- loo_l$estimates[2, 1]
+    p_se <- loo_l$estimates[2, 2]
+    looic <- loo_l$estimates[3, 1]
+    looic_se <- loo_l$estimates[3, 2]
     pointwise <- loo_l$pointwise
     pareto_k <- loo_l$pareto_k
     ic <- list("elpd" = elpd, "elpd_se" = elpd_se, "p" = p, "p_se" = p_se, 

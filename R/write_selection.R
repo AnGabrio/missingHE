@@ -105,16 +105,16 @@ write_selection <- function(dist_e , dist_c, ind, type, pe, pc, ze, zc) eval.par
   
   #priors for mean regression coefficients
   for (j in 2:pe) {#begin alpha priors effects
-  for(t in 1:2) {alpha[j, t] ~ dnorm(0, 0.01) }
+  for(t in 1:2) {alpha[j, t] ~ dnorm(0, 0.0000001) }
   }#end alpha priors effects
-  alpha[1, 1] ~ dnorm(0, 0.001)
-  alpha[1, 2] ~ dnorm(0, 0.001)
+  alpha[1, 1] ~ dnorm(0, 0.0000001)
+  alpha[1, 2] ~ dnorm(0, 0.0000001)
   
   for (j in 2:pc) {#begin beta priors costs
-  for(t in 1:2) {beta[j, t] ~ dnorm(0, 0.01) }
+  for(t in 1:2) {beta[j, t] ~ dnorm(0, 0.0000001) }
   }#end beta priors costs
-  beta[1, 1] ~ dnorm(0, 0.001)
-  beta[1, 2] ~ dnorm(0, 0.001)
+  beta[1, 1] ~ dnorm(0, 0.0000001)
+  beta[1, 2] ~ dnorm(0, 0.0000001)
   
   #standard deviation priors
   for(t in 1:2) {
@@ -122,7 +122,7 @@ write_selection <- function(dist_e , dist_c, ind, type, pe, pc, ze, zc) eval.par
   ls_e[t] ~ dunif(-5, 10)
 
   #correlation
-  beta_f[t] ~ dnorm(0, 0.001)
+  beta_f[t] ~ dnorm(0, 0.0000001)
   }
   
   #priors on missing data mechanism
@@ -176,7 +176,7 @@ write_selection <- function(dist_e , dist_c, ind, type, pe, pc, ze, zc) eval.par
  if(ind == TRUE) {
   model_string_jags <- gsub(" + beta_f[1] * (eff1[i] - mu_e[1])", "", model_string_jags, fixed = TRUE)
   model_string_jags <- gsub(" + beta_f[2] * (eff2[i] - mu_e[2])", "", model_string_jags, fixed = TRUE)
-  model_string_jags <- gsub("beta_f[t] ~ dnorm(0, 0.001)", "", model_string_jags, fixed = TRUE)
+  model_string_jags <- gsub("beta_f[t] ~ dnorm(0, 0.0000001)", "", model_string_jags, fixed = TRUE)
   model_string_jags <- gsub("#correlation", "", model_string_jags, fixed = TRUE)
  } 
  if(dist_c == "norm") {
@@ -196,7 +196,7 @@ write_selection <- function(dist_e , dist_c, ind, type, pe, pc, ze, zc) eval.par
   model_string_jags <- gsub("s_c[t] <- exp(ls_c[t])", "", model_string_jags, fixed = TRUE)
   model_string_jags <- gsub("mu_c[1] <- inprod(mean_cov_c1[], beta[, 1])", "mu_c[1] <- exp(inprod(mean_cov_c1[], beta[, 1]))", model_string_jags, fixed = TRUE)
   model_string_jags <- gsub("mu_c[2] <- inprod(mean_cov_c2[], beta[, 2])", "mu_c[2] <- exp(inprod(mean_cov_c2[], beta[, 2]))", model_string_jags, fixed = TRUE)
-  model_string_jags <- gsub("ls_c[t] ~ dunif(-5, 10)", "s_c[t] ~ dunif(0, 1000)", model_string_jags, fixed = TRUE)
+  model_string_jags <- gsub("ls_c[t] ~ dunif(-5, 10)", "s_c[t] ~ dunif(0, 10000)", model_string_jags, fixed = TRUE)
   model_string_jags <- gsub("loglik_c1[i] <- logdensity.norm(cost1[i], mu_c1[i], tau_c[1])", "loglik_c1[i] <- logdensity.gamma(cost1[i], mu_c1[i] * tau_c1[i], tau_c1[i])", model_string_jags, fixed = TRUE)
   model_string_jags <- gsub("loglik_c2[i] <- logdensity.norm(cost2[i], mu_c2[i], tau_c[2])", "loglik_c2[i] <- logdensity.gamma(cost2[i], mu_c2[i] * tau_c2[i], tau_c2[i])", model_string_jags, fixed = TRUE)
  } else if(dist_c == "lnorm") {
@@ -211,6 +211,7 @@ write_selection <- function(dist_e , dist_c, ind, type, pe, pc, ze, zc) eval.par
    model_string_jags <- gsub("s_c[t] <- exp(ls_c[t])", "s_c[t] <- sqrt(exp(2 * lmu_c[t] + lss_c[t]) * (exp(lss_c[t]) - 1))", model_string_jags, fixed = TRUE)
    model_string_jags <- gsub("mu_c[1] <- inprod(mean_cov_c1[], beta[, 1])", "lmu_c[1] <- inprod(mean_cov_c1[], beta[, 1])", model_string_jags, fixed = TRUE)
    model_string_jags <- gsub("mu_c[2] <- inprod(mean_cov_c2[], beta[, 2])", "lmu_c[2] <- inprod(mean_cov_c2[], beta[, 2])", model_string_jags, fixed = TRUE)
+   model_string_jags <- gsub("ls_c[t] ~ dunif(-5, 10)", "ls_c[t] ~ dunif(0, 100)", model_string_jags, fixed = TRUE)
    model_string_jags <- gsub("#mean for lnorm", "mu_c[t] <- exp(lmu_c[t] + lss_c[t] / 2)", model_string_jags, fixed = TRUE)
    model_string_jags <- gsub("loglik_c1[i] <- logdensity.norm(cost1[i], mu_c1[i], tau_c[1])", "loglik_c1[i] <- logdensity.lnorm(cost1[i], lmu_c1[i], ltau_c[1])", model_string_jags, fixed = TRUE)
    model_string_jags <- gsub("loglik_c2[i] <- logdensity.norm(cost2[i], mu_c2[i], tau_c[2])", "loglik_c2[i] <- logdensity.lnorm(cost2[i], lmu_c2[i], ltau_c[2])", model_string_jags, fixed = TRUE)
@@ -248,17 +249,17 @@ write_selection <- function(dist_e , dist_c, ind, type, pe, pc, ze, zc) eval.par
   begin_prior_beta <- "#begin alpha priors effects"
   prior_beta <- "#"
   end_prior_beta <- "#end alpha priors effects"
-  prior_beta_e1 <- "alpha[1] ~ dnorm(0, 0.0001)"
-  prior_beta_e2 <- "alpha[2] ~ dnorm(0, 0.0001)"
+  prior_beta_e1 <- "alpha[1] ~ dnorm(0, 0.0000001)"
+  prior_beta_e2 <- "alpha[2] ~ dnorm(0, 0.0000001)"
   model_string_jags <- gsub("inprod(X1_e[i, ], alpha[, 1])", inprod_e1, model_string_jags, fixed = TRUE)
   model_string_jags <- gsub("inprod(X2_e[i, ], alpha[, 2])", inprod_e2, model_string_jags, fixed = TRUE)
   model_string_jags <- gsub("inprod(mean_cov_e1[], alpha[, 1])", inprod_mean_e1, model_string_jags, fixed = TRUE)
   model_string_jags <- gsub("inprod(mean_cov_e2[], alpha[, 2])", inprod_mean_e2, model_string_jags, fixed = TRUE)
   model_string_jags <- gsub("for (j in 2:pe) {#begin alpha priors effects", begin_prior_beta, model_string_jags, fixed = TRUE)
-  model_string_jags <- gsub("for(t in 1:2) {alpha[j, t] ~ dnorm(0, 0.01) }",prior_beta, model_string_jags, fixed = TRUE)
+  model_string_jags <- gsub("for(t in 1:2) {alpha[j, t] ~ dnorm(0, 0.0000001) }",prior_beta, model_string_jags, fixed = TRUE)
   model_string_jags <- gsub("}#end alpha priors effects", end_prior_beta, model_string_jags, fixed = TRUE)
-  model_string_jags <- gsub("alpha[1, 1] ~ dnorm(0, 0.001)", prior_beta_e1, model_string_jags, fixed = TRUE)
-  model_string_jags <- gsub("alpha[1, 2] ~ dnorm(0, 0.001)", prior_beta_e2, model_string_jags, fixed = TRUE)
+  model_string_jags <- gsub("alpha[1, 1] ~ dnorm(0, 0.0000001)", prior_beta_e1, model_string_jags, fixed = TRUE)
+  model_string_jags <- gsub("alpha[1, 2] ~ dnorm(0, 0.0000001)", prior_beta_e2, model_string_jags, fixed = TRUE)
  }
  if(pc == 1) {
   inprod_c1 <- "X1_c[i] * beta[1]"
@@ -268,17 +269,17 @@ write_selection <- function(dist_e , dist_c, ind, type, pe, pc, ze, zc) eval.par
   begin_prior_beta <- "#begin beta priors costs"
   prior_beta <- "#"
   end_prior_beta <- "#end beta priors costs"
-  prior_beta_c1 <- "beta[1] ~ dnorm(0, 0.0001)"
-  prior_beta_c2 <- "beta[2] ~ dnorm(0, 0.0001)"
+  prior_beta_c1 <- "beta[1] ~ dnorm(0, 0.0000001)"
+  prior_beta_c2 <- "beta[2] ~ dnorm(0, 0.0000001)"
   model_string_jags <- gsub("inprod(X1_c[i, ], beta[, 1])", inprod_c1, model_string_jags, fixed = TRUE)
   model_string_jags <- gsub("inprod(X2_c[i, ], beta[, 2])", inprod_c2, model_string_jags, fixed = TRUE)
   model_string_jags <- gsub("inprod(mean_cov_c1[], beta[, 1])", inprod_mean_c1, model_string_jags, fixed = TRUE)
   model_string_jags <- gsub("inprod(mean_cov_c2[], beta[, 2])", inprod_mean_c2, model_string_jags, fixed = TRUE)
   model_string_jags <- gsub("for (j in 2:pc) {#begin beta priors costs", begin_prior_beta, model_string_jags, fixed = TRUE)
-  model_string_jags <- gsub("for(t in 1:2) {beta[j, t] ~ dnorm(0, 0.01) }", prior_beta, model_string_jags, fixed = TRUE)
+  model_string_jags <- gsub("for(t in 1:2) {beta[j, t] ~ dnorm(0, 0.0000001) }", prior_beta, model_string_jags, fixed = TRUE)
   model_string_jags <- gsub("}#end beta priors costs", end_prior_beta,model_string_jags, fixed = TRUE)
-  model_string_jags <- gsub("beta[1, 1] ~ dnorm(0, 0.001)", prior_beta_c1, model_string_jags, fixed = TRUE)
-  model_string_jags <- gsub("beta[1, 2] ~ dnorm(0, 0.001)", prior_beta_c2, model_string_jags, fixed = TRUE)
+  model_string_jags <- gsub("beta[1, 1] ~ dnorm(0, 0.0000001)", prior_beta_c1, model_string_jags, fixed = TRUE)
+  model_string_jags <- gsub("beta[1, 2] ~ dnorm(0, 0.0000001)", prior_beta_c2, model_string_jags, fixed = TRUE)
  }  
  if(ze == 1) {
   inprod_e1 <- "Z1_e[i] * gamma_e[1]"

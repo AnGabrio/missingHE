@@ -1,7 +1,7 @@
 #' Missing Data Imputation Plot
 #'
 #' Produces a plot of the observed and imputed values (with credible intervals) for the effect and cost outcomes from a
-#' probabilistic Cost-Effectiveness Analysis model with two treatment arms, run using the function \code{\link{selection}} or \code{\link{hurdle}}.
+#' probabilistic Cost-Effectiveness Analysis model with two treatment arms, run using the function \code{\link{selection}}, \code{\link{pattern}} or \code{\link{hurdle}}.
 #' The Graphics layout is obtained from the functions contained in the package \strong{ggplot2} and \strong{ggthemes}.
 #' @keywords plot missing data 
 #' @param x A \code{missingHE} object containing the results of the Bayesian model for cost-effectiveness analysis.
@@ -17,9 +17,9 @@
 #' @param theme Type of ggplot theme among some pre-defined themes, mostly taken from the package \strong{ggthemes}. For a full list of available themes see details.
 #' @param ... additional parameters that can be provided to manage the output of \code{plot.missingHE}. 
 #' @return A \code{ggplot} object containing the plots specified in the argument \code{class}.
-#' @seealso \code{\link{selection}} \code{\link{hurdle}} \code{\link{diagnostic}}
+#' @seealso \code{\link{selection}} \code{\link{pattern}} \code{\link{hurdle}} \code{\link{diagnostic}}
 #' @details The funciton produces a plot of the observed and imputed effect and cost data in a two-arm based 
-#' Cost-Effectiveness Analysis model run with the function \code{\link{selection}} or \code{\link{hurdle}}. The purpose of this graph
+#' Cost-Effectiveness Analysis model run with the function \code{\link{selection}}, \code{\link{pattern}} or \code{\link{hurdle}}. The purpose of this graph
 #' is to visually compare the outcome values for the fully-observed individuals with those imputed by the model for the missing individuals.
 #' According to the missingness or structural values mechanism assumed, it is possible to compare observed and imputed values.
 #' For the scatter plot, imputed values are also associated with the credible intervals specified in the argument \code{prob}.
@@ -34,7 +34,7 @@
 #' @import ggplot2 gridExtra grid 
 #' @export 
 #' @examples
-#' #For examples see the function selection or hurdle
+#' #For examples see the function selection, pattern or hurdle
 #' #
 #' #
 

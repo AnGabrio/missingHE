@@ -1,14 +1,15 @@
 #' Diagnostic checks for assessing MCMC convergence 
 #'
 #' Convergence issues need to be assessed every time a probabilistic model is implemented via Markov Chain Monte Carlo methods.
-#' The focus is restricted to full Bayesian models in cost-effectiveness analyses based on the function \code{\link{selection}} and \code{\link{hurdle}}, 
+#' The focus is restricted to full Bayesian models in cost-effectiveness analyses based on the function \code{\link{selection}}, \code{\link{pattern}} and \code{\link{hurdle}}, 
 #' with convergence of the chains that is assessed through Visual checks of the posterior distribution of the parameters of interest,
 #' Examples are density plots, trace plots, autocrrelation plots, etc. Other types of posterior checks are related to some summary MCMC statistics 
 #' that are able to detect possible issues in the convergence of the algorithm, such as the potential scale reduction factor or the effective sample size.
 #' Different types of diagnostic tools and statistics are used to assess model convergence using functions contained in the package \strong{ggmcmc} and \strong{mcmcplots}. 
 #' Graphics and plots are managed using functions contained in the package \strong{ggplot2} and \strong{ggthemes}.
 #' @keywords diagnostics MCMC convergence checks
-#' @param x An object of class "missingHE" containing the posterior results of a full Bayesian model implemented usgin the function \code{\link{selection}} or \code{\link{hurdle}}
+#' @param x An object of class "missingHE" containing the posterior results of a full Bayesian model implemented usgin the function \code{\link{selection}}, 
+#' \code{\link{pattern}} or \code{\link{hurdle}}
 #' @param type type of diagnostic check to be plotted for each model parameter. Available choices include: 'histogram' for histrogram plots,
 #' 'denplot' for density plots, 'traceplot' for trace plots, 'acf' for autocorrelation plots, 'running' for running mean plots,
 #' 'compare' for comparing the distribution of the whole chain with only its last part, 'cross' for crosscorrelation plots, 'Rhat' for the potential scale reduction factor, 'geweke' for the geweke diagnostic,
@@ -21,7 +22,7 @@
 #' @param theme Type of ggplot theme among some pre-defined themes. For a full list of available themes see details.
 #' @param ... additional parameters that can be provided to manage the graphical output of \code{diagnostic}
 #' @return A \strong{ggplot} object containing the plots specified in the argument \code{type}
-#' @seealso \code{\link[ggmcmc]{ggs}} \code{\link{selection}}  \code{\link{hurdle}}
+#' @seealso \code{\link[ggmcmc]{ggs}} \code{\link{selection}} \code{\link{selection}} \code{\link{hurdle}}
 #' @details Depending on the types of plots specified in the argument \code{type} the output of \code{diagnostic} can produce
 #' different combinations of MCMC visual posterior checks for the family of parameters indicated in the argument \code{param}.
 #' For a full list of the available plots see the description of the argument \code{type} or see the corresponding plots in the package \strong{ggmcmc}.
@@ -31,20 +32,31 @@
 #' \itemize{
 #' \item "mu.e" the mean parameters of the effect variables in the two treatment arms.
 #' \item "mu.c" the mean parameters of the cost variables in the two treatment arms.
+#' \item "mu.e.p" the pattern-specific mean parameters of the effect variables in the two treatment arms (only with the function \code{pattern}).
+#' \item "mu.c.p" the pattern-specific mean parameters of the cost variables in the two treatment arms (only with the function \code{pattern}).
 #' \item "sd.e" the standard deviation parameters of the effect variables in the two treatment arms.
 #' \item "sd.c" the standard deviation parameters of the cost variables in the two treatment arms.
 #' \item "alpha" the regression intercept and covariate coefficient parameters for the effect variables in the two treatment arms.
 #' \item "beta" the regression intercept and covariate coefficient parameters for the cost variables in the two treatment arms.
-#' \item "p.e" the probability parameters of the missingness or structural values mechanism for the effect variables in the two treatment arms.
-#' \item "p.c" the probability parameters of the missingness or structural values mechanism for the cost variables in the two treatment arms.
-#' \item "gamma.e" the regression intercept and covariate coefficient parameters of the missingness or structural values mechanism for the effect variables in the two treatment arms.
-#' \item "gamma.c" the regression intercept and covariate coefficient parameters of the missingness or structural values mechanism for the cost variables in the two treatment arms.
-#' \item "delta.e" the mnar parameters of the missingness mechanism for the effect variables in the two treatment arms (only if the function \code{selection} is used).
-#' \item "delta.c" the mnar parameters of the missingness mechanism for the cost variables in the two treatment arms (only if the function \code{selection} is used).
+#' \item "p.e" the probability parameters of the missingness or structural values mechanism for the effect variables in the two treatment arms 
+#' (only with the function \code{selection} or \code{hurdle}).
+#' \item "p.c" the probability parameters of the missingness or structural values mechanism for the cost variables in the two treatment arms 
+#' (only with the function \code{selection} or \code{hurdle}).
+#' \item "gamma.e" the regression intercept and covariate coefficient parameters of the missingness or structural values mechanism
+#'  for the effect variables in the two treatment arms (only with the function \code{selection} or \code{hurdle}).
+#' \item "gamma.c" the regression intercept and covariate coefficient parameters of the missingness or structural values mechanism 
+#'  for the cost variables in the two treatment arms (only with the function \code{selection} or \code{hurdle}).
+#' \item "pattern" the probabilities associated with the missingness patterns in the data (only with the function \code{pattern}).
+#' \item "delta.e" the mnar parameters of the missingness mechanism for the effect variables in the two treatment arms 
+#' (only with the function \code{selection} or \code{pattern}).
+#' \item "delta.c" the mnar parameters of the missingness mechanism for the cost variables in the two treatment arms 
+#' (only with the function \code{selection} or \code{pattern}).
 #' \item "all" all available parameters stored in the object \code{x}.
 #' }
-#' The parameters associated with a missingness or structural values model can be accessed only when \code{x} is created using the function \code{selection}
-#' or \code{hurdle}, respectively.
+#' When the object \code{x} is created using the function \code{pattern}, pattern-specific standard deviation ("sd.e", "sd.c") and regression coefficient 
+#' parameters ("alpha", "beta") for both outcomes are visualised. The parameters associated with a missingness mechanism can be accessed only when \code{x}
+#' is created using the function \code{selection} or \code{pattern}, while the parameters associated with the model for the structural values mechanism
+#' can be accessed only when \code{x} is created using the function \code{hurdle}.
 #' 
 #' The argument \code{theme} allows to customise the graphical output of the plots generated by \code{diagnostic} and
 #' allows to choose among a set of possible pre-defined themes taken form the package \strong{ggtheme}. Those available can
@@ -59,7 +71,7 @@
 #' @importFrom stats quantile
 #' @export 
 #' @examples 
-#' #For examples see the function selection or hurdle
+#' #For examples see the function selection, pattern or hurdle
 #' #
 #' #
 
@@ -68,39 +80,52 @@ diagnostic <- function(x, type = "histogram", param = "all", theme = NULL, ...) 
   if(class(x) != "missingHE") {
     stop("Only objects of class 'missingHE' can be used")
   }
-  if(!isTRUE(requireNamespace("ggmcmc")) | !isTRUE(requireNamespace("mcmcplots"))) {
-    stop("You need to install the R packages 'ggmcmc' and 'mcmcplots'. Please run in your R terminal:\n install.packages('ggmcmc','mcmcplots')")
+  if(!isTRUE(requireNamespace("ggmcmc")) | !isTRUE(requireNamespace("mcmcplots")) | !isTRUE(requireNamespace("mcmcr")) | !isTRUE(requireNamespace("coda"))) {
+    stop("You need to install the R packages 'ggmcmc', 'mcmcplots', 'mcmcr' and 'coda'. Please run in your R terminal:\n install.packages('ggmcmc', 'mcmcplots', 'mcmcr', 'coda')")
   }
   if(length(theme) != 0) {
     theme_names = c("base", "calc", "economist", "excel", "few", "538", "gdocs", "hc", "par", "pander", "solarized", "stata", "tufte", "wsj")
-    if(theme %in% theme_names) {
-      if(!isTRUE(requireNamespace("ggmcmc"))) {
-        stop("You need to install the R packages 'ggmcmc' and 'mcmcplots'. Please run in your R terminal:\n install.packages('ggmcmc','mcmcplots')")
-      }
-    } else if(!theme %in% theme_names) {
+    if(!theme %in% theme_names) {
       stop("You must provide one of the available theme styles")
     } 
   }
-  par_hurdle_scar <- c("all", "mu.e", "mu.c", "sd.e", "sd.c", "alpha", "beta", "p.e", "p.c")
-  par_hurdle_sar_e <- c("all", "mu.e", "mu.c", "sd.e", "sd.c", "alpha", "beta", "p.e", "p.c", "gamma.e")
-  par_hurdle_sar_c <- c("all", "mu.e", "mu.c", "sd.e", "sd.c", "alpha", "beta", "p.e", "p.c", "gamma.c")
+    #if(theme %in% theme_names) {
+    #  if(!isTRUE(requireNamespace("ggmcmc"))) {
+    #    stop("You need to install the R packages 'ggmcmc' and 'mcmcplots'. Please run in your R terminal:\n install.packages('ggmcmc', 'mcmcplots')")
+    #  }
+    #} else 
+  par_hurdle_sar_e <- c("all", "mu.e", "mu.c", "sd.e", "sd.c", "alpha", "beta", "p.e", "gamma.e")
+  par_hurdle_sar_c <- c("all", "mu.e", "mu.c", "sd.e", "sd.c", "alpha", "beta", "p.c", "gamma.c")
   par_hurdle_sar_ec <- c("all", "mu.e", "mu.c", "sd.e", "sd.c", "alpha", "beta", "p.e", "p.c", "gamma.e", "gamma.c")
   par_selection_e <- c("all", "mu.e", "mu.c", "sd.e", "sd.c", "alpha", "beta", "p.e", "p.c", "gamma.e", "gamma.c", "delta.e")
   par_selection_c <- c("all", "mu.e", "mu.c", "sd.e", "sd.c", "alpha", "beta", "p.e", "p.c", "gamma.e", "gamma.c", "delta.c")
   par_selection_ec <- c("all", "mu.e", "mu.c", "sd.e", "sd.c", "alpha", "beta", "p.e", "p.c", "gamma.e", "gamma.c", "delta.e", "delta.c")
+  par_pattern <- c("all", "mu.e", "mu.c", "mu.e.p", "mu.c.p","sd.e", "sd.c", "alpha", "beta", "pattern")
+  par_pattern_e <- c("all", "mu.e", "mu.c", "mu.e.p", "mu.c.p","sd.e", "sd.c", "alpha", "beta", "pattern", "delta.e")
+  par_pattern_c <- c("all", "mu.e", "mu.c", "mu.e.p", "mu.c.p","sd.e", "sd.c", "alpha", "beta", "pattern", "delta.c")
+  par_pattern_ec <- c("all", "mu.e", "mu.c", "mu.e.p", "mu.c.p","sd.e", "sd.c", "alpha", "beta", "pattern", "delta.e", "delta.c")
   if(x$model_output$type == "SELECTION_e") {
     if(!param %in% par_selection_e) {stop("You must provide valid parameter names contained in the output of selection") }
-  }else if(x$model_output$type == "SELECTION_c") {
+  } else if(x$model_output$type == "SELECTION_c") {
     if(!param %in% par_selection_c) {stop("You must provide valid parameter names contained in the output of selection") }
-  }else if(x$model_output$type == "SELECTION_ec") {
+  } else if(x$model_output$type == "SELECTION_ec") {
     if(!param %in% par_selection_ec) {stop("You must provide valid parameter names contained in the output of selection") }
   }
   if(x$model_output$type == "HURDLE_e") {
     if(!param %in% par_hurdle_sar_e) {stop("You must provide valid parameter names contained in the output of hurdle") }
-  }else if(x$model_output$type == "HURDLE_c") {
+  } else if(x$model_output$type == "HURDLE_c") {
     if(!param %in% par_hurdle_sar_c) {stop("You must provide valid parameter names contained in the output of hurdle") }
-  }else if(x$model_output$type == "HURDLE_ec") {
+  } else if(x$model_output$type == "HURDLE_ec") {
     if(!param %in% par_hurdle_sar_ec) {stop("You must provide valid parameter names contained in the output of hurdle") }
+  }
+  if(x$model_output$type == "PATTERN") {
+    if(!param %in% par_pattern) {stop("You must provide valid parameter names contained in the output of pattern") }
+  } else if(x$model_output$type == "PATTERN_e") {
+    if(!param %in% par_pattern_e) {stop("You must provide valid parameter names contained in the output of pattern") }
+  } else if(x$model_output$type == "PATTERN_c") {
+    if(!param %in% par_pattern_c) {stop("You must provide valid parameter names contained in the output of pattern") }
+  } else if(x$model_output$type == "PATTERN_ec") {
+    if(!param %in% par_pattern_ec) {stop("You must provide valid parameter names contained in the output of pattern") }
   }
   if(length(param) != 1) {
     stop("You can only visualise diagnostic checks for one family of parameters at a time 
@@ -111,69 +136,97 @@ diagnostic <- function(x, type = "histogram", param = "all", theme = NULL, ...) 
          'Rhat', 'geweke', 'caterpillar', 'pairs'")
   }
   labs <- param
-  labs[pmatch("mu.e",labs)] <- "mu_e"
-  labs[pmatch("mu.c",labs)] <- "mu_c"
-  labs[pmatch("sd.e",labs)] <- "s_e"
-  labs[pmatch("sd.c",labs)] <- "s_c"
-  labs[pmatch("p.e",labs)] <- "p_e"
-  labs[pmatch("p.c",labs)] <- "p_c"
-  labs[pmatch("alpha",labs)] <- "alpha"
-  labs[pmatch("beta",labs)] <- "beta"
-  labs[pmatch("gamma.e",labs)] <- "gamma_e"
-  labs[pmatch("gamma.c",labs)] <- "gamma_c"
-  labs[pmatch("delta.e",labs)] <- "delta_e"
-  labs[pmatch("delta.c",labs)] <- "delta_c"
-  mcmc_object <- coda::as.mcmc(x$model_output$`model summary`)
-  if(param == "all" & type != "summary") {
-    v_name <- coda::varnames(mcmc_object[, , drop = FALSE])
-    check_name_eff <- grepl("eff", v_name)
-    check_index_eff <- which(check_name_eff, TRUE)
-    check_name_cost <- grepl("cost", v_name)
-    check_index_cost <- which(check_name_cost, TRUE)
-    check_index <- c(check_index_cost, check_index_eff)
-    parameters <- v_name[-check_index]
-    param_all <- paste("model.", parameters, sep = "")
-    v_name[-check_index] <- param_all
-    coda::varnames(mcmc_object) <- v_name
-    ggmcmc_object <- ggmcmc::ggs(mcmc_object)
-    family = c("model")
-  } else {
-  family = labs
-  ggmcmc_object <- ggmcmc::ggs(mcmc_object)
+  if(length(grep("^SELECTION",x$model_output$type)) == 1 | length(grep("^HURDLE",x$model_output$type)) == 1) {
+    labs[pmatch("mu.e",labs)] <- "mu_e"
+    labs[pmatch("mu.c",labs)] <- "mu_c"
+    labs[pmatch("sd.e",labs)] <- "s_e"
+    labs[pmatch("sd.c",labs)] <- "s_c"
+    labs[pmatch("alpha",labs)] <- "alpha"
+    labs[pmatch("beta",labs)] <- "beta"
+    labs[pmatch("p.e",labs)] <- "p_e"
+    labs[pmatch("p.c",labs)] <- "p_c"
+    labs[pmatch("gamma.e",labs)] <- "gamma_e"
+    labs[pmatch("gamma.c",labs)] <- "gamma_c"
   }
+  if(length(grep("^SELECTION",x$model_output$type)) == 1) {
+    labs[pmatch("delta.e",labs)] <- "delta_e"
+    labs[pmatch("delta.c",labs)] <- "delta_c"
+  }
+  if(length(grep("^PATTERN",x$model_output$type)) == 1) {
+    labs[match("mu.e",labs)] <- "mu_e\\[.\\]"
+    labs[match("mu.c",labs)] <- "mu_c\\[.\\]"
+    labs[match("mu.e.p",labs)] <- "mu_e_p"
+    labs[match("mu.c.p",labs)] <- "mu_c_p"
+    labs[match("sd.e",labs)] <- "s_e_p"
+    labs[match("sd.c",labs)] <- "s_c_p"
+    labs[match("alpha",labs)] <- "alpha_p"
+    labs[match("beta",labs)] <- "beta_p"
+    labs[match("pattern",labs)] <- "p_prob"
+    labs[match("delta.e",labs)] <- "Delta_e"
+    labs[match("delta.c",labs)] <- "Delta_c"
+  }
+  mcmc_object <- coda::as.mcmc(x$model_output$`model summary`)
+  v_name <- coda::varnames(mcmc_object[, , drop = FALSE])
+  check_name_eff <- grepl("eff", v_name)
+  check_index_eff <- which(check_name_eff, TRUE)
+  check_name_cost <- grepl("cost", v_name)
+  check_index_cost <- which(check_name_cost, TRUE)
+  check_name_loglik <- grepl("loglik", v_name)
+  check_index_loglik <- which(check_name_loglik, TRUE)
+  check_name_deviance <- grepl("dev", v_name)
+  check_index_deviance <- which(check_name_deviance, TRUE)
+  check_index <- c(check_index_cost, check_index_eff, check_index_loglik, check_index_deviance)
+  parameters <- v_name[-check_index]
+  parameters <- gsub("\\[|\\]", "", parameters)
+  parameters <- gsub('[[:digit:]]+', '', parameters)
+  parameters <- gsub(",", '', parameters)
+  parameters <- paste(unique(parameters))
+  if(x$model_output$type == "PATTERN" | x$model_output$type == "PATTERN_e" | x$model_output$type == "PATTERN_c" | x$model_output$type == "PATTERN_ec") {
+    parameters <- c(paste(parameters,'1', sep = ""), paste(parameters,'2', sep = ""))
+    parameters <- gsub("mu_c1", "mu_c", parameters)
+    parameters <- gsub("mu_c2", "mu_c", parameters)
+    parameters <- gsub("mu_e1", "mu_e", parameters)
+    parameters <- gsub("mu_e2", "mu_e", parameters)
+    parameters <- paste(unique(parameters))
+    if(x$model_output$type == "PATTERN_e" | x$model_output$type == "PATTERN_ec") {
+      parameters <- gsub("Delta_e1", "Delta_e", parameters) 
+      parameters <- gsub("Delta_e2", "Delta_e", parameters) 
+      parameters <- paste(unique(parameters))
+    } 
+    if(x$model_output$type == "PATTERN_c" | x$model_output$type == "PATTERN_ec") {
+      parameters <- gsub("Delta_c1", "Delta_c", parameters) 
+      parameters <- gsub("Delta_c2", "Delta_c", parameters) 
+      parameters <- paste(unique(parameters))
+    } 
+  }
+  mcmc_object_subset <- subset(mcmc_object, parameters = parameters)
   if(type == "summary") {
     if(param == "all") {
-      v_name <- coda::varnames(mcmc_object[, , drop = FALSE])
-      check_name_eff <- grepl("eff", v_name)
-      check_index_eff <- which(check_name_eff, TRUE)
-      check_name_cost <- grepl("cost", v_name)
-      check_index_cost <- which(check_name_cost, TRUE)
-      check_index <- c(check_index_cost, check_index_eff)
-      parameters <- v_name[-check_index]
-      check_index2 <- unique(substr(parameters, 1, 4))
-      check_index3 <- gsub("\\[|\\]", "", check_index2)
-      parameters <- gsub("devi", "deviance", check_index3, fixed=TRUE)
-      parameters <- c(gsub("alph", "alpha", parameters, fixed=TRUE))
-      if(x$type == "MAR") {
-        parameters <- c(gsub("gamm", "gamma_e", parameters, fixed = TRUE), "gamma_c")
-      }else if(x$type == "MNAR_eff") {
-      parameters <- gsub("delt", "delta_e", parameters, fixed = TRUE)
-      parameters <- gsub("gamm", "gamma_e", parameters, fixed = TRUE)
-      }else if(x$type == "MNAR_cost") {
-        parameters <- gsub("delt", "delta_c", parameters, fixed = TRUE)
-        parameters <- gsub("gamm", "gamma_c", parameters, fixed = TRUE)
-      }else if(x$type == "MNAR") {
-        parameters <- c(gsub("delt", "delta_e", parameters, fixed = TRUE), "delta_c")
-        parameters <- c(gsub("gamm", "gamma_e", parameters, fixed = TRUE), "gamma_c")
+    parameters.mcmc <- parameters
+    } else if(param != "all") {
+       parameters.mcmc <- labs
+      if(length(grep("^SELECTION",x$model_output$type)) == 1 | length(grep("^HURDLE",x$model_output$type)) == 1) {
+        parameters = labs }
+      if(length(grep("^PATTERN",x$model_output$type)) == 1) {
+        if("mu_e\\[.\\]" %in% labs == TRUE) {
+          parameters <- "mu_e" 
+          exArgs$leaf.marker = "\\["
+        }
+        if("mu_c\\[.\\]" %in% labs == TRUE) {
+          parameters <- "mu_c" 
+          exArgs$leaf.marker = "\\["
+        }
+        if("mu_e_p" %in% labs == TRUE) {parameters <- c("mu_e_p1", "mu_e_p2") }
+        if("mu_c_p" %in% labs == TRUE) {parameters <- c("mu_c_p1", "mu_c_p2") }
+        if("s_e_p" %in% labs == TRUE) {parameters <- c("s_e_p1", "s_e_p2") }
+        if("s_c_p" %in% labs == TRUE) {parameters <- c("s_c_p1", "s_c_p2") }
+        if("alpha_p" %in% labs == TRUE) {parameters <- c("alpha_p1", "alpha_p2") }
+        if("beta_p" %in% labs == TRUE) {parameters <- c("beta_p1", "beta_p2") }
+        if("p_prob" %in% labs == TRUE) {parameters <- c("p_prob1", "p_prob2") }
+        if("Delta_e" %in% labs == TRUE | "Delta_c" %in% labs == TRUE) {parameters <- labs }
+        parameters.mcmc <- parameters
       }
-      if(x$model_output$type == "HURDLE_e") {
-        parameters <- gsub("gamm", "gamma_e", parameters, fixed = TRUE)
-      } else if(x$model_output$type == "HURDLE_c") {
-        parameters <- gsub("gamm", "gamma_c", parameters, fixed = TRUE)
-      } else if(x$model_output$type == "HURDLE_ec") {
-        parameters <- c(gsub("gamm", "gamma_e", parameters, fixed = TRUE), "gamma_c")
-      }
-       } else {parameters = labs}
+    } 
     if(exists("regex", where = exArgs)) {regex = exArgs$regex} else {regex = NULL }
     if(exists("leaf.marker", where = exArgs)) {leaf.marker = exArgs$leaf.marker} else {leaf.marker = "[\\[_]" }
     if(exists("random", where = exArgs)) {random = exArgs$random} else {random = NULL }
@@ -187,10 +240,19 @@ diagnostic <- function(x, type = "histogram", param = "all", theme = NULL, ...) 
     if(exists("ylim", where = exArgs)) {ylim = exArgs$ylim} else {ylim = NULL }
     if(exists("style", where = exArgs)) {style = exArgs$style} else {style = c("gray", "plain") }
     if(exists("greek", where = exArgs)) {greek = exArgs$greek} else {greek = TRUE }
-    ggmcmc_out <- mcmcplots::mcmcplot(mcmc_object, parms = parameters, regex = regex, leaf.marker = leaf.marker, random = random, dir = dir, 
+    ggmcmc_out <- mcmcplots::mcmcplot(mcmc_object_subset, parms = parameters.mcmc, regex = regex, leaf.marker = leaf.marker, random = random, dir = dir, 
                                       filename = filename, extension = extension, title = title, col = col, lty = lty, xlim = xlim, ylim = ylim, 
                                       style = style, greek = greek)
-  } else if(type == "histogram") {
+    } else {
+      if(param == "all") {
+        varnames(mcmc_object_subset) <- paste("model", varnames(mcmc_object_subset), sep=".")
+        family <- "model"
+      } else {
+        family <- labs
+      }
+    ggmcmc_object <- ggmcmc::ggs(mcmc_object_subset)
+  }
+  if(type == "histogram") {
     if(exists("bins", where = exArgs)) {bins = exArgs$bins} else {bins = 30 }
     if(exists("greek", where = exArgs)) {greek = exArgs$greek} else {greek = FALSE }
     ggmcmc_out <- ggmcmc::ggs_histogram(ggmcmc_object, family = family, bins = bins, greek = greek)

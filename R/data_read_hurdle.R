@@ -26,6 +26,7 @@
 #' @param sc Structural value to be found in the cost data defined in \code{data}. If set to \code{NULL}, 
 #' no structural value is chosen and a standard model for the costs is run.
 #' @param type Type of structural value mechanism assumed, either 'SCAR' (Structural Completely At Random) or 'SAR' (Strcutural At Random).
+#' @param center Logical. If \code{center} is \code{TRUE} all the covariates in the model are centered.
 #' @keywords read data hurdle models
 #' @importFrom stats na.omit sd as.formula model.matrix model.frame model.response
 #' @export
@@ -58,13 +59,13 @@
 #' 
 #' #run the function
 #' date_rearranged <- data_read_hurdle(data = data,model.eff = e ~ 1, model.cost = c ~ 1,
-#' model.se = e ~ 1, model.sc = c ~ 1, se = 1, sc = 0, type = "SCAR")
+#' model.se = e ~ 1, model.sc = c ~ 1, se = 1, sc = 0, type = "SCAR", center = FALSE)
 #' }
 #' #
 #' #
 
 
-data_read_hurdle <- function(data, model.eff, model.cost, model.se, model.sc, se, sc, type = type) {
+data_read_hurdle <- function(data, model.eff, model.cost, model.se, model.sc, se, sc, type = type, center) {
   if(any(names(data) == "e") == TRUE & any(names(data) == "c") == TRUE) {
     e <- as.name("e")
     c <- as.name("c")
@@ -170,28 +171,27 @@ data_read_hurdle <- function(data, model.eff, model.cost, model.se, model.sc, se
   cov2_c <- as.data.frame(x_c[t2_index, ])
   names(cov2_c) <- colnames(x_c)
   cov_c <- list(cov1_c, cov2_c)
-  binary_check <- function(x) { 
-    length(unique(x)) <= 2 
-  } 
   cove <- list(cov1_e, cov2_e) 
   mean_cov_e <- list(apply(as.matrix(cov1_e), 2, mean), apply(as.matrix(cov2_e), 2, mean))
   covc <- list(cov1_c, cov2_c) 
   mean_cov_c <- list(apply(as.matrix(cov1_c), 2, mean), apply(as.matrix(cov2_c), 2, mean))
-  check1_e <- which(apply(cov1_e, 2, binary_check)) 
-  check1_e <- check1_e[-1]
-  check2_e <- which(apply(cov2_e, 2, binary_check)) 
-  check2_e <- check2_e[-1]
-  check1_c <- which(apply(cov1_c, 2, binary_check)) 
-  check1_c <- check1_c[-1]
-  check2_c <- which(apply(cov2_c, 2, binary_check)) 
-  check2_c <- check2_c[-1]
-  if(any(unlist(lapply(mf_e, is.factor))) == TRUE) {
-    mean_cov_e[[1]][check1_e] <- 1
-    mean_cov_e[[2]][check2_e] <- 1
-  }
-  if(any(unlist(lapply(mf_c, is.factor))) == TRUE) {
-    mean_cov_c[[1]][check1_c] <- 1
-    mean_cov_c[[2]][check2_c] <- 1
+  cov1_e_center <- as.data.frame(scale(cov1_e, scale = FALSE))
+  cov2_e_center <- as.data.frame(scale(cov2_e, scale = FALSE))
+  cov1_e_center[, 1] <- rep(1, nrow(cov1_e))
+  cov2_e_center[, 1] <- rep(1, nrow(cov2_e))
+  cov_e_center <- list(cov1_e_center, cov2_e_center)
+  mean_cov_e_center <- list(apply(as.matrix(cov1_e_center), 2, mean), apply(as.matrix(cov2_e_center), 2, mean))
+  cov1_c_center <- as.data.frame(scale(cov1_c, scale = FALSE))
+  cov2_c_center <- as.data.frame(scale(cov2_c, scale = FALSE))
+  cov1_c_center[, 1] <- rep(1, nrow(cov1_c))
+  cov2_c_center[, 1] <- rep(1, nrow(cov2_c))
+  cov_c_center <- list(cov1_c_center, cov2_c_center)
+  mean_cov_c_center <- list(apply(as.matrix(cov1_c_center), 2, mean), apply(as.matrix(cov2_c_center), 2, mean))
+  if(center == TRUE) {
+    cov_e <- cov_e_center
+    cov_c <- cov_c_center
+    mean_cov_e <- mean_cov_e_center
+    mean_cov_c <- mean_cov_c_center
   }
   data2$e[is.na(data2$e) == TRUE] <- -999999
   data2$c[is.na(data2$c) == TRUE] <- -999999
@@ -231,7 +231,7 @@ data_read_hurdle <- function(data, model.eff, model.cost, model.se, model.sc, se
   data2$c[index_mis2_c] <- NA
   if(is.null(se) == TRUE & is.null(sc) == TRUE) { stop("Structural values in at least one outcome variable are required, please provide the structural value") }
   if(is.null(se) == FALSE) {
-  index_str_e <- ifelse(y_e == se, 1, 0)
+  index_str_e <- ifelse(round(y_e, digits = 4) == se, 1, 0)
   if(any(na.omit(index_str_e) == 1) == FALSE) { stop("Provide structural values that are present in the data") }
   d_eff1 <- d_eff2 <- c()
   d_eff1 <- index_str_e[t1_index]
@@ -244,19 +244,21 @@ data_read_hurdle <- function(data, model.eff, model.cost, model.se, model.sc, se
   covz_e <- list(covz1_e, covz2_e)
   covze <- list(covz1_e, covz2_e) 
   mean_covz_e <- list(apply(as.matrix(covz1_e), 2, mean), apply(as.matrix(covz2_e), 2, mean))
-  checkz1_e <- which(apply(covz1_e, 2, binary_check)) 
-  checkz1_e <- checkz1_e[-1]
-  checkz2_e <- which(apply(covz2_e, 2, binary_check)) 
-  checkz2_e <- checkz2_e[-1]
-  if(any(unlist(lapply(zf_e, is.factor))) == TRUE) {
-    mean_covz_e[[1]][checkz1_e] <- 1
-    mean_covz_e[[2]][checkz2_e] <- 1
+  covz1_e_center <- as.data.frame(scale(covz1_e, scale = FALSE))
+  covz2_e_center <- as.data.frame(scale(covz2_e, scale = FALSE))
+  covz1_e_center[, 1] <- rep(1, nrow(covz1_e))
+  covz2_e_center[, 1] <- rep(1, nrow(covz2_e))
+  covz_e_center <- list(covz1_e_center, covz2_e_center)
+  mean_covz_e_center <- list(apply(as.matrix(covz1_e_center), 2, mean), apply(as.matrix(covz2_e_center), 2, mean))
+  if(center == TRUE) {
+    covz_e <- covz_e_center
+    mean_covz_e <- mean_covz_e_center
   }
   names(covz_e) <- names(mean_covz_e) <- c("Control", "Intervention")
   names(d_eff) <- c("Control", "Intervention")
   }
   if(is.null(sc) == FALSE) {
-  index_str_c <- ifelse(y_c == sc, 1, 0)
+  index_str_c <- ifelse(round(y_c, digits = 0) == sc, 1, 0)
   if(any(na.omit(index_str_c) == 1) == FALSE){ stop("Provide structural values that are present in the data") }
   d_cost1 <- d_cost2 <- c() 
   d_cost1 <- index_str_c[t1_index]
@@ -269,13 +271,16 @@ data_read_hurdle <- function(data, model.eff, model.cost, model.se, model.sc, se
   covz_c <- list(covz1_c, covz2_c)
   covzc <- list(covz1_c, covz2_c) 
   mean_covz_c <- list(apply(as.matrix(covz1_c), 2, mean), apply(as.matrix(covz2_c), 2, mean))
-  checkz1_c <- which(apply(covz1_c, 2, binary_check)) 
-  checkz1_c <- checkz1_c[-1]
-  checkz2_c <- which(apply(covz2_c, 2, binary_check)) 
-  checkz2_c <- checkz2_c[-1]
-  if(any(unlist(lapply(zf_c, is.factor))) == TRUE) {
-    mean_covz_c[[1]][checkz1_c] <- 1
-    mean_covz_c[[2]][checkz2_c] <- 1
+  mean_covz_c <- list(apply(as.matrix(covz1_c), 2, mean), apply(as.matrix(covz2_c), 2, mean))
+  covz1_c_center <- as.data.frame(scale(covz1_c, scale = FALSE))
+  covz2_c_center <- as.data.frame(scale(covz2_c, scale = FALSE))
+  covz1_c_center[, 1] <- rep(1, nrow(covz1_c))
+  covz2_c_center[, 1] <- rep(1, nrow(covz2_c))
+  covz_c_center <- list(covz1_c_center, covz2_c_center)
+  mean_covz_c_center <- list(apply(as.matrix(covz1_c_center), 2, mean), apply(as.matrix(covz2_c_center), 2, mean))
+  if(center == TRUE) {
+    covz_c <- covz_c_center
+    mean_covz_c <- mean_covz_c_center
   }
   names(covz_c) <- names(mean_covz_c) <- c("Control", "Intervention")
   names(d_cost) <- c("Control", "Intervention")

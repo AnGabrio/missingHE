@@ -81,39 +81,39 @@ prior_selection <- function(type, dist_e, dist_c, pe, pc, ze, zc) eval.parent( s
         if(length(alpha0.prior) != 2) {stop("provide correct hyper prior values") }
         prior_mue <- alpha0.prior
         prior_mue_str <- paste("alpha[1] ~ dnorm(", prior_mue[1], ",", prior_mue[2])
-        model_string_jags <- gsub("alpha[1] ~ dnorm(0, 0.0001", prior_mue_str, model_string_jags,fixed = TRUE)
+        model_string_jags <- gsub("alpha[1] ~ dnorm(0, 0.0000001", prior_mue_str, model_string_jags,fixed = TRUE)
         prior_mue_str <- paste("alpha[2] ~ dnorm(", prior_mue[1],",", prior_mue[2])
-        model_string_jags <- gsub("alpha[2] ~ dnorm(0, 0.0001", prior_mue_str, model_string_jags, fixed = TRUE) }
+        model_string_jags <- gsub("alpha[2] ~ dnorm(0, 0.0000001", prior_mue_str, model_string_jags, fixed = TRUE) }
     } else if(pe > 1){
       if(is.null(alpha0.prior) == FALSE & grepl("alpha[1, 1] ~ ", model_string_jags, fixed = TRUE) == TRUE & grepl("alpha[1, 2] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
         if(length(alpha0.prior) != 2) {stop("provide correct hyper prior values") }
         prior_mue <- alpha0.prior
         prior_mue_str <- paste("alpha[1, 1] ~ dnorm(", prior_mue[1], ",", prior_mue[2])
-        model_string_jags <- gsub("alpha[1, 1] ~ dnorm(0, 0.001", prior_mue_str, model_string_jags,fixed = TRUE)
+        model_string_jags <- gsub("alpha[1, 1] ~ dnorm(0, 0.0000001", prior_mue_str, model_string_jags,fixed = TRUE)
         prior_mue_str <- paste("alpha[1, 2] ~ dnorm(", prior_mue[1], ",", prior_mue[2])
-        model_string_jags <- gsub("alpha[1, 2] ~ dnorm(0, 0.001", prior_mue_str, model_string_jags, fixed = TRUE) }
+        model_string_jags <- gsub("alpha[1, 2] ~ dnorm(0, 0.0000001", prior_mue_str, model_string_jags, fixed = TRUE) }
         if(is.null(alpha.prior) == FALSE & grepl("alpha[j, t] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
         if(length(alpha.prior) != 2) {stop("provide correct hyper prior values") }
         prior_alphae <- alpha.prior
         prior_alphae_str <- paste("alpha[j, t] ~ dnorm(", prior_alphae[1], ",", prior_alphae[2])
-        model_string_jags <- gsub("alpha[j, t] ~ dnorm(0, 0.01", prior_alphae_str, model_string_jags, fixed = TRUE) }
+        model_string_jags <- gsub("alpha[j, t] ~ dnorm(0, 0.0000001", prior_alphae_str, model_string_jags, fixed = TRUE) }
     }
     if(pc == 1) {
       if(is.null(beta0.prior) == FALSE & grepl("beta[1] ~ ", model_string_jags, fixed = TRUE) == TRUE & grepl("beta[2] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
         if(length(beta0.prior) != 2) {stop("provide correct hyper prior values") }
         prior_muc <- beta0.prior
         prior_muc_str <- paste("beta[1] ~ dnorm(", prior_muc[1], ",", prior_muc[2])
-        model_string_jags <- gsub("beta[1] ~ dnorm(0, 0.0001", prior_muc_str, model_string_jags, fixed = TRUE)
+        model_string_jags <- gsub("beta[1] ~ dnorm(0, 0.0000001", prior_muc_str, model_string_jags, fixed = TRUE)
         prior_muc_str <- paste("beta[2] ~ dnorm(",prior_muc[1],",", prior_muc[2])
-        model_string_jags <- gsub("beta[2] ~ dnorm(0, 0.0001", prior_muc_str, model_string_jags, fixed = TRUE) }
+        model_string_jags <- gsub("beta[2] ~ dnorm(0, 0.0000001", prior_muc_str, model_string_jags, fixed = TRUE) }
     } else if(pc > 1) {
       if(is.null(beta0.prior) == FALSE & grepl("beta[1, 1] ~ ", model_string_jags, fixed = TRUE) == TRUE & grepl("beta[1, 2] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
         if(length(beta0.prior) != 2) {stop("provide correct hyper prior values") }
         prior_muc <- beta0.prior
         prior_muc_str <- paste("beta[1, 1] ~ dnorm(", prior_muc[1], ",", prior_muc[2])
-        model_string_jags <- gsub("beta[1, 1] ~ dnorm(0, 0.001", prior_muc_str, model_string_jags, fixed = TRUE)
+        model_string_jags <- gsub("beta[1, 1] ~ dnorm(0, 0.0000001", prior_muc_str, model_string_jags, fixed = TRUE)
         prior_muc_str <- paste("beta[1, 2] ~ dnorm(", prior_muc[1], ",", prior_muc[2])
-        model_string_jags <- gsub("beta[1, 2] ~ dnorm(0, 0.001", prior_muc_str, model_string_jags, fixed = TRUE) }
+        model_string_jags <- gsub("beta[1, 2] ~ dnorm(0, 0.0000001", prior_muc_str, model_string_jags, fixed = TRUE) }
         if(is.null(beta.prior) == FALSE & grepl("beta[j, t] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
         if(length(beta.prior) != 2){stop("provide correct hyper prior values") }
         prior_betac <- beta.prior
@@ -133,25 +133,31 @@ prior_selection <- function(type, dist_e, dist_c, pe, pc, ze, zc) eval.parent( s
         prior_alphae_str <- paste("s_e[t] ~ dunif(", prior_alphae[1], ",", prior_alphae[2])
         model_string_jags <- gsub("s_e[t] ~ dunif(0, sqrt(mu_e[t] * (1 - mu_e[t]))", prior_alphae_str, model_string_jags, fixed = TRUE) }
   }
-  if(dist_c == "norm" | dist_c == "lnorm") {
+  if(dist_c == "norm") {
     if(is.null(sigma.prior.c) == FALSE & grepl("ls_c[t] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
       if(length(sigma.prior.c) != 2) {stop("provide correct hyper prior values") }
       prior_alphac <- sigma.prior.c
       prior_alphac_str <- paste("ls_c[t] ~ dunif(", prior_alphac[1], ",", prior_alphac[2])
       model_string_jags <- gsub("ls_c[t] ~ dunif(-5, 10", prior_alphac_str, model_string_jags, fixed = TRUE) }
+  } else if(dist_c == "lnorm") {
+    if(is.null(sigma.prior.c) == FALSE & grepl("ls_c[t] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
+      if(length(sigma.prior.c) != 2) {stop("provide correct hyper prior values") }
+      prior_alphac <- sigma.prior.c
+      prior_alphac_str <- paste("ls_c[t] ~ dunif(", prior_alphac[1], ",", prior_alphac[2])
+      model_string_jags <- gsub("ls_c[t] ~ dunif(0, 100", prior_alphac_str, model_string_jags, fixed = TRUE) }
   } else if(dist_c == "gamma") {
       if(is.null(sigma.prior.c) == FALSE & grepl("s_c[t] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
         if(length(sigma.prior.c) != 2) {stop("provide correct hyper prior values") }
         prior_alphac <- sigma.prior.c
         prior_alphac_str <- paste("s_c[t] ~ dunif(", prior_alphac[1], ",", prior_alphac[2])
-        model_string_jags <- gsub("s_c[t] ~ dunif(0, 1000", prior_alphac_str, model_string_jags, fixed = TRUE) }
+        model_string_jags <- gsub("s_c[t] ~ dunif(0, 10000", prior_alphac_str, model_string_jags, fixed = TRUE) }
   }
       if(exists("beta_f.prior") == TRUE) {
       if(is.null(beta_f.prior) == FALSE & grepl("beta_f", model_string_jags, fixed = TRUE) == TRUE) {
         if(length(beta_f.prior) != 2) {stop("provide correct hyper prior values") }
           prior_beta_f <- beta_f.prior
           prior_beta_f_str <- paste("beta_f[t] ~ dnorm(", prior_beta_f[1], ",", prior_beta_f[2])
-          model_string_jags <- gsub("beta_f[t] ~ dnorm(0, 0.001", prior_beta_f_str, model_string_jags, fixed = TRUE)
+          model_string_jags <- gsub("beta_f[t] ~ dnorm(0, 0.0000001", prior_beta_f_str, model_string_jags, fixed = TRUE)
         }
       }
   model_string_prior <- model_string_jags

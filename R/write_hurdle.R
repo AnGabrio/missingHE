@@ -137,24 +137,24 @@ write_hurdle <- function(dist_e , dist_c, ind, type, pe, pc, ze, zc, se, sc) eva
   
   #priors for mean regression coefficients
   for (j in 2:pe) {#begin alpha priors effects
-  alpha1[j, 1] ~ dnorm(0, 0.01)
-  alpha2[j, 1] ~ dnorm(0, 0.01)
+  alpha1[j, 1] ~ dnorm(0, 0.0000001)
+  alpha2[j, 1] ~ dnorm(0, 0.0000001)
   alpha1[j, 2] <- 0
   alpha2[j, 2] <- 0
   }#end alpha priors effects
-  alpha1[1, 1] ~ dnorm(0, 0.001)
-  alpha2[1, 1] ~ dnorm(0, 0.001)
+  alpha1[1, 1] ~ dnorm(0, 0.0000001)
+  alpha2[1, 1] ~ dnorm(0, 0.0000001)
   alpha1[1, 2] <- se
   alpha2[1, 2] <- se
   
   for (j in 2:pc) {#begin beta priors costs
-  beta1[j, 1] ~ dnorm(0, 0.01)
-  beta2[j, 1] ~ dnorm(0, 0.01)
+  beta1[j, 1] ~ dnorm(0, 0.0000001)
+  beta2[j, 1] ~ dnorm(0, 0.0000001)
   beta1[j, 2] <- 0
   beta2[j, 2] <- 0
   }#end beta priors costs
-  beta1[1, 1] ~ dnorm(0, 0.001)
-  beta2[1, 1] ~ dnorm(0, 0.001)
+  beta1[1, 1] ~ dnorm(0, 0.0000001)
+  beta2[1, 1] ~ dnorm(0, 0.0000001)
   beta1[1, 2] <- sc
   beta2[1, 2] <- sc
   
@@ -169,8 +169,8 @@ write_hurdle <- function(dist_e , dist_c, ind, type, pe, pc, ze, zc, se, sc) eva
   ls_e2[2] <- sde
 
   #correlation
-  beta_f1[1] ~ dnorm(0, 0.001)
-  beta_f2[1] ~ dnorm(0, 0.001)
+  beta_f1[1] ~ dnorm(0, 0.0000001)
+  beta_f2[1] ~ dnorm(0, 0.0000001)
   beta_f1[2] <- 0
   beta_f2[2] <- 0
 
@@ -235,8 +235,8 @@ write_hurdle <- function(dist_e , dist_c, ind, type, pe, pc, ze, zc, se, sc) eva
       model_string_jags <- gsub("}#end transformation costs", "", model_string_jags, fixed = TRUE)
       model_string_jags <- gsub("nu_c[1] <- inprod(mean_cov_c1[], beta1[, 1])", "nu_c[1] <- exp(inprod(mean_cov_c1[], beta1[, 1]))", model_string_jags, fixed = TRUE)
       model_string_jags <- gsub("nu_c[2] <- inprod(mean_cov_c2[], beta2[, 1])", "nu_c[2] <- exp(inprod(mean_cov_c2[], beta2[, 1]))", model_string_jags, fixed = TRUE)
-      model_string_jags <- gsub("ls_c1[1] ~ dunif(-5, 10)", "s_c1[1] ~ dunif(0, 1000)", model_string_jags, fixed = TRUE)
-      model_string_jags <- gsub("ls_c2[1] ~ dunif(-5, 10)", "s_c2[1] ~ dunif(0, 1000)", model_string_jags, fixed = TRUE)
+      model_string_jags <- gsub("ls_c1[1] ~ dunif(-5, 10)", "s_c1[1] ~ dunif(0, 10000)", model_string_jags, fixed = TRUE)
+      model_string_jags <- gsub("ls_c2[1] ~ dunif(-5, 10)", "s_c2[1] ~ dunif(0, 10000)", model_string_jags, fixed = TRUE)
       model_string_jags <- gsub("ls_c1[2] <- sdc", "s_c1[2] <- sdc", model_string_jags, fixed = TRUE)
       model_string_jags <- gsub("ls_c2[2] <- sdc", "s_c2[2] <- sdc", model_string_jags, fixed = TRUE)
       model_string_jags <- gsub("mu_c[1] <- nu_c[1] * (1 - p_c[1]) + sc * p_c[1]", "mu_c[1] <- nu_c[1] * (1 - p_c[1]) + exp(sc) * p_c[1]", model_string_jags, fixed = TRUE)
@@ -264,6 +264,8 @@ write_hurdle <- function(dist_e , dist_c, ind, type, pe, pc, ze, zc, se, sc) eva
        model_string_jags <- gsub("mu_c[2] <- nu_c[2] * (1 - p_c[2]) + sc * p_c[2]", "mu_c[2] <- nu_c[2] * (1 - p_c[2]) + exp(sc) * p_c[2]", model_string_jags, fixed = TRUE)
        model_string_jags <- gsub("#mean for lnorm1", "nu_c[1] <- exp(lnu_c[1] + lss_c1[1] / 2)", model_string_jags, fixed = TRUE)
        model_string_jags <- gsub("#mean for lnorm2", "nu_c[2] <- exp(lnu_c[2] + lss_c2[1] / 2)", model_string_jags, fixed = TRUE)
+       model_string_jags <- gsub("ls_c1[1] ~ dunif(-5, 10)", "ls_c1[1] ~ dunif(0, 100)", model_string_jags, fixed = TRUE)
+       model_string_jags <- gsub("ls_c2[1] ~ dunif(-5, 10)", "ls_c2[1] ~ dunif(0, 100)", model_string_jags, fixed = TRUE)
        model_string_jags <- gsub("s_c[1] <- s_c1[1]", "s_c[1] <- sqrt(exp(2 * lnu_c[1] + lss_c1[1]) * (exp(lss_c1[1]) - 1))",model_string_jags, fixed = TRUE)
        model_string_jags <- gsub("s_c[2] <- s_c2[1]", "s_c[2] <- sqrt(exp(2 * lnu_c[2] + lss_c2[1]) * (exp(lss_c2[1]) - 1))",model_string_jags, fixed = TRUE)
        model_string_jags <- gsub("loglik_c1[i] <- logdensity.norm(cost1[i], mu_c1[i], tau_c1[d_cost1[i] + 1])", "loglik_c1[i] <- logdensity.lnorm(cost1[i], lmu_c1[i], ltau_c1[d_cost1[i] + 1])", model_string_jags, fixed = TRUE)
@@ -310,8 +312,8 @@ write_hurdle <- function(dist_e , dist_c, ind, type, pe, pc, ze, zc, se, sc) eva
          beta_nons_e1 <- "alpha[1] <- alpha1[1]"
          beta_nons_e2 <- "alpha[2] <- alpha2[1]"
          begin_prior_beta <- "#begin alpha priors effects"
-         prior_beta_e1 <- "alpha1[1] ~ dnorm(0, 0.0001)"
-         prior_beta_e2 <- "alpha2[1] ~ dnorm(0, 0.0001)"
+         prior_beta_e1 <- "alpha1[1] ~ dnorm(0, 0.0000001)"
+         prior_beta_e2 <- "alpha2[1] ~ dnorm(0, 0.0000001)"
          prior_beta_e1s <- "alpha1[2] <- se"
          prior_beta_e2s <- "alpha2[2] <- se"
          end_prior_beta <- "#end alpha priors effects"
@@ -323,12 +325,12 @@ write_hurdle <- function(dist_e , dist_c, ind, type, pe, pc, ze, zc, se, sc) eva
          model_string_jags <- gsub("alpha[j, 1] <- alpha1[j, 1]", beta_nons_e1, model_string_jags, fixed = TRUE)
          model_string_jags <- gsub("alpha[j, 2] <- alpha2[j, 1] }", beta_nons_e2, model_string_jags, fixed = TRUE)
          model_string_jags <- gsub("for (j in 2:pe) {#begin alpha priors effects", begin_prior_beta, model_string_jags, fixed = TRUE)
-         model_string_jags <- gsub("alpha1[j, 1] ~ dnorm(0, 0.01)", prior_beta_e1j, model_string_jags, fixed = TRUE)
-         model_string_jags <- gsub("alpha2[j, 1] ~ dnorm(0, 0.01)", prior_beta_e2j, model_string_jags, fixed = TRUE)
+         model_string_jags <- gsub("alpha1[j, 1] ~ dnorm(0, 0.0000001)", prior_beta_e1j, model_string_jags, fixed = TRUE)
+         model_string_jags <- gsub("alpha2[j, 1] ~ dnorm(0, 0.0000001)", prior_beta_e2j, model_string_jags, fixed = TRUE)
          model_string_jags <- gsub("alpha1[j, 2] <- 0", prior_beta_e10, model_string_jags, fixed = TRUE)
          model_string_jags <- gsub("alpha2[j, 2] <- 0", prior_beta_e20, model_string_jags, fixed = TRUE)
-         model_string_jags <- gsub("alpha1[1, 1] ~ dnorm(0, 0.001)", prior_beta_e1, model_string_jags, fixed = TRUE)
-         model_string_jags <- gsub("alpha2[1, 1] ~ dnorm(0, 0.001)", prior_beta_e2, model_string_jags, fixed = TRUE)
+         model_string_jags <- gsub("alpha1[1, 1] ~ dnorm(0, 0.0000001)", prior_beta_e1, model_string_jags, fixed = TRUE)
+         model_string_jags <- gsub("alpha2[1, 1] ~ dnorm(0, 0.0000001)", prior_beta_e2, model_string_jags, fixed = TRUE)
          model_string_jags <- gsub("alpha1[1, 2] <- se", prior_beta_e1s, model_string_jags, fixed = TRUE)
          model_string_jags <- gsub("alpha2[1, 2] <- se", prior_beta_e2s, model_string_jags, fixed = TRUE)
          model_string_jags <- gsub("}#end alpha priors effects", end_prior_beta, model_string_jags, fixed = TRUE)
@@ -342,8 +344,8 @@ write_hurdle <- function(dist_e , dist_c, ind, type, pe, pc, ze, zc, se, sc) eva
          beta_nons_c1 <- "beta[1] <- beta1[1]"
          beta_nons_c2 <- "beta[2] <- beta2[1]"
          begin_prior_beta <- "#begin beta priors costs"
-         prior_beta_c1 <- "beta1[1] ~ dnorm(0, 0.0001)"
-         prior_beta_c2 <- "beta2[1] ~ dnorm(0, 0.0001)"
+         prior_beta_c1 <- "beta1[1] ~ dnorm(0, 0.0000001)"
+         prior_beta_c2 <- "beta2[1] ~ dnorm(0, 0.0000001)"
          prior_beta_c1s <- "beta1[2] <- sc"
          prior_beta_c2s <- "beta2[2] <- sc"
          end_prior_beta <- "#end beta priors costs"
@@ -355,12 +357,12 @@ write_hurdle <- function(dist_e , dist_c, ind, type, pe, pc, ze, zc, se, sc) eva
          model_string_jags <- gsub("beta[j, 1] <- beta1[j, 1]", beta_nons_c1, model_string_jags, fixed = TRUE)
          model_string_jags <- gsub("beta[j, 2] <- beta2[j, 1] }", beta_nons_c2, model_string_jags, fixed = TRUE)
          model_string_jags <- gsub("for (j in 2:pc) {#begin beta priors costs", begin_prior_beta, model_string_jags, fixed = TRUE)
-         model_string_jags <- gsub("beta1[j, 1] ~ dnorm(0, 0.01)", prior_beta_c1j, model_string_jags, fixed = TRUE)
-         model_string_jags <- gsub("beta2[j, 1] ~ dnorm(0, 0.01)", prior_beta_c2j, model_string_jags, fixed = TRUE)
+         model_string_jags <- gsub("beta1[j, 1] ~ dnorm(0, 0.0000001)", prior_beta_c1j, model_string_jags, fixed = TRUE)
+         model_string_jags <- gsub("beta2[j, 1] ~ dnorm(0, 0.0000001)", prior_beta_c2j, model_string_jags, fixed = TRUE)
          model_string_jags <- gsub("beta1[j, 2] <- 0", prior_beta_c10, model_string_jags, fixed = TRUE)
          model_string_jags <- gsub("beta2[j, 2] <- 0", prior_beta_c20, model_string_jags, fixed = TRUE)
-         model_string_jags <- gsub("beta1[1, 1] ~ dnorm(0, 0.001)", prior_beta_c1, model_string_jags, fixed = TRUE)
-         model_string_jags <- gsub("beta2[1, 1] ~ dnorm(0, 0.001)", prior_beta_c2, model_string_jags, fixed = TRUE)
+         model_string_jags <- gsub("beta1[1, 1] ~ dnorm(0, 0.0000001)", prior_beta_c1, model_string_jags, fixed = TRUE)
+         model_string_jags <- gsub("beta2[1, 1] ~ dnorm(0, 0.0000001)", prior_beta_c2, model_string_jags, fixed = TRUE)
          model_string_jags <- gsub("beta1[1, 2] <- sc", prior_beta_c1s, model_string_jags, fixed = TRUE)
          model_string_jags <- gsub("beta2[1, 2] <- sc", prior_beta_c2s, model_string_jags, fixed = TRUE)
          model_string_jags <- gsub("}#end beta priors costs", end_prior_beta, model_string_jags, fixed = TRUE)
@@ -440,12 +442,14 @@ write_hurdle <- function(dist_e , dist_c, ind, type, pe, pc, ze, zc, se, sc) eva
      model_string_jags <- gsub("s_e[2] <- s_e2[1]", "s_e[2] <- s_e2", model_string_jags, fixed = TRUE)
      model_string_jags <- gsub("p_e[1] <- ilogit(inprod(mean_z_e1[], gamma_e[, 1]))", "", model_string_jags, fixed = TRUE)
      model_string_jags <- gsub("p_e[2] <- ilogit(inprod(mean_z_e2[], gamma_e[, 2]))", "", model_string_jags, fixed = TRUE)
-     model_string_jags <- gsub("alpha1[j, 1] ~ dnorm(0, 0.01)", "alpha1[j] ~ dnorm(0, 0.01)", model_string_jags, fixed = TRUE)
-     model_string_jags <- gsub("alpha2[j, 1] ~ dnorm(0, 0.01)", "alpha2[j] ~ dnorm(0, 0.01)", model_string_jags, fixed = TRUE)
+     model_string_jags <- gsub("gamma_e[1, 1] ~ dlogis(0, 1)", "", model_string_jags, fixed = TRUE)
+     model_string_jags <- gsub("gamma_e[1, 2] ~ dlogis(0, 1)", "", model_string_jags, fixed = TRUE)
+     model_string_jags <- gsub("alpha1[j, 1] ~ dnorm(0, 0.0000001)", "alpha1[j] ~ dnorm(0, 0.0000001)", model_string_jags, fixed = TRUE)
+     model_string_jags <- gsub("alpha2[j, 1] ~ dnorm(0, 0.0000001)", "alpha2[j] ~ dnorm(0, 0.0000001)", model_string_jags, fixed = TRUE)
      model_string_jags <- gsub("alpha1[j, 2] <- 0", "", model_string_jags, fixed = TRUE)
      model_string_jags <- gsub("alpha2[j, 2] <- 0", "", model_string_jags, fixed = TRUE)
-     model_string_jags <- gsub("alpha1[1, 1] ~ dnorm(0, 0.001)", "alpha1[1] ~ dnorm(0, 0.001)", model_string_jags, fixed = TRUE)
-     model_string_jags <- gsub("alpha2[1, 1] ~ dnorm(0, 0.001)", "alpha2[1] ~ dnorm(0, 0.001)", model_string_jags, fixed = TRUE)
+     model_string_jags <- gsub("alpha1[1, 1] ~ dnorm(0, 0.0000001)", "alpha1[1] ~ dnorm(0, 0.0000001)", model_string_jags, fixed = TRUE)
+     model_string_jags <- gsub("alpha2[1, 1] ~ dnorm(0, 0.0000001)", "alpha2[1] ~ dnorm(0, 0.0000001)", model_string_jags, fixed = TRUE)
      model_string_jags <- gsub("alpha1[1, 2] <- se", "", model_string_jags, fixed = TRUE)
      model_string_jags <- gsub("alpha2[1, 2] <- se", "", model_string_jags, fixed = TRUE)
      model_string_jags <- gsub("ls_e1[1] ~ dunif(-5, 10)", "ls_e1 ~ dunif(-5, 10)", model_string_jags, fixed = TRUE)
@@ -494,8 +498,8 @@ write_hurdle <- function(dist_e , dist_c, ind, type, pe, pc, ze, zc, se, sc) eva
       model_string_jags <- gsub("}#end transformation costs", "", model_string_jags, fixed = TRUE)
       model_string_jags <- gsub("nu_c[1] <- inprod(mean_cov_c1[], beta1[, 1])", "nu_c[1] <- exp(inprod(mean_cov_c1[], beta1[, 1]))", model_string_jags, fixed = TRUE)
       model_string_jags <- gsub("nu_c[2] <- inprod(mean_cov_c2[], beta2[, 1])", "nu_c[2] <- exp(inprod(mean_cov_c2[], beta2[, 1]))", model_string_jags, fixed = TRUE)
-      model_string_jags <- gsub("ls_c1[1] ~ dunif(-5, 10)", "s_c1[1] ~ dunif(0, 1000)", model_string_jags, fixed = TRUE)
-      model_string_jags <- gsub("ls_c2[1] ~ dunif(-5, 10)", "s_c2[1] ~ dunif(0, 1000)", model_string_jags, fixed = TRUE)
+      model_string_jags <- gsub("ls_c1[1] ~ dunif(-5, 10)", "s_c1[1] ~ dunif(0, 10000)", model_string_jags, fixed = TRUE)
+      model_string_jags <- gsub("ls_c2[1] ~ dunif(-5, 10)", "s_c2[1] ~ dunif(0, 10000)", model_string_jags, fixed = TRUE)
       model_string_jags <- gsub("ls_c1[2] <- sdc", "s_c1[2] <- sdc", model_string_jags, fixed = TRUE)
       model_string_jags <- gsub("ls_c2[2] <- sdc", "s_c2[2] <- sdc", model_string_jags, fixed = TRUE)
       model_string_jags <- gsub("mu_c[1] <- nu_c[1] * (1 - p_c[1]) + sc * p_c[1]", "mu_c[1] <- nu_c[1] * (1 - p_c[1]) + exp(sc) * p_c[1]", model_string_jags, fixed = TRUE)
@@ -523,6 +527,8 @@ write_hurdle <- function(dist_e , dist_c, ind, type, pe, pc, ze, zc, se, sc) eva
       model_string_jags <- gsub("mu_c[2] <- nu_c[2] * (1 - p_c[2]) + sc * p_c[2]", "mu_c[2] <- nu_c[2] * (1 - p_c[2]) + exp(sc) * p_c[2]", model_string_jags, fixed = TRUE)
       model_string_jags <- gsub("#mean for lnorm1", "nu_c[1] <- exp(lnu_c[1] + lss_c1[1] / 2)", model_string_jags, fixed = TRUE)
       model_string_jags <- gsub("#mean for lnorm2", "nu_c[2] <- exp(lnu_c[2] + lss_c2[1] / 2)", model_string_jags, fixed = TRUE)
+      model_string_jags <- gsub("ls_c1[1] ~ dunif(-5, 10)", "ls_c1[1] ~ dunif(0, 100)", model_string_jags, fixed = TRUE)
+      model_string_jags <- gsub("ls_c2[1] ~ dunif(-5, 10)", "ls_c2[1] ~ dunif(0, 100)", model_string_jags, fixed = TRUE)
       model_string_jags <- gsub("s_c[1] <- s_c1[1]", "s_c[1] <- sqrt(exp(2 * lnu_c[1] + lss_c1[1]) * (exp(lss_c1[1]) - 1))",model_string_jags, fixed = TRUE)
       model_string_jags <- gsub("s_c[2] <- s_c2[1]", "s_c[2] <- sqrt(exp(2 * lnu_c[2] + lss_c2[1]) * (exp(lss_c2[1]) - 1))",model_string_jags, fixed = TRUE)
       model_string_jags <- gsub("loglik_c1[i] <- logdensity.norm(cost1[i], mu_c1[i], tau_c1[d_cost1[i] + 1])", "loglik_c1[i] <- logdensity.lnorm(cost1[i], lmu_c1[i], ltau_c1[d_cost1[i] + 1])", model_string_jags, fixed = TRUE)
@@ -565,8 +571,8 @@ write_hurdle <- function(dist_e , dist_c, ind, type, pe, pc, ze, zc, se, sc) eva
          beta_nons_e1 <- "alpha[1] <- alpha1[1]"
          beta_nons_e2 <- "alpha[2] <- alpha2[1]"
          begin_prior_beta <- "#begin alpha priors effects"
-         prior_beta_e1 <- "alpha1[1] ~ dnorm(0, 0.0001)"
-         prior_beta_e2 <- "alpha2[1] ~ dnorm(0, 0.0001)"
+         prior_beta_e1 <- "alpha1[1] ~ dnorm(0, 0.0000001)"
+         prior_beta_e2 <- "alpha2[1] ~ dnorm(0, 0.0000001)"
          end_prior_beta <- "#end beta priors effects"
          model_string_jags <- gsub("inprod(X1_e[i, ], alpha1[])", inprod_e1, model_string_jags, fixed = TRUE)
          model_string_jags <- gsub("inprod(X2_e[i, ], alpha2[])", inprod_e2, model_string_jags, fixed = TRUE)
@@ -576,12 +582,12 @@ write_hurdle <- function(dist_e , dist_c, ind, type, pe, pc, ze, zc, se, sc) eva
          model_string_jags <- gsub("alpha[j, 1] <- alpha1[j]", beta_nons_e1, model_string_jags, fixed = TRUE)
          model_string_jags <- gsub("alpha[j, 2] <- alpha2[j] }", beta_nons_e2, model_string_jags, fixed = TRUE)
          model_string_jags <- gsub("for (j in 2:pe) {#begin alpha priors effects", begin_prior_beta, model_string_jags, fixed = TRUE)
-         model_string_jags <- gsub("alpha1[j] ~ dnorm(0, 0.01)", prior_beta_e1j, model_string_jags, fixed = TRUE)
-         model_string_jags <- gsub("alpha2[j] ~ dnorm(0, 0.01)", prior_beta_e2j, model_string_jags, fixed = TRUE)
+         model_string_jags <- gsub("alpha1[j] ~ dnorm(0, 0.0000001)", prior_beta_e1j, model_string_jags, fixed = TRUE)
+         model_string_jags <- gsub("alpha2[j] ~ dnorm(0, 0.0000001)", prior_beta_e2j, model_string_jags, fixed = TRUE)
          model_string_jags <- gsub("alpha1[j] <- 0", prior_beta_e10, model_string_jags, fixed = TRUE)
          model_string_jags <- gsub("alpha2[j] <- 0", prior_beta_e20, model_string_jags, fixed = TRUE)
-         model_string_jags <- gsub("alpha1[1] ~ dnorm(0, 0.001)", prior_beta_e1, model_string_jags, fixed = TRUE)
-         model_string_jags <- gsub("alpha2[1] ~ dnorm(0, 0.001)", prior_beta_e2, model_string_jags, fixed = TRUE)
+         model_string_jags <- gsub("alpha1[1] ~ dnorm(0, 0.0000001)", prior_beta_e1, model_string_jags, fixed = TRUE)
+         model_string_jags <- gsub("alpha2[1] ~ dnorm(0, 0.0000001)", prior_beta_e2, model_string_jags, fixed = TRUE)
          model_string_jags <- gsub("}#end alpha priors effects", end_prior_beta, model_string_jags, fixed = TRUE)
      }
      if(pc == 1) {
@@ -593,8 +599,8 @@ write_hurdle <- function(dist_e , dist_c, ind, type, pe, pc, ze, zc, se, sc) eva
        beta_nons_c1 <- "beta[1] <- beta1[1]"
        beta_nons_c2 <- "beta[2] <- beta2[1]"
        begin_prior_beta <- "#begin beta priors costs"
-       prior_beta_c1 <- "beta1[1] ~ dnorm(0, 0.0001)"
-       prior_beta_c2 <- "beta2[1] ~ dnorm(0, 0.0001)"
+       prior_beta_c1 <- "beta1[1] ~ dnorm(0, 0.0000001)"
+       prior_beta_c2 <- "beta2[1] ~ dnorm(0, 0.0000001)"
        prior_beta_c1s <- "beta1[2] <- sc"
        prior_beta_c2s <- "beta2[2] <- sc"
        end_prior_beta <- "#end beta priors costs"
@@ -606,12 +612,12 @@ write_hurdle <- function(dist_e , dist_c, ind, type, pe, pc, ze, zc, se, sc) eva
        model_string_jags <- gsub("beta[j, 1] <- beta1[j, 1]", beta_nons_c1, model_string_jags, fixed = TRUE)
        model_string_jags <- gsub("beta[j, 2] <- beta2[j, 1] }", beta_nons_c2, model_string_jags, fixed = TRUE)
        model_string_jags <- gsub("for (j in 2:pc) {#begin beta priors costs", begin_prior_beta, model_string_jags, fixed = TRUE)
-       model_string_jags <- gsub("beta1[j, 1] ~ dnorm(0, 0.01)", prior_beta_c1j, model_string_jags, fixed = TRUE)
-       model_string_jags <- gsub("beta2[j, 1] ~ dnorm(0, 0.01)", prior_beta_c2j, model_string_jags, fixed = TRUE)
+       model_string_jags <- gsub("beta1[j, 1] ~ dnorm(0, 0.0000001)", prior_beta_c1j, model_string_jags, fixed = TRUE)
+       model_string_jags <- gsub("beta2[j, 1] ~ dnorm(0, 0.0000001)", prior_beta_c2j, model_string_jags, fixed = TRUE)
        model_string_jags <- gsub("beta1[j, 2] <- 0", prior_beta_c10, model_string_jags, fixed = TRUE)
        model_string_jags <- gsub("beta2[j, 2] <- 0", prior_beta_c20, model_string_jags, fixed = TRUE)
-       model_string_jags <- gsub("beta1[1, 1] ~ dnorm(0, 0.001)", prior_beta_c1, model_string_jags, fixed = TRUE)
-       model_string_jags <- gsub("beta2[1, 1] ~ dnorm(0, 0.001)", prior_beta_c2, model_string_jags, fixed = TRUE)
+       model_string_jags <- gsub("beta1[1, 1] ~ dnorm(0, 0.0000001)", prior_beta_c1, model_string_jags, fixed = TRUE)
+       model_string_jags <- gsub("beta2[1, 1] ~ dnorm(0, 0.0000001)", prior_beta_c2, model_string_jags, fixed = TRUE)
        model_string_jags <- gsub("beta1[1, 2] <- sc", prior_beta_c1s, model_string_jags, fixed = TRUE)
        model_string_jags <- gsub("beta2[1, 2] <- sc", prior_beta_c2s, model_string_jags, fixed = TRUE)
        model_string_jags <- gsub("}#end beta priors costs", end_prior_beta, model_string_jags, fixed = TRUE)
@@ -691,12 +697,14 @@ write_hurdle <- function(dist_e , dist_c, ind, type, pe, pc, ze, zc, se, sc) eva
      model_string_jags <- gsub("s_c[2] <- s_c2[1]", "s_c[2] <- s_c2", model_string_jags, fixed = TRUE)
      model_string_jags <- gsub("p_c[1] <- ilogit(inprod(mean_z_c1[], gamma_c[, 1]))", "", model_string_jags, fixed = TRUE)
      model_string_jags <- gsub("p_c[2] <- ilogit(inprod(mean_z_c2[], gamma_c[, 2]))", "", model_string_jags, fixed = TRUE)
-     model_string_jags <- gsub("beta1[j, 1] ~ dnorm(0, 0.01)", "beta1[j] ~ dnorm(0, 0.01)", model_string_jags, fixed = TRUE)
-     model_string_jags <- gsub("beta2[j, 1] ~ dnorm(0, 0.01)", "beta2[j] ~ dnorm(0, 0.01)", model_string_jags, fixed = TRUE)
+     model_string_jags <- gsub("gamma_c[1, 1] ~ dlogis(0, 1)", "", model_string_jags, fixed = TRUE)
+     model_string_jags <- gsub("gamma_c[1, 2] ~ dlogis(0, 1)", "", model_string_jags, fixed = TRUE)
+     model_string_jags <- gsub("beta1[j, 1] ~ dnorm(0, 0.0000001)", "beta1[j] ~ dnorm(0, 0.0000001)", model_string_jags, fixed = TRUE)
+     model_string_jags <- gsub("beta2[j, 1] ~ dnorm(0, 0.0000001)", "beta2[j] ~ dnorm(0, 0.0000001)", model_string_jags, fixed = TRUE)
      model_string_jags <- gsub("beta1[j, 2] <- 0", "", model_string_jags, fixed = TRUE)
      model_string_jags <- gsub("beta2[j, 2] <- 0", "", model_string_jags, fixed = TRUE)
-     model_string_jags <- gsub("beta1[1, 1] ~ dnorm(0, 0.001)", "beta1[1] ~ dnorm(0, 0.001)", model_string_jags, fixed = TRUE)
-     model_string_jags <- gsub("beta2[1, 1] ~ dnorm(0, 0.001)", "beta2[1] ~ dnorm(0, 0.001)", model_string_jags, fixed = TRUE)
+     model_string_jags <- gsub("beta1[1, 1] ~ dnorm(0, 0.0000001)", "beta1[1] ~ dnorm(0, 0.0000001)", model_string_jags, fixed = TRUE)
+     model_string_jags <- gsub("beta2[1, 1] ~ dnorm(0, 0.0000001)", "beta2[1] ~ dnorm(0, 0.0000001)", model_string_jags, fixed = TRUE)
      model_string_jags <- gsub("beta1[1, 2] <- sc", "", model_string_jags, fixed = TRUE)
      model_string_jags <- gsub("beta2[1, 2] <- sc", "", model_string_jags, fixed = TRUE)
      model_string_jags <- gsub("ls_c1[1] ~ dunif(-5, 10)", "ls_c1 ~ dunif(-5, 10)", model_string_jags, fixed = TRUE)
@@ -706,8 +714,8 @@ write_hurdle <- function(dist_e , dist_c, ind, type, pe, pc, ze, zc, se, sc) eva
      model_string_jags <- gsub("for (j in 2:zc) {#begin gamma priors costs", "", model_string_jags, fixed = TRUE)
      model_string_jags <- gsub("for(t in 1:2) {gamma_c[j, t] ~ dnorm(0, 0.01) }", "", model_string_jags, fixed = TRUE)
      model_string_jags <- gsub("}#end gamma priors costs", "", model_string_jags, fixed = TRUE)
-     model_string_jags <- gsub("beta_f1[1] ~ dnorm(0, 0.001)", "beta_f[1] ~ dnorm(0, 0.001)", model_string_jags, fixed = TRUE)
-     model_string_jags <- gsub("beta_f2[1] ~ dnorm(0, 0.001)", "beta_f[2] ~ dnorm(0, 0.001)", model_string_jags, fixed = TRUE)
+     model_string_jags <- gsub("beta_f1[1] ~ dnorm(0, 0.0000001)", "beta_f[1] ~ dnorm(0, 0.0000001)", model_string_jags, fixed = TRUE)
+     model_string_jags <- gsub("beta_f2[1] ~ dnorm(0, 0.0000001)", "beta_f[2] ~ dnorm(0, 0.0000001)", model_string_jags, fixed = TRUE)
      model_string_jags <- gsub("beta_f1[2] <- 0", "", model_string_jags, fixed = TRUE)
      model_string_jags <- gsub("beta_f2[2] <- 0", "", model_string_jags, fixed = TRUE)
      model_string_jags <- gsub("beta_f[1] <- beta_f1[1]", "", model_string_jags, fixed = TRUE)
@@ -749,8 +757,8 @@ write_hurdle <- function(dist_e , dist_c, ind, type, pe, pc, ze, zc, se, sc) eva
        model_string_jags <- gsub("#end transformation costs", "", model_string_jags, fixed = TRUE)
        model_string_jags <- gsub("nu_c[1] <- inprod(mean_cov_c1[], beta1[])", "nu_c[1] <- exp(inprod(mean_cov_c1[], beta1[]))", model_string_jags, fixed = TRUE)
        model_string_jags <- gsub("nu_c[2] <- inprod(mean_cov_c2[], beta2[])", "nu_c[2] <- exp(inprod(mean_cov_c2[], beta2[]))", model_string_jags, fixed = TRUE)
-       model_string_jags <- gsub("ls_c1 ~ dunif(-5, 10)", "s_c1 ~ dunif(0, 1000)", model_string_jags, fixed = TRUE)
-       model_string_jags <- gsub("ls_c2 ~ dunif(-5, 10)", "s_c2 ~ dunif(0, 1000)", model_string_jags, fixed = TRUE)
+       model_string_jags <- gsub("ls_c1 ~ dunif(-5, 10)", "s_c1 ~ dunif(0, 10000)", model_string_jags, fixed = TRUE)
+       model_string_jags <- gsub("ls_c2 ~ dunif(-5, 10)", "s_c2 ~ dunif(0, 10000)", model_string_jags, fixed = TRUE)
        model_string_jags <- gsub("#mean for lnorm1", "", model_string_jags, fixed = TRUE)
        model_string_jags <- gsub("#mean for lnorm2", "", model_string_jags, fixed = TRUE)
        model_string_jags <- gsub("loglik_c1[i] <- logdensity.norm(cost1[i], mu_c1[i], tau_c1)", "loglik_c1[i] <- logdensity.gamma(cost1[i], mu_c1[i] * tau_c1[i], tau_c1[i])", model_string_jags, fixed = TRUE)
@@ -774,6 +782,8 @@ write_hurdle <- function(dist_e , dist_c, ind, type, pe, pc, ze, zc, se, sc) eva
        model_string_jags <- gsub("nu_c[2] <- inprod(mean_cov_c2[], beta2[])", "lnu_c[2] <- inprod(mean_cov_c2[], beta2[])", model_string_jags, fixed = TRUE)
        model_string_jags <- gsub("#mean for lnorm1", "mu_c[1] <- exp(lnu_c[1] + lss_c1 / 2)", model_string_jags, fixed = TRUE)
        model_string_jags <- gsub("#mean for lnorm2", "mu_c[2] <- exp(lnu_c[2] + lss_c2 / 2)", model_string_jags, fixed = TRUE)
+       model_string_jags <- gsub("ls_c1 ~ dunif(-5, 10)", "ls_c1 ~ dunif(0, 100)", model_string_jags, fixed = TRUE)
+       model_string_jags <- gsub("ls_c2 ~ dunif(-5, 10)", "ls_c2 ~ dunif(0, 100)", model_string_jags, fixed = TRUE)
        model_string_jags <- gsub("mu_c[1] <- nu_c[1]","", model_string_jags, fixed = TRUE)
        model_string_jags <- gsub("mu_c[2] <- nu_c[2]","", model_string_jags, fixed = TRUE)
        model_string_jags <- gsub("loglik_c1[i] <- logdensity.norm(cost1[i], mu_c1[i], tau_c1)", "loglik_c1[i] <- logdensity.lnorm(cost1[i], lmu_c1[i], ltau_c1)", model_string_jags, fixed = TRUE)
@@ -820,8 +830,8 @@ write_hurdle <- function(dist_e , dist_c, ind, type, pe, pc, ze, zc, se, sc) eva
        beta_nons_e1 <- "alpha[1] <- alpha1[1]"
        beta_nons_e2 <- "alpha[2] <- alpha2[1]"
        begin_prior_beta <- "#begin alpha priors effects"
-       prior_beta_e1 <- "alpha1[1] ~ dnorm(0, 0.0001)"
-       prior_beta_e2 <- "alpha2[1] ~ dnorm(0, 0.0001)"
+       prior_beta_e1 <- "alpha1[1] ~ dnorm(0, 0.0000001)"
+       prior_beta_e2 <- "alpha2[1] ~ dnorm(0, 0.0000001)"
        prior_beta_e1s <- "alpha1[2] <- se"
        prior_beta_e2s <- "alpha2[2] <- se"
        end_prior_beta <- "#end alpha priors effects"
@@ -833,12 +843,12 @@ write_hurdle <- function(dist_e , dist_c, ind, type, pe, pc, ze, zc, se, sc) eva
        model_string_jags <- gsub("alpha[j, 1] <- alpha1[j, 1]", beta_nons_e1, model_string_jags, fixed = TRUE)
        model_string_jags <- gsub("alpha[j, 2] <- alpha2[j, 1] }", beta_nons_e2, model_string_jags, fixed = TRUE)
        model_string_jags <- gsub("for (j in 2:pe) {#begin alpha priors effects", begin_prior_beta, model_string_jags, fixed = TRUE)
-       model_string_jags <- gsub("alpha1[j, 1] ~ dnorm(0, 0.01)", prior_beta_e1j, model_string_jags, fixed = TRUE)
-       model_string_jags <- gsub("alpha2[j, 1] ~ dnorm(0, 0.01)", prior_beta_e2j, model_string_jags, fixed = TRUE)
+       model_string_jags <- gsub("alpha1[j, 1] ~ dnorm(0, 0.0000001)", prior_beta_e1j, model_string_jags, fixed = TRUE)
+       model_string_jags <- gsub("alpha2[j, 1] ~ dnorm(0, 0.0000001)", prior_beta_e2j, model_string_jags, fixed = TRUE)
        model_string_jags <- gsub("alpha1[j, 2] <- 0", prior_beta_e10, model_string_jags, fixed = TRUE)
        model_string_jags <- gsub("alpha2[j, 2] <- 0", prior_beta_e20, model_string_jags, fixed = TRUE)
-       model_string_jags <- gsub("alpha1[1, 1] ~ dnorm(0, 0.001)", prior_beta_e1, model_string_jags, fixed = TRUE)
-       model_string_jags <- gsub("alpha2[1, 1] ~ dnorm(0, 0.001)", prior_beta_e2, model_string_jags, fixed = TRUE)
+       model_string_jags <- gsub("alpha1[1, 1] ~ dnorm(0, 0.0000001)", prior_beta_e1, model_string_jags, fixed = TRUE)
+       model_string_jags <- gsub("alpha2[1, 1] ~ dnorm(0, 0.0000001)", prior_beta_e2, model_string_jags, fixed = TRUE)
        model_string_jags <- gsub("alpha1[1, 2] <- se", prior_beta_e1s, model_string_jags, fixed = TRUE)
        model_string_jags <- gsub("alpha2[1, 2] <- se", prior_beta_e2s, model_string_jags, fixed = TRUE)
        model_string_jags <- gsub("}#end alpha priors effects", end_prior_beta, model_string_jags, fixed = TRUE)
@@ -852,8 +862,8 @@ write_hurdle <- function(dist_e , dist_c, ind, type, pe, pc, ze, zc, se, sc) eva
          beta_nons_c1 <- "beta[1] <- beta1[1]"
          beta_nons_c2 <- "beta[2] <- beta2[1]"
          begin_prior_beta <- "#begin beta priors costs"
-         prior_beta_c1 <- "beta1[1] ~ dnorm(0, 0.0001)"
-         prior_beta_c2 <- "beta2[1] ~ dnorm(0, 0.0001)"
+         prior_beta_c1 <- "beta1[1] ~ dnorm(0, 0.0000001)"
+         prior_beta_c2 <- "beta2[1] ~ dnorm(0, 0.0000001)"
          end_prior_beta <- "#end beta priors costs"
          model_string_jags <- gsub("inprod(X1_c[i, ], beta1[])", inprod_c1, model_string_jags, fixed = TRUE)
          model_string_jags <- gsub("inprod(X2_c[i, ], beta2[])", inprod_c2, model_string_jags, fixed = TRUE)
@@ -863,12 +873,12 @@ write_hurdle <- function(dist_e , dist_c, ind, type, pe, pc, ze, zc, se, sc) eva
          model_string_jags <- gsub("beta[j, 1] <- beta1[j]", beta_nons_c1, model_string_jags, fixed = TRUE)
          model_string_jags <- gsub("beta[j, 2] <- beta2[j] }", beta_nons_c2, model_string_jags, fixed = TRUE)
          model_string_jags <- gsub("for (j in 2:pc) {#begin beta priors costs", begin_prior_beta, model_string_jags, fixed = TRUE)
-         model_string_jags <- gsub("beta1[j] ~ dnorm(0, 0.01)", prior_beta_c1j, model_string_jags, fixed = TRUE)
-         model_string_jags <- gsub("beta2[j] ~ dnorm(0, 0.01)", prior_beta_c2j, model_string_jags, fixed = TRUE)
+         model_string_jags <- gsub("beta1[j] ~ dnorm(0, 0.0000001)", prior_beta_c1j, model_string_jags, fixed = TRUE)
+         model_string_jags <- gsub("beta2[j] ~ dnorm(0, 0.0000001)", prior_beta_c2j, model_string_jags, fixed = TRUE)
          model_string_jags <- gsub("beta1[j] <- 0", prior_beta_c10, model_string_jags, fixed = TRUE)
          model_string_jags <- gsub("beta2[j] <- 0", prior_beta_c20, model_string_jags, fixed = TRUE)
-         model_string_jags <- gsub("beta1[1] ~ dnorm(0, 0.001)", prior_beta_c1, model_string_jags, fixed = TRUE)
-         model_string_jags <- gsub("beta2[1] ~ dnorm(0, 0.001)", prior_beta_c2, model_string_jags, fixed = TRUE)
+         model_string_jags <- gsub("beta1[1] ~ dnorm(0, 0.0000001)", prior_beta_c1, model_string_jags, fixed = TRUE)
+         model_string_jags <- gsub("beta2[1] ~ dnorm(0, 0.0000001)", prior_beta_c2, model_string_jags, fixed = TRUE)
          model_string_jags <- gsub("}#end beta priors costs", end_prior_beta, model_string_jags, fixed = TRUE)
      }
      if(is.null(se) == FALSE) {
@@ -924,8 +934,8 @@ write_hurdle <- function(dist_e , dist_c, ind, type, pe, pc, ze, zc, se, sc) eva
     if(is.null(sc) == FALSE) {
     model_string_jags <- gsub(" + beta_f1[d_cost1[i] + 1] * (eff1[i] - mu_e[1])", "", model_string_jags, fixed = TRUE)
     model_string_jags <- gsub(" + beta_f2[d_cost2[i] + 1] * (eff2[i] - mu_e[2])", "", model_string_jags, fixed = TRUE)
-    model_string_jags <- gsub("beta_f1[1] ~ dnorm(0, 0.001)", "", model_string_jags, fixed = TRUE)
-    model_string_jags <- gsub("beta_f2[1] ~ dnorm(0, 0.001)", "", model_string_jags, fixed = TRUE)
+    model_string_jags <- gsub("beta_f1[1] ~ dnorm(0, 0.0000001)", "", model_string_jags, fixed = TRUE)
+    model_string_jags <- gsub("beta_f2[1] ~ dnorm(0, 0.0000001)", "", model_string_jags, fixed = TRUE)
     model_string_jags <- gsub("beta_f1[2] <- 0", "", model_string_jags, fixed = TRUE)
     model_string_jags <- gsub("beta_f2[2] <- 0", "", model_string_jags, fixed = TRUE)
     model_string_jags <- gsub("beta_f[1] <- beta_f1[1]", "", model_string_jags, fixed = TRUE)
@@ -934,8 +944,8 @@ write_hurdle <- function(dist_e , dist_c, ind, type, pe, pc, ze, zc, se, sc) eva
     } else if(is.null(sc) == TRUE) {
       model_string_jags <- gsub(" + beta_f[1] * (eff1[i] - mu_e[1])", "", model_string_jags, fixed = TRUE)
       model_string_jags <- gsub(" + beta_f[2] * (eff2[i] - mu_e[2])", "", model_string_jags, fixed = TRUE)
-      model_string_jags <- gsub("beta_f[1] ~ dnorm(0, 0.001)", "", model_string_jags, fixed = TRUE)
-      model_string_jags <- gsub("beta_f[2] ~ dnorm(0, 0.001)", "", model_string_jags, fixed = TRUE)
+      model_string_jags <- gsub("beta_f[1] ~ dnorm(0, 0.0000001)", "", model_string_jags, fixed = TRUE)
+      model_string_jags <- gsub("beta_f[2] ~ dnorm(0, 0.0000001)", "", model_string_jags, fixed = TRUE)
       model_string_jags <- gsub("#correlation", "", model_string_jags, fixed = TRUE)
       model_string_jags <- gsub("beta_f[1] <- beta_f1[1]", "", model_string_jags, fixed = TRUE)
       model_string_jags <- gsub("beta_f[2] <- beta_f2[1]", "", model_string_jags, fixed = TRUE)

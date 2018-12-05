@@ -12,12 +12,6 @@
 #'  cost outcome ('c') whose name must correspond to that used in \code{data}, and any covariates are given on the right-hand side.
 #'  If there are no covariates, specify \code{1} on the right hand side. By default, covariates are placed on the "location" 
 #'  parameter of the distribution through a linear model.
-#' @param model.me A formula expression in conventional \code{R} linear modelling syntax.  The response must be indicated with the 
-#' term 'me'(missing effects) and any covariates used to estimate the probability of missing effects are given on the right-hand side. 
-#' If there are no covariates, specify \code{1} on the right hand side. By default, covariates are placed on the "probability" parameter for the missing effects through a logistic-linear model.
-#' @param model.mc A formula expression in conventional R linear modelling syntax. The response must be indicated with the 
-#' term 'mc'(missing costs) and any covariates used to estimate the probability of missing costs should be given on the right-hand side. 
-#' If there are no covariates, specify \code{1} on the right hand side. By default, covariates are placed on the "probability" parameter for the missing costs through a logistic-linear model.
 #' @param type Type of missingness mechanism assumed. Choices are Missing At Random (MAR) and Missing Not At Random (MNAR).
 #' @param center Logical. If \code{center} is \code{TRUE} all the covariates in the model are centered.
 #' @keywords read data
@@ -52,14 +46,14 @@
 #' data <- data.frame(e ,c, t)
 #' 
 #' #run the function
-#' date_rearranged <- data_read_selection(data = data, model.eff = e ~ 1, model.cost = c ~ 1
-#' model.me = me ~ 1, model.mc = mc ~ 1, type = "MAR", center = FALSE)
+#' date_rearranged <- data_read_pattern(data = data, model.eff = e ~ 1, model.cost = c ~ 1,
+#' type = "MAR", center = FALSE)
 #' }
 #' #
 #' #
 
 
-data_read_selection <- function(data, model.eff, model.cost, model.me, model.mc, type = type, center) {
+data_read_pattern <- function(data, model.eff, model.cost, type = type, center) {
   if(any(names(data) == "e") == TRUE & any(names(data) == "c") == TRUE) {
     e <- as.name("e")
     c <- as.name("c")
@@ -134,6 +128,34 @@ data_read_selection <- function(data, model.eff, model.cost, model.me, model.mc,
   m_cost1 <- m_cost[t1_index]
   m_cost2 <- m_cost[t2_index]
   m_cost <- list(m_cost1, m_cost2) 
+  d1 <- d2 <- c()
+  d1[is.na(eff1) == FALSE & is.na(cost1) == FALSE] <- 1
+  d1[is.na(eff1) == TRUE & is.na(cost1) == FALSE] <- 2
+  d1[is.na(eff1) == FALSE & is.na(cost1) == TRUE] <- 3
+  d1[is.na(eff1) == TRUE & is.na(cost1) == TRUE] <- 4
+  d2[is.na(eff2) == FALSE & is.na(cost2) == FALSE] <- 1
+  d2[is.na(eff2) == TRUE & is.na(cost2) == FALSE] <- 2
+  d2[is.na(eff2) == FALSE & is.na(cost2) == TRUE] <- 3
+  d2[is.na(eff2) == TRUE & is.na(cost2) == TRUE] <- 4
+  n_patterns1 <- length(unique(d1))
+  n_patterns2 <- length(unique(d2))
+  d1_list <- list()
+  d1_list[[1]] <- any(d1 == 1)
+  d1_list[[2]] <- any(d1 == 2)
+  d1_list[[3]] <- any(d1 == 3)
+  d1_list[[4]] <- any(d1 == 4)
+  names(d1_list) <- c("d1_ec_obs", "d1_c_obs", "d1_e_obs", "d1_ec_mis")
+  d2_list<-list()
+  d2_list[[1]] <- any(d2 == 1)
+  d2_list[[2]] <- any(d2 == 2)
+  d2_list[[3]] <- any(d2 == 3)
+  d2_list[[4]] <- any(d2 == 4)
+  names(d2_list) <- c("d2_ec_obs", "d2_c_obs", "d2_e_obs", "d2_ec_mis")
+  d_list <- list()
+  d_list[[1]] <- c(n_patterns1, n_patterns2)
+  d_list[[2]] <- d1_list
+  d_list[[3]] <- d2_list
+  names(d_list) <- c("n_patterns", "d1", "d2")
   N1_cc <- N2_cc <- N1_mis <- N2_mis <- c() 
   N1_cc[1] <- length(na.omit(eff1)) 
   N1_cc[2] <- length(na.omit(cost1)) 
@@ -192,79 +214,15 @@ data_read_selection <- function(data, model.eff, model.cost, model.me, model.mc,
   data2$c[is.na(data2$c) == TRUE] <- -999999
   data2$me <- c(m_eff1, m_eff2)
   data2$mc <- c(m_cost1, m_cost2)
-  if(is.formula(model.me) == FALSE | is.formula(model.mc) == FALSE) {
-    stop("model.me and/or model.mc must be formula objects")
-  }
-  if(all(names(model.frame(model.me, data = data2)) %in% names(data2)) == FALSE | 
-     all(names(model.frame(model.mc, data = data2)) %in% names(data2)) == FALSE) {
-    stop("you must provide names in the formula that correspond to those in the data")
-  }
-  if(names(model.frame(model.me, data = data2)[1]) != "me") {
-    stop("you must set 'me' as the response in the formula model.me")
-  }
-  if(names(model.frame(model.mc, data = data2)[1]) != "mc") {
-    stop("you must set 'mc' as the response in the formula model.mc")
-  }
-  if("t" %in% names(model.frame(model.mc, data = data2)) | "t" %in% names(model.frame(model.me, data = data2))) {
-    stop("treatment indicator must be provided only in the data. Please remove 't' from 'model.me' and/or 'model.mc'")
-  }
-  if("c" %in% names(model.frame(model.me, data = data2)) | "e" %in% names(model.frame(model.mc, data = data2))) {
-    stop("please remove 'e' from model.mc and/or remove 'c' from model.me")
-  }
-  zf_e <- model.frame(formula = model.me, data = data2)
-  zf_c <- model.frame(formula = model.mc, data = data2)
-  z_e <- model.matrix(attr(zf_e, "terms"), data = zf_e)
-  z_c <- model.matrix(attr(zf_c, "terms"), data = zf_c)
-  z_e_hold <- z_e
-  if("e" %in% colnames(z_e_hold)) {
-    z_e <- subset(z_e_hold, select = -c(e))
-  }
-  covz1_e <- as.data.frame(z_e[t1_index, ])
-  names(covz1_e) <- colnames(z_e)
-  covz2_e <- as.data.frame(z_e[t2_index, ])
-  names(covz2_e) <- colnames(z_e)
-  covz_e <- list(covz1_e,covz2_e)
-  covze <- list(covz1_e,covz2_e) 
-  mean_covz_e <- list(apply(as.matrix(covz1_e), 2, mean), apply(as.matrix(covz2_e), 2, mean))
-  names(covz_e) <- names(mean_covz_e) <- c("Control", "Intervention")
-  z_c_hold <- z_c
-  if("c" %in% colnames(z_c_hold)) {
-    z_c <- subset(z_c_hold, select = -c(c))
-  }
-  covz1_c <- as.data.frame(z_c[t1_index, ])
-  names(covz1_c) <- colnames(z_c)
-  covz2_c <- as.data.frame(z_c[t2_index, ])
-  names(covz2_c) <- colnames(z_c)
-  covz_c <- list(covz1_c,covz2_c)
-  covzc <- list(covz1_c,covz2_c) 
-  mean_covz_c <- list(apply(as.matrix(covz1_c), 2, mean), apply(as.matrix(covz2_c), 2, mean))
-  covz1_e_center <- as.data.frame(scale(covz1_e, scale = FALSE))
-  covz2_e_center <- as.data.frame(scale(covz2_e, scale = FALSE))
-  covz1_e_center[, 1] <- rep(1, nrow(covz1_e))
-  covz2_e_center[, 1] <- rep(1, nrow(covz2_e))
-  covz_e_center <- list(covz1_e_center, covz2_e_center)
-  mean_covz_e_center <- list(apply(as.matrix(covz1_e_center), 2, mean), apply(as.matrix(covz2_e_center), 2, mean))
-  covz1_c_center <- as.data.frame(scale(covz1_c, scale = FALSE))
-  covz2_c_center <- as.data.frame(scale(covz2_c, scale = FALSE))
-  covz1_c_center[, 1] <- rep(1, nrow(covz1_c))
-  covz2_c_center[, 1] <- rep(1, nrow(covz2_c))
-  covz_c_center <- list(covz1_c_center, covz2_c_center)
-  mean_covz_c_center <- list(apply(as.matrix(covz1_c_center), 2, mean), apply(as.matrix(covz2_c_center), 2, mean))
-  if(center == TRUE) {
-    covz_e <- covz_e_center
-    covz_c <- covz_c_center
-    mean_covz_e <- mean_covz_e_center
-    mean_covz_c <- mean_covz_c_center
-  }
-  names(covz_e) <- names(mean_covz_e) <- names(covz_c) <- names(mean_covz_c) <- c("Control", "Intervention")
+  d <- list(d1, d2)
   names(cov_e) <- names(cov_c) <- names(mean_cov_e) <- names(mean_cov_c) <- c("Control", "Intervention")
   names(m_eff) <- names(m_cost) <- c("Control", "Intervention")
+  names(d) <- c("Control", "Intervention")
   names(effects) <- names(costs) <- names(eff_cc) <- names(cost_cc) <- c("Control", "Intervention")
   data_raw <- list("raw_effects" = effects, "raw_costs" = costs, "raw_effects_cc" = eff_cc, "raw_costs_cc" = cost_cc, "arm_lengths" = N, 
                    "arm_lengths_cc" = N_cc, "arm_missing_data" = N_mis, "missing_effects" = m_eff, "missing_costs" = m_cost, 
                    "covariates_effects" = cov_e, "covariates_costs" = cov_c, "mean_cov_effects" = mean_cov_e, "mean_cov_costs" = mean_cov_c, 
-                   "covariates_missing_effects" = covz_e, "mean_cov_missing_effects" = mean_covz_e, "covariates_missing_costs" = covz_c, 
-                   "mean_cov_missing_costs" = mean_covz_c, "data_ind" = data2) 
+                   "data_ind" = data2, "patterns_list" = d_list, "patterns" = d) 
   return(data_raw) 
 }
 

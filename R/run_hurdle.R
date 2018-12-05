@@ -41,22 +41,24 @@ run_hurdle <- function(type, dist_e, dist_c, inits, se = se, sc = sc, sde = sde,
   if(dist_c == "gamma" | dist_c == "lnorm") {
   if(is.null(sc) == FALSE) {
     if(sc == 0) {
-      sc = log(0.000001)
+      sc = log(0.0000001)
       if(any(which(cost1 == 0)) == TRUE) {
         index_c1_0 <- which(cost1 == 0)
-        cost1[index_c1_0] = 0.000001
+        cost1[index_c1_0] = 0.0000001
       }
       if(any(which(cost2 == 0)) == TRUE) {
         index_c2_0 <- which(cost2 == 0)
-        cost2[index_c2_0] = 0.000001
+        cost2[index_c2_0] = 0.0000001
       }
+    } else {
+      sc = log(sc)
     }
    }
   }
   if(dist_e == "beta") {
     if(is.null(se) == FALSE) {
       if(se == 1) {
-        se = qlogis(1 - 0.000001)
+        se = qlogis(1 - 0.0000001)
         if(any(which(eff1 == 1)) == TRUE) {
           index_e1_1 <- which(eff1 == 1)
           eff1[index_e1_1] = 1 - 0.0000001
@@ -66,7 +68,7 @@ run_hurdle <- function(type, dist_e, dist_c, inits, se = se, sc = sc, sde = sde,
           eff2[index_e2_1] = 1 - 0.0000001
         }
       } else if(se == 0){
-        se = qlogis(0 + 0.000001)
+        se = qlogis(0 + 0.0000001)
         if(any(which(eff1 == 0)) == TRUE) {
           index_e1_0 <- which(eff1 == 0)
           eff1[index_e1_0] = 0 + 0.0000001
@@ -75,6 +77,8 @@ run_hurdle <- function(type, dist_e, dist_c, inits, se = se, sc = sc, sde = sde,
           index_e2_0 <- which(eff2 == 0)
           eff2[index_e2_0] = 0 + 0.0000001
         }
+      } else {
+        se = qlogis(se)
       }
     }
   }

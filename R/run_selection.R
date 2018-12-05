@@ -7,7 +7,7 @@
 #' @param dist_c Distribution assumed for the costs. Current available chocies are: Normal ('norm'), Gamma ('gamma') or LogNormal ('lnorm')
 #' @param inits a list with elements equal to the number of chains selected; each element of the list is itself a list of starting values for the BUGS model, 
 #' or a function creating (possibly random) initial values. If inits is NULL, JAGS will generate initial values for parameters
-#' @keywords JAGS Bayesian hurdle models 
+#' @keywords JAGS Bayesian selection models 
 #' @examples
 #' #Internal function only
 #' #No examples
