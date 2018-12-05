@@ -8,6 +8,5 @@ Depends: R (>= 3.3.0)
 License: GPL (>=3)
 Encoding: UTF-8
 LazyData: true
-Imports: mcmcplots,mcmcr,ggmcmc,ggthemes,BCEA,ggplot2,grid,
-         gridExtra,methods,R2jags,loo,coda
+Imports: mcmcplots,mcmcr,ggmcmc,ggthemes,BCEA,ggplot2,grid,gridExtra,methods,R2jags,loo,coda
 RoxygenNote: 6.1.0
