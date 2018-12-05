@@ -7,7 +7,8 @@
 diagnostic(x, type = "histogram", param = "all", theme = NULL, ...)
 }
 \arguments{
-\item{x}{An object of class "missingHE" containing the posterior results of a full Bayesian model implemented usgin the function \code{\link{selection}} or \code{\link{hurdle}}}
+\item{x}{An object of class "missingHE" containing the posterior results of a full Bayesian model implemented usgin the function \code{\link{selection}}, 
+\code{\link{pattern}} or \code{\link{hurdle}}}
 
 \item{type}{type of diagnostic check to be plotted for each model parameter. Available choices include: 'histogram' for histrogram plots,
 'denplot' for density plots, 'traceplot' for trace plots, 'acf' for autocorrelation plots, 'running' for running mean plots,
@@ -29,7 +30,7 @@ A \strong{ggplot} object containing the plots specified in the argument \code{ty
 }
 \description{
 Convergence issues need to be assessed every time a probabilistic model is implemented via Markov Chain Monte Carlo methods.
-The focus is restricted to full Bayesian models in cost-effectiveness analyses based on the function \code{\link{selection}} and \code{\link{hurdle}}, 
+The focus is restricted to full Bayesian models in cost-effectiveness analyses based on the function \code{\link{selection}}, \code{\link{pattern}} and \code{\link{hurdle}}, 
 with convergence of the chains that is assessed through Visual checks of the posterior distribution of the parameters of interest,
 Examples are density plots, trace plots, autocrrelation plots, etc. Other types of posterior checks are related to some summary MCMC statistics 
 that are able to detect possible issues in the convergence of the algorithm, such as the potential scale reduction factor or the effective sample size.
@@ -46,27 +47,38 @@ must be specified in the argument \code{param}. The available names and the para
 \itemize{
 \item "mu.e" the mean parameters of the effect variables in the two treatment arms.
 \item "mu.c" the mean parameters of the cost variables in the two treatment arms.
+\item "mu.e.p" the pattern-specific mean parameters of the effect variables in the two treatment arms (only with the function \code{pattern}).
+\item "mu.c.p" the pattern-specific mean parameters of the cost variables in the two treatment arms (only with the function \code{pattern}).
 \item "sd.e" the standard deviation parameters of the effect variables in the two treatment arms.
 \item "sd.c" the standard deviation parameters of the cost variables in the two treatment arms.
 \item "alpha" the regression intercept and covariate coefficient parameters for the effect variables in the two treatment arms.
 \item "beta" the regression intercept and covariate coefficient parameters for the cost variables in the two treatment arms.
-\item "p.e" the probability parameters of the missingness or structural values mechanism for the effect variables in the two treatment arms.
-\item "p.c" the probability parameters of the missingness or structural values mechanism for the cost variables in the two treatment arms.
-\item "gamma.e" the regression intercept and covariate coefficient parameters of the missingness or structural values mechanism for the effect variables in the two treatment arms.
-\item "gamma.c" the regression intercept and covariate coefficient parameters of the missingness or structural values mechanism for the cost variables in the two treatment arms.
-\item "delta.e" the mnar parameters of the missingness mechanism for the effect variables in the two treatment arms (only if the function \code{selection} is used).
-\item "delta.c" the mnar parameters of the missingness mechanism for the cost variables in the two treatment arms (only if the function \code{selection} is used).
+\item "p.e" the probability parameters of the missingness or structural values mechanism for the effect variables in the two treatment arms 
+(only with the function \code{selection} or \code{hurdle}).
+\item "p.c" the probability parameters of the missingness or structural values mechanism for the cost variables in the two treatment arms 
+(only with the function \code{selection} or \code{hurdle}).
+\item "gamma.e" the regression intercept and covariate coefficient parameters of the missingness or structural values mechanism
+ for the effect variables in the two treatment arms (only with the function \code{selection} or \code{hurdle}).
+\item "gamma.c" the regression intercept and covariate coefficient parameters of the missingness or structural values mechanism 
+ for the cost variables in the two treatment arms (only with the function \code{selection} or \code{hurdle}).
+\item "pattern" the probabilities associated with the missingness patterns in the data (only with the function \code{pattern}).
+\item "delta.e" the mnar parameters of the missingness mechanism for the effect variables in the two treatment arms 
+(only with the function \code{selection} or \code{pattern}).
+\item "delta.c" the mnar parameters of the missingness mechanism for the cost variables in the two treatment arms 
+(only with the function \code{selection} or \code{pattern}).
 \item "all" all available parameters stored in the object \code{x}.
 }
-The parameters associated with a missingness or structural values model can be accessed only when \code{x} is created using the function \code{selection}
-or \code{hurdle}, respectively.
+When the object \code{x} is created using the function \code{pattern}, pattern-specific standard deviation ("sd.e", "sd.c") and regression coefficient 
+parameters ("alpha", "beta") for both outcomes are visualised. The parameters associated with a missingness mechanism can be accessed only when \code{x}
+is created using the function \code{selection} or \code{pattern}, while the parameters associated with the model for the structural values mechanism
+can be accessed only when \code{x} is created using the function \code{hurdle}.
 
 The argument \code{theme} allows to customise the graphical output of the plots generated by \code{diagnostic} and
 allows to choose among a set of possible pre-defined themes taken form the package \strong{ggtheme}. Those available can
 be indicated using the following character names: "base","calc","economist","excel","few","538","gdocs","hc","par","pander","solarized","stata","tufte","wsj".
 }
 \examples{
-#For examples see the function selection or hurdle
+#For examples see the function selection, pattern or hurdle
 #
 #
 }
@@ -76,7 +88,7 @@ Gelman, A. Carlin, JB., Stern, HS. Rubin, DB.(2003). \emph{Bayesian Data Analysi
 Brooks, S. Gelman, A. Jones, JL. Meng, XL. (2011). \emph{Handbook of Markov Chain Monte Carlo}, CRC/Chapman and Hall.
 }
 \seealso{
-\code{\link[ggmcmc]{ggs}} \code{\link{selection}}  \code{\link{hurdle}}
+\code{\link[ggmcmc]{ggs}} \code{\link{selection}} \code{\link{selection}} \code{\link{hurdle}}
 }
 \author{
 Andrea Gabrio

@@ -5,7 +5,7 @@
 \title{A function to read and re-arrange the data in different ways for the hurdle model}
 \usage{
 data_read_hurdle(data, model.eff, model.cost, model.se, model.sc, se, sc,
-  type = type)
+  type = type, center)
 }
 \arguments{
 \item{data}{A data frame in which to find variables supplied in \code{model.eff}, \code{model.cost} (model formulas for effects and costs) 
@@ -39,6 +39,8 @@ no structural value is chosen and a standard model for the effects is run.}
 no structural value is chosen and a standard model for the costs is run.}
 
 \item{type}{Type of structural value mechanism assumed, either 'SCAR' (Structural Completely At Random) or 'SAR' (Strcutural At Random).}
+
+\item{center}{Logical. If \code{center} is \code{TRUE} all the covariates in the model are centered.}
 }
 \description{
 This internal function imports the data and outputs only those variables that are needed to run the hurdle model
@@ -73,7 +75,7 @@ data <- data.frame(e, c, t)
 
 #run the function
 date_rearranged <- data_read_hurdle(data = data,model.eff = e ~ 1, model.cost = c ~ 1,
-model.se = e ~ 1, model.sc = c ~ 1, se = 1, sc = 0, type = "SCAR")
+model.se = e ~ 1, model.sc = c ~ 1, se = 1, sc = 0, type = "SCAR", center = FALSE)
 }
 #
 #

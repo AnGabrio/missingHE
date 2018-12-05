@@ -2,7 +2,7 @@
 % Please edit documentation in R/pic.R
 \name{pic}
 \alias{pic}
-\title{Predictive information criteria for Bayesian models fitted in \code{JAGS} using the funciton \code{\link{selection}} or \code{\link{hurdle}}}
+\title{Predictive information criteria for Bayesian models fitted in \code{JAGS} using the funciton \code{\link{selection}}, \code{\link{pattern}} or \code{\link{hurdle}}}
 \usage{
 pic(x, criterion = "dic", module = "total")
 }
@@ -53,7 +53,7 @@ In finite cases, WAIC and LOO give similar esitmates, but for influential observ
 }
 \examples{
  
-#For examples see the function selection or hurdle 
+#For examples see the function selection, pattern or hurdle 
 # 
 # 
 }

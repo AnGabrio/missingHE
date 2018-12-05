@@ -31,12 +31,12 @@ A \code{ggplot} object containing the plots specified in the argument \code{clas
 }
 \description{
 Produces a plot of the observed and imputed values (with credible intervals) for the effect and cost outcomes from a
-probabilistic Cost-Effectiveness Analysis model with two treatment arms, run using the function \code{\link{selection}} or \code{\link{hurdle}}.
+probabilistic Cost-Effectiveness Analysis model with two treatment arms, run using the function \code{\link{selection}}, \code{\link{pattern}} or \code{\link{hurdle}}.
 The Graphics layout is obtained from the functions contained in the package \strong{ggplot2} and \strong{ggthemes}.
 }
 \details{
 The funciton produces a plot of the observed and imputed effect and cost data in a two-arm based 
-Cost-Effectiveness Analysis model run with the function \code{\link{selection}} or \code{\link{hurdle}}. The purpose of this graph
+Cost-Effectiveness Analysis model run with the function \code{\link{selection}}, \code{\link{pattern}} or \code{\link{hurdle}}. The purpose of this graph
 is to visually compare the outcome values for the fully-observed individuals with those imputed by the model for the missing individuals.
 According to the missingness or structural values mechanism assumed, it is possible to compare observed and imputed values.
 For the scatter plot, imputed values are also associated with the credible intervals specified in the argument \code{prob}.
@@ -45,7 +45,7 @@ allows to choose among a set of possible pre-defined themes taken form the packa
 be indicated using the following character names: "base","calc","economist","excel","few","538","gdocs","hc","par","pander","solarized","stata","tufte","wsj".
 }
 \examples{
-#For examples see the function selection or hurdle
+#For examples see the function selection, pattern or hurdle
 #
 #
 }
@@ -55,7 +55,7 @@ Daniels, MJ. Hogan, JW. \emph{Missing Data in Longitudinal Studies: strategies f
 Molenberghs, G. Fitzmaurice, G. Kenward, MG. Tsiatis, A. Verbeke, G. \emph{Handbook of Missing Data Methodology}, CRC/Chapman Hall.
 }
 \seealso{
-\code{\link{selection}} \code{\link{hurdle}} \code{\link{diagnostic}}
+\code{\link{selection}} \code{\link{pattern}} \code{\link{hurdle}} \code{\link{diagnostic}}
 }
 \author{
 Andrea Gabrio

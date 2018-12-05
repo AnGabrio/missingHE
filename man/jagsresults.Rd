@@ -4,8 +4,8 @@
 \alias{jagsresults}
 \title{An internal function to summarise results from BUGS model}
 \usage{
-jagsresults(x, params, regex = FALSE, invert = FALSE, probs = c(0.025,
-  0.25, 0.5, 0.75, 0.975), signif, ...)
+jagsresults(x, params, regex = FALSE, invert = FALSE,
+  probs = c(0.025, 0.25, 0.5, 0.75, 0.975), signif, ...)
 }
 \arguments{
 \item{x}{The \code{rjags}, \code{rjags.parallel}, or \code{mcmc.list} object

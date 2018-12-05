@@ -2,12 +2,12 @@
 % Please edit documentation in R/print.missingHE.R
 \name{print.missingHE}
 \alias{print.missingHE}
-\title{Print a summary of the \code{JAGS} model fitted by \code{\link{selection}} or \code{\link{hurdle}}}
+\title{Print a summary of the \code{JAGS} model fitted by \code{\link{selection}}, \code{\link{pattern}} or \code{\link{hurdle}}}
 \usage{
 \method{print}{missingHE}(x, value.mis = FALSE, ...)
 }
 \arguments{
-\item{x}{A \code{missingHE} object containing the results of the Bayesian model run using the function \code{\link{selection}} or \code{\link{hurdle}}.}
+\item{x}{A \code{missingHE} object containing the results of the Bayesian model run using the function \code{\link{selection}}, \code{\link{pattern}} or \code{\link{hurdle}}.}
 
 \item{value.mis}{Logical. If \code{value.mis} is \code{TRUE}, the model results displayed contain also the imputed values,
 else if \code{value.mis} is \code{FALSE} the missing values are hidden.}
@@ -20,7 +20,7 @@ Prints the summary table for the model fitted, with the estimate of the paramete
 }
 \examples{
  
-#For examples see the function selection or hurdle 
+#For examples see the function selection, pattern or hurdle 
 # 
 # 
 }
