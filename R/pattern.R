@@ -101,12 +101,13 @@
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #'#Simple example to simulate and analyse a data set
 #'#Define the number of individuals fer treatment arm
 #'N1 <- 150
 #'N2 <- 100
 #'
-#'#Create the misisngness indicators totally random (MCAR mechanism)
+#'#Create the missingness indicators totally random (MCAR mechanism)
 #'m_eff1 <- m_cost1 <- rbinom(N1,1,0.25)
 #'m_eff2 <- m_cost2 <- rbinom(N2,1,0.25)
 #'
@@ -159,7 +160,7 @@
 #'#
 #'#Summarise the CEA information from model results
 #'summary(x)
-#'
+#' }
 #'#
 #'#
 

@@ -97,7 +97,7 @@
 #' \itemize{
 #' \item location parameters \eqn{\alpha_0, \beta_0}: "mean.prior.e"(effects) and/or "mean.prior.c"(costs)
 #' \item auxiliary parameters \eqn{\sigma}: "sigma.prior.e"(effects) and/or "sigma.prior.c"(costs)
-#' \item covariate parameters \eqn{\apha_j, \beta_j}: "alpha.prior"(effects) and/or "beta.prior"(costs)
+#' \item covariate parameters \eqn{\alpha_j, \beta_j}: "alpha.prior"(effects) and/or "beta.prior"(costs)
 #' \item marginal probability of structural values \eqn{\gamma_0}: "p.prior.e"(effects) and/or "p.prior.c"(costs)
 #' \item covariate parameters in the model of the structural values \eqn{\gamma_j} (if covariate data provided): "gamma.prior.e"(effects) and/or "gamma.prior.c"(costs)
 #' } 
@@ -119,6 +119,7 @@
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #'#Simple example to simulate and analyse a data set
 #'#Define the number of individuals fer treatment arm
 #'N1 <- 150
@@ -183,6 +184,7 @@
 #'
 #'#Summarise the CEA information from model results
 #'summary(x)
+#' }
 #'#
 #'#
 
