@@ -1,6 +1,6 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
-missingHE  [![Travis-CI Build Status] (https://travis-ci.org/AnGabrio/missingHE.svg?branch=master)] (https://travis-ci.org/AnGabrio/missingHE)
+missingHE[![Travis-CI Build Status] (https://travis-ci.org/AnGabrio/missingHE.svg?branch=master)] (https://travis-ci.org/AnGabrio/missingHE)
 ===========================================================================================================================================
 
 Missing outcome data in health economic evaluation
