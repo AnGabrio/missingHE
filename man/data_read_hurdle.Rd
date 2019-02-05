@@ -47,36 +47,8 @@ This internal function imports the data and outputs only those variables that ar
 according to the information provided by the user.
 }
 \examples{
-\dontrun{
-#create a data set which respects the requirements specified in "data" (see Arguments)
-N1 <- 150
-N2 <- 100
-eff1 <- rnorm(N1, 0.5, 0.5)
-eff2 <- rnorm(N2, 0.5, 0.5)
-cost1 <- rnorm(N1, 90, 20)
-cost2 <- rnorm(N2, 90, 20)
-
-#introduce structural values
-#ones for the effects
-se = 1
-eff1[1:10] <- 1
-eff2[1:10] <- 1
-
-#zeros for the costs
-sc = 0
-cost1[1:10] <- 0
-cost2[1:10] <- 0
-
-#arrange data frame
-e <- c(eff1, eff2)
-c <- c(cost1, cost2)
-t <- c(t1, t2)
-data <- data.frame(e, c, t)
-
-#run the function
-date_rearranged <- data_read_hurdle(data = data,model.eff = e ~ 1, model.cost = c ~ 1,
-model.se = e ~ 1, model.sc = c ~ 1, se = 1, sc = 0, type = "SCAR", center = FALSE)
-}
+#Internal function only
+#no examples
 #
 #
 }

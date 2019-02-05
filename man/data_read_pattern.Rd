@@ -29,37 +29,8 @@ This internal function imports the data and outputs only those variables that ar
 according to the information provided by the user.
 }
 \examples{
-\dontrun{
-#create a data set which respects the requirements specified in "data" (see Arguments)
-N1 <- 150
-N2 <- 100
-m_eff1 <- m_cost1 <- rbinom(N1, 1, 0.25)
-m_eff2 <- m_cost2 <- rbinom(N2, 1, 0.25)
-m_cost1 <- m_cost1 <- rbinom(N1, 1, 0.25)
-m_cost2 <- m_cost2 <- rbinom(N2, 1, 0.25)
-eff1 <- rnorm(N1, 0.5, 0.5)
-eff2 <- rnorm(N2, 0.5, 0.5)
-cost1 <- rnorm(N1, 90, 20)
-cost2 <- rnorm(N2, 90, 20)
-
-#introduce missingness
-eff1[m_eff1 == 1] <- NA
-eff2[m_eff2 == 1] <- NA
-cost1[m_cost1 == 1] <- NA
-cost2[m_cost2 == 1] <- NA
-
-#arrange data frame
-e <- c(eff1, eff2)
-c <- c(cost1, cost2)
-m_eff <- c(m_eff1, m_eff2)
-m_cost <- c(m_cost1, m_cost2)
-t <- c(t1, t2)
-data <- data.frame(e ,c, t)
-
-#run the function
-date_rearranged <- data_read_pattern(data = data, model.eff = e ~ 1, model.cost = c ~ 1,
-type = "MAR", center = FALSE)
-}
+#Internal function only
+#no examples
 #
 #
 }
