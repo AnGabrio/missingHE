@@ -17,7 +17,7 @@ and by summing up the cost components at each time point.
 }
 \details{
 \describe{
-  \item{id}{id number}
+  \item{e}{id}{id number}
   \item{u.0}{baseline utilities}
   \item{u.1}{utilities at 3-months follow-up}
   \item{u.2}{utilities at 6-months follow-up}
