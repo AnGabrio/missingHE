@@ -182,6 +182,7 @@ pattern <- function(data, model.eff, model.cost, dist_e, dist_c, Delta_e, Delta_
     stop("Effectiveness and cost data must be numeric")
   }
   cov_matrix <- subset(data, select = -c(e, c))
+  cov_matrix <- cov_matrix[!unlist(vapply(cov_matrix, anyNA, logical(1)))]
   if(any(is.na(cov_matrix)) == TRUE) {
     stop("no missing covariate or treatment indicator is allowed")
   }

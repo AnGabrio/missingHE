@@ -189,9 +189,7 @@ selection <- function(data, model.eff, model.cost, model.me = me ~ 1, model.mc =
     stop("Effectiveness and cost data must be numeric")
   }
   cov_matrix <- subset(data, select = -c(e, c))
-  if(any(is.na(cov_matrix)) == TRUE) {
-    stop("no missing covariate or treatment indicator is allowed")
-  }
+  cov_matrix <- cov_matrix[!unlist(vapply(cov_matrix, anyNA, logical(1)))]
   if(!all(levels(as.factor(cov_matrix$t)) %in% c("1", "2")) == TRUE) {
     stop("A two arm indicator variable must be provided with '1' for the control and '2' for the other intervention")
   }

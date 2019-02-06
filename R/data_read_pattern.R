@@ -25,35 +25,40 @@
 
 
 data_read_pattern <- function(data, model.eff, model.cost, type = type, center) {
+  if(is.data.frame(data) == FALSE) {
+    stop("object data must be provided as data frame")
+  }
   if(any(names(data) == "e") == TRUE & any(names(data) == "c") == TRUE) {
     e <- as.name("e")
     c <- as.name("c")
   }
   cov_matrix <- subset(data, select = -c(e, c))
-  if(any(is.na(cov_matrix)) == TRUE) {
-    stop("no missing covariate or treatment indicator is allowed")
-  }
+  cov_matrix <- cov_matrix[!unlist(vapply(cov_matrix, anyNA, logical(1)))]
   is.formula<-function (x) { inherits(x, "formula") }
   if(is.formula(model.eff) == FALSE | is.formula(model.cost) == FALSE) {
     stop("model.eff and/or model.cost must be formula objects")
   }
-  if(all(names(model.frame(model.eff)) %in% names(data)) == FALSE | 
-     all(names(model.frame(model.cost)) %in% names(data)) == FALSE) {
+  if(all(names(model.frame(model.eff, data = data)) %in% c("e", names(cov_matrix))) == FALSE | 
+     all(names(model.frame(model.cost, data = data)) %in% c("c", names(cov_matrix))) == FALSE) {
+    stop("partially-observed covariates cannot be included in the model")
+  }
+  if(all(names(model.frame(model.eff, data = data)) %in% names(data)) == FALSE | 
+     all(names(model.frame(model.cost, data = data)) %in% names(data)) == FALSE) {
     stop("you must provide names in the formula that correspond to those in the data")
   }
   if("e" %in% labels(terms(model.eff)) | "c" %in% labels(terms(model.cost))) {
     stop("please remove 'e' from the right hand side of model.eff and/or 'c' from the right hand side of model.cost")
   }
-  if(names(model.frame(model.eff)[1]) != "e") {
+  if(names(model.frame(model.eff, data = data)[1]) != "e") {
     stop("you must set 'e' as the response in the formula model.eff")
   }
-  if("c" %in% names(model.frame(model.eff))) {
+  if("c" %in% names(model.frame(model.eff, data = data))) {
     stop("dependence allowed only through the cost model; please remove 'c' from model.eff")
   }
-  if(names(model.frame(model.cost)[1]) != "c") {
+  if(names(model.frame(model.cost, data = data)[1]) != "c") {
     stop("you must set 'c' as the response in the formula model.cost")
   }
-  if("t" %in% names(model.frame(model.cost)) | "t" %in% names(model.frame(model.eff))) {
+  if("t" %in% names(model.frame(model.cost, data = data)) | "t" %in% names(model.frame(model.eff, data = data))) {
     stop("treatment indicator must be provided only in the data. Please remove 't' from 'model.eff' and/or 'model.cost'")
   }
   if(is.logical(center) == FALSE) { stop("center must be either TRUE or FALSE") }
