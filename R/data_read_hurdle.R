@@ -51,7 +51,7 @@ data_read_hurdle <- function(data, model.eff, model.cost, model.se, model.sc, se
     stop("model.eff and/or model.cost must be formula objects")
   }
   if(all(names(model.frame(model.eff, data = data)) %in% c("e", names(cov_matrix))) == FALSE | 
-     all(names(model.frame(model.cost, data = data)) %in% c("c", names(cov_matrix))) == FALSE) {
+     all(names(model.frame(model.cost, data = data)) %in% c("c","e", names(cov_matrix))) == FALSE) {
     stop("partially-observed covariates cannot be included in the model")
   }
   if(all(names(model.frame(model.eff, data = data)) %in% names(data)) == FALSE | 
