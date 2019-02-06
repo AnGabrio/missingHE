@@ -34,7 +34,7 @@ and by summing up the cost components at each time point.
 }
 }
 \examples{
-data(MenSS)
+MenSS <- data(MenSS)
 summary(MenSS)
 str(MenSS)
 }
