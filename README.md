@@ -5,7 +5,7 @@ missingHE [![Travis-CI Build Status](https://travis-ci.org/AnGabrio/missingHE.sv
 Missing Outcome Data in Health Economic Evaluation
 --------------------------------------------------
 
-Contains a suite of functions to perform economic evaluations with missing outcome (either costs, effects or both) under a range of alternative assumptions about the missing data mechanisms. Estimation of the key parameters of interest and imputation of the missing data are carried out through Markov Chain Monte Carlo (MCMC) methods and a set of pre-defined Bayesian parametric models written in the BUGS language using the software [JAGS](http://mcmc-jags.sourceforge.net/), which is called via the R package [R2jags](https://cran.r-project.org/package=R2jags). In addition, missingHE provides a set of specialised functions to assess model convergence, fit to the data, plotting of observed and imputed data, and compute different measures to summarise the cost-effectvieness results.
+Contains a suite of functions to handle missing individual-level effectiveness and cost outcomes (e.g. from a trial) in economic evaluations under a range of alternative assumptions about the missing data mechanisms. Estimation of the key parameters of interest and imputation of the missing data are carried out through Markov Chain Monte Carlo (MCMC) methods and a set of pre-defined Bayesian parametric models. In addition, missingHE provides a set of specialised functions to assess model convergence, fit to the data, plotting of observed and imputed data, and compute different measures to summarise the cost-effectvieness results.
 
 Installation
 ------------
@@ -23,3 +23,5 @@ before installing the package using `devtools`:
 ``` r
 devtools::install_github("AnGabrio/missingHE")
 ```
+All models implemented in `missingHE` are written in the BUGS language using the software [JAGS](http://mcmc-jags.sourceforge.net/), which needs to be installed from its own repository and instuctions for installations under different OS can be found online. Once installed, the software is called in `missingHE` via the R package [R2jags](https://cran.r-project.org/package=R2jags).
+Note that the `missingHE` package is currently under active developement and therefore it is advisable to reinstall the package directly from GitHub before each use to ensure that you are using the most updated version.
