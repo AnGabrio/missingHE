@@ -79,8 +79,8 @@ diagnostic <- function(x, type = "histogram", param = "all", theme = NULL, ...) 
   if(class(x) != "missingHE") {
     stop("Only objects of class 'missingHE' can be used")
   }
-  if(!isTRUE(requireNamespace("ggmcmc")) | !isTRUE(requireNamespace("mcmcplots")) | !isTRUE(requireNamespace("mcmcr")) | !isTRUE(requireNamespace("coda")) | !isTRUE(requireNamespace("ggthemes"))) {
-    stop("You need to install the R packages 'ggmcmc', 'mcmcplots', 'mcmcr' and 'coda'. Please run in your R terminal:\n install.packages('ggmcmc', 'mcmcplots', 'mcmcr', 'coda', 'ggthemes')")
+  if(!isTRUE(requireNamespace("ggmcmc")) | !isTRUE(requireNamespace("mcmcplots")) | !isTRUE(requireNamespace("coda")) | !isTRUE(requireNamespace("ggthemes"))) {
+    stop("You need to install the R packages 'ggmcmc', 'mcmcplots' and 'coda'. Please run in your R terminal:\n install.packages('ggmcmc', 'mcmcplots', 'coda', 'ggthemes')")
   }
   if(length(theme) != 0) {
     theme_names = c("base", "calc", "economist", "excel", "few", "538", "gdocs", "hc", "par", "pander", "solarized", "stata", "tufte", "wsj")
