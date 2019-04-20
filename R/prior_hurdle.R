@@ -7,10 +7,10 @@
 #' @param type Type of structural value mechanism assumed. Choices are Structural Completely At Random (SCAR),
 #' and Structural At Random (SAR). For a complete list of all available hyper parameters 
 #' and types of models see the manual.
-#' @param dist_e distribution assumed for the effects. Current available chocies are: Normal ('norm') or Beta ('beta').
-#' @param dist_c distribution assumed for the costs. Current available chocies are: Normal ('norm'), Gamma ('gamma') or LogNormal ('lnorm')
+#' @param dist_e distribution assumed for the effects. Current available choices are: Normal ('norm') or Beta ('beta').
+#' @param dist_c distribution assumed for the costs. Current available choices are: Normal ('norm'), Gamma ('gamma') or LogNormal ('lnorm')
 #' @param pe Number of covariates for the effectiveness model
-#' @param pc Number of cvoariates for the cost model
+#' @param pc Number of covariates for the cost model
 #' @param ze Number of covariates or the structural indicators model for the effectiveness
 #' @param zc Number of covariates or the structural indicators model for the costs
 #' @param se Structural value for the effectiveness 

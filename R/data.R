@@ -1,6 +1,6 @@
 #' MenSS economic data on STIs
 #'
-#' Data from a pilot RCT trial (The MenSS trial) on youn men at risk of Sexually Trasmitted Infections (STIs).
+#' Data from a pilot RCT trial (The MenSS trial) on young men at risk of Sexually Transmitted Infections (STIs).
 #' A total of 159 individuals were enrolled in trial: 75 in the control (t=1) and 84 in the active intervention (t=2).
 #' Health related quality of life and cost data were collected via self-reported questionnaires at four time points throughout the study: at baseline,
 #' 3 months, 6 months and 12 months follow-up. QALYs and total costs were then computed by combining the utility scores using the area under the curve method

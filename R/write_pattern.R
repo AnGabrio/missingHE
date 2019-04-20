@@ -5,13 +5,13 @@
 
 #' This function selects which type of model to execute.
 #' @keywords JAGS Pattern mixture models
-#' @param dist_e Distribution assumed for the effects. Current available chocies are: Normal ('norm') or Beta ('beta')
-#' @param dist_c Distribution assumed for the costs. Current available chocies are: Normal ('norm'), Gamma ('gamma') or LogNormal ('lnorm')
+#' @param dist_e Distribution assumed for the effects. Current available choices are: Normal ('norm') or Beta ('beta')
+#' @param dist_c Distribution assumed for the costs. Current available choices are: Normal ('norm'), Gamma ('gamma') or LogNormal ('lnorm')
 #' @param ind Logical; if TRUE independence between effectiveness and costs is assumed, else correlation is accounted for
 #' @param type Type of missingness mechanism assumed. Choices are Missing At Random (MAR), Missing Not At Random for the effects (MNAR_eff),
 #' Missing Not At Random for the costs (MNAR_cost), and Missing Not At Random for both (MNAR)
 #' @param pe Number of covariates for the effectiveness model
-#' @param pc Number of cvoariates for the cost model
+#' @param pc Number of covariates for the cost model
 #' @param d_list Number and type of patterns 
 #' @param d1 Pattern indicator in the control 
 #' @param d2 Pattern indicator in the intervention

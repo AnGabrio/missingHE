@@ -10,15 +10,15 @@ run_selection(type, dist_e, dist_c, inits)
 \item{type}{Type of missingness mechanism assumed. Choices are Missing At Random (MAR), Missing Not At Random for the effects (MNAR_eff),
 Missing Not At Random for the costs (MNAR_cost), and Missing Not At Random for both (MNAR)}
 
-\item{dist_e}{distribution assumed for the effects. Current available chocies are: Normal ('norm') or Beta ('beta').}
+\item{dist_e}{distribution assumed for the effects. Current available choices are: Normal ('norm') or Beta ('beta').}
 
-\item{dist_c}{Distribution assumed for the costs. Current available chocies are: Normal ('norm'), Gamma ('gamma') or LogNormal ('lnorm')}
+\item{dist_c}{Distribution assumed for the costs. Current available choices are: Normal ('norm'), Gamma ('gamma') or LogNormal ('lnorm')}
 
 \item{inits}{a list with elements equal to the number of chains selected; each element of the list is itself a list of starting values for the BUGS model, 
 or a function creating (possibly random) initial values. If inits is NULL, JAGS will generate initial values for parameters}
 }
 \description{
-This function fits a JAGS using the \code{\link[R2jags]{jags}} funciton and obtain posterior inferences.
+This function fits a JAGS using the \code{\link[R2jags]{jags}} function and obtain posterior inferences.
 }
 \examples{
 #Internal function only

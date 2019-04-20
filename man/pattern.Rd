@@ -10,23 +10,23 @@ pattern(data, model.eff, model.cost, dist_e, dist_c, Delta_e, Delta_c,
   save_model = FALSE, prior = "default", ...)
 }
 \arguments{
-\item{data}{A data frame in which to find variables supplied in \code{model.eff}, \code{model.cost} (model formulas for effects and costs).
-Among these, effectiveness, cost and treatment indicator (only two arms) variables must always be provided and named 'e', 'c' and 't' respectively.}
+\item{data}{A data frame in which to find the variables supplied in \code{model.eff}, \code{model.cost} (model formulas for effects and costs).
+Among these, effectiveness, cost and treatment indicator (only two arms) variables must always be provided and named 'e', 'c' and 't', respectively.}
 
-\item{model.eff}{A formula expression in conventional \code{R} linear modelling syntax. The response must be a health economics
-effectiveness outcome ('e') whose name must correspond to that used in \code{data}, and 
-any covariates are given on the right-hand side. If there are no covariates, specify \code{1} on the right hand side.
+\item{model.eff}{A formula expression in conventional \code{R} linear modelling syntax. The response must be a health economic
+effectiveness outcome ('e') whose name must correspond to that used in \code{data}. Any covariates in the model must be provided on the right-hand side of the formula.
+If there are no covariates, \code{1} should be specified on the right hand side of the formula.
 By default, covariates are placed on the "location" parameter of the distribution through a linear model.}
 
-\item{model.cost}{A formula expression in conventional \code{R} linear modelling syntax. The response must be a health economics
-cost outcome ('c') whose name must correspond to that used in \code{data}, and any covariates are given on the right-hand side.
-If there are no covariates, specify \code{1} on the right hand side. By default, covariates are placed on the "location" 
-parameter of the distribution through a linear model. A joint bivariate distribution for effects and costs can be specified by
-including 'e' in the model for the costs.}
+\item{model.cost}{A formula expression in conventional \code{R} linear modelling syntax. The response must be a health economic
+cost outcome ('c') whose name must correspond to that used in \code{data}. Any covariates in the model must be provided on the right-hand side of the formula.
+If there are no covariates, \code{1} should be specified on the right hand side of the formula. 
+By default, covariates are placed on the "location" parameter of the distribution through a linear model. A joint bivariate distribution for effects and costs can be specified by
+including 'e' on the right-hand side of the formula for the costs model.}
 
-\item{dist_e}{distribution assumed for the effects. Current available chocies are: Normal ('norm') or Beta ('beta').}
+\item{dist_e}{Distribution assumed for the effects. Current available choices are: Normal ('norm') or Beta ('beta').}
 
-\item{dist_c}{Distribution assumed for the costs. Current available chocies are: Normal ('norm'), Gamma ('gamma') or LogNormal ('lnorm').}
+\item{dist_c}{Distribution assumed for the costs. Current available choices are: Normal ('norm'), Gamma ('gamma') or LogNormal ('lnorm').}
 
 \item{Delta_e}{Range of values for the prior on the sensitivity parameters used to identify the mean of the effects under MNAR. The value must be set to 0 under MAR.}
 
@@ -54,11 +54,11 @@ in the current working directory.}
 
 \item{prior}{A list containing the hyperprior values provided by the user. Each element of this list must be a vector of length two
 containing the user-provided hyperprior values and must be named with the name of the corresponding parameter. For example, the hyperprior
-values for the mean effect parameter can be provided using \code{prior = list('mu.prior.e' = c(0, 1))}.
+values for the standard deviation effect parameters can be provided using the list \code{prior = list('sigma.prior.e' = c(0, 100))}.
 For more information about how to provide prior hypervalues for different types of parameters and models see details. 
 If \code{prior} is set to 'default', the default values will be used.}
 
-\item{...}{additional input parameters provided by the user. Examples are \code{center = TRUE} to center all the covariates in the model 
+\item{...}{Additional arguments that can be provided by the user. Examples are \code{center = TRUE} to center all the covariates in the model 
 or the additional arguments that can be provided to the function \code{\link[BCEA]{bcea}} to summarise the health economic evaluation results.}
 }
 \value{
@@ -74,25 +74,25 @@ An object of the class 'missingHE' containing the following elements
 }
 }
 \description{
-Full Bayesian cost-effectiveness models to handle missing data in the outcomes under different missing data 
-mechanism assumptions, using a variatey of alternative parametric distributions for the effect and cost variables and 
-using a pattern mixture approach to identify the model. The analysis is performed using the \code{BUGS} language, 
-which is implemented in \code{JAGS} using the functions \code{\link[R2jags]{jags}} The output is stored in an object of class 'missingHE'.
+Full Bayesian cost-effectiveness models to handle missing data in the outcomes under different missingness 
+mechanism assumptions, using alternative parametric distributions for the effect and cost variables and a pattern mixture approach to identify the model. 
+The analysis is performed using the \code{BUGS} language, which is implemented in the software \code{JAGS} using the function \code{\link[R2jags]{jags}}.
+The output is stored in an object of class 'missingHE'.
 }
 \details{
-Depending on the distributional assumptions specified for the outcome variables in the arguments \code{dist_e} and
-\code{dist_c} and the type of missingness mechanism assumed in the argument \code{type}, different types of pattern mixture models
+Depending on the distributions specified for the outcome variables in the arguments \code{dist_e} and
+\code{dist_c} and the type of missingness mechanism specified in the argument \code{type}, different pattern mixture models
 are built and run in the background by the function \code{pattern}. The model for the outcomes is fitted in each missingness pattern 
 and the parameters indexing the missing data distributions are identified using: the corresponding parameters identified from the observed data
 in other patterns (under 'MAR'); or a combination of the parameters identified by the observed data and some sensitivity parameters (under 'MNAR'). 
-A simple example can be used to show how Pattern mixture models are specified. 
+A simple example can be used to show how pattern mixture models are specified. 
 Consider a data set comprising a response variable \eqn{y} and a set of centered covariate \eqn{X_j}. We denote with \eqn{d_i} the patterns' indicator variable for each 
 subject in the trial \eqn{i = 1, ..., n} such that: \eqn{d_i = 1} indicates the completers (both e and c observed), \eqn{d_i = 2} and \eqn{d_i = 3} indicate that 
 only the costs or effects are observed, respectively, while \eqn{d_i = 4} indicates that neither of the two outcomes is observed. In general, a different number of patterns 
 can be observed between the treatment groups and \code{missingHE} accounts for this possibility by modelling a different patterns' indicator variables for each arm. 
 For simplicity, in this example, we assume that the same number of patterns is observed in both groups. \eqn{d_i} is assigned a multinomial distribution, 
 which probabilities are modelled using a Dirichlet prior (by default giving to each pattern the same weight). Next, the model specified in \code{dist_e} 
-and \code{dist_c} is fitted in each pattern. The parameters that cannot be identified by the observed data in each pattern (d = 2, 3, 4), e.g. the means 
+and \code{dist_c} is fitted in each pattern. The parameters that cannot be identified by the observed data in each pattern (d = 2, 3, 4), e.g. the means.
 \eqn{mu_e[d]} and \code{mu_c[d]}, are then identified as: 
 \deqn{mu_e[2] = \mu_e[4] = \mu_e[1] + \Delta_e}
 \deqn{mu_c[3] = \mu_c[4] = \mu_c[1] + \Delta_c}
@@ -103,19 +103,19 @@ where
 \item \eqn{\Delta_e} is the sensitivity parameters associated with the marginal effects mean.
 \item \eqn{\Delta_c} is the sensitivity parameters associated with the marginal costs mean.
 }
-When \eqn{\Delta_e = 0} and \eqn{\Delta_c = 0} the model assumes a 'MAR' mechanism. When \eqn{\Delta_e != 0} and/or \eqn{\Delta_c != 0} 'MNAR' departues for the 
+When \eqn{\Delta_e = 0} and \eqn{\Delta_c = 0} the model assumes a 'MAR' mechanism. When \eqn{\Delta_e != 0} and/or \eqn{\Delta_c != 0} 'MNAR' departures for the 
 effects and/or costs are explored assuming a Uniform prior distributions for the sensitivity parameters. The range of values for these priors is defined based on the
 boundaries specified in \code{Delta_e} and \code{Delta_c} (see Arguments), which must be provided by the user. 
 When user-defined hyperprior values are supplied via the argument \code{prior} in the function \code{pattern}, the elements of this list (see Arguments)
-must be vectors of length \code{2} containing the user-provided hyperprior values and must take specific names according to the parameters they are associated with. 
-Specifically, the names for the parameters indexing the outcome model accepted by \strong{missingHE} are the following:
+must be vectors of length two containing the user-provided hyperprior values and must take specific names according to the parameters they are associated with. 
+Specifically, the names for the parameters indexing the model which are accepted by \strong{missingHE} are the following:
 \itemize{
 \item location parameters \eqn{\alpha_0} and \eqn{\beta_0}: "mean.prior.e"(effects) and/or "mean.prior.c"(costs)
 \item auxiliary parameters \eqn{\sigma}: "sigma.prior.e"(effects) and/or "sigma.prior.c"(costs)
 \item covariate parameters \eqn{\alpha_j} and \eqn{\beta_j}: "alpha.prior"(effects) and/or "beta.prior"(costs)
 } 
-The only exception is the missingness patterns' probability \eqn{\pi}, denoted with "patterns.prior", which hyperprior values must be provided as a list
-formed by two elements. These must be vectors of the same length as the number of patterns in the control (first element) and intervention (second element) group.
+The only exception is the missingness patterns' probability \eqn{\pi}, denoted with "patterns.prior", whose hyperprior values must be provided as a list
+formed by two elements. These must be vectors of the same length equal to the number of patterns in the control (first element) and intervention (second element) group.
 }
 \examples{
 \dontrun{

@@ -1,10 +1,10 @@
 #' An internal function to execute a JAGS selection model and get posterior results
 #'
-#' This function fits a JAGS using the \code{\link[R2jags]{jags}} funciton and obtain posterior inferences.
+#' This function fits a JAGS using the \code{\link[R2jags]{jags}} function and obtain posterior inferences.
 #' @param type Type of missingness mechanism assumed. Choices are Missing At Random (MAR), Missing Not At Random for the effects (MNAR_eff),
 #' Missing Not At Random for the costs (MNAR_cost), and Missing Not At Random for both (MNAR)
-#' @param dist_e distribution assumed for the effects. Current available chocies are: Normal ('norm') or Beta ('beta').
-#' @param dist_c Distribution assumed for the costs. Current available chocies are: Normal ('norm'), Gamma ('gamma') or LogNormal ('lnorm')
+#' @param dist_e distribution assumed for the effects. Current available choices are: Normal ('norm') or Beta ('beta').
+#' @param dist_c Distribution assumed for the costs. Current available choices are: Normal ('norm'), Gamma ('gamma') or LogNormal ('lnorm')
 #' @param inits a list with elements equal to the number of chains selected; each element of the list is itself a list of starting values for the BUGS model, 
 #' or a function creating (possibly random) initial values. If inits is NULL, JAGS will generate initial values for parameters
 #' @keywords JAGS Bayesian selection models 

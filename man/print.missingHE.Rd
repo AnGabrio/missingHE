@@ -2,7 +2,7 @@
 % Please edit documentation in R/print.missingHE.R
 \name{print.missingHE}
 \alias{print.missingHE}
-\title{Print a summary of the \code{JAGS} model fitted by \code{\link{selection}}, \code{\link{pattern}} or \code{\link{hurdle}}}
+\title{Print method for the posterior results contained in the objects of class \code{missingHE}}
 \usage{
 \method{print}{missingHE}(x, value.mis = FALSE, ...)
 }

@@ -5,12 +5,12 @@
 
 #' This function selects which type of model to execute.
 #' @keywords JAGS Hurdle models
-#' @param dist_e Distribution assumed for the effects. Current available chocies are: Normal ('norm') or Beta ('beta')
-#' @param dist_c Distribution assumed for the costs. Current available chocies are: Normal ('norm'), Gamma ('gamma') or LogNormal ('lnorm')
+#' @param dist_e Distribution assumed for the effects. Current available choices are: Normal ('norm') or Beta ('beta')
+#' @param dist_c Distribution assumed for the costs. Current available choices are: Normal ('norm'), Gamma ('gamma') or LogNormal ('lnorm')
 #' @param ind Logical; if TRUE independence between effectiveness and costs is assumed, else correlation is accounted for
 #' @param type Type of structural value mechanism assumed. Choices are Structural Completely At Random (SCAR) and Structural At Random (SAR)
 #' @param pe Number of covariates for the effectiveness model
-#' @param pc Number of cvoariates for the cost model
+#' @param pc Number of covariates for the cost model
 #' @param ze Number of covariates or the structural indicators model for the effectiveness
 #' @param zc Number of covariates or the structural indicators model for the costs
 #' @param se Structural value for the effectiveness 

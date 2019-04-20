@@ -3,14 +3,14 @@
 #' Produces a table printout with some summary results of the health economic evaluation probabilistic model
 #' run using the function \code{\link{selection}}, \code{\link{pattern}} or \code{\link{hurdle}}.
 #' @param object A \code{missingHE} object containing the results of the Bayesian modelling and the economic evaluation
-#' @param ... additional arguments affecting the summary produced.
+#' @param ... Additional arguments affecting the summary produced.
 #' @return Prints a table with some information on the health economic model based on the assumption
 #' selected for the missingness using the function \code{selection}, \code{pattern} or \code{hurdle}. 
 #' Summary information on the main parameters of interests is provided.
 #' @seealso \code{\link{selection}} \code{\link{pattern}} \code{\link{hurdle}} \code{\link{diagnostic}} \code{\link{plot.missingHE}}
 #' @author Andrea Gabrio
 #' @references 
-#' Baio, G.(2012). \emph{Bayesian Methods in Health Economcis}. CRC/Chapman Hall, London.
+#' Baio, G.(2012). \emph{Bayesian Methods in Health Economics}. CRC/Chapman Hall, London.
 #' @importFrom stats quantile
 #' @export
 #' @examples 

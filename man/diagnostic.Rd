@@ -2,15 +2,15 @@
 % Please edit documentation in R/diagnostic.R
 \name{diagnostic}
 \alias{diagnostic}
-\title{Diagnostic checks for assessing MCMC convergence}
+\title{Diagnostic checks for assessing MCMC convergence of Bayesian models fitted in \code{JAGS} using the function \code{\link{selection}}, \code{\link{pattern}} or \code{\link{hurdle}}}
 \usage{
 diagnostic(x, type = "histogram", param = "all", theme = NULL, ...)
 }
 \arguments{
-\item{x}{An object of class "missingHE" containing the posterior results of a full Bayesian model implemented usgin the function \code{\link{selection}}, 
+\item{x}{An object of class "missingHE" containing the posterior results of a full Bayesian model implemented using the function \code{\link{selection}}, 
 \code{\link{pattern}} or \code{\link{hurdle}}}
 
-\item{type}{type of diagnostic check to be plotted for each model parameter. Available choices include: 'histogram' for histrogram plots,
+\item{type}{Type of diagnostic check to be plotted for the model parameter selected Available choices include: 'histogram' for histogram plots,
 'denplot' for density plots, 'traceplot' for trace plots, 'acf' for autocorrelation plots, 'running' for running mean plots,
 'compare' for comparing the distribution of the whole chain with only its last part, 'cross' for crosscorrelation plots, 'Rhat' for the potential scale reduction factor, 'geweke' for the geweke diagnostic,
 'pairs' for posterior correlation among the parameters,'caterpillar' for caterpillar plots. In addition the class 'summary' provides an overview of some of the most popular
@@ -18,32 +18,31 @@ diagnostic checks for each parameter selected.}
 
 \item{param}{Name of the family of parameters to process, as given by a regular expression. For example the mean parameters 
 for the effect and cost variables can be specified using 'mu.e' and 'mu.c', respectively. Different types of
-models may have different parameters depending on the assumed distributions and missing data mechanisms. 
-To see a complete list of all possible paraemters by types of models assumed see details.}
+models may have different parameters depending on the assumed distributions and missing data assumptions. 
+To see a complete list of all possible parameters by types of models assumed see details.}
 
 \item{theme}{Type of ggplot theme among some pre-defined themes. For a full list of available themes see details.}
 
-\item{...}{additional parameters that can be provided to manage the graphical output of \code{diagnostic}}
+\item{...}{Additional parameters that can be provided to manage the graphical output of \code{diagnostic}.}
 }
 \value{
 A \strong{ggplot} object containing the plots specified in the argument \code{type}
 }
 \description{
-Convergence issues need to be assessed every time a probabilistic model is implemented via Markov Chain Monte Carlo methods.
 The focus is restricted to full Bayesian models in cost-effectiveness analyses based on the function \code{\link{selection}}, \code{\link{pattern}} and \code{\link{hurdle}}, 
-with convergence of the chains that is assessed through Visual checks of the posterior distribution of the parameters of interest,
-Examples are density plots, trace plots, autocrrelation plots, etc. Other types of posterior checks are related to some summary MCMC statistics 
+with convergence of the MCMC chains that is assessed through graphical checks of the posterior distribution of the parameters of interest,
+Examples are density plots, trace plots, autocorrelation plots, etc. Other types of posterior checks are related to some summary MCMC statistics 
 that are able to detect possible issues in the convergence of the algorithm, such as the potential scale reduction factor or the effective sample size.
 Different types of diagnostic tools and statistics are used to assess model convergence using functions contained in the package \strong{ggmcmc} and \strong{mcmcplots}. 
 Graphics and plots are managed using functions contained in the package \strong{ggplot2} and \strong{ggthemes}.
 }
 \details{
-Depending on the types of plots specified in the argument \code{type} the output of \code{diagnostic} can produce
+Depending on the types of plots specified in the argument \code{type}, the output of \code{diagnostic} can produce
 different combinations of MCMC visual posterior checks for the family of parameters indicated in the argument \code{param}.
 For a full list of the available plots see the description of the argument \code{type} or see the corresponding plots in the package \strong{ggmcmc}.
 
-The parameters that can be assessed through \code{diagnostic} are only those inlcuded in the object \code{x} (see Arguments). Specific character names
-must be specified in the argument \code{param}. The available names and the parameters associated with them are:
+The parameters that can be assessed through \code{diagnostic} are only those included in the object \code{x} (see Arguments). Specific character names
+must be specified in the argument \code{param} according to the specific model implemented. The available names and the parameters associated with them are:
 \itemize{
 \item "mu.e" the mean parameters of the effect variables in the two treatment arms.
 \item "mu.c" the mean parameters of the cost variables in the two treatment arms.
@@ -69,13 +68,13 @@ must be specified in the argument \code{param}. The available names and the para
 \item "all" all available parameters stored in the object \code{x}.
 }
 When the object \code{x} is created using the function \code{pattern}, pattern-specific standard deviation ("sd.e", "sd.c") and regression coefficient 
-parameters ("alpha", "beta") for both outcomes are visualised. The parameters associated with a missingness mechanism can be accessed only when \code{x}
+parameters ("alpha", "beta") for both outcomes can be visualised. The parameters associated with a missingness mechanism can be accessed only when \code{x}
 is created using the function \code{selection} or \code{pattern}, while the parameters associated with the model for the structural values mechanism
 can be accessed only when \code{x} is created using the function \code{hurdle}.
 
 The argument \code{theme} allows to customise the graphical output of the plots generated by \code{diagnostic} and
 allows to choose among a set of possible pre-defined themes taken form the package \strong{ggtheme}. Those available can
-be indicated using the following character names: "base","calc","economist","excel","few","538","gdocs","hc","par","pander","solarized","stata","tufte","wsj".
+be indicated using one of the following character names: "base","calc","economist","excel","few","538","gdocs","hc","par","pander","solarized","stata","tufte","wsj".
 }
 \examples{
 #For examples see the function selection, pattern or hurdle
@@ -88,7 +87,7 @@ Gelman, A. Carlin, JB., Stern, HS. Rubin, DB.(2003). \emph{Bayesian Data Analysi
 Brooks, S. Gelman, A. Jones, JL. Meng, XL. (2011). \emph{Handbook of Markov Chain Monte Carlo}, CRC/Chapman and Hall.
 }
 \seealso{
-\code{\link[ggmcmc]{ggs}} \code{\link{selection}} \code{\link{selection}} \code{\link{hurdle}}
+\code{\link[ggmcmc]{ggs}} \code{\link{selection}} \code{\link{selection}} \code{\link{hurdle}}.
 }
 \author{
 Andrea Gabrio

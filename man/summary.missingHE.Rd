@@ -9,7 +9,7 @@
 \arguments{
 \item{object}{A \code{missingHE} object containing the results of the Bayesian modelling and the economic evaluation}
 
-\item{...}{additional arguments affecting the summary produced.}
+\item{...}{Additional arguments affecting the summary produced.}
 }
 \value{
 Prints a table with some information on the health economic model based on the assumption
@@ -26,7 +26,7 @@ run using the function \code{\link{selection}}, \code{\link{pattern}} or \code{\
 #
 }
 \references{
-Baio, G.(2012). \emph{Bayesian Methods in Health Economcis}. CRC/Chapman Hall, London.
+Baio, G.(2012). \emph{Bayesian Methods in Health Economics}. CRC/Chapman Hall, London.
 }
 \seealso{
 \code{\link{selection}} \code{\link{pattern}} \code{\link{hurdle}} \code{\link{diagnostic}} \code{\link{plot.missingHE}}

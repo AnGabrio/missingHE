@@ -1,16 +1,15 @@
-
-#' Predictive information criteria for Bayesian models fitted in \code{JAGS} using the funciton \code{\link{selection}}, \code{\link{pattern}} or \code{\link{hurdle}}
+#' Predictive information criteria for Bayesian models fitted in \code{JAGS} using the function \code{\link{selection}}, \code{\link{pattern}} or \code{\link{hurdle}}
 #' 
-#' Efficient approximate leave-one-out cross validation (LOO), deviance information criterion (DIC) and widely applicable criterion (WAIC) for Bayesian models, 
+#' Efficient approximate leave-one-out cross validation (LOO), deviance information criterion (DIC) and widely applicable information criterion (WAIC) for Bayesian models, 
 #' calculated on the observed data.
 #' @keywords loo waic dic JAGS   
-#' @param x A \code{missingHE} object containing the results of the Bayesian model run using the function \code{\link{selection}} or \code{\link{hurdle}}.
+#' @param x A \code{missingHE} object containing the results of a Bayesian model fitted in cost-effectiveness analysis using the function \code{\link{selection}}, \code{\link{pattern}} or \code{\link{hurdle}}.
 #' @param criterion type of information criteria to be produced. Available choices are \code{'dic'} for the Deviance Information Criterion, 
 #' \code{'waic'} for the Widely Applicable Information Criterion, and \code{'looic'} for the Leave-One-Out Information Criterion.
 #' @param module The modules with respect to which the information criteria should be computed. Available choices are \code{'total'} for the whole model, 
-#' \code{'e'} for the effectiveness variables only, \code{'c'} for the cost variables only, and \code{'both'} for both outcome variables only.
-#' @return A named list containing different predictive information criteria results and quantities according to value of \code{criterion}. In all cases, these measures are 
-#' computed on the observed data for the model nodes selected in \code{module}.
+#' \code{'e'} for the effectiveness variables only, \code{'c'} for the cost variables only, and \code{'both'} for both outcome variables.
+#' @return A named list containing different predictive information criteria results and quantities according to the value of \code{criterion}. In all cases, the measures are 
+#' computed on the observed data for the specific modules of the model selected in \code{module}.
 #' \describe{
 #'   \item{d_bar}{Posterior mean deviance (only if \code{criterion} is \code{'dic'}).}
 #'   \item{pD}{Effective number of parameters calculated with the formula used by \code{JAGS} (only if \code{criterion} is \code{'dic'})}.
@@ -35,11 +34,11 @@
 #' @importFrom stats var
 #' @details The Deviance Information Criterion (DIC), Leave-One-Out Information Criterion (LOOIC) and the Widely Applicable Information Criterion (WAIC) are methods for estimating 
 #' out-of-sample predictive accuracy from a Bayesian model using the log-likelihood evaluated at the posterior simulations of the parameters. 
-#' DIC is computationally simple to calculate but it is known to have some problems, arising in part from it not being fully Bayesian in that it is based on a point esitmate.
+#' DIC is computationally simple to calculate but it is known to have some problems, arising in part from it not being fully Bayesian in that it is based on a point estimate.
 #' LOOIC can be computationally expensive but can be easily approximated using importance weights that are smoothed by fitting a generalised Pareto distribution to the upper tail 
 #' of the distribution of the importance weights. For more details about the methods used to compute LOOIC see the PSIS-LOO section in \code{\link{loo-package}}.
 #' WAIC is fully Bayesian and closely approximates Bayesian cross-validation. Unlike DIC, WAIC is invariant to parameterisation and also works for singular models. 
-#' In finite cases, WAIC and LOO give similar esitmates, but for influential observations WAIC underestimates the effect of leaving out one observation.
+#' In finite cases, WAIC and LOO give similar estimates, but for influential observations WAIC underestimates the effect of leaving out one observation.
 #' 
 #' @references  
 #' Plummer, M. \emph{JAGS: A program for analysis of Bayesian graphical models using Gibbs sampling.} (2003).

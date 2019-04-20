@@ -10,32 +10,33 @@ selection(data, model.eff, model.cost, model.me = me ~ 1, model.mc = mc
   n.thin = 1, save_model = FALSE, prior = "default", ...)
 }
 \arguments{
-\item{data}{A data frame in which to find variables supplied in \code{model.eff}, \code{model.cost} (model formulas for effects and costs) 
-and \code{model.me}, \code{model.mc} (model formulas for the missing effect and cost models) . Among these,
-effectiveness, cost and treatment indicator (only two arms) variables must always be provided and named 'e', 'c' and 't' respectively.}
+\item{data}{A data frame in which to find the variables supplied in \code{model.eff}, \code{model.cost} (model formulas for effects and costs) 
+and \code{model.me}, \code{model.mc} (model formulas for the missing effect and cost models). Among these,
+effectiveness, cost and treatment indicator (only two arms) variables must always be provided and named 'e', 'c' and 't', respectively.}
 
-\item{model.eff}{A formula expression in conventional \code{R} linear modelling syntax. The response must be a health economics
-effectiveness outcome ('e') whose name must correspond to that used in \code{data}, and 
-any covariates are given on the right-hand side. If there are no covariates, specify \code{1} on the right hand side.
+\item{model.eff}{A formula expression in conventional \code{R} linear modelling syntax. The response must be a health economic
+effectiveness outcome ('e') whose name must correspond to that used in \code{data}. Any covariates in the model must be provided on the right-hand side of the formula.
+If there are no covariates, \code{1} should be specified on the right hand side of the formula.
 By default, covariates are placed on the "location" parameter of the distribution through a linear model.}
 
-\item{model.cost}{A formula expression in conventional \code{R} linear modelling syntax. The response must be a health economics
-cost outcome ('c') whose name must correspond to that used in \code{data}, and any covariates are given on the right-hand side.
-If there are no covariates, specify \code{1} on the right hand side. By default, covariates are placed on the "location" 
-parameter of the distribution through a linear model. A joint bivariate distribution for effects and costs can be specified by
-including 'e' in the model for the costs.}
+\item{model.cost}{A formula expression in conventional \code{R} linear modelling syntax. The response must be a health economic
+cost outcome ('c') whose name must correspond to that used in \code{data}. 
+and any covariates are given on the right-hand side. Any covariates in the model must be provided on the right-hand side of the formula.
+If there are no covariates, \code{1} should be specified on the right hand side of the formula.
+By default, covariates are placed on the "location" parameter of the distribution through a linear model. A joint bivariate distribution for effects and costs can be specified by
+including 'e' on the right-hand side of the formula for the costs model.}
 
-\item{model.me}{A formula expression in conventional \code{R} linear modelling syntax.  The response must be indicated with the 
-term 'me'(missing effects) and any covariates used to estimate the probability of missing effects are given on the right-hand side. 
-If there are no covariates, specify \code{1} on the right hand side. By default, covariates are placed on the "probability" parameter for the missing effects through a logistic-linear model.}
+\item{model.me}{A formula expression in conventional \code{R} linear modelling syntax. The response must be indicated with the 
+term 'me'(missing effects) and any covariates must be provided on the right-hand side of the formula. 
+If there are no covariates, \code{1} should be specified on the right hand side of the formula. By default, covariates are placed on the "probability" parameter for the missing effects through a logistic-linear model.}
 
 \item{model.mc}{A formula expression in conventional \code{R} linear modelling syntax. The response must be indicated with the 
-term 'mc'(missing costs) and any covariates used to estimate the probability of missing costs should be given on the right-hand side. 
-If there are no covariates, specify \code{1} on the right hand side. By default, covariates are placed on the "probability" parameter for the missing costs through a logistic-linear model.}
+term 'mc'(missing costs) and any covariates must be provided on the right-hand side of the formula. 
+If there are no covariates, \code{1} should be specified on the right hand side of the formula. By default, covariates are placed on the "probability" parameter for the missing costs through a logistic-linear model.}
 
-\item{dist_e}{distribution assumed for the effects. Current available chocies are: Normal ('norm') or Beta ('beta').}
+\item{dist_e}{Distribution assumed for the effects. Current available choices are: Normal ('norm') or Beta ('beta').}
 
-\item{dist_c}{Distribution assumed for the costs. Current available chocies are: Normal ('norm'), Gamma ('gamma') or LogNormal ('lnorm').}
+\item{dist_c}{Distribution assumed for the costs. Current available choices are: Normal ('norm'), Gamma ('gamma') or LogNormal ('lnorm').}
 
 \item{type}{Type of missingness mechanism assumed. Choices are Missing At Random (MAR) and Missing Not At Random (MNAR).}
 
@@ -59,11 +60,11 @@ in the current working directory.}
 
 \item{prior}{A list containing the hyperprior values provided by the user. Each element of this list must be a vector of length two
 containing the user-provided hyperprior values and must be named with the name of the corresponding parameter. For example, the hyperprior
-values for the mean effect parameter can be provided using \code{prior = list('mu.prior.e' = c(0, 1))}.
+values for the standard deviation effect parameters can be provided using the list \code{prior = list('sigma.prior.e' = c(0, 100))}.
 For more information about how to provide prior hypervalues for different types of parameters and models see details. 
 If \code{prior} is set to 'default', the default values will be used.}
 
-\item{...}{additional input parameters provided by the user. Examples are \code{center = TRUE} to center all the covariates in the model 
+\item{...}{Additional arguments that can be provided by the user. Examples are \code{center = TRUE} to center all the covariates in the model 
 or the additional arguments that can be provided to the function \code{\link[BCEA]{bcea}} to summarise the health economic evaluation results.}
 }
 \value{
@@ -80,15 +81,16 @@ An object of the class 'missingHE' containing the following elements
 }
 \description{
 Full Bayesian cost-effectiveness models to handle missing data in the outcomes under different missing data 
-mechanism assumptions, using a variatey of alternative parametric distributions for the effect and cost variables and 
+mechanism assumptions, using alternative parametric distributions for the effect and cost variables and 
 using a selection model approach to identify the model. The analysis is performed using the \code{BUGS} language, 
-which is implemented in \code{JAGS} using the functions \code{\link[R2jags]{jags}} The output is stored in an object of class 'missingHE'.
+which is implemented in the software \code{JAGS} using the function \code{\link[R2jags]{jags}} The output is stored in an object of class 'missingHE'.
 }
 \details{
-Depending on the distributional assumptions specified for the outcome variables in the arguments \code{dist_e} and
-\code{dist_c} and the type of missingness mechanism assumed in the argument \code{type}, different types of selection models
+Depending on the distributions specified for the outcome variables in the arguments \code{dist_e} and
+\code{dist_c} and the type of missingness mechanism specified in the argument \code{type}, different selection models
 are built and run in the background by the function \code{selection}. These models consist in logistic regressions that are used to estimate
-the probability of missingness in either or both the outcomes. A simple example can be used to show how Selection models are specified. 
+the probability of missingness in one or both the outcomes. 
+A simple example can be used to show how selection models are specified. 
 Consider a data set comprising a response variable \eqn{y} and a set of centered covariate \eqn{X_j}. For each subject in the trial \eqn{i = 1, ..., n}
 we define an indicator variable \eqn{m_i} taking value \code{1} if the \eqn{i}-th individual is associated with a missing value and \code{0} otherwise.
 This is modelled as:
@@ -105,12 +107,12 @@ When \eqn{\delta = 0} the model assumes a 'MAR' mechanism, while when \eqn{\delt
 the default prior distributions assumed are the following:
 \itemize{
 \item \eqn{\gamma_0 ~ Logisitc(0, 1)}
-\item \eqn{\gamma_j ~ Normal(0, 0.0001)}
+\item \eqn{\gamma_j ~ Normal(0, 0.01)}
 \item \eqn{\delta ~ Normal(0, 1)}
 }
 When user-defined hyperprior values are supplied via the argument \code{prior} in the function \code{selection}, the elements of this list (see Arguments)
-must be vectors of length \code{2} containing the user-provided hyperprior values and must take specific names according to the parameters they are associated with. 
-Specifically, the names for the parameters indexing the MoA and MoM accepted by \strong{missingHE} are the following:
+must be vectors of length two containing the user-provided hyperprior values and must take specific names according to the parameters they are associated with. 
+Specifically, the names for the parameters indexing the model which are accepted by \strong{missingHE} are the following:
 \itemize{
 \item location parameters \eqn{\alpha_0} and \eqn{\beta_0}: "mean.prior.e"(effects) and/or "mean.prior.c"(costs)
 \item auxiliary parameters \eqn{\sigma}: "sigma.prior.e"(effects) and/or "sigma.prior.c"(costs)

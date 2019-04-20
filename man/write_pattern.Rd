@@ -10,9 +10,9 @@ This function selects which type of model to execute.}
 write_pattern(dist_e, dist_c, ind, type, pe, pc, d_list, d1, d2)
 }
 \arguments{
-\item{dist_e}{Distribution assumed for the effects. Current available chocies are: Normal ('norm') or Beta ('beta')}
+\item{dist_e}{Distribution assumed for the effects. Current available choices are: Normal ('norm') or Beta ('beta')}
 
-\item{dist_c}{Distribution assumed for the costs. Current available chocies are: Normal ('norm'), Gamma ('gamma') or LogNormal ('lnorm')}
+\item{dist_c}{Distribution assumed for the costs. Current available choices are: Normal ('norm'), Gamma ('gamma') or LogNormal ('lnorm')}
 
 \item{ind}{Logical; if TRUE independence between effectiveness and costs is assumed, else correlation is accounted for}
 
@@ -21,7 +21,7 @@ Missing Not At Random for the costs (MNAR_cost), and Missing Not At Random for b
 
 \item{pe}{Number of covariates for the effectiveness model}
 
-\item{pc}{Number of cvoariates for the cost model}
+\item{pc}{Number of covariates for the cost model}
 
 \item{d_list}{Number and type of patterns}
 

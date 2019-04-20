@@ -1,34 +1,34 @@
 #' Full Bayesian Models to handle missingness in Economic Evaluations (Hurdle Models)
 #' 
 #' Full Bayesian cost-effectiveness models to handle missing data in the outcomes using Hurdle models
-#' under a variatey of alternative parametric distributions for the effect and cost variables. Alternative
-#' assumptions about the mechanisms of the structural values are implemented using a hurdle model approach. The analysis is performed using the \code{BUGS} language, 
-#' which is implemented in \code{JAGS} using the functions \code{\link[R2jags]{jags}}. The output is stored in an object of class 'missingHE'.
+#' under alternative parametric distributions for the effect and cost variables. Alternative
+#' assumptions about the mechanisms of the structural values are implemented using a hurdle approach. The analysis is performed using the \code{BUGS} language, 
+#' which is implemented in the software \code{JAGS} using the function \code{\link[R2jags]{jags}}. The output is stored in an object of class 'missingHE'.
 #' 
-#' @param data A data frame in which to find variables supplied in \code{model.eff}, \code{model.cost} (model formulas for effects and costs) 
-#' and \code{model.se}, \code{model.sc} (model formulas for the structural effect and cost models) . Among these,
-#' effectiveness, cost and treatment indicator (only two arms) variables must always be provided and named 'e', 'c' and 't' respectively. 
-#' @param model.eff A formula expression in conventional \code{R} linear modelling syntax. The response must be a health economics
-#' effectiveness outcome ('e') whose name must correspond to that used in \code{data}, and 
-#' any covariates are given on the right-hand side. If there are no covariates, specify \code{1} on the right hand side.
+#' @param data A data frame in which to find the variables supplied in \code{model.eff}, \code{model.cost} (model formulas for effects and costs) 
+#' and \code{model.se}, \code{model.sc} (model formulas for the structural effect and cost models). Among these,
+#' effectiveness, cost and treatment indicator (only two arms) variables must always be provided and named 'e', 'c' and 't', respectively. 
+#' @param model.eff A formula expression in conventional \code{R} linear modelling syntax. The response must be a health economic
+#' effectiveness outcome ('e') whose name must correspond to that used in \code{data}. Any covariates in the model must be provided on the right-hand side of the formula. 
+#' If there are no covariates, \code{1} should be specified on the right hand side of the formula.
 #' By default, covariates are placed on the "location" parameter of the distribution through a linear model.
-#' @param model.cost A formula expression in conventional \code{R} linear modelling syntax. The response must be a health economics
-#' cost outcome ('c') whose name must correspond to that used in \code{data}, and any covariates are given on the right-hand side.
-#' If there are no covariates, specify \code{1} on the right hand side. By default, covariates are placed on the "location" 
+#' @param model.cost A formula expression in conventional \code{R} linear modelling syntax. The response must be a health economic
+#' cost outcome ('c') whose name must correspond to that used in \code{data}. Any covariates in the model must be provided on the right-hand side of the formula.
+#' If there are no covariates, \code{1} should be specified on the right hand side of the formula. By default, covariates are placed on the "location" 
 #' parameter of the distribution through a linear model. A joint bivariate distribution for effects and costs can be specified by
-#' including 'e' in the model for the costs.
-#' @param model.se A formula expression in conventional \code{R} linear modelling syntax.  The response must be indicated with the 
-#' term 'se'(structural effects) and any covariates used to estimate the probability of structural effects are given on the right-hand side. 
-#' If there are no covariates, specify \code{1} on the right hand side. By default, covariates are placed on the "probability" parameter for the structural effects through a logistic-linear model.
+#' including 'e' on the right-hand side of the formula for the costs model.
+#' @param model.se A formula expression in conventional \code{R} linear modelling syntax. The response must be indicated with the 
+#' term 'se'(structural effects). Any covariates in the model must be provided on the right-hand side of the formula. 
+#' If there are no covariates, \code{1} should be specified on the right hand side of the formula. By default, covariates are placed on the "probability" parameter for the structural effects through a logistic-linear model.
 #' @param model.sc A formula expression in conventional \code{R} linear modelling syntax. The response must be indicated with the 
-#' term 'sc'(structural costs) and any covariates used to estimate the probability of structural costs should be given on the right-hand side. 
-#' If there are no covariates, specify \code{1} on the right hand side. By default, covariates are placed on the "probability" parameter for the structural costs through a logistic-linear model.
-#' @param se Structural value to be found in the effect data defined in \code{data}. If set to \code{NULL}, 
+#' term 'sc'(structural costs). Any covariates in the model must be provided on the right-hand side of the formula. 
+#' If there are no covariates, \code{1} should be specified on the right hand side of the formula. By default, covariates are placed on the "probability" parameter for the structural costs through a logistic-linear model.
+#' @param se Structural value to be found in the effect variables defined in \code{data}. If set to \code{NULL}, 
 #' no structural value is chosen and a standard model for the effects is run.
-#' @param sc Structural value to be found in the cost data defined in \code{data}. If set to \code{NULL}, 
+#' @param sc Structural value to be found in the cost variables defined in \code{data}. If set to \code{NULL}, 
 #' no structural value is chosen and a standard model for the costs is run.
-#' @param dist_e distribution assumed for the effects. Current available chocies are: Normal ('norm') or Beta ('beta').
-#' @param dist_c distribution assumed for the costs. Current available chocies are: Normal ('norm'), Gamma ('gamma') or LogNormal ('lnorm').
+#' @param dist_e Distribution assumed for the effects. Current available choices are: Normal ('norm') or Beta ('beta').
+#' @param dist_c Distribution assumed for the costs. Current available choices are: Normal ('norm'), Gamma ('gamma') or LogNormal ('lnorm').
 #' @param type Type of structural value mechanism assumed. Choices are Structural Completely At Random (SCAR),
 #' and Structural At Random (SAR).
 #' @param prob A numeric vector of probabilities within the range (0,1), representing the upper and lower
@@ -44,15 +44,14 @@
 #' in the current working directory.
 #' @param prior A list containing the hyperprior values provided by the user. Each element of this list must be a vector of length two
 #' containing the user-provided hyperprior values and must be named with the name of the corresponding parameter. For example, the hyperprior
-#' values for the mean effect parameter can be provided using \code{prior = list('mu.prior.e' = c(0, 1))}. For more information about how 
+#' values for the standard deviation parameter for the effects can be provided using the list \code{prior = list('sigma.prior.e' = c(0, 100))}. For more information about how 
 #' to provide prior hypervalues for different types of parameters and models see details. 
 #' If \code{prior} is set to 'default', the default values will be used.  
-#' @param ... additional input parameters provided by the user. Examples are \code{d_e} and \code{d_c} which should be binary indicator vectors
+#' @param ... Additional arguments that can be provided by the user. Examples are \code{d_e} and \code{d_c}, which should correspond to two binary indicator vectors
 #' with length equal to the number of rows of \code{data}. By default these variables are constructed within the function based on the observed data
-#' but it is possible for  the user to directly provide them as a means to explore some Structural Not At Random (SNAR) mechanism assumptions about 
-#' either or both the effects and costs. Individuals whose corresponding indicator value is set to \code{1} or \code{0} will be respectively 
-#' associated with the structural or non-structural component in the model. #' @param ... additional input parameters provided by the user. 
-#' Other optional arguments are \code{center = TRUE}, which centers all the covariates in the model or the additional arguments that can be provided 
+#' but it is possible for the user to directly provide them as a means to explore some Structural Not At Random (SNAR) mechanism assumptions about one or both outcomes.
+#' Individuals whose corresponding indicator value is set to \code{1} or \code{0} will be respectively 
+#' associated with the structural or non-structural component in the model. Other optional arguments are \code{center = TRUE}, which centers all the covariates in the model or the additional arguments that can be provided 
 #' to the function \code{\link[BCEA]{bcea}} to summarise the health economic evaluation results. 
 #' @return An object of the class 'missingHE' containing the following elements
 #' \describe{
@@ -67,13 +66,13 @@
 #' @seealso \code{\link[R2jags]{jags}}, \code{\link[BCEA]{bcea}}
 #' @keywords CEA JAGS missing data Hurdle Models
 #' @importFrom stats model.frame 
-#' @details Depending on the distributional assumptions specified for the outcome variables in the arguments \code{dist_e} and
-#' \code{dist_c} and the type of structural value mechanism assumed in the argument \code{type}, different types of hurdle models
+#' @details Depending on the distributions specified for the outcome variables in the arguments \code{dist_e} and
+#' \code{dist_c} and the type of structural value mechanism specified in the argument \code{type}, different hurdle models
 #' are built and run in the background by the function \code{hurdle}. These are mixture models defined by two components: the first one
 #' is a mass distribution at the spike, while the second is a parametric model applied to the natural range of the relevant variable.
 #' Usually, a logistic regression is used to estimate the probability of incurring a "structural" value (e.g. 0 for the costs, or 1 for the
-#' effects); this is then used to weigh the mean of the "non-structural" values estimated in the second component. A simple example can be used
-#' to show how Hurdle models are specified. 
+#' effects); this is then used to weigh the mean of the "non-structural" values estimated in the second component. 
+#' A simple example can be used to show how hurdle models are specified. 
 #' Consider a data set comprising a response variable \eqn{y} and a set of centered covariate \eqn{X_j}.Specifically, for each subject in the trial \eqn{i = 1, ..., n}
 #' we define an indicator variable \eqn{d_i} taking value \code{1} if the \eqn{i}-th individual is associated with a structural value and \code{0} otherwise.
 #' This is modelled as:
@@ -85,11 +84,11 @@
 #' \item \eqn{\gamma_0} represents the marginal probability of a structural value in \eqn{y} on the logit scale.
 #' \item \eqn{\gamma_j} represents the impact on the probability of a structural value in \eqn{y} of the centered covariates \eqn{X_j}.
 #' }
-#' When \eqn{\gamma_j = 0} the model assumes a 'SCAR' mechanism, while when \eqn{\gamma_j != 0} the mechanism is 'SAR'.
+#' When \eqn{\gamma_j = 0}, the model assumes a 'SCAR' mechanism, while when \eqn{\gamma_j != 0} the mechanism is 'SAR'.
 #' For the parameters indexing the structural value model, the default prior distributions assumed are the following:
 #' \itemize{
-#' \item \eqn{\gamma_0 ~ Logisitc(0, 1)}
-#' \item \eqn{\gamma_j ~ Normal(0, 0.0001)}
+#' \item \eqn{\gamma_0 ~ Logisitic(0, 1)}
+#' \item \eqn{\gamma_j ~ Normal(0, 0.01)}
 #' }
 #' When user-defined hyperprior values are supplied via the argument \code{prior} in the function \code{hurdle}, the elements of this list (see Arguments)
 #' must be vectors of length \code{2} containing the user-provided hyperprior values and must take specific names according to the parameters they are associated with. 

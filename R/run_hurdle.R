@@ -1,10 +1,10 @@
 #' An internal function to execute a JAGS hurdle model and get posterior results
 #'
-#' This function fits a JAGS using the \code{\link[R2jags]{jags}} funciton and obtain posterior inferences.
+#' This function fits a JAGS using the \code{\link[R2jags]{jags}} function and obtain posterior inferences.
 #' @param type Type of structural value mechanism assumed. Choices are Structural Completely At Random (SCAR),
 #' and Structural At Random (SAR).
-#' @param dist_e distribution assumed for the effects. Current available chocies are: Normal ('norm') or Beta ('beta').
-#' @param dist_c distribution assumed for the costs. Current available chocies are: Normal ('norm'), Gamma ('gamma') or LogNormal ('lnorm')
+#' @param dist_e distribution assumed for the effects. Current available choices are: Normal ('norm') or Beta ('beta').
+#' @param dist_c distribution assumed for the costs. Current available choices are: Normal ('norm'), Gamma ('gamma') or LogNormal ('lnorm')
 #' @param se Structural value to be found in the effect data. If set to \code{NULL}, 
 #' no structural value is chosen and a standard model for the effects is run.
 #' @param sc Structural value to be found in the cost data. If set to \code{NULL}, 

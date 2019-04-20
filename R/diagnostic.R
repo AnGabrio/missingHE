@@ -1,34 +1,33 @@
-#' Diagnostic checks for assessing MCMC convergence 
+#' Diagnostic checks for assessing MCMC convergence of Bayesian models fitted in \code{JAGS} using the function \code{\link{selection}}, \code{\link{pattern}} or \code{\link{hurdle}}
 #'
-#' Convergence issues need to be assessed every time a probabilistic model is implemented via Markov Chain Monte Carlo methods.
 #' The focus is restricted to full Bayesian models in cost-effectiveness analyses based on the function \code{\link{selection}}, \code{\link{pattern}} and \code{\link{hurdle}}, 
-#' with convergence of the chains that is assessed through Visual checks of the posterior distribution of the parameters of interest,
-#' Examples are density plots, trace plots, autocrrelation plots, etc. Other types of posterior checks are related to some summary MCMC statistics 
+#' with convergence of the MCMC chains that is assessed through graphical checks of the posterior distribution of the parameters of interest,
+#' Examples are density plots, trace plots, autocorrelation plots, etc. Other types of posterior checks are related to some summary MCMC statistics 
 #' that are able to detect possible issues in the convergence of the algorithm, such as the potential scale reduction factor or the effective sample size.
 #' Different types of diagnostic tools and statistics are used to assess model convergence using functions contained in the package \strong{ggmcmc} and \strong{mcmcplots}. 
 #' Graphics and plots are managed using functions contained in the package \strong{ggplot2} and \strong{ggthemes}.
 #' @keywords diagnostics MCMC convergence checks
-#' @param x An object of class "missingHE" containing the posterior results of a full Bayesian model implemented usgin the function \code{\link{selection}}, 
+#' @param x An object of class "missingHE" containing the posterior results of a full Bayesian model implemented using the function \code{\link{selection}}, 
 #' \code{\link{pattern}} or \code{\link{hurdle}}
-#' @param type type of diagnostic check to be plotted for each model parameter. Available choices include: 'histogram' for histrogram plots,
+#' @param type Type of diagnostic check to be plotted for the model parameter selected Available choices include: 'histogram' for histogram plots,
 #' 'denplot' for density plots, 'traceplot' for trace plots, 'acf' for autocorrelation plots, 'running' for running mean plots,
 #' 'compare' for comparing the distribution of the whole chain with only its last part, 'cross' for crosscorrelation plots, 'Rhat' for the potential scale reduction factor, 'geweke' for the geweke diagnostic,
 #' 'pairs' for posterior correlation among the parameters,'caterpillar' for caterpillar plots. In addition the class 'summary' provides an overview of some of the most popular
 #' diagnostic checks for each parameter selected.
 #' @param param Name of the family of parameters to process, as given by a regular expression. For example the mean parameters 
 #' for the effect and cost variables can be specified using 'mu.e' and 'mu.c', respectively. Different types of
-#' models may have different parameters depending on the assumed distributions and missing data mechanisms. 
-#' To see a complete list of all possible paraemters by types of models assumed see details.
+#' models may have different parameters depending on the assumed distributions and missing data assumptions. 
+#' To see a complete list of all possible parameters by types of models assumed see details.
 #' @param theme Type of ggplot theme among some pre-defined themes. For a full list of available themes see details.
-#' @param ... additional parameters that can be provided to manage the graphical output of \code{diagnostic}
+#' @param ... Additional parameters that can be provided to manage the graphical output of \code{diagnostic}.
 #' @return A \strong{ggplot} object containing the plots specified in the argument \code{type}
-#' @seealso \code{\link[ggmcmc]{ggs}} \code{\link{selection}} \code{\link{selection}} \code{\link{hurdle}}
-#' @details Depending on the types of plots specified in the argument \code{type} the output of \code{diagnostic} can produce
+#' @seealso \code{\link[ggmcmc]{ggs}} \code{\link{selection}} \code{\link{selection}} \code{\link{hurdle}}.
+#' @details Depending on the types of plots specified in the argument \code{type}, the output of \code{diagnostic} can produce
 #' different combinations of MCMC visual posterior checks for the family of parameters indicated in the argument \code{param}.
 #' For a full list of the available plots see the description of the argument \code{type} or see the corresponding plots in the package \strong{ggmcmc}.
 #' 
-#' The parameters that can be assessed through \code{diagnostic} are only those inlcuded in the object \code{x} (see Arguments). Specific character names
-#' must be specified in the argument \code{param}. The available names and the parameters associated with them are:
+#' The parameters that can be assessed through \code{diagnostic} are only those included in the object \code{x} (see Arguments). Specific character names
+#' must be specified in the argument \code{param} according to the specific model implemented. The available names and the parameters associated with them are:
 #' \itemize{
 #' \item "mu.e" the mean parameters of the effect variables in the two treatment arms.
 #' \item "mu.c" the mean parameters of the cost variables in the two treatment arms.
@@ -54,13 +53,13 @@
 #' \item "all" all available parameters stored in the object \code{x}.
 #' }
 #' When the object \code{x} is created using the function \code{pattern}, pattern-specific standard deviation ("sd.e", "sd.c") and regression coefficient 
-#' parameters ("alpha", "beta") for both outcomes are visualised. The parameters associated with a missingness mechanism can be accessed only when \code{x}
+#' parameters ("alpha", "beta") for both outcomes can be visualised. The parameters associated with a missingness mechanism can be accessed only when \code{x}
 #' is created using the function \code{selection} or \code{pattern}, while the parameters associated with the model for the structural values mechanism
 #' can be accessed only when \code{x} is created using the function \code{hurdle}.
 #' 
 #' The argument \code{theme} allows to customise the graphical output of the plots generated by \code{diagnostic} and
 #' allows to choose among a set of possible pre-defined themes taken form the package \strong{ggtheme}. Those available can
-#' be indicated using the following character names: "base","calc","economist","excel","few","538","gdocs","hc","par","pander","solarized","stata","tufte","wsj".
+#' be indicated using one of the following character names: "base","calc","economist","excel","few","538","gdocs","hc","par","pander","solarized","stata","tufte","wsj".
 #' 
 #' @author Andrea Gabrio
 #' @references 
@@ -80,8 +79,8 @@ diagnostic <- function(x, type = "histogram", param = "all", theme = NULL, ...) 
   if(class(x) != "missingHE") {
     stop("Only objects of class 'missingHE' can be used")
   }
-  if(!isTRUE(requireNamespace("ggmcmc")) | !isTRUE(requireNamespace("mcmcplots")) | !isTRUE(requireNamespace("mcmcr")) | !isTRUE(requireNamespace("coda"))) {
-    stop("You need to install the R packages 'ggmcmc', 'mcmcplots', 'mcmcr' and 'coda'. Please run in your R terminal:\n install.packages('ggmcmc', 'mcmcplots', 'mcmcr', 'coda')")
+  if(!isTRUE(requireNamespace("ggmcmc")) | !isTRUE(requireNamespace("mcmcplots")) | !isTRUE(requireNamespace("mcmcr")) | !isTRUE(requireNamespace("coda")) | !isTRUE(requireNamespace("ggthemes"))) {
+    stop("You need to install the R packages 'ggmcmc', 'mcmcplots', 'mcmcr' and 'coda'. Please run in your R terminal:\n install.packages('ggmcmc', 'mcmcplots', 'mcmcr', 'coda', 'ggthemes')")
   }
   if(length(theme) != 0) {
     theme_names = c("base", "calc", "economist", "excel", "few", "538", "gdocs", "hc", "par", "pander", "solarized", "stata", "tufte", "wsj")
@@ -89,11 +88,6 @@ diagnostic <- function(x, type = "histogram", param = "all", theme = NULL, ...) 
       stop("You must provide one of the available theme styles")
     } 
   }
-    #if(theme %in% theme_names) {
-    #  if(!isTRUE(requireNamespace("ggmcmc"))) {
-    #    stop("You need to install the R packages 'ggmcmc' and 'mcmcplots'. Please run in your R terminal:\n install.packages('ggmcmc', 'mcmcplots')")
-    #  }
-    #} else 
   par_hurdle_sar_e <- c("all", "mu.e", "mu.c", "sd.e", "sd.c", "alpha", "beta", "p.e", "gamma.e")
   par_hurdle_sar_c <- c("all", "mu.e", "mu.c", "sd.e", "sd.c", "alpha", "beta", "p.c", "gamma.c")
   par_hurdle_sar_ec <- c("all", "mu.e", "mu.c", "sd.e", "sd.c", "alpha", "beta", "p.e", "p.c", "gamma.e", "gamma.c")
@@ -245,7 +239,7 @@ diagnostic <- function(x, type = "histogram", param = "all", theme = NULL, ...) 
                                       style = style, greek = greek)
     } else {
       if(param == "all") {
-        varnames(mcmc_object_subset) <- paste("model", varnames(mcmc_object_subset), sep=".")
+        coda::varnames(mcmc_object_subset) <- paste("model", coda::varnames(mcmc_object_subset), sep=".")
         family <- "model"
       } else {
         family <- labs

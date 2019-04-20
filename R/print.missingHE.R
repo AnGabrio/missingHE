@@ -1,4 +1,4 @@
-#' Print a summary of the \code{JAGS} model fitted by \code{\link{selection}}, \code{\link{pattern}} or \code{\link{hurdle}}
+#' Print method for the posterior results contained in the objects of class \code{missingHE}
 #' 
 #' Prints the summary table for the model fitted, with the estimate of the parameters and/or missing values.
 #' @keywords print JAGS missing data  
