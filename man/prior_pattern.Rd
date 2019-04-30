@@ -27,8 +27,8 @@ This function modifies default hyper prior parameter values in the type of selec
 to the type of missingness mechanism and distributions for the outcomes assumed.
 }
 \examples{
-#Internal function only
-#no examples
+# Internal function only
+# no examples
 #
 #
 }

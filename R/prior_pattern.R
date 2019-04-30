@@ -13,8 +13,8 @@
 #' @param pc Number of covariates for the cost model
 #' @param d_list a list of the number and types of patterns in the data
 #' @examples
-#' #Internal function only
-#' #no examples
+#' # Internal function only
+#' # no examples
 #' #
 #' #
 

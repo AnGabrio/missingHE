@@ -16,8 +16,8 @@
 #' @param se Structural value for the effectiveness 
 #' @param sc Structural value for the costs
 #' @examples
-#' #Internal function only
-#' #no examples
+#' # Internal function only
+#' # no examples
 #' #
 #' #
 

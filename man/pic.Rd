@@ -53,7 +53,8 @@ In finite cases, WAIC and LOO give similar estimates, but for influential observ
 }
 \examples{
  
-#For examples see the function selection, pattern or hurdle 
+# For examples see the function \\code{\\link{selection}}, 
+# \\code{\\link{pattern}} or \\code{\\link{hurdle}}
 # 
 # 
 }

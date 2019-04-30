@@ -16,3 +16,15 @@
 * There are currently no downstream dependencies for this package 
 
 * This is my first submission.
+
+* As per email correspondence with Swetlana Herbrandt, I have updated the package DESCRIPTION to include more 
+* information about the methods used in the package alongside with some references. 
+
+* Using check_for_cran (r-hub) I get one note for possibly mis-spelled words in DESCRIPTION. All words are proper names and I have checked that these are correctly spelled.
+
+* I have included examples for the main functions in the package. All functions without an example are only for internal use and therefore no example is applicable. 
+* I have used quick examples to ensure that they run in <5 sec. Addtional and longer examples are included using \donttest. If these are run as well then the total running time can be >5 sec.
+
+
+
+

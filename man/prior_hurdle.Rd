@@ -33,8 +33,8 @@ This function modifies default hyper prior parameter values in the type of hurdl
 to the type of structural value mechanism and distributions for the outcomes assumed.
 }
 \examples{
-#Internal function only
-#no examples
+# Internal function only
+# no examples
 #
 #
 }

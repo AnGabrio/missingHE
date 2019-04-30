@@ -9,8 +9,8 @@
 #' or a function creating (possibly random) initial values. If inits is NULL, JAGS will generate initial values for parameters
 #' @keywords JAGS Bayesian selection models 
 #' @examples
-#' #Internal function only
-#' #No examples
+#' # Internal function only
+#' # No examples
 #' #
 #' #
 

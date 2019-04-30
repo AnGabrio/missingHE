@@ -34,8 +34,8 @@ no structural value is chosen and a standard model for the costs is run.}
 This function fits a JAGS using the \code{\link[R2jags]{jags}} function and obtain posterior inferences.
 }
 \examples{
-#Internal function only
-#No examples
+# Internal function only
+# No examples
 #
 #
 }

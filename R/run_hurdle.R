@@ -17,8 +17,8 @@
 #' \code{1.0E-6} to approximate a point mass at the structural value provided by the user.
 #' @keywords JAGS Bayesian hurdle models 
 #' @examples
-#' #Internal function only
-#' #No examples
+#' # Internal function only
+#' # No examples
 #' #
 #' #
 

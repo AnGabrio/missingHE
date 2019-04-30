@@ -15,8 +15,8 @@
 #' @param ze Number of covariates or the missingness indicators model for the effectiveness
 #' @param zc Number of covariates or the missingness indicators model for the costs
 #' @examples
-#' #Internal function only
-#' #No examples
+#' # Internal function only
+#' # No examples
 #' #
 #' #
 

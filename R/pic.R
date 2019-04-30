@@ -56,7 +56,8 @@
 #' 
 #' @export
 #' @examples  
-#' #For examples see the function selection, pattern or hurdle 
+#' # For examples see the function \code{\link{selection}}, 
+#' # \code{\link{pattern}} or \code{\link{hurdle}}
 #' # 
 #' # 
 

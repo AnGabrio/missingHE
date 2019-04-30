@@ -16,8 +16,8 @@
 #' @param d1 Pattern indicator in the control 
 #' @param d2 Pattern indicator in the intervention
 #' @examples
-#' #Internal function only
-#' #No examples
+#' # Internal function only
+#' # No examples
 #' #
 #' #
 

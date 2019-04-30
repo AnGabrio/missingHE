@@ -12,8 +12,8 @@
 #' @param d2 Patterns in the intervention
 #' @keywords JAGS Bayesian pattern mixture models 
 #' @examples
-#' #Internal function only
-#' #No examples
+#' # Internal function only
+#' # No examples
 #' #
 #' #
 

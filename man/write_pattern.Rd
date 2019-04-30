@@ -36,8 +36,8 @@ type of missingness mechanism assumed and independence or joint modelling
 This function selects which type of model to execute.
 }
 \examples{
-#Internal function only
-#No examples
+# Internal function only
+# No examples
 #
 #
 }

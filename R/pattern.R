@@ -101,68 +101,68 @@
 #' @export
 #'
 #' @examples
-#' \dontrun{
-#'#Simple example to simulate and analyse a data set
-#'#Define the number of individuals fer treatment arm
-#'N1 <- 150
-#'N2 <- 100
+#' # Quck example to run using subset of MenSS dataset
+#' MenSS.subset <- MenSS[1:80, ]
+#' 
+#' # Run the model using the pattern function assuming a SCAR mechanism
+#' # Use only 100 iterations to run a quick check
+#' model.pattern <- pattern(data = MenSS.subset,model.eff = e~1,model.cost = c~1,
+#'    dist_e = "norm", dist_c = "norm",type = "MAR", Delta_e = 0, Delta_c = 0, 
+#'    n.chains = 2, n.iter = 100)
+#' 
+#' # Print the results of the JAGS model
+#' print(model.pattern)
+#' #
 #'
-#'#Create the missingness indicators totally random (MCAR mechanism)
-#'m_eff1 <- m_cost1 <- rbinom(N1,1,0.25)
-#'m_eff2 <- m_cost2 <- rbinom(N2,1,0.25)
-#'
-#'#Simulate data from normal distributions for both arms
-#'eff1 <- rnorm(N1, 0.5, 0.5)
-#'eff2 <- rnorm(N2, 0.5, 0.5)
-#'cost1 <- rnorm(N1, 90, 20)
-#'cost2 <- rnorm(N2, 90, 20)
-#'
-#'#Set value missing if indicator is 1
-#'eff1[m_eff1 == 1] <- NA
-#'eff2[m_eff2 == 1] <- NA
-#'cost1[m_cost1 == 1] <- NA
-#'cost2[m_cost2 == 1] <- NA
-#'
-#'#Create treatment arm indicators
-#'t1 <- rep(1, length(eff1))
-#'t2 <- rep(2, length(eff2))
-#'
-#'#Combine variables and define a data set
-#'e <- c(eff1, eff2)
-#'c <- c(cost1, cost2)
-#'m_eff <- c(m_eff1, m_eff2)
-#'m_cost <- c(m_cost1, m_cost2)
-#'t <- c(t1, t2)
-#'data <- data.frame(e, c, t)
-#'
-#'#Run the model using pattern with JAGS assuming a MCAR missingness mechanism
-#'x <- pattern(data = data, model.eff = e ~ 1, model.cost = c ~ 1,
-#'Delta_e = 0, Delta_c = 0, dist_e = "norm", dist_c = "norm", type = "MAR", center = FALSE)
-#'
-#'#print the results of the JAGS model
-#'print(x)
-#'#
-#'
-#'#use information criteria to assess model fit
-#'pic <- pic(x, criterion = "dic", module = "total")
-#'#
-#'
-#'#Assess model convergence using graphical tools
-#'#Produce histograms of the posterior samples for the mean effect
-#'#parameters in the two treatment arms. 
-#'diagnostic(x, type = "histogram", param = "mu.e")
-#'
-#'#
-#'#Compare observed outcome data with imputations from the model
-#'# (posteiror means and credible intervals)
-#'plot(x, class = "scatter", outcome = "all")
-#'
-#'#
-#'#Summarise the CEA information from model results
-#'summary(x)
+#' # Use dic information criterion to assess model fit
+#' pic.dic <- pic(model.pattern, criterion = "dic", module = "total")
+#' pic.dic
+#' #
+#' 
+#' \dontshow{
+#' # Use waic information criterion to assess model fit
+#' pic.waic <- pic(model.pattern, criterion = "waic", module = "total")
+#' pic.waic
 #' }
-#'#
-#'#
+#'
+#' # Assess model convergence using graphical tools
+#' # Produce histograms of the posterior samples for the mean effects
+#' diag.hist <- diagnostic(model.pattern, type = "histogram", param = "mu.e")
+#' #
+#'
+#' # Compare observed effect data with imputations from the model
+#' # using plots (posteiror means and credible intervals)
+#' p1 <- plot(model.pattern, class = "scatter", outcome = "effects")
+#' #
+#'
+#' # Summarise the CEA information from the model
+#' summary(model.pattern)
+#' 
+#' \donttest{
+#' # Further examples which take longer to run
+#' model.pattern <- pattern(data = MenSS, model.eff = e ~ u.0,model.cost = c ~ e,
+#'    Delta_e = 0, Delta_c = 0, dist_e = "norm", dist_c = "norm",
+#'    type = "MAR", n.chains = 2, n.iter = 1000)
+#' #
+#' # Print results for all imputed values
+#' print(model.pattern, value.mis = TRUE)
+#' 
+#' # Use looic to assess model fit
+#' pic.looic<-pic(model.pattern, criterion = "looic", module = "total")
+#' pic.looic
+#' 
+#' # Show density plots for all parameters
+#' diag.hist <- diagnostic(model.pattern, type = "denplot", param = "all")
+#' 
+#' # Plots of imputations for all data
+#' p1 <- plot(model.pattern, class = "scatter", outcome = "all")
+#' 
+#' # Summarise the CEA results
+#' summary(model.pattern)
+#' 
+#' }
+#' #
+#' #
 
 
 pattern <- function(data, model.eff, model.cost, dist_e, dist_c, Delta_e, Delta_c, type, prob = c(0.05, 0.95), n.chains = 2, n.iter = 20000, 

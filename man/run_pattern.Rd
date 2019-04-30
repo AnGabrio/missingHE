@@ -27,8 +27,8 @@ or a function creating (possibly random) initial values. If inits is NULL, JAGS 
 This function fits a JAGS using the \code{\link[R2jags]{jags}} function and obtain posterior inferences.
 }
 \examples{
-#Internal function only
-#No examples
+# Internal function only
+# No examples
 #
 #
 }

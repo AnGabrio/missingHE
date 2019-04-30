@@ -77,7 +77,8 @@ allows to choose among a set of possible pre-defined themes taken form the packa
 be indicated using one of the following character names: "base","calc","economist","excel","few","538","gdocs","hc","par","pander","solarized","stata","tufte","wsj".
 }
 \examples{
-#For examples see the function selection, pattern or hurdle
+# For examples see the function \\code{\\link{selection}}, 
+# \\code{\\link{pattern}} or \\code{\\link{hurdle}}
 #
 #
 }

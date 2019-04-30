@@ -3,13 +3,17 @@ Type: Package
 Title: Missing Outcome Data in Health Economic Evaluation
 Version: 1.0.0
 Authors@R: person("Andrea", "Gabrio", email = "ucakgab@ucl.ac.uk", role = c("aut", "cre"))
-Description: Contains a suite of functions for health economic evaluations with missing outcome data.
-Depends: R (>= 3.3.0),
+Description: Contains a suite of functions for health economic evaluations with missing outcome data. 
+  The package can fit different types of statistical models under a fully Bayesian approach using the software JAGS (which should be installed locally and which is loaded in missingHE via the R package R2jags). 
+  Three classes of models can be fitted under a variety of missing data assumptions: selection models, pattern mixture models and hurdle models.
+  In addition to model fitting, missingHE provides a set of specialised functions to assess model convergence and summarise the statistical and economic results using different types of measures and graphs. 
+  The methods implemented are described in
+  Mason (2018) <doi:10.1002/hec.3793>,
+  Molenberghs (2000) <doi:10.1007/978-1-4419-0300-6_18> and 
+  Gabrio (2019) <doi:10.1002/sim.8045>.
+Depends: R (>= 3.3.0)
 License: GPL-2
 Encoding: UTF-8
 LazyData: true
-Imports: mcmcplots, ggmcmc, ggthemes, BCEA, ggplot2, grid, gridExtra, methods, R2jags, loo, coda 
+Imports: mcmcplots, ggmcmc, ggthemes, BCEA, ggplot2, grid, gridExtra, methods, R2jags, loo, coda, mcmcr
 RoxygenNote: 6.1.1
-Suggests:
-    spelling
-Language: en-GB
