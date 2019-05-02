@@ -5,7 +5,7 @@ missingHE [![Travis-CI Build Status](https://travis-ci.org/AnGabrio/missingHE.sv
 Missing Outcome Data in Health Economic Evaluation
 --------------------------------------------------
 
-Contains a suite of functions to handle missing individual-level effectiveness and cost outcomes (e.g. from a trial) in economic evaluations under a range of alternative assumptions about the missing data mechanisms. Estimation of the key parameters of interest and imputation of the missing data are carried out through Markov Chain Monte Carlo (MCMC) methods and a set of pre-defined Bayesian parametric models. In addition, missingHE provides a set of specialised functions to assess model convergence, fit to the data, plotting of observed and imputed data, and compute different measures to summarise the cost-effectiveness results.
+Contains a suite of functions for health economic evaluations with missing outcome data. The package can fit different types of statistical models under a fully Bayesian approach using Markov Chain Monte Carlo (MCMC) methods. Three classes of models can be fitted under a variety of missing data assumptions: selection models, pattern mixture models and hurdle models. In addition to model fitting, `missingHE` provides a set of specialised functions to assess model convergence and summarise the statistical and economic results using different types of measures and graphs. 
 
 Installation
 ------------
