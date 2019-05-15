@@ -10,11 +10,11 @@ Contains a suite of functions for health economic evaluations with missing outco
 Installation
 ------------
 
-There are two ways of installing `missingHE`. A "stable" version is packaged and binary files are available for Windows and as source. To install the stable version on a Windows machine, run the following commands
+There are two ways of installing `missingHE`. A "stable" version is packaged and binary files are available for Windows and as source. To install the stable version on a Windows machine, run the following command
 ```R
 install.packages("missingHE")
 ```
-which install the package from a CRAN mirror [CRAN mirror](https://cran.r-project.org/index.html), which ensures that `install.packages()` can also install the "dependencies" (e.g. other packages that are required for `missingHE` to work).
+which installs the package from a [CRAN mirror](https://cran.r-project.org/index.html) and ensures that `install.packages()` can also install the "dependencies" (e.g. other packages that are required for `missingHE` to work).
 
 It is also possible to install `missingHE` using the "development" version - this will usually be updated frequently and may be continuously tested. On Windows machines, you need to install a few dependencies, including [Rtools](https://cran.r-project.org/bin/windows/Rtools/) first, e.g. by running
 
