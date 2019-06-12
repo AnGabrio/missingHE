@@ -5,6 +5,9 @@
 #' @param x A \code{missingHE} object containing the results of the Bayesian model run using the function \code{\link{selection}}, \code{\link{pattern}} or \code{\link{hurdle}}.
 #' @param value.mis Logical. If \code{value.mis} is \code{TRUE}, the model results displayed contain also the imputed values,
 #' else if \code{value.mis} is \code{FALSE} the missing values are hidden.
+#' @param only.means Logical. If \code{only.means} is \code{TRUE}, then the \code{print} function only shows the summary
+#' statistics for the mean effectiveness and costs. Defaults at \code{FALSE} (in which case, shows the summary statistics
+#' for all parameters in the model).
 #' @param ... additional arguments affecting the printed output produced. For example: \code{digits=} number of 
 #' significant digits to be shown in the printed table (default=3). Not available if \code{value.mis=}TRUE.
 #' @author Andrea Gabrio
@@ -16,7 +19,7 @@
 #' # 
 
 
-print.missingHE <- function(x, value.mis = FALSE, ...) {
+print.missingHE <- function(x, value.mis = FALSE, only.means=FALSE, ...) {
   exArgs <- list(...)
   if(exists("digits", where = exArgs)) {digits = exArgs$digits} else {digits = 3}
   if(class(x) != "missingHE") { 
@@ -31,10 +34,13 @@ print.missingHE <- function(x, value.mis = FALSE, ...) {
                   'loglik_de1', 'loglik_de2', 'loglik_dc1', 'loglik_dc2', 'loglik_d1', 'loglik_d2'), invert = TRUE)
   x_print_sum2 <- x_print_sum2[, c(1:3, 7:9)]
     if(x$model_output$`model summary`$BUGSoutput$n.chains > 1) {
-        if(value.mis == FALSE) {
+        if(value.mis == FALSE & only.means==FALSE) {
           print(x_print_sum, digits = digits)
-        } else if(value.mis == TRUE) {
+        } else if(value.mis == TRUE & only.means==FALSE) {
           print(x_print_sum2, digits = digits)
         }
+      if(only.means==TRUE) {
+        print(x_print_sum[grep("mu",rownames(x_print_sum)),])
       }
+    }
 }
