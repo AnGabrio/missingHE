@@ -39,8 +39,8 @@ print.missingHE <- function(x, value.mis = FALSE, only.means=FALSE, ...) {
         } else if(value.mis == TRUE & only.means==FALSE) {
           print(x_print_sum2, digits = digits)
         }
-      if(only.means==TRUE) {
-        print(x_print_sum[grep("mu",rownames(x_print_sum)),])
+      if(only.means == TRUE) {
+        print(x_print_sum[grep("mu", rownames(x_print_sum)),])
       }
     }
 }
