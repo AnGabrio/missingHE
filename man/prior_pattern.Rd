@@ -5,30 +5,32 @@
 \title{An internal function to change the hyperprior parameters in the selection model provided by the user depending on the type of
 missingness mechanism and outcome distributions assumed}
 \usage{
-prior_pattern(type, dist_e, dist_c, pe, pc, d_list)
+prior_pattern(type, dist_e, dist_c, pe, pc, d_list, restriction)
 }
 \arguments{
 \item{type}{Type of missingness mechanism assumed. Choices are Missing At Random (MAR), Missing Not At Random for the effects (MNAR_eff),
 Missing Not At Random for the costs (MNAR_cost), and Missing Not At Random for both (MNAR). For a complete list of all available hyper parameters 
 and types of models see the manual.}
 
-\item{dist_e}{distribution assumed for the effects. Current available choices are: Normal ('norm') or Beta ('beta').}
+\item{dist_e}{distribution assumed for the effects. Current available chocies are: Normal ('norm') or Beta ('beta').}
 
-\item{dist_c}{Distribution assumed for the costs. Current available choices are: Normal ('norm'), Gamma ('gamma') or LogNormal ('lnorm')}
+\item{dist_c}{Distribution assumed for the costs. Current available chocies are: Normal ('norm'), Gamma ('gamma') or LogNormal ('lnorm')}
 
 \item{pe}{Number of covariates for the effectiveness model}
 
-\item{pc}{Number of covariates for the cost model}
+\item{pc}{Number of cvoariates for the cost model}
 
 \item{d_list}{a list of the number and types of patterns in the data}
+
+\item{restriction}{type of identifying restriction to be imposed}
 }
 \description{
 This function modifies default hyper prior parameter values in the type of selection model selected according 
 to the type of missingness mechanism and distributions for the outcomes assumed.
 }
 \examples{
-# Internal function only
-# no examples
+#Internal function only
+#no examples
 #
 #
 }

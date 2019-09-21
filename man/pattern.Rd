@@ -5,9 +5,10 @@
 \title{Full Bayesian Models to handle missingness in Economic Evaluations (Pattern Mixture Models)}
 \usage{
 pattern(data, model.eff, model.cost, dist_e, dist_c, Delta_e, Delta_c,
-  type, prob = c(0.05, 0.95), n.chains = 2, n.iter = 20000,
-  n.burnin = floor(n.iter/2), inits = NULL, n.thin = 1,
-  save_model = FALSE, prior = "default", ...)
+  type, restriction = "CC", prob = c(0.05, 0.95), n.chains = 2,
+  n.iter = 20000, n.burnin = floor(n.iter/2), inits = NULL,
+  n.thin = 1, ppc = FALSE, save_model = FALSE, prior = "default",
+  ...)
 }
 \arguments{
 \item{data}{A data frame in which to find the variables supplied in \code{model.eff}, \code{model.cost} (model formulas for effects and costs).
@@ -24,15 +25,18 @@ If there are no covariates, \code{1} should be specified on the right hand side 
 By default, covariates are placed on the "location" parameter of the distribution through a linear model. A joint bivariate distribution for effects and costs can be specified by
 including 'e' on the right-hand side of the formula for the costs model.}
 
-\item{dist_e}{Distribution assumed for the effects. Current available choices are: Normal ('norm') or Beta ('beta').}
+\item{dist_e}{Distribution assumed for the effects. Current available chocies are: Normal ('norm') or Beta ('beta').}
 
-\item{dist_c}{Distribution assumed for the costs. Current available choices are: Normal ('norm'), Gamma ('gamma') or LogNormal ('lnorm').}
+\item{dist_c}{Distribution assumed for the costs. Current available chocies are: Normal ('norm'), Gamma ('gamma') or LogNormal ('lnorm').}
 
 \item{Delta_e}{Range of values for the prior on the sensitivity parameters used to identify the mean of the effects under MNAR. The value must be set to 0 under MAR.}
 
 \item{Delta_c}{Range of values for the prior on the sensitivity parameters used to identify the mean of the costs under MNAR. The value must be set to 0 under MAR.}
 
 \item{type}{Type of missingness mechanism assumed. Choices are Missing At Random (MAR) and Missing Not At Random (MNAR).}
+
+\item{restriction}{type of identifying restriction to be imposed to identify the distributions of the missing data in each pattern. 
+Available choices are: complete case restrcition ('CC') - default - or available case restriction ('AC').}
 
 \item{prob}{A numeric vector of probabilities within the range (0,1), representing the upper and lower
 CI sample quantiles to be calculated and returned for the imputed values.}
@@ -48,6 +52,8 @@ CI sample quantiles to be calculated and returned for the imputed values.}
 will generate initial values for all the model parameters.}
 
 \item{n.thin}{Thinning interval.}
+
+\item{ppc}{Logical. If \code{ppc} is \code{TRUE}, the estimates of the parameters that can be used to generate replications from the model are saved.}
 
 \item{save_model}{Logical. If \code{save_model} is \code{TRUE} a \code{txt} file containing the model code is printed
 in the current working directory.}
@@ -93,7 +99,8 @@ can be observed between the treatment groups and \code{missingHE} accounts for t
 For simplicity, in this example, we assume that the same number of patterns is observed in both groups. \eqn{d_i} is assigned a multinomial distribution, 
 which probabilities are modelled using a Dirichlet prior (by default giving to each pattern the same weight). Next, the model specified in \code{dist_e} 
 and \code{dist_c} is fitted in each pattern. The parameters that cannot be identified by the observed data in each pattern (d = 2, 3, 4), e.g. the means.
-\eqn{mu_e[d]} and \code{mu_c[d]}, are then identified as: 
+\eqn{mu_e[d]} and \code{mu_c[d]}, can be identified using the parameters estimated from other patterns. Two choices are currently available: the complete cases ('CC') or available cases ('AC').
+For example, using the 'CC' restriction, the parameters indexing the distributions of the missing data are identified as: 
 \deqn{mu_e[2] = \mu_e[4] = \mu_e[1] + \Delta_e}
 \deqn{mu_c[3] = \mu_c[4] = \mu_c[1] + \Delta_c}
 where
@@ -103,7 +110,8 @@ where
 \item \eqn{\Delta_e} is the sensitivity parameters associated with the marginal effects mean.
 \item \eqn{\Delta_c} is the sensitivity parameters associated with the marginal costs mean.
 }
-When \eqn{\Delta_e = 0} and \eqn{\Delta_c = 0} the model assumes a 'MAR' mechanism. When \eqn{\Delta_e != 0} and/or \eqn{\Delta_c != 0} 'MNAR' departures for the 
+If the 'AC' restriction is chosen, only the parameters estimated from the observed data in pattern 2 (costs) and pattern 3 (effects) are used to identify those in the other patterns.  
+When \eqn{\Delta_e = 0} and \eqn{\Delta_c = 0} the model assumes a 'MAR' mechanism. When \eqn{\Delta_e != 0} and/or \eqn{\Delta_c != 0} 'MNAR' departues for the 
 effects and/or costs are explored assuming a Uniform prior distributions for the sensitivity parameters. The range of values for these priors is defined based on the
 boundaries specified in \code{Delta_e} and \code{Delta_c} (see Arguments), which must be provided by the user. 
 When user-defined hyperprior values are supplied via the argument \code{prior} in the function \code{pattern}, the elements of this list (see Arguments)
@@ -119,21 +127,22 @@ formed by two elements. These must be vectors of the same length equal to the nu
 }
 \examples{
 # Quck example to run using subset of MenSS dataset
-MenSS.subset <- MenSS[1:80, ]
+MenSS.subset <- MenSS[50:100, ]
 
 # Run the model using the pattern function assuming a SCAR mechanism
 # Use only 100 iterations to run a quick check
 model.pattern <- pattern(data = MenSS.subset,model.eff = e~1,model.cost = c~1,
    dist_e = "norm", dist_c = "norm",type = "MAR", Delta_e = 0, Delta_c = 0, 
-   n.chains = 2, n.iter = 100)
+   n.chains = 2, n.iter = 100, ppc = TRUE)
 
 # Print the results of the JAGS model
 print(model.pattern)
 #
 
-# Use dic information criterion to assess model fit
+# Use dic information criterion and predictive checks to assess model fit
 pic.dic <- pic(model.pattern, criterion = "dic", module = "total")
 pic.dic
+ppc(model.pattern, type = "histogram", ndisplay = 5)
 #
 
 \dontshow{
@@ -159,7 +168,7 @@ summary(model.pattern)
 # Further examples which take longer to run
 model.pattern <- pattern(data = MenSS, model.eff = e ~ u.0,model.cost = c ~ e,
    Delta_e = 0, Delta_c = 0, dist_e = "norm", dist_c = "norm",
-   type = "MAR", n.chains = 2, n.iter = 1000)
+   type = "MAR", n.chains = 2, n.iter = 500, ppc = FALSE)
 #
 # Print results for all imputed values
 print(model.pattern, value.mis = TRUE)

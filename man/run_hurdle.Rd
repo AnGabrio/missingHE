@@ -4,16 +4,15 @@
 \alias{run_hurdle}
 \title{An internal function to execute a JAGS hurdle model and get posterior results}
 \usage{
-run_hurdle(type, dist_e, dist_c, inits, se = se, sc = sc, sde = sde,
-  sdc = sdc)
+run_hurdle(type, dist_e, dist_c, inits, se, sc, sde, sdc, ppc)
 }
 \arguments{
 \item{type}{Type of structural value mechanism assumed. Choices are Structural Completely At Random (SCAR),
 and Structural At Random (SAR).}
 
-\item{dist_e}{distribution assumed for the effects. Current available choices are: Normal ('norm') or Beta ('beta').}
+\item{dist_e}{distribution assumed for the effects. Current available chocies are: Normal ('norm') or Beta ('beta').}
 
-\item{dist_c}{distribution assumed for the costs. Current available choices are: Normal ('norm'), Gamma ('gamma') or LogNormal ('lnorm')}
+\item{dist_c}{distribution assumed for the costs. Current available chocies are: Normal ('norm'), Gamma ('gamma') or LogNormal ('lnorm').}
 
 \item{inits}{a list with elements equal to the number of chains selected; each element of the list is itself a list of starting values for the BUGS model, 
 or a function creating (possibly random) initial values. If inits is NULL, JAGS will generate initial values for parameters}
@@ -29,13 +28,15 @@ no structural value is chosen and a standard model for the costs is run.}
 
 \item{sdc}{hyper-prior value for the standard deviation of the distribution of the structural costs. The default value is
 \code{1.0E-6} to approximate a point mass at the structural value provided by the user.}
+
+\item{ppc}{Logical. If \code{ppc} is \code{TRUE}, the estimates of the parameters that can be used to generate replications from the model are saved.}
 }
 \description{
-This function fits a JAGS using the \code{\link[R2jags]{jags}} function and obtain posterior inferences.
+This function fits a JAGS using the \code{\link[R2jags]{jags}} funciton and obtain posterior inferences.
 }
 \examples{
-# Internal function only
-# No examples
+#Internal function only
+#No examples
 #
 #
 }

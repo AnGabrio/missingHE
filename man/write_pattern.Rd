@@ -7,7 +7,8 @@ Alternatives vary depending on the type of distribution assumed for the effect a
 type of missingness mechanism assumed and independence or joint modelling
 This function selects which type of model to execute.}
 \usage{
-write_pattern(dist_e, dist_c, ind, type, pe, pc, d_list, d1, d2)
+write_pattern(dist_e, dist_c, ind, type, pe, pc, d_list, d1, d2,
+  restriction)
 }
 \arguments{
 \item{dist_e}{Distribution assumed for the effects. Current available choices are: Normal ('norm') or Beta ('beta')}
@@ -28,6 +29,8 @@ Missing Not At Random for the costs (MNAR_cost), and Missing Not At Random for b
 \item{d1}{Pattern indicator in the control}
 
 \item{d2}{Pattern indicator in the intervention}
+
+\item{restriction}{type of identifying restriction to be imposed}
 }
 \description{
 An internal function to select which type of pattern mixture model to execute. 

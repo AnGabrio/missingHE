@@ -24,8 +24,8 @@
 #' @param model.mc A formula expression in conventional \code{R} linear modelling syntax. The response must be indicated with the 
 #' term 'mc'(missing costs) and any covariates must be provided on the right-hand side of the formula. 
 #' If there are no covariates, \code{1} should be specified on the right hand side of the formula. By default, covariates are placed on the "probability" parameter for the missing costs through a logistic-linear model.
-#' @param dist_e Distribution assumed for the effects. Current available choices are: Normal ('norm') or Beta ('beta').
-#' @param dist_c Distribution assumed for the costs. Current available choices are: Normal ('norm'), Gamma ('gamma') or LogNormal ('lnorm').
+#' @param dist_e Distribution assumed for the effects. Current available chocies are: Normal ('norm') or Beta ('beta').
+#' @param dist_c Distribution assumed for the costs. Current available chocies are: Normal ('norm'), Gamma ('gamma') or LogNormal ('lnorm').
 #' @param type Type of missingness mechanism assumed. Choices are Missing At Random (MAR) and Missing Not At Random (MNAR).
 #' @param prob A numeric vector of probabilities within the range (0,1), representing the upper and lower
 #'  CI sample quantiles to be calculated and returned for the imputed values.
@@ -36,7 +36,8 @@
 #' \code{JAGS} model, or a function creating (possibly random) initial values. If \code{inits} is \code{NULL}, \code{JAGS}
 #' will generate initial values for all the model parameters.
 #' @param n.thin Thinning interval.
-#' @param save_model Logical. If \code{save_model} is \code{TRUE} a \code{txt} file containing the model code is printed
+#' @param ppc Logical. If \code{ppc} is \code{TRUE}, the estimates of the parameters that can be used to generate replications from the model are saved.
+#' @param save_model Logical. If \code{save_model} is \code{TRUE}, a \code{txt} file containing the model code is printed
 #' in the current working directory.
 #' @param prior A list containing the hyperprior values provided by the user. Each element of this list must be a vector of length two
 #' containing the user-provided hyperprior values and must be named with the name of the corresponding parameter. For example, the hyperprior
@@ -111,21 +112,22 @@
 #'
 #' @examples
 #' # Quck example to run using subset of MenSS dataset
-#' MenSS.subset <- MenSS[1:80, ]
+#' MenSS.subset <- MenSS[50:100, ]
 #' 
 #' # Run the model using the selection function assuming a SCAR mechanism
 #' # Use only 100 iterations to run a quick check
 #' model.selection <- selection(data = MenSS.subset, model.eff = e ~ 1,model.cost = c ~ 1,
 #'    model.me = me ~ 1, model.mc = mc ~ 1, dist_e = "norm", dist_c = "norm",
-#'    type = "MAR", n.chains = 2, n.iter = 100)
+#'    type = "MAR", n.chains = 2, n.iter = 100, ppc = TRUE)
 #' 
 #' # Print the results of the JAGS model
 #' print(model.selection)
 #' #
 #'
-#' # Use dic information criterion to assess model fit
+#' # Use dic information criterion and predictive checks to assess model fit
 #' pic.dic <- pic(model.selection, criterion = "dic", module = "total")
 #' pic.dic
+#' ppc(model.selection, type = "histogram", ndisplay = 5)
 #' #
 #' 
 #' \dontshow{
@@ -151,7 +153,7 @@
 #' # Further examples which take longer to run
 #' model.selection <- selection(data = MenSS, model.eff = e ~ u.0,model.cost = c ~ e,
 #'    model.se = me ~ u.0, model.mc = mc ~ 1, dist_e = "norm", dist_c = "norm",
-#'    type = "MAR", n.chains = 2, n.iter = 1000)
+#'    type = "MAR", n.chains = 2, n.iter = 500, ppc = FALSE)
 #' #
 #' # Print results for all imputed values
 #' print(model.selection, value.mis = TRUE)
@@ -175,7 +177,7 @@
 
 
 selection <- function(data, model.eff, model.cost, model.me = me ~ 1, model.mc = mc ~ 1, dist_e, dist_c, type, prob = c(0.05, 0.95), 
-                      n.chains = 2, n.iter = 20000, n.burnin = floor(n.iter / 2), inits = NULL, n.thin = 1, save_model = FALSE, prior = "default", ...) {
+                      n.chains = 2, n.iter = 20000, n.burnin = floor(n.iter / 2), inits = NULL, n.thin = 1, ppc = FALSE, save_model = FALSE, prior = "default", ...) {
   filein <- NULL
   if(is.data.frame(data) == FALSE) {
     stop("data must be in data frame format")
@@ -213,8 +215,8 @@ selection <- function(data, model.eff, model.cost, model.me = me ~ 1, model.mc =
   if(length(prob) != 2 | is.numeric(prob) == FALSE | any(prob < 0) != FALSE | any(prob > 1) != FALSE) {
     stop("You must provide valid lower/upper quantiles for the imputed data distribution")
   }
-  if(is.logical(save_model) == FALSE) {
-    stop("save_model should be either TRUE or FALSE")
+  if(is.logical(save_model) == FALSE | is.logical(ppc) == FALSE) {
+    stop("save_model and ppc are logical arguments and should be either TRUE or FALSE")
   }
   exArgs <- list(...)
   if(exists("center", where = exArgs)) {
@@ -363,7 +365,7 @@ selection <- function(data, model.eff, model.cost, model.me = me ~ 1, model.mc =
                    "covariates_effects" = data_read$covariates_effects, "covariates_costs" = data_read$covariates_costs, 
                    "covariates_missing_effects" = data_read$covariates_missing_effects, "missing_effects" = data_read$missing_effects, 
                    "covariates_missing_costs" = data_read$covariates_missing_costs, "missing_costs" = data_read$missing_costs)
-  model_output <- run_selection(type = type, dist_e = dist_e, dist_c = dist_c, inits = inits)
+  model_output <- run_selection(type = type, dist_e = dist_e, dist_c = dist_c, inits = inits, ppc = ppc)
   if(save_model == FALSE) {
     unlink(filein)
   }

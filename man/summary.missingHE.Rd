@@ -21,13 +21,12 @@ Produces a table printout with some summary results of the health economic evalu
 run using the function \code{\link{selection}}, \code{\link{pattern}} or \code{\link{hurdle}}.
 }
 \examples{
-# For examples see the function \\code{\\link{selection}}, 
-# \\code{\\link{pattern}} or \\code{\\link{hurdle}}
+#For examples see the function selection, pattern or hurdle
 #
 #
 }
 \references{
-Baio, G.(2012). \emph{Bayesian Methods in Health Economics}. CRC/Chapman Hall, London.
+Baio, G.(2012). \emph{Bayesian Methods in Health Economcis}. CRC/Chapman Hall, London.
 }
 \seealso{
 \code{\link{selection}} \code{\link{pattern}} \code{\link{hurdle}} \code{\link{diagnostic}} \code{\link{plot.missingHE}}

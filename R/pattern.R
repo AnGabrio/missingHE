@@ -16,11 +16,13 @@
 #' If there are no covariates, \code{1} should be specified on the right hand side of the formula. 
 #' By default, covariates are placed on the "location" parameter of the distribution through a linear model. A joint bivariate distribution for effects and costs can be specified by
 #' including 'e' on the right-hand side of the formula for the costs model.
-#' @param dist_e Distribution assumed for the effects. Current available choices are: Normal ('norm') or Beta ('beta').
-#' @param dist_c Distribution assumed for the costs. Current available choices are: Normal ('norm'), Gamma ('gamma') or LogNormal ('lnorm').
+#' @param dist_e Distribution assumed for the effects. Current available chocies are: Normal ('norm') or Beta ('beta').
+#' @param dist_c Distribution assumed for the costs. Current available chocies are: Normal ('norm'), Gamma ('gamma') or LogNormal ('lnorm').
 #' @param Delta_e Range of values for the prior on the sensitivity parameters used to identify the mean of the effects under MNAR. The value must be set to 0 under MAR. 
 #' @param Delta_c Range of values for the prior on the sensitivity parameters used to identify the mean of the costs under MNAR. The value must be set to 0 under MAR.
 #' @param type Type of missingness mechanism assumed. Choices are Missing At Random (MAR) and Missing Not At Random (MNAR).
+#' @param restriction type of identifying restriction to be imposed to identify the distributions of the missing data in each pattern. 
+#' Available choices are: complete case restrcition ('CC') - default - or available case restriction ('AC'). 
 #' @param prob A numeric vector of probabilities within the range (0,1), representing the upper and lower
 #' CI sample quantiles to be calculated and returned for the imputed values.
 #' @param n.chains Number of chains.
@@ -30,6 +32,7 @@
 #' \code{JAGS} model, or a function creating (possibly random) initial values. If \code{inits} is \code{NULL}, \code{JAGS}
 #' will generate initial values for all the model parameters.
 #' @param n.thin Thinning interval.
+#' @param ppc Logical. If \code{ppc} is \code{TRUE}, the estimates of the parameters that can be used to generate replications from the model are saved.
 #' @param save_model Logical. If \code{save_model} is \code{TRUE} a \code{txt} file containing the model code is printed
 #' in the current working directory.
 #' @param prior A list containing the hyperprior values provided by the user. Each element of this list must be a vector of length two
@@ -65,7 +68,8 @@
 #' For simplicity, in this example, we assume that the same number of patterns is observed in both groups. \eqn{d_i} is assigned a multinomial distribution, 
 #' which probabilities are modelled using a Dirichlet prior (by default giving to each pattern the same weight). Next, the model specified in \code{dist_e} 
 #' and \code{dist_c} is fitted in each pattern. The parameters that cannot be identified by the observed data in each pattern (d = 2, 3, 4), e.g. the means.
-#' \eqn{mu_e[d]} and \code{mu_c[d]}, are then identified as: 
+#' \eqn{mu_e[d]} and \code{mu_c[d]}, can be identified using the parameters estimated from other patterns. Two choices are currently available: the complete cases ('CC') or available cases ('AC').
+#' For example, using the 'CC' restriction, the parameters indexing the distributions of the missing data are identified as: 
 #' \deqn{mu_e[2] = \mu_e[4] = \mu_e[1] + \Delta_e}
 #' \deqn{mu_c[3] = \mu_c[4] = \mu_c[1] + \Delta_c}
 #' where
@@ -75,7 +79,8 @@
 #' \item \eqn{\Delta_e} is the sensitivity parameters associated with the marginal effects mean.
 #' \item \eqn{\Delta_c} is the sensitivity parameters associated with the marginal costs mean.
 #' }
-#' When \eqn{\Delta_e = 0} and \eqn{\Delta_c = 0} the model assumes a 'MAR' mechanism. When \eqn{\Delta_e != 0} and/or \eqn{\Delta_c != 0} 'MNAR' departures for the 
+#' If the 'AC' restriction is chosen, only the parameters estimated from the observed data in pattern 2 (costs) and pattern 3 (effects) are used to identify those in the other patterns.  
+#' When \eqn{\Delta_e = 0} and \eqn{\Delta_c = 0} the model assumes a 'MAR' mechanism. When \eqn{\Delta_e != 0} and/or \eqn{\Delta_c != 0} 'MNAR' departues for the 
 #' effects and/or costs are explored assuming a Uniform prior distributions for the sensitivity parameters. The range of values for these priors is defined based on the
 #' boundaries specified in \code{Delta_e} and \code{Delta_c} (see Arguments), which must be provided by the user. 
 #' When user-defined hyperprior values are supplied via the argument \code{prior} in the function \code{pattern}, the elements of this list (see Arguments)
@@ -99,24 +104,25 @@
 #' 
 #' Plummer, M. \emph{JAGS: A program for analysis of Bayesian graphical models using Gibbs sampling.} (2003).
 #' @export
-#'
+#' 
 #' @examples
 #' # Quck example to run using subset of MenSS dataset
-#' MenSS.subset <- MenSS[1:80, ]
+#' MenSS.subset <- MenSS[50:100, ]
 #' 
 #' # Run the model using the pattern function assuming a SCAR mechanism
 #' # Use only 100 iterations to run a quick check
 #' model.pattern <- pattern(data = MenSS.subset,model.eff = e~1,model.cost = c~1,
 #'    dist_e = "norm", dist_c = "norm",type = "MAR", Delta_e = 0, Delta_c = 0, 
-#'    n.chains = 2, n.iter = 100)
+#'    n.chains = 2, n.iter = 100, ppc = TRUE)
 #' 
 #' # Print the results of the JAGS model
 #' print(model.pattern)
 #' #
 #'
-#' # Use dic information criterion to assess model fit
+#' # Use dic information criterion and predictive checks to assess model fit
 #' pic.dic <- pic(model.pattern, criterion = "dic", module = "total")
 #' pic.dic
+#' ppc(model.pattern, type = "histogram", ndisplay = 5)
 #' #
 #' 
 #' \dontshow{
@@ -142,7 +148,7 @@
 #' # Further examples which take longer to run
 #' model.pattern <- pattern(data = MenSS, model.eff = e ~ u.0,model.cost = c ~ e,
 #'    Delta_e = 0, Delta_c = 0, dist_e = "norm", dist_c = "norm",
-#'    type = "MAR", n.chains = 2, n.iter = 1000)
+#'    type = "MAR", n.chains = 2, n.iter = 500, ppc = FALSE)
 #' #
 #' # Print results for all imputed values
 #' print(model.pattern, value.mis = TRUE)
@@ -165,8 +171,8 @@
 #' #
 
 
-pattern <- function(data, model.eff, model.cost, dist_e, dist_c, Delta_e, Delta_c, type, prob = c(0.05, 0.95), n.chains = 2, n.iter = 20000, 
-                    n.burnin = floor(n.iter / 2), inits = NULL, n.thin = 1, save_model = FALSE, prior = "default", ...) {
+pattern <- function(data, model.eff, model.cost, dist_e, dist_c, Delta_e, Delta_c, type, restriction = "CC", prob = c(0.05, 0.95), n.chains = 2, n.iter = 20000, 
+                    n.burnin = floor(n.iter / 2), inits = NULL, n.thin = 1, ppc = FALSE, save_model = FALSE, prior = "default", ...) {
   filein <- NULL
   if(is.data.frame(data) == FALSE) {
     stop("data must be in data frame format")
@@ -195,6 +201,9 @@ pattern <- function(data, model.eff, model.cost, dist_e, dist_c, Delta_e, Delta_
   if(is.numeric(Delta_e) == FALSE | is.numeric(Delta_c) == FALSE) {
     stop("Delta parameters values or ranges must be numeric")
   }
+  if(!restriction %in% c("CC", "AC")){
+    stop("Only 'CC' or 'AC' types of restriction are allowed")
+  }
   dist_e <- tolower(dist_e)
   dist_c <- tolower(dist_c)
   if(dist_e == "normal") { dist_e <- "norm" }
@@ -210,8 +219,8 @@ pattern <- function(data, model.eff, model.cost, dist_e, dist_c, Delta_e, Delta_
   if(length(prob) != 2 | is.numeric(prob) == FALSE | any(prob < 0) != FALSE | any(prob > 1) != FALSE) {
     stop("You must provide valid lower/upper quantiles for the imputed data distribution")
   }
-  if(is.logical(save_model) == FALSE) {
-    stop("save_model should be either TRUE or FALSE")
+  if(is.logical(save_model) == FALSE | is.logical(ppc) == FALSE) {
+    stop("save_model and ppc are logical arguments and should be either TRUE or FALSE")
   }
   exArgs <- list(...)
   if(exists("center", where = exArgs)) {
@@ -248,7 +257,7 @@ pattern <- function(data, model.eff, model.cost, dist_e, dist_c, Delta_e, Delta_
    } else if(is.matrix(Delta_e) == TRUE & is.matrix(Delta_c) == TRUE) {
       type = "MNAR"
    }
-  } 
+  }
   N1 <- data_read$arm_lengths[1]
   N2 <- data_read$arm_lengths[2]
   pe <- ncol(data_read$covariates_effects$Intervention)
@@ -319,18 +328,31 @@ pattern <- function(data, model.eff, model.cost, dist_e, dist_c, Delta_e, Delta_
       if("beta_f.prior" %in% names(list_check_vector)) {stop(stop_mes) } 
     }
   }
-  if(exists("sigma.prior.e", where=prior)) {sigma.prior.e = prior$sigma.prior.e} else {sigma.prior.e = NULL }
-  if(exists("sigma.prior.c", where=prior)) {sigma.prior.c = prior$sigma.prior.c} else {sigma.prior.c = NULL }
-  if(exists("alpha0.prior", where=prior)) {alpha0.prior = prior$alpha0.prior} else {alpha0.prior = NULL }
-  if(exists("beta0.prior", where=prior)) {beta0.prior = prior$beta0.prior} else {beta0.prior = NULL }
-  if(exists("alpha.prior", where=prior)) {alpha.prior = prior$alpha.prior} else {alpha.prior = NULL }
-  if(exists("beta.prior", where=prior)) {beta.prior = prior$beta.prior} else {beta.prior = NULL }
-  if(exists("patterns.prior", where=prior)) {patterns.prior = prior$patterns.prior} else {patterns.prior = NULL }
+  if(exists("sigma.prior.e", where = prior)) {sigma.prior.e = prior$sigma.prior.e} else {sigma.prior.e = NULL }
+  if(exists("sigma.prior.c", where = prior)) {sigma.prior.c = prior$sigma.prior.c} else {sigma.prior.c = NULL }
+  if(exists("alpha0.prior", where = prior)) {alpha0.prior = prior$alpha0.prior} else {alpha0.prior = NULL }
+  if(exists("beta0.prior", where = prior)) {beta0.prior = prior$beta0.prior} else {beta0.prior = NULL }
+  if(exists("alpha.prior", where = prior)) {alpha.prior = prior$alpha.prior} else {alpha.prior = NULL }
+  if(exists("beta.prior", where = prior)) {beta.prior = prior$beta.prior} else {beta.prior = NULL }
+  if(exists("patterns.prior", where = prior)) {patterns.prior = prior$patterns.prior} else {patterns.prior = NULL }
   if(exists("beta_f.prior", where = prior)) {beta_f.prior = prior$beta_f.prior} else {beta_f.prior = NULL }
   if(n_patterns1 < 2 | n_patterns2 < 2) { 
     stop("at least two patterns are required in each group to fit the model") }
-  if(any(d1 == 1, na.rm = TRUE) == FALSE | any(d2 == 1, na.rm = TRUE) == FALSE) {
-    stop("some completers must be observed in both treatment groups to fit the model") }
+  if(restriction == "CC"){
+    if(any(d1 == 1, na.rm = TRUE) == FALSE | any(d2 == 1, na.rm = TRUE) == FALSE) {
+      stop("some completers must be observed in both treatment groups to fit the model") }
+  }
+  if(restriction == "AC"){
+    if(any(d1 == 3, na.rm = TRUE) == FALSE | any(d2 == 3, na.rm = TRUE) == FALSE |
+       any(d1 == 2, na.rm = TRUE) == FALSE | any(d2 == 2, na.rm = TRUE) == FALSE) {
+      stop("some non-completers for both outcomes must be observed in both treatment groups to fit the model") }
+    if(ind == FALSE){
+      if(any(d1 == 1, na.rm = TRUE) == FALSE | any(d2 == 1, na.rm = TRUE) == FALSE) {
+        stop("some completers must be observed in both treatment groups when 'e' is included in the model of 'c' under AC restriction") }
+      if(n_patterns1 == 2 | n_patterns2 == 2){
+        stop("at least three patterns in each arm are required to fit the model when 'e' is included in the model of 'c' under AC restriction") }
+    }
+  }
   if(all(d1 %in% c(1,3) == TRUE) & is.matrix(Delta_e) == TRUE) {stop("Cannot introduce sensitvity parameters for effects when all effects are observed in one arm") }
   if(all(d2 %in% c(1,3) == TRUE) & is.matrix(Delta_e) == TRUE) {stop("Cannot introduce sensitvity parameters for effects when all effects are observed in one arm") }
   if(all(d1 %in% c(1,2) == TRUE) & is.matrix(Delta_c) == TRUE) {stop("Cannot introduce sensitvity parameters for costs when all costs are observed in one arm") }
@@ -344,7 +366,8 @@ pattern <- function(data, model.eff, model.cost, dist_e, dist_c, Delta_e, Delta_
                    "N observed in reference arm" = N1_cc, "N observed in comparator arm" = N2_cc, "N missing in reference arm" = N1_mis, "N missing in comparator arm"= N2_mis, 
                    "patterns in comparator arm" = data_read$patterns$Control, "patterns in reference arm" = data_read$patterns$Intervention, "covariates_effects" = data_read$covariates_effects, 
                    "covariates_costs" = data_read$covariates_costs, "missing_effects" = data_read$missing_effects, "missing_costs" = data_read$missing_costs)
-  model_output <- run_pattern(type = type, dist_e = dist_e, dist_c = dist_c, inits = inits, d_list = d_list, d1 = d1, d2 = d2)
+  model_output <- run_pattern(type = type, dist_e = dist_e, dist_c = dist_c, inits = inits, d_list = d_list, d1 = d1, d2 = d2, 
+                              restriction = restriction, ppc = ppc)
   if(save_model == FALSE) {
     unlink(filein)
   }

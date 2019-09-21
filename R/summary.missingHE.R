@@ -10,12 +10,11 @@
 #' @seealso \code{\link{selection}} \code{\link{pattern}} \code{\link{hurdle}} \code{\link{diagnostic}} \code{\link{plot.missingHE}}
 #' @author Andrea Gabrio
 #' @references 
-#' Baio, G.(2012). \emph{Bayesian Methods in Health Economics}. CRC/Chapman Hall, London.
+#' Baio, G.(2012). \emph{Bayesian Methods in Health Economcis}. CRC/Chapman Hall, London.
 #' @importFrom stats quantile
 #' @export
 #' @examples 
-#' # For examples see the function \code{\link{selection}}, 
-#' # \code{\link{pattern}} or \code{\link{hurdle}}
+#' #For examples see the function selection, pattern or hurdle
 #' #
 #' #
 
@@ -49,7 +48,7 @@ summary.missingHE <- function(object, ...) {
   upper_mu_cost2 <- round(quantile(object$model_output$mean_costs[,2], probs = 0.95), digits = 3)
   upper_mu_delta_e <- round(quantile(object$cea$delta.e, probs = 0.95), digits = 3)
   upper_mu_delta_c <- round(quantile(object$cea$delta.c, probs = 0.95), digits = 3)
-  rownames_v <- c("mean effects", "mean costs", "mean effects", "mean costs",
+  rownames_v <- c("mean effects (t = 1)", "mean costs (t = 1)", "mean effects (t = 2)", "mean costs (t = 2)",
                 "delta effects", "delta costs", "ICER")
   colnames_v <- c("mean", "sd", "LB", "UB")
   mean_v <- c(mu_eff1, mu_cost1, mu_eff2, mu_cost2, mu_delta_e, mu_delta_c, icer)

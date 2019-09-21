@@ -1,3 +1,14 @@
+## Resubmission
+* This is a resubmission. In this version I have made two main changes:
+
+* I added the choice of using two different restriction methods (CC or AC) to fit pattern mixture models (via the function pattern).
+
+* I added an accessory function for generating different types of graphical posterior predictive checks (function is named ppc) to assess the fit of all three types of models in the package (selection, pattern and hurdle). 
+
+* I made few other changes to some of the other functions of the package to fix some minor bugs and updated the description of the functions accordingly.
+
+* Updated the version of the package in the DESCRIPTION file to 1.2.1.
+
 ## Test environments
 * Windows 10 64-bit install, R 3.5.2 and R 3.5.3 (local)
 * Ubuntu 14.04, R 3.5.2 (on travis-ci)
@@ -15,18 +26,6 @@
 ## Downstream dependencies
 * There are currently no downstream dependencies for this package 
 
-* This is my first submission.
-
-* As per email correspondence with Martina Schmirl, I have updated the package DESCRIPTION and write package, software and API names in single quotes in title and description.
-
-* Using check_for_cran (r-hub) I still get one note for possibly mis-spelled words in DESCRIPTION which is only related to two proper names of authors listed in the description field (Gabrio and Molenberghs). 
-* I have checked that these are correctly spelled.
-
-* I have included examples for the main functions in the package. All functions without an example are only for internal use and therefore no example is applicable. 
-* I have used quick examples to ensure that they run in <5 sec. Additional and longer examples are included using \donttest. If these are run as well then the total running time can be >5 sec.
-
-* I have clarified in the description field that the software JAGS needs to be installed as all models are fitted using this Bayesian software. 
-* If JAGS is installed, then the software is automatically loaded via the R2jags package (included in imports)
 
 
 

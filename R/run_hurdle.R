@@ -1,10 +1,10 @@
 #' An internal function to execute a JAGS hurdle model and get posterior results
 #'
-#' This function fits a JAGS using the \code{\link[R2jags]{jags}} function and obtain posterior inferences.
+#' This function fits a JAGS using the \code{\link[R2jags]{jags}} funciton and obtain posterior inferences.
 #' @param type Type of structural value mechanism assumed. Choices are Structural Completely At Random (SCAR),
 #' and Structural At Random (SAR).
-#' @param dist_e distribution assumed for the effects. Current available choices are: Normal ('norm') or Beta ('beta').
-#' @param dist_c distribution assumed for the costs. Current available choices are: Normal ('norm'), Gamma ('gamma') or LogNormal ('lnorm')
+#' @param dist_e distribution assumed for the effects. Current available chocies are: Normal ('norm') or Beta ('beta').
+#' @param dist_c distribution assumed for the costs. Current available chocies are: Normal ('norm'), Gamma ('gamma') or LogNormal ('lnorm').
 #' @param se Structural value to be found in the effect data. If set to \code{NULL}, 
 #' no structural value is chosen and a standard model for the effects is run.
 #' @param sc Structural value to be found in the cost data. If set to \code{NULL}, 
@@ -15,15 +15,16 @@
 #' \code{1.0E-6} to approximate a point mass at the structural value provided by the user.
 #' @param sdc hyper-prior value for the standard deviation of the distribution of the structural costs. The default value is
 #' \code{1.0E-6} to approximate a point mass at the structural value provided by the user.
+#' @param ppc Logical. If \code{ppc} is \code{TRUE}, the estimates of the parameters that can be used to generate replications from the model are saved.
 #' @keywords JAGS Bayesian hurdle models 
 #' @examples
-#' # Internal function only
-#' # No examples
+#' #Internal function only
+#' #No examples
 #' #
 #' #
 
 
-run_hurdle <- function(type, dist_e, dist_c, inits, se = se, sc = sc, sde = sde, sdc = sdc) eval.parent(substitute( {
+run_hurdle <- function(type, dist_e, dist_c, inits, se, sc, sde, sdc, ppc) eval.parent(substitute( {
   if(!isTRUE(requireNamespace("R2jags", quietly = TRUE))) {
     stop("You need to install the R package 'R2jags'. Please run in your R terminal:\n install.packages('R2jags')")
   }
@@ -176,6 +177,21 @@ run_hurdle <- function(type, dist_e, dist_c, inits, se = se, sc = sc, sde = sde,
               "loglik_e1", "loglik_e2", "loglik_c1", "loglik_c2", "loglik_de1", "loglik_de2", "loglik_dc1", "loglik_dc2") 
   }
   if(ind == FALSE) {params <- c(params, "beta_f") }
+  if(ppc == TRUE) { 
+    if(dist_e == "norm") {
+      ppc_e_params <- c("mu_e1", "mu_e2", "tau_e1", "tau_e2") 
+    } else if(dist_e == "beta") {
+      ppc_e_params <- c("mu_e1", "tau_e1", "mu_e2", "tau_e2")
+    }
+    if(dist_c == "norm") {
+      ppc_c_params <- c("mu_c1", "mu_c2", "tau_c1", "tau_c2") 
+    } else if(dist_c == "gamma") {
+      ppc_c_params <- c("mu_c1", "tau_c1", "mu_c2", "tau_c2")
+    } else if(dist_c == "lnorm") {
+      ppc_c_params <- c("lmu_c1", "lmu_c2", "ltau_c1", "ltau_c2")
+    } 
+    params <- c(params, ppc_e_params, ppc_c_params)
+  }
   modelN1 <- R2jags::jags(data = datalist, inits = inits, parameters.to.save = params, model.file = filein, n.chains = n.chains, 
                           n.iter = n.iter, n.burnin = n.burnin, DIC = DIC, n.thin = n.thin)
     mu_e <- modelN1$BUGSoutput$sims.list$mu_e
@@ -264,16 +280,18 @@ run_hurdle <- function(type, dist_e, dist_c, inits, se = se, sc = sc, sde = sde,
     if(is.null(se) == TRUE) {
       model_output_jags <- list("summary" = model_sum, "model summary" = modelN1, "mean_effects" = mu_e, "mean_costs" = mu_c, "sd_effects" = s_e, "sd_costs" = s_c, 
                                 "covariate_parameter_effects" = alpha, "covariate_parameter_costs" = beta, "structural_probability_costs" = p_c, 
-                                "structural_parameter_costs" = gamma_c, "loglik" = loglik, "imputed" = imputed, "type" = "HURDLE_c", "ind" = ind)
+                                "structural_parameter_costs" = gamma_c, "loglik" = loglik, "imputed" = imputed, "type" = "HURDLE_c", "ind" = ind,
+                                "ppc" = ppc, "dist_e" = dist_e, "dist_c" = dist_c)
     } else if(is.null(sc) == TRUE) {
       model_output_jags <- list("summary" = model_sum, "model summary" = modelN1, "mean_effects" = mu_e, "mean_costs" = mu_c, "sd_effects" = s_e, "sd_costs" = s_c, 
                                 "covariate_parameter_effects" = alpha, "covariate_parameter_costs" = beta, "structural_probability_effects" = p_e, 
-                                "structural_parameter_effects" = gamma_e, "loglik" = loglik, "imputed" = imputed, "type" = "HURDLE_e", "ind" = ind)
+                                "structural_parameter_effects" = gamma_e, "loglik" = loglik, "imputed" = imputed, "type" = "HURDLE_e", "ind" = ind,
+                                "ppc" = ppc, "dist_e" = dist_e, "dist_c" = dist_c)
     } else if(is.null(se) == FALSE & is.null(sc) == FALSE) {
       model_output_jags <- list("summary" = model_sum, "model summary" = modelN1, "mean_effects" = mu_e, "mean_costs" = mu_c, "sd_effects" = s_e, "sd_costs" = s_c, 
                                 "covariate_parameter_effects" = alpha, "covariate_parameter_costs" = beta, "structural_probability_effects" = p_e, 
                                 "structural_parameter_effects" = gamma_e, "structural_probability_costs" = p_c, "structural_parameter_costs" = gamma_c, 
-                                "loglik" = loglik, "imputed" = imputed, "type" = "HURDLE_ec", "ind" = ind)
+                                "loglik" = loglik, "imputed" = imputed, "type" = "HURDLE_ec", "ind" = ind, "ppc" = ppc, "dist_e" = dist_e, "dist_c" = dist_c)
     }
   if(n.chains == 1) {model_output_jags <- model_output_jags[-1] }
   return(model_output_jags = model_output_jags)

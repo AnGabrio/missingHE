@@ -26,7 +26,7 @@ print.missingHE <- function(x, value.mis = FALSE, only.means=FALSE, ...) {
     stop("Only objects of class 'missingHE' can be used") 
   }
   if(x$model_output$`model summary`$BUGSoutput$n.chains == 1){
-    stop("no output is available if n.chain=1")
+    stop("no output is available if n.chain = 1")
   }
   x_print_sum <- x$model_output$summary[, c(1:3, 7:9)]
   x_print_sum2 <- jagsresults(x = x$model_output$`model summary`, params = c('loglik_e1', 'loglik_e2',
@@ -34,13 +34,13 @@ print.missingHE <- function(x, value.mis = FALSE, only.means=FALSE, ...) {
                   'loglik_de1', 'loglik_de2', 'loglik_dc1', 'loglik_dc2', 'loglik_d1', 'loglik_d2'), invert = TRUE)
   x_print_sum2 <- x_print_sum2[, c(1:3, 7:9)]
     if(x$model_output$`model summary`$BUGSoutput$n.chains > 1) {
-        if(value.mis == FALSE & only.means==FALSE) {
+        if(value.mis == FALSE & only.means == FALSE) {
           print(x_print_sum, digits = digits)
-        } else if(value.mis == TRUE & only.means==FALSE) {
+        } else if(value.mis == TRUE & only.means == FALSE) {
           print(x_print_sum2, digits = digits)
         }
       if(only.means == TRUE) {
-        print(x_print_sum[grep("mu", rownames(x_print_sum)),])
+        print(x_print_sum[grep("mu_[ec]\\[", rownames(x_print_sum)),])
       }
     }
 }

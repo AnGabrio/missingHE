@@ -4,7 +4,8 @@
 \alias{print.missingHE}
 \title{Print method for the posterior results contained in the objects of class \code{missingHE}}
 \usage{
-\method{print}{missingHE}(x, value.mis = FALSE, only.means = FALSE, ...)
+\method{print}{missingHE}(x, value.mis = FALSE, only.means = FALSE,
+  ...)
 }
 \arguments{
 \item{x}{A \code{missingHE} object containing the results of the Bayesian model run using the function \code{\link{selection}}, \code{\link{pattern}} or \code{\link{hurdle}}.}
@@ -14,7 +15,7 @@ else if \code{value.mis} is \code{FALSE} the missing values are hidden.}
 
 \item{only.means}{Logical. If \code{only.means} is \code{TRUE}, then the \code{print} function only shows the summary
 statistics for the mean effectiveness and costs. Defaults at \code{FALSE} (in which case, shows the summary statistics
-for all parameters in the model)}
+for all parameters in the model).}
 
 \item{...}{additional arguments affecting the printed output produced. For example: \code{digits=} number of 
 significant digits to be shown in the printed table (default=3). Not available if \code{value.mis=}TRUE.}

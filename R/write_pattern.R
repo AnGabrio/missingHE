@@ -15,6 +15,7 @@
 #' @param d_list Number and type of patterns 
 #' @param d1 Pattern indicator in the control 
 #' @param d2 Pattern indicator in the intervention
+#' @param restriction type of identifying restriction to be imposed
 #' @examples
 #' # Internal function only
 #' # No examples
@@ -22,7 +23,7 @@
 #' #
 
 
-write_pattern <- function(dist_e , dist_c, ind, type, pe, pc, d_list, d1, d2) eval.parent(substitute( {
+write_pattern <- function(dist_e , dist_c, ind, type, pe, pc, d_list, d1, d2, restriction) eval.parent(substitute( {
   model_string_jags<-  "
   model {
   
@@ -232,6 +233,32 @@ write_pattern <- function(dist_e , dist_c, ind, type, pe, pc, d_list, d1, d2) ev
     model_string_jags <- gsub(" + Delta_e[2]", "", model_string_jags, fixed = TRUE)
     model_string_jags <- gsub("Delta_e[t] ~ dunif(range_e[t, 1], range_e[t, 2])", "", model_string_jags, fixed = TRUE)
   }  
+  if(restriction == "AC") {
+    model_string_jags <- gsub("alpha_p1[j, 2] <- alpha_p1[j, 1]", "alpha_p1[j, 2] <- alpha_p1[j, 3]", model_string_jags, fixed = TRUE)
+    model_string_jags <- gsub("alpha_p1[j, 4] <- alpha_p1[j, 1]", "alpha_p1[j, 4] <- alpha_p1[j, 3]", model_string_jags, fixed = TRUE)
+    model_string_jags <- gsub("alpha_p2[j, 2] <- alpha_p2[j, 1]", "alpha_p2[j, 2] <- alpha_p2[j, 3]", model_string_jags, fixed = TRUE)
+    model_string_jags <- gsub("alpha_p2[j, 4] <- alpha_p2[j, 1]", "alpha_p2[j, 4] <- alpha_p2[j, 3]", model_string_jags, fixed = TRUE)
+    model_string_jags <- gsub("alpha_p1[1, 2] <- alpha_p1[1, 1]", "alpha_p1[1, 2] <- alpha_p1[1, 3]", model_string_jags, fixed = TRUE)
+    model_string_jags <- gsub("alpha_p1[1, 4] <- alpha_p1[1, 1]", "alpha_p1[1, 4] <- alpha_p1[1, 3]", model_string_jags, fixed = TRUE)
+    model_string_jags <- gsub("alpha_p2[1, 2] <- alpha_p2[1, 1]", "alpha_p2[1, 2] <- alpha_p2[1, 3]", model_string_jags, fixed = TRUE)
+    model_string_jags <- gsub("alpha_p2[1, 4] <- alpha_p2[1, 1]", "alpha_p2[1, 4] <- alpha_p2[1, 3]", model_string_jags, fixed = TRUE)
+    model_string_jags <- gsub("beta_p1[j, 3] <- beta_p1[j, 1]", "beta_p1[j, 3] <- beta_p1[j, 2]", model_string_jags, fixed = TRUE)
+    model_string_jags <- gsub("beta_p1[j, 4] <- beta_p1[j, 1]", "beta_p1[j, 4] <- beta_p1[j, 2]", model_string_jags, fixed = TRUE)
+    model_string_jags <- gsub("beta_p2[j, 3] <- beta_p2[j, 1]", "beta_p2[j, 3] <- beta_p2[j, 2]", model_string_jags, fixed = TRUE)
+    model_string_jags <- gsub("beta_p2[j, 4] <- beta_p2[j, 1]", "beta_p2[j, 4] <- beta_p2[j, 2]", model_string_jags, fixed = TRUE)
+    model_string_jags <- gsub("beta_p1[1, 3] <- beta_p1[1, 1]", "beta_p1[1, 3] <- beta_p1[1, 2]", model_string_jags, fixed = TRUE)
+    model_string_jags <- gsub("beta_p1[1, 4] <- beta_p1[1, 1]", "beta_p1[1, 4] <- beta_p1[1, 2]", model_string_jags, fixed = TRUE)
+    model_string_jags <- gsub("beta_p2[1, 3] <- beta_p2[1, 1]", "beta_p2[1, 3] <- beta_p2[1, 2]", model_string_jags, fixed = TRUE)
+    model_string_jags <- gsub("beta_p2[1, 4] <- beta_p2[1, 1]", "beta_p2[1, 4] <- beta_p2[1, 2]", model_string_jags, fixed = TRUE)
+    model_string_jags <- gsub("ls_c_p1[3] <- ls_c_p1[1]", "ls_c_p1[3] <- ls_c_p1[2]", model_string_jags, fixed = TRUE)
+    model_string_jags <- gsub("ls_c_p1[4] <- ls_c_p1[1]", "ls_c_p1[4] <- ls_c_p1[2]", model_string_jags, fixed = TRUE)
+    model_string_jags <- gsub("ls_e_p1[2] <- ls_e_p1[1]", "ls_e_p1[2] <- ls_e_p1[3]", model_string_jags, fixed = TRUE)
+    model_string_jags <- gsub("ls_e_p1[4] <- ls_e_p1[1]", "ls_e_p1[4] <- ls_e_p1[3]", model_string_jags, fixed = TRUE)
+    model_string_jags <- gsub("ls_c_p2[3] <- ls_c_p2[1]", "ls_c_p2[3] <- ls_c_p2[2]", model_string_jags, fixed = TRUE)
+    model_string_jags <- gsub("ls_c_p2[4] <- ls_c_p2[1]", "ls_c_p2[4] <- ls_c_p2[2]", model_string_jags, fixed = TRUE)
+    model_string_jags <- gsub("ls_e_p2[2] <- ls_e_p2[1]", "ls_e_p2[2] <- ls_e_p2[3]", model_string_jags, fixed = TRUE)
+    model_string_jags <- gsub("ls_e_p2[4] <- ls_e_p2[1]", "ls_e_p2[4] <- ls_e_p2[3]", model_string_jags, fixed = TRUE)
+  }
   if(ind == TRUE) {
     model_string_jags <- gsub(" + beta_f_p1[d1[i]] * (eff1[i] - meane_p1[d1[i]])", "", model_string_jags, fixed = TRUE)
     model_string_jags <- gsub(" + beta_f_p2[d2[i]] * (eff2[i] - meane_p2[d2[i]])", "", model_string_jags, fixed = TRUE)
@@ -274,6 +301,12 @@ write_pattern <- function(dist_e , dist_c, ind, type, pe, pc, d_list, d1, d2) ev
     model_string_jags <- gsub("ls_c_p2[2] ~ dunif(-5, 10)", "s_c_p2[2] ~ dunif(0, 10000)", model_string_jags, fixed = TRUE)
     model_string_jags <- gsub("ls_c_p2[3] <- ls_c_p2[1]", "s_c_p2[3] <- s_c_p2[1]", model_string_jags, fixed = TRUE)
     model_string_jags <- gsub("ls_c_p2[4] <- ls_c_p2[1]", "s_c_p2[4] <- s_c_p2[1]", model_string_jags, fixed = TRUE)
+    if(restriction == "AC"){
+      model_string_jags <- gsub("ls_c_p1[3] <- ls_c_p1[2]", "s_c_p1[3] <- s_c_p1[2]", model_string_jags, fixed = TRUE)
+      model_string_jags <- gsub("ls_c_p1[4] <- ls_c_p1[2]", "s_c_p1[4] <- s_c_p1[2]", model_string_jags, fixed = TRUE)
+      model_string_jags <- gsub("ls_c_p2[3] <- ls_c_p2[2]", "s_c_p2[3] <- s_c_p2[2]", model_string_jags, fixed = TRUE)
+      model_string_jags <- gsub("ls_c_p2[4] <- ls_c_p2[2]", "s_c_p2[4] <- s_c_p2[2]", model_string_jags, fixed = TRUE)
+    }
     model_string_jags <- gsub("#mean for lnorm for t=1", "", model_string_jags, fixed = TRUE)
     model_string_jags <- gsub("#mean for lnorm for t=2", "", model_string_jags, fixed = TRUE)
     model_string_jags <- gsub("loglik_c1[i] <- logdensity.norm(cost1[i], mu_c1[i], tau_c_p1[d1[i]])", "loglik_c1[i] <- logdensity.gamma(cost1[i], mu_c1[i] * tau_c1[i], tau_c1[i])", model_string_jags, fixed = TRUE)
@@ -330,6 +363,12 @@ write_pattern <- function(dist_e , dist_c, ind, type, pe, pc, d_list, d1, d2) ev
     model_string_jags <- gsub("ls_e_p2[2] <- ls_e_p2[1]", "s_e_p2[2] <- s_e_p2[1]", model_string_jags, fixed = TRUE)
     model_string_jags <- gsub("ls_e_p2[3] ~ dunif(-5, 10)", "s_e_p2[3] ~ dunif(0, sqrt(meane_p2[3] * (1 - meane_p2[3])))", model_string_jags, fixed = TRUE)
     model_string_jags <- gsub("ls_e_p2[4] <- ls_e_p2[1]", "s_e_p2[4] <- s_e_p2[1]", model_string_jags, fixed = TRUE)
+    if(restriction == "AC"){
+      model_string_jags <- gsub("ls_e_p1[2] <- ls_e_p1[3]", "s_e_p1[2] <- s_e_p1[3]", model_string_jags, fixed = TRUE)
+      model_string_jags <- gsub("ls_e_p1[4] <- ls_e_p1[3]", "s_e_p1[4] <- s_e_p1[3]", model_string_jags, fixed = TRUE)
+      model_string_jags <- gsub("ls_e_p2[2] <- ls_e_p2[3]", "s_e_p2[2] <- s_e_p2[3]", model_string_jags, fixed = TRUE)
+      model_string_jags <- gsub("ls_e_p2[4] <- ls_e_p2[3]", "s_e_p2[4] <- s_e_p2[3]", model_string_jags, fixed = TRUE)
+    }
     model_string_jags <- gsub("loglik_e1[i] <- logdensity.norm(eff1[i], mu_e1[i], tau_e_p1[d1[i]])", "loglik_e1[i] <- logdensity.beta(eff1[i], mu_e1[i] * tau_e1[i], (1 - mu_e1[i]) * tau_e1[i])", model_string_jags, fixed = TRUE)
     model_string_jags <- gsub("loglik_e2[i] <- logdensity.norm(eff2[i], mu_e2[i], tau_e_p2[d2[i]])", "loglik_e2[i] <- logdensity.beta(eff2[i], mu_e2[i] * tau_e2[i], (1 - mu_e2[i]) * tau_e2[i])", model_string_jags, fixed = TRUE)
   }
@@ -374,6 +413,16 @@ write_pattern <- function(dist_e , dist_c, ind, type, pe, pc, d_list, d1, d2) ev
     model_string_jags <- gsub("alpha_p2[1, 3] ~ dnorm(0, 0.0000001)", prior_beta_e2_3, model_string_jags, fixed = TRUE)
     model_string_jags <- gsub("alpha_p2[1, 2] <- alpha_p2[1, 1]", "alpha_p2[2] <- alpha_p2[1]", model_string_jags, fixed = TRUE)
     model_string_jags <- gsub("alpha_p2[1, 4] <- alpha_p2[1, 1]", "alpha_p2[4] <- alpha_p2[1]", model_string_jags, fixed = TRUE)
+    if(restriction == "AC"){
+      model_string_jags <- gsub("alpha_p1[j, 2] <- alpha_p1[j, 3]", prior_beta, model_string_jags, fixed = TRUE)
+      model_string_jags <- gsub("alpha_p1[j, 4] <- alpha_p1[j, 3]", prior_beta, model_string_jags, fixed = TRUE)
+      model_string_jags <- gsub("alpha_p2[j, 2] <- alpha_p2[j, 3]", prior_beta, model_string_jags, fixed = TRUE)
+      model_string_jags <- gsub("alpha_p2[j, 4] <- alpha_p2[j, 3]", prior_beta, model_string_jags, fixed = TRUE)
+      model_string_jags <- gsub("alpha_p1[1, 2] <- alpha_p1[1, 3]", "alpha_p1[2] <- alpha_p1[3]", model_string_jags, fixed = TRUE)
+      model_string_jags <- gsub("alpha_p1[1, 4] <- alpha_p1[1, 3]", "alpha_p1[4] <- alpha_p1[3]", model_string_jags, fixed = TRUE)
+      model_string_jags <- gsub("alpha_p2[1, 2] <- alpha_p2[1, 3]", "alpha_p2[2] <- alpha_p2[3]", model_string_jags, fixed = TRUE)
+      model_string_jags <- gsub("alpha_p2[1, 4] <- alpha_p2[1, 3]", "alpha_p2[4] <- alpha_p2[3]", model_string_jags, fixed = TRUE)
+    }
   }
   if(pc == 1) {
     inprod_c1 <- "X1_c[i] * beta_p1[d1[i]]"
@@ -409,8 +458,19 @@ write_pattern <- function(dist_e , dist_c, ind, type, pe, pc, d_list, d1, d2) ev
     model_string_jags <- gsub("beta_p2[1, 2] ~ dnorm(0, 0.0000001)", prior_beta_c2_2, model_string_jags, fixed = TRUE)
     model_string_jags <- gsub("beta_p2[1, 3] <- beta_p2[1, 1]", "beta_p2[3] <- beta_p2[1]", model_string_jags, fixed = TRUE)
     model_string_jags <- gsub("beta_p2[1, 4] <- beta_p2[1, 1]", "beta_p2[4] <- beta_p2[1]", model_string_jags, fixed = TRUE)
-  }  
-  if(d_list$n_patterns[1] == 3 | d_list$n_patterns[1] == 2) {
+    if(restriction == "AC"){
+      model_string_jags <- gsub("beta_p1[j, 3] <- beta_p1[j, 2]", prior_beta, model_string_jags, fixed = TRUE)
+      model_string_jags <- gsub("beta_p1[j, 4] <- beta_p1[j, 2]", prior_beta, model_string_jags, fixed = TRUE)
+      model_string_jags <- gsub("beta_p2[j, 3] <- beta_p2[j, 2]", prior_beta, model_string_jags, fixed = TRUE)
+      model_string_jags <- gsub("beta_p2[j, 4] <- beta_p2[j, 2]", prior_beta, model_string_jags, fixed = TRUE)
+      model_string_jags <- gsub("beta_p1[1, 3] <- beta_p1[1, 2]", "beta_p1[3] <- beta_p1[2]", model_string_jags, fixed = TRUE)
+      model_string_jags <- gsub("beta_p1[1, 4] <- beta_p1[1, 2]", "beta_p1[4] <- beta_p1[2]", model_string_jags, fixed = TRUE)
+      model_string_jags <- gsub("beta_p2[1, 3] <- beta_p2[1, 2]", "beta_p2[3] <- beta_p2[2]", model_string_jags, fixed = TRUE)
+      model_string_jags <- gsub("beta_p2[1, 4] <- beta_p2[1, 2]", "beta_p2[4] <- beta_p2[2]", model_string_jags, fixed = TRUE)
+    }
+  }
+  if(restriction == "CC") {
+   if(d_list$n_patterns[1] == 3 | d_list$n_patterns[1] == 2) {
     if(type == "MAR" | type == "MNAR_eff") {model_string_jags <- gsub("mu_c_p1[4] <- meanc_p1[4]", "", model_string_jags, fixed = TRUE) }
     if(type == "MAR" | type == "MNAR_cost") {model_string_jags <- gsub("mu_e_p1[4] <- meane_p1[4]", "", model_string_jags, fixed = TRUE) }
     if(type == "MNAR" | type == "MNAR_cost") {model_string_jags <- gsub("mu_c_p1[4] <- meanc_p1[4] + Delta_c[1]", "", model_string_jags, fixed = TRUE) }
@@ -430,32 +490,32 @@ write_pattern <- function(dist_e , dist_c, ind, type, pe, pc, d_list, d1, d2) ev
     if(dist_e == "norm") {model_string_jags <- gsub("ls_e_p1[4] <- ls_e_p1[1]", "", model_string_jags, fixed = TRUE) }
     if(dist_e == "beta") {model_string_jags <- gsub("s_e_p1[4] <- s_e_p1[1]", "", model_string_jags, fixed = TRUE) }
     if(ind == FALSE) {model_string_jags <- gsub("beta_f_p1[4] <- beta_f_p1[1]" , "", model_string_jags, fixed = TRUE) }
-  }
-  if(d_list$n_patterns[1] == 3){
-    if(d_list$d1$d1_ec_obs == TRUE & d_list$d1$d1_c_obs == TRUE & d_list$d1$d1_e_obs == FALSE & d_list$d1$d1_ec_mis == TRUE) {
-      d1 <- ifelse(d1 == 4, 3, d1)
-      if(type == "MNAR" | type == "MNAR_eff") {model_string_jags <- gsub("mu_e_p1[3] <- meane_p1[3]", "mu_e_p1[3] <- meane_p1[3] + Delta_e[1]", model_string_jags, fixed = TRUE) }
-      if(pe > 1) {
-        model_string_jags <- gsub("alpha_p1[1, 3] ~ dnorm(0, 0.0000001)", "alpha_p1[1, 3] <- alpha_p1[1, 1]", model_string_jags, fixed = TRUE) 
-        model_string_jags <- gsub("alpha_p1[j, 3] ~ dnorm(0, 0.0000001)", "alpha_p1[j, 3] <- alpha_p1[j, 1]", model_string_jags, fixed = TRUE) 
+   }
+    if(d_list$n_patterns[1] == 3){
+      if(d_list$d1$d1_ec_obs == TRUE & d_list$d1$d1_c_obs == TRUE & d_list$d1$d1_e_obs == FALSE & d_list$d1$d1_ec_mis == TRUE) {
+        d1 <- ifelse(d1 == 4, 3, d1)
+        if(type == "MNAR" | type == "MNAR_eff") {model_string_jags <- gsub("mu_e_p1[3] <- meane_p1[3]", "mu_e_p1[3] <- meane_p1[3] + Delta_e[1]", model_string_jags, fixed = TRUE) }
+        if(pe > 1) {
+          model_string_jags <- gsub("alpha_p1[1, 3] ~ dnorm(0, 0.0000001)", "alpha_p1[1, 3] <- alpha_p1[1, 1]", model_string_jags, fixed = TRUE) 
+          model_string_jags <- gsub("alpha_p1[j, 3] ~ dnorm(0, 0.0000001)", "alpha_p1[j, 3] <- alpha_p1[j, 1]", model_string_jags, fixed = TRUE) 
         }
-      if(pe == 1) {model_string_jags <- gsub("alpha_p1[3] ~ dnorm(0, 0.0000001)", "alpha_p1[3] <- alpha_p1[1]", model_string_jags, fixed = TRUE) }
-      if(dist_e == "norm") {model_string_jags <- gsub("ls_e_p1[3] ~ dunif(-5, 10)", "ls_e_p1[3] <- ls_e_p1[1]", model_string_jags, fixed = TRUE) }
-      if(dist_e == "beta") {model_string_jags <- gsub("s_e_p1[3] ~ dunif(0, sqrt(meane_p1[3] * (1 - meane_p1[3])))", "s_e_p1[3] <- s_e_p1[1]", model_string_jags, fixed = TRUE) }
-    } else if(d_list$d1$d1_ec_obs == TRUE & d_list$d1$d1_c_obs == FALSE & d_list$d1$d1_e_obs == TRUE & d_list$d1$d1_ec_mis == TRUE) {
-      d1 <- ifelse(d1 == 4, 2, d1)
-      if(type == "MNAR" | type == "MNAR_cost") {model_string_jags <- gsub("mu_c_p1[2] <- meanc_p1[2]", "mu_c_p1[2] <- meanc_p1[2] + Delta_c[1]", model_string_jags, fixed = TRUE) }
-      if(pc > 1) {
-        model_string_jags <- gsub("beta_p1[1, 2] ~ dnorm(0, 0.0000001)", "beta_p1[1, 2] <- beta_p1[1, 1]", model_string_jags, fixed = TRUE) 
-        model_string_jags <- gsub("beta_p1[j, 2] ~ dnorm(0, 0.0000001)", "beta_p1[j, 2] <- beta_p1[j, 1]", model_string_jags, fixed = TRUE) 
+        if(pe == 1) {model_string_jags <- gsub("alpha_p1[3] ~ dnorm(0, 0.0000001)", "alpha_p1[3] <- alpha_p1[1]", model_string_jags, fixed = TRUE) }
+        if(dist_e == "norm") {model_string_jags <- gsub("ls_e_p1[3] ~ dunif(-5, 10)", "ls_e_p1[3] <- ls_e_p1[1]", model_string_jags, fixed = TRUE) }
+        if(dist_e == "beta") {model_string_jags <- gsub("s_e_p1[3] ~ dunif(0, sqrt(meane_p1[3] * (1 - meane_p1[3])))", "s_e_p1[3] <- s_e_p1[1]", model_string_jags, fixed = TRUE) }
+      } else if(d_list$d1$d1_ec_obs == TRUE & d_list$d1$d1_c_obs == FALSE & d_list$d1$d1_e_obs == TRUE & d_list$d1$d1_ec_mis == TRUE) {
+        d1 <- ifelse(d1 == 4, 2, d1)
+        if(type == "MNAR" | type == "MNAR_cost") {model_string_jags <- gsub("mu_c_p1[2] <- meanc_p1[2]", "mu_c_p1[2] <- meanc_p1[2] + Delta_c[1]", model_string_jags, fixed = TRUE) }
+        if(pc > 1) {
+          model_string_jags <- gsub("beta_p1[1, 2] ~ dnorm(0, 0.0000001)", "beta_p1[1, 2] <- beta_p1[1, 1]", model_string_jags, fixed = TRUE) 
+          model_string_jags <- gsub("beta_p1[j, 2] ~ dnorm(0, 0.0000001)", "beta_p1[j, 2] <- beta_p1[j, 1]", model_string_jags, fixed = TRUE) 
         }
-      if(pc == 1) {model_string_jags <- gsub("beta_p1[2] ~ dnorm(0, 0.0000001)", "beta_p1[2] <- beta_p1[1]", model_string_jags, fixed = TRUE) }
-      if(dist_c == "norm") {model_string_jags <- gsub("ls_c_p1[2] ~ dunif(-5, 10)", "ls_c_p1[2] <- ls_c_p1[1]", model_string_jags, fixed = TRUE) }
-      if(dist_c == "lnorm") {model_string_jags <- gsub("ls_c_p1[2] ~ dunif(0, 100)", "ls_c_p1[2] <- ls_c_p1[1]", model_string_jags, fixed = TRUE) }
-      if(dist_c == "gamma") {model_string_jags <- gsub("s_c_p1[2] ~ dunif(0, 10000)", "s_c_p1[2] <- s_c_p1[1]", model_string_jags, fixed = TRUE) }
+        if(pc == 1) {model_string_jags <- gsub("beta_p1[2] ~ dnorm(0, 0.0000001)", "beta_p1[2] <- beta_p1[1]", model_string_jags, fixed = TRUE) }
+        if(dist_c == "norm") {model_string_jags <- gsub("ls_c_p1[2] ~ dunif(-5, 10)", "ls_c_p1[2] <- ls_c_p1[1]", model_string_jags, fixed = TRUE) }
+        if(dist_c == "lnorm") {model_string_jags <- gsub("ls_c_p1[2] ~ dunif(0, 100)", "ls_c_p1[2] <- ls_c_p1[1]", model_string_jags, fixed = TRUE) }
+        if(dist_c == "gamma") {model_string_jags <- gsub("s_c_p1[2] ~ dunif(0, 10000)", "s_c_p1[2] <- s_c_p1[1]", model_string_jags, fixed = TRUE) }
+      } 
     } 
-  } 
-  if(d_list$n_patterns[1] == 2) {
+    if(d_list$n_patterns[1] == 2) {
       if(type == "MAR" | type == "MNAR_eff") {model_string_jags <- gsub("mu_c_p1[3] <- meanc_p1[3]", "", model_string_jags, fixed = TRUE) }
       if(type == "MAR" | type == "MNAR_cost") {model_string_jags <- gsub("mu_e_p1[3] <- meane_p1[3]", "", model_string_jags, fixed = TRUE) }
       if(type == "MNAR" | type == "MNAR_cost") {model_string_jags <- gsub("mu_c_p1[3] <- meanc_p1[3] + Delta_c[1]", "", model_string_jags, fixed = TRUE) }
@@ -463,49 +523,140 @@ write_pattern <- function(dist_e , dist_c, ind, type, pe, pc, d_list, d1, d2) ev
       if(pe > 1) {
         model_string_jags <- gsub("alpha_p1[1, 3] ~ dnorm(0, 0.0000001)", "", model_string_jags, fixed = TRUE) 
         model_string_jags <- gsub("alpha_p1[j, 3] ~ dnorm(0, 0.0000001)", "", model_string_jags, fixed = TRUE) 
-        }
+      }
       if(pe == 1) {model_string_jags <- gsub("alpha_p1[3] ~ dnorm(0, 0.0000001)", "", model_string_jags, fixed = TRUE) }
       if(pc > 1) {
         model_string_jags <- gsub("beta_p1[1, 3] <- beta_p1[1, 1]", "", model_string_jags, fixed = TRUE) 
         model_string_jags <- gsub("beta_p1[j, 3] <- beta_p1[j, 1]", "", model_string_jags, fixed = TRUE) 
-        }
+      }
       if(pc == 1) {model_string_jags <- gsub("beta_p1[3] <- beta_p1[1]", "", model_string_jags, fixed = TRUE) }
       if(dist_c == "norm" | dist_c == "lnorm") {model_string_jags <- gsub("ls_c_p1[3] <- ls_c_p1[1]", "", model_string_jags, fixed = TRUE) }
       if(dist_c == "gamma") {model_string_jags <- gsub("s_c_p1[3] <- s_c_p1[1]", "", model_string_jags, fixed = TRUE) }
       if(dist_e == "norm") {model_string_jags <- gsub("ls_e_p1[3] ~ dunif(-5, 10)", "", model_string_jags, fixed = TRUE) }
       if(dist_e == "beta") {model_string_jags <- gsub("s_e_p1[3] ~ dunif(0, sqrt(meane_p1[3] * (1 - meane_p1[3])))", "", model_string_jags, fixed = TRUE) }
       if(ind == FALSE) {model_string_jags <- gsub("beta_f_p1[3] <- beta_f_p1[1]" , "", model_string_jags, fixed = TRUE) }
-    if(d_list$d1$d1_ec_obs == TRUE & d_list$d1$d1_c_obs == FALSE & d_list$d1$d1_e_obs == TRUE & d_list$d1$d1_ec_mis == FALSE) {
-      d1 <- ifelse(d1 == 3, 2, d1)
-      if(type == "MNAR" | type == "MNAR_cost") {model_string_jags <- gsub("mu_c_p1[2] <- meanc_p1[2]", "mu_c_p1[2] <- meanc_p1[2] + Delta_c[1]", model_string_jags, fixed = TRUE) }
-      if(pc > 1) {
-        model_string_jags <- gsub("beta_p1[1, 2] ~ dnorm(0, 0.0000001)", "beta_p1[1, 2] <- beta_p1[1, 1]", model_string_jags, fixed = TRUE) 
-        model_string_jags <- gsub("beta_p1[j, 2] ~ dnorm(0, 0.0000001)", "beta_p1[j, 2] <- beta_p1[j, 1]", model_string_jags, fixed = TRUE) 
+      if(d_list$d1$d1_ec_obs == TRUE & d_list$d1$d1_c_obs == FALSE & d_list$d1$d1_e_obs == TRUE & d_list$d1$d1_ec_mis == FALSE) {
+        d1 <- ifelse(d1 == 3, 2, d1)
+        if(type == "MNAR" | type == "MNAR_cost") {model_string_jags <- gsub("mu_c_p1[2] <- meanc_p1[2]", "mu_c_p1[2] <- meanc_p1[2] + Delta_c[1]", model_string_jags, fixed = TRUE) }
+        if(pc > 1) {
+          model_string_jags <- gsub("beta_p1[1, 2] ~ dnorm(0, 0.0000001)", "beta_p1[1, 2] <- beta_p1[1, 1]", model_string_jags, fixed = TRUE) 
+          model_string_jags <- gsub("beta_p1[j, 2] ~ dnorm(0, 0.0000001)", "beta_p1[j, 2] <- beta_p1[j, 1]", model_string_jags, fixed = TRUE) 
         }
-      if(pc == 1) {model_string_jags <- gsub("beta_p1[2] ~ dnorm(0, 0.0000001)", "beta_p1[2] <- beta_p1[1]", model_string_jags, fixed = TRUE) }
-      if(dist_c == "norm") {model_string_jags <- gsub("ls_c_p1[2] ~ dunif(-5, 10)", "ls_c_p1[2] <- ls_c_p1[1]", model_string_jags, fixed = TRUE) }
-      if(dist_c == "lnorm") {model_string_jags <- gsub("ls_c_p1[2] ~ dunif(0, 100)", "ls_c_p1[2] <- ls_c_p1[1]", model_string_jags, fixed = TRUE) }
-      if(dist_c == "gamma") {model_string_jags <- gsub("s_c_p1[2] ~ dunif(0, 10000)", "s_c_p1[2] <- s_c_p1[1]", model_string_jags, fixed = TRUE) }
-      if(pe > 1) {
-        model_string_jags <- gsub("alpha_p1[1, 2] <- alpha_p1[1, 1]", "alpha_p1[1, 2] ~ dnorm(0, 0.0000001)", model_string_jags, fixed = TRUE) 
-        model_string_jags <- gsub("alpha_p1[j, 2] <- alpha_p1[j, 1]", "alpha_p1[j, 2] ~ dnorm(0, 0.0000001)", model_string_jags, fixed = TRUE) 
+        if(pc == 1) {model_string_jags <- gsub("beta_p1[2] ~ dnorm(0, 0.0000001)", "beta_p1[2] <- beta_p1[1]", model_string_jags, fixed = TRUE) }
+        if(dist_c == "norm") {model_string_jags <- gsub("ls_c_p1[2] ~ dunif(-5, 10)", "ls_c_p1[2] <- ls_c_p1[1]", model_string_jags, fixed = TRUE) }
+        if(dist_c == "lnorm") {model_string_jags <- gsub("ls_c_p1[2] ~ dunif(0, 100)", "ls_c_p1[2] <- ls_c_p1[1]", model_string_jags, fixed = TRUE) }
+        if(dist_c == "gamma") {model_string_jags <- gsub("s_c_p1[2] ~ dunif(0, 10000)", "s_c_p1[2] <- s_c_p1[1]", model_string_jags, fixed = TRUE) }
+        if(pe > 1) {
+          model_string_jags <- gsub("alpha_p1[1, 2] <- alpha_p1[1, 1]", "alpha_p1[1, 2] ~ dnorm(0, 0.0000001)", model_string_jags, fixed = TRUE) 
+          model_string_jags <- gsub("alpha_p1[j, 2] <- alpha_p1[j, 1]", "alpha_p1[j, 2] ~ dnorm(0, 0.0000001)", model_string_jags, fixed = TRUE) 
         }
-      if(pe == 1) {model_string_jags <- gsub("alpha_p1[2] <- alpha_p1[1]", "alpha_p1[2] ~ dnorm(0, 0.0000001)", model_string_jags, fixed = TRUE) }
-      if(dist_e == "norm") {model_string_jags <- gsub("ls_e_p1[2] <- ls_e_p1[1]", "ls_e_p1[2] ~ dunif(-5, 10)", model_string_jags, fixed = TRUE) }
-      if(dist_e == "beta") {model_string_jags <- gsub("s_e_p1[2] <- s_e_p1[1]", "s_e_p1[2] ~ dunif(0, sqrt(meane_p1[2] * (1 - meane_p1[2])))", model_string_jags, fixed = TRUE) }
-    } else if(d_list$d1$d1_ec_obs == TRUE & d_list$d1$d1_c_obs == FALSE & d_list$d1$d1_e_obs == FALSE & d_list$d1$d1_ec_mis == TRUE) {
-      d1 <- ifelse(d1 == 4, 2, d1)
-      if(type == "MNAR" | type == "MNAR_cost") {model_string_jags <- gsub("mu_c_p1[2] <- meanc_p1[2]", "mu_c_p1[2] <- meanc_p1[2] + Delta_c[1]", model_string_jags, fixed = TRUE) }
-      if(pc > 1) {
-        model_string_jags <- gsub("beta_p1[1, 2] ~ dnorm(0, 0.0000001)", "beta_p1[1, 2] <- beta_p1[1, 1]", model_string_jags, fixed = TRUE) 
-        model_string_jags <- gsub("beta_p1[j, 2] ~ dnorm(0, 0.0000001)", "beta_p1[j, 2] <- beta_p1[j, 1]", model_string_jags, fixed = TRUE) 
+        if(pe == 1) {model_string_jags <- gsub("alpha_p1[2] <- alpha_p1[1]", "alpha_p1[2] ~ dnorm(0, 0.0000001)", model_string_jags, fixed = TRUE) }
+        if(dist_e == "norm") {model_string_jags <- gsub("ls_e_p1[2] <- ls_e_p1[1]", "ls_e_p1[2] ~ dunif(-5, 10)", model_string_jags, fixed = TRUE) }
+        if(dist_e == "beta") {model_string_jags <- gsub("s_e_p1[2] <- s_e_p1[1]", "s_e_p1[2] ~ dunif(0, sqrt(meane_p1[2] * (1 - meane_p1[2])))", model_string_jags, fixed = TRUE) }
+      } else if(d_list$d1$d1_ec_obs == TRUE & d_list$d1$d1_c_obs == FALSE & d_list$d1$d1_e_obs == FALSE & d_list$d1$d1_ec_mis == TRUE) {
+        d1 <- ifelse(d1 == 4, 2, d1)
+        if(type == "MNAR" | type == "MNAR_cost") {model_string_jags <- gsub("mu_c_p1[2] <- meanc_p1[2]", "mu_c_p1[2] <- meanc_p1[2] + Delta_c[1]", model_string_jags, fixed = TRUE) }
+        if(pc > 1) {
+          model_string_jags <- gsub("beta_p1[1, 2] ~ dnorm(0, 0.0000001)", "beta_p1[1, 2] <- beta_p1[1, 1]", model_string_jags, fixed = TRUE) 
+          model_string_jags <- gsub("beta_p1[j, 2] ~ dnorm(0, 0.0000001)", "beta_p1[j, 2] <- beta_p1[j, 1]", model_string_jags, fixed = TRUE) 
         }
-      if(pc == 1) {model_string_jags <- gsub("beta_p1[2] ~ dnorm(0, 0.0000001)", "beta_p1[2] <- beta_p1[1]", model_string_jags, fixed = TRUE) }
-      if(dist_c == "norm") {model_string_jags <- gsub("ls_c_p1[2] ~ dunif(-5, 10)", "ls_c_p1[2] <- ls_c_p1[1]", model_string_jags, fixed = TRUE) }
-      if(dist_c == "lnorm") {model_string_jags <- gsub("ls_c_p1[2] ~ dunif(0, 100)", "ls_c_p1[2] <- ls_c_p1[1]", model_string_jags, fixed = TRUE) }
-      if(dist_c == "gamma") {model_string_jags <- gsub("s_c_p1[2] ~ dunif(0, 10000)", "s_c_p1[2] <- s_c_p1[1]", model_string_jags, fixed = TRUE) }
-    } 
+        if(pc == 1) {model_string_jags <- gsub("beta_p1[2] ~ dnorm(0, 0.0000001)", "beta_p1[2] <- beta_p1[1]", model_string_jags, fixed = TRUE) }
+        if(dist_c == "norm") {model_string_jags <- gsub("ls_c_p1[2] ~ dunif(-5, 10)", "ls_c_p1[2] <- ls_c_p1[1]", model_string_jags, fixed = TRUE) }
+        if(dist_c == "lnorm") {model_string_jags <- gsub("ls_c_p1[2] ~ dunif(0, 100)", "ls_c_p1[2] <- ls_c_p1[1]", model_string_jags, fixed = TRUE) }
+        if(dist_c == "gamma") {model_string_jags <- gsub("s_c_p1[2] ~ dunif(0, 10000)", "s_c_p1[2] <- s_c_p1[1]", model_string_jags, fixed = TRUE) }
+      } 
+    }
   }
+  if(restriction == "AC") {
+    if(d_list$n_patterns[1] == 3 | d_list$n_patterns[1] == 2) {
+      if(type == "MAR" | type == "MNAR_eff") {model_string_jags <- gsub("mu_c_p1[4] <- meanc_p1[4]", "", model_string_jags, fixed = TRUE) }
+      if(type == "MAR" | type == "MNAR_cost") {model_string_jags <- gsub("mu_e_p1[4] <- meane_p1[4]", "", model_string_jags, fixed = TRUE) }
+      if(type == "MNAR" | type == "MNAR_cost") {model_string_jags <- gsub("mu_c_p1[4] <- meanc_p1[4] + Delta_c[1]", "", model_string_jags, fixed = TRUE) }
+      if(type == "MNAR" | type == "MNAR_eff") {model_string_jags <- gsub("mu_e_p1[4] <- meane_p1[4] + Delta_e[1]", "", model_string_jags, fixed = TRUE) }
+      if(pe > 1) {
+        model_string_jags <- gsub("alpha_p1[1, 4] <- alpha_p1[1, 3]", "", model_string_jags, fixed = TRUE) 
+        model_string_jags <- gsub("alpha_p1[j, 4] <- alpha_p1[j, 3]", "", model_string_jags, fixed = TRUE)
+      }
+      if(pe == 1) {model_string_jags <- gsub("alpha_p1[4] <- alpha_p1[3]", "", model_string_jags, fixed = TRUE) }
+      if(pc > 1) {
+        model_string_jags <- gsub("beta_p1[1, 4] <- beta_p1[1, 2]", "", model_string_jags, fixed = TRUE) 
+        model_string_jags <- gsub("beta_p1[j, 4] <- beta_p1[j, 2]", "", model_string_jags, fixed = TRUE) 
+      }
+      if(pc == 1) {model_string_jags <- gsub("beta_p1[4] <- beta_p1[2]", "", model_string_jags, fixed = TRUE) }
+      if(dist_c == "norm" | dist_c == "lnorm") {model_string_jags <- gsub("ls_c_p1[4] <- ls_c_p1[2]", "", model_string_jags, fixed = TRUE) }
+      if(dist_c == "gamma") {model_string_jags <- gsub("s_c_p1[4] <- s_c_p1[2]", "", model_string_jags, fixed = TRUE) }
+      if(dist_e == "norm") {model_string_jags <- gsub("ls_e_p1[4] <- ls_e_p1[3]", "", model_string_jags, fixed = TRUE) }
+      if(dist_e == "beta") {model_string_jags <- gsub("s_e_p1[4] <- s_e_p1[3]", "", model_string_jags, fixed = TRUE) }
+      if(ind == FALSE) {model_string_jags <- gsub("beta_f_p1[4] <- beta_f_p1[1]" , "", model_string_jags, fixed = TRUE) }
+    }
+    if(d_list$n_patterns[1] == 3){
+      if(d_list$d1$d1_ec_obs == FALSE & d_list$d1$d1_c_obs == TRUE & d_list$d1$d1_e_obs == TRUE & d_list$d1$d1_ec_mis == TRUE & ind == TRUE) {
+        d1 <- ifelse(d1 == 4, 1, d1)
+        if(type == "MNAR" | type == "MNAR_eff") {model_string_jags <- gsub("mu_e_p1[1] <- meane_p1[1]", "mu_e_p1[1] <- meane_p1[1] + Delta_e[1]", model_string_jags, fixed = TRUE) }
+        if(pe > 1) {
+          model_string_jags <- gsub("alpha_p1[1, 1] ~ dnorm(0, 0.0000001)", "alpha_p1[1, 1] <- alpha_p1[1, 3]", model_string_jags, fixed = TRUE) 
+          model_string_jags <- gsub("alpha_p1[j, 1] ~ dnorm(0, 0.0000001)", "alpha_p1[j, 1] <- alpha_p1[j, 3]", model_string_jags, fixed = TRUE) 
+        }
+        if(pe == 1) {model_string_jags <- gsub("alpha_p1[1] ~ dnorm(0, 0.0000001)", "alpha_p1[1] <- alpha_p1[3]", model_string_jags, fixed = TRUE) }
+        if(dist_e == "norm") {model_string_jags <- gsub("ls_e_p1[1] ~ dunif(-5, 10)", "ls_e_p1[1] <- ls_e_p1[3]", model_string_jags, fixed = TRUE) }
+        if(dist_e == "beta") {model_string_jags <- gsub("s_e_p1[1] ~ dunif(0, sqrt(meane_p1[1] * (1 - meane_p1[1])))", "s_e_p1[1] <- s_e_p1[3]", model_string_jags, fixed = TRUE) }
+        if(type == "MNAR" | type == "MNAR_cost") {model_string_jags <- gsub("mu_c_p1[1] <- meanc_p1[1]", "mu_c_p1[1] <- meanc_p1[1] + Delta_c[1]", model_string_jags, fixed = TRUE) }
+        if(pc > 1) {
+          model_string_jags <- gsub("beta_p1[1, 1] ~ dnorm(0, 0.0000001)", "beta_p1[1, 1] <- beta_p1[1, 2]", model_string_jags, fixed = TRUE) 
+          model_string_jags <- gsub("beta_p1[j, 1] ~ dnorm(0, 0.0000001)", "beta_p1[j, 1] <- beta_p1[j, 2]", model_string_jags, fixed = TRUE) 
+        }
+        if(pc == 1) {model_string_jags <- gsub("beta_p1[1] ~ dnorm(0, 0.0000001)", "beta_p1[1] <- beta_p1[2]", model_string_jags, fixed = TRUE) }
+        if(dist_c == "norm") {model_string_jags <- gsub("ls_c_p1[1] ~ dunif(-5, 10)", "ls_c_p1[1] <- ls_c_p1[2]", model_string_jags, fixed = TRUE) }
+        if(dist_c == "lnorm") {model_string_jags <- gsub("ls_c_p1[1] ~ dunif(0, 100)", "ls_c_p1[1] <- ls_c_p1[2]", model_string_jags, fixed = TRUE) }
+        if(dist_c == "gamma") {model_string_jags <- gsub("s_c_p1[1] ~ dunif(0, 10000)", "s_c_p1[1] <- s_c_p1[2]", model_string_jags, fixed = TRUE) }
+      }
+    } 
+    if(d_list$n_patterns[1] == 2) {
+      d1 <- ifelse(d1 == 3, 1, d1)
+      if(type == "MAR" | type == "MNAR_eff") {model_string_jags <- gsub("mu_c_p1[3] <- meanc_p1[3]", "", model_string_jags, fixed = TRUE) }
+      if(type == "MAR" | type == "MNAR_cost") {model_string_jags <- gsub("mu_e_p1[3] <- meane_p1[3]", "", model_string_jags, fixed = TRUE) }
+      if(type == "MNAR" | type == "MNAR_cost") {model_string_jags <- gsub("mu_c_p1[3] <- meanc_p1[3] + Delta_c[1]", "", model_string_jags, fixed = TRUE) }
+      if(type == "MNAR" | type == "MNAR_eff") {model_string_jags <- gsub("mu_e_p1[3] <- meane_p1[3]", "", model_string_jags, fixed = TRUE) }
+      if(pe > 1) {
+        model_string_jags <- gsub("alpha_p1[1, 3] ~ dnorm(0, 0.0000001)", "", model_string_jags, fixed = TRUE) 
+        model_string_jags <- gsub("alpha_p1[1, 2] <- alpha_p1[1, 3]", "alpha_p1[1, 2] <- alpha_p1[1, 1]", model_string_jags, fixed = TRUE) 
+        model_string_jags <- gsub("alpha_p1[j, 3] ~ dnorm(0, 0.0000001)", "", model_string_jags, fixed = TRUE) 
+        model_string_jags <- gsub("alpha_p1[j, 2] <- alpha_p1[j, 3]", "alpha_p1[j, 2] <- alpha_p1[j, 1]", model_string_jags, fixed = TRUE) 
+      }
+      if(pe == 1) {
+        model_string_jags <- gsub("alpha_p1[3] ~ dnorm(0, 0.0000001)", "", model_string_jags, fixed = TRUE) 
+        model_string_jags <- gsub("alpha_p1[2] <- alpha_p1[3]", "alpha_p1[2] <- alpha_p1[1]", model_string_jags, fixed = TRUE) 
+      }
+      if(pc > 1) {
+        model_string_jags <- gsub("beta_p1[1, 3] <- beta_p1[1, 2]", "", model_string_jags, fixed = TRUE) 
+        model_string_jags <- gsub("beta_p1[j, 3] <- beta_p1[j, 2]", "", model_string_jags, fixed = TRUE) 
+      }
+      if(pc == 1) {
+        model_string_jags <- gsub("beta_p1[3] <- beta_p1[2]", "", model_string_jags, fixed = TRUE) 
+      }
+      if(dist_c == "norm" | dist_c == "lnorm") {model_string_jags <- gsub("ls_c_p1[3] <- ls_c_p1[2]", "", model_string_jags, fixed = TRUE) }
+      if(dist_c == "gamma") {model_string_jags <- gsub("s_c_p1[3] <- s_c_p1[2]", "", model_string_jags, fixed = TRUE) }
+      if(dist_e == "norm") {
+        model_string_jags <- gsub("ls_e_p1[3] ~ dunif(-5, 10)", "", model_string_jags, fixed = TRUE) 
+        model_string_jags <- gsub("ls_e_p1[2] <- ls_e_p1[3]", "ls_e_p1[2] <- ls_e_p1[1]", model_string_jags, fixed = TRUE) 
+        }
+      if(dist_e == "beta") {
+        model_string_jags <- gsub("s_e_p1[3] ~ dunif(0, sqrt(meane_p1[3] * (1 - meane_p1[3])))", "", model_string_jags, fixed = TRUE) 
+        model_string_jags <- gsub("s_e_p1[2] <- s_e_p1[3]", "s_e_p1[2] <- s_e_p1[1]", model_string_jags, fixed = TRUE) 
+        }
+      if(ind == FALSE) {model_string_jags <- gsub("beta_f_p1[3] <- beta_f_p1[1]" , "", model_string_jags, fixed = TRUE) }
+      if(type == "MNAR" | type == "MNAR_cost") {model_string_jags <- gsub("mu_c_p1[1] <- meanc_p1[1]", "mu_c_p1[1] <- meanc_p1[1] + Delta_c[1]", model_string_jags, fixed = TRUE) }
+      if(pc > 1) {
+          model_string_jags <- gsub("beta_p1[1, 1] ~ dnorm(0, 0.0000001)", "beta_p1[1, 1] <- beta_p1[1, 2]", model_string_jags, fixed = TRUE) 
+          model_string_jags <- gsub("beta_p1[j, 1] ~ dnorm(0, 0.0000001)", "beta_p1[j, 1] <- beta_p1[j, 2]", model_string_jags, fixed = TRUE) 
+      }
+      if(pc == 1) {model_string_jags <- gsub("beta_p1[1] ~ dnorm(0, 0.0000001)", "beta_p1[1] <- beta_p1[2]", model_string_jags, fixed = TRUE) }
+      if(dist_c == "norm") {model_string_jags <- gsub("ls_c_p1[1] ~ dunif(-5, 10)", "ls_c_p1[1] <- ls_c_p1[2]", model_string_jags, fixed = TRUE) }
+      if(dist_c == "lnorm") {model_string_jags <- gsub("ls_c_p1[1] ~ dunif(0, 100)", "ls_c_p1[1] <- ls_c_p1[2]", model_string_jags, fixed = TRUE) }
+      if(dist_c == "gamma") {model_string_jags <- gsub("s_c_p1[1] ~ dunif(0, 10000)", "s_c_p1[1] <- s_c_p1[2]", model_string_jags, fixed = TRUE) }
+    }
+  }
+  if(restriction == "CC") {
   if(d_list$n_patterns[2] == 3 | d_list$n_patterns[2] == 2) {
     if(type == "MAR" | type == "MNAR_eff") {model_string_jags <- gsub("mu_c_p2[4] <- meanc_p2[4]", "", model_string_jags, fixed = TRUE) }
     if(type == "MAR" | type == "MNAR_cost") {model_string_jags <- gsub("mu_e_p2[4] <- meane_p2[4]", "", model_string_jags, fixed = TRUE) }
@@ -601,8 +752,98 @@ write_pattern <- function(dist_e , dist_c, ind, type, pe, pc, d_list, d1, d2) ev
       if(dist_c == "lnorm") {model_string_jags <- gsub("ls_c_p2[2] ~ dunif(0, 100)", "ls_c_p2[2] <- ls_c_p2[1]", model_string_jags, fixed = TRUE) }
       if(dist_c == "gamma") {model_string_jags <- gsub("s_c_p2[2] ~ dunif(0, 10000)", "s_c_p2[2] <- s_c_p2[1]", model_string_jags, fixed = TRUE) }
     } 
+   }
   }
-  model_string_jags <- prior_pattern(type = type, dist_e = dist_e, dist_c = dist_c, pe = pe, pc = pc, d_list = d_list)
+  if(restriction == "AC") {
+    if(d_list$n_patterns[2] == 3 | d_list$n_patterns[2] == 2) {
+      if(type == "MAR" | type == "MNAR_eff") {model_string_jags <- gsub("mu_c_p2[4] <- meanc_p2[4]", "", model_string_jags, fixed = TRUE) }
+      if(type == "MAR" | type == "MNAR_cost") {model_string_jags <- gsub("mu_e_p2[4] <- meane_p2[4]", "", model_string_jags, fixed = TRUE) }
+      if(type == "MNAR" | type == "MNAR_cost") {model_string_jags <- gsub("mu_c_p2[4] <- meanc_p2[4] + Delta_c[2]", "", model_string_jags, fixed = TRUE) }
+      if(type == "MNAR" | type == "MNAR_eff") {model_string_jags <- gsub("mu_e_p2[4] <- meane_p2[4] + Delta_e[2]", "", model_string_jags, fixed = TRUE) }
+      if(pe > 1) {
+        model_string_jags <- gsub("alpha_p2[1, 4] <- alpha_p2[1, 3]", "", model_string_jags, fixed = TRUE) 
+        model_string_jags <- gsub("alpha_p2[j, 4] <- alpha_p2[j, 3]", "", model_string_jags, fixed = TRUE)
+      }
+      if(pe == 1) {model_string_jags <- gsub("alpha_p2[4] <- alpha_p2[3]", "", model_string_jags, fixed = TRUE) }
+      if(pc > 1) {
+        model_string_jags <- gsub("beta_p2[1, 4] <- beta_p2[1, 3]", "", model_string_jags, fixed = TRUE) 
+        model_string_jags <- gsub("beta_p2[j, 4] <- beta_p2[j, 3]", "", model_string_jags, fixed = TRUE) 
+      }
+      if(pc == 1) {model_string_jags <- gsub("beta_p2[4] <- beta_p2[2]", "", model_string_jags, fixed = TRUE) }
+      if(dist_c == "norm" | dist_c == "lnorm") {model_string_jags <- gsub("ls_c_p2[4] <- ls_c_p2[2]", "", model_string_jags, fixed = TRUE) }
+      if(dist_c == "gamma") {model_string_jags <- gsub("s_c_p2[4] <- s_c_p2[2]", "", model_string_jags, fixed = TRUE) }
+      if(dist_e == "norm") {model_string_jags <- gsub("ls_e_p2[4] <- ls_e_p2[3]", "", model_string_jags, fixed = TRUE) }
+      if(dist_e == "beta") {model_string_jags <- gsub("s_e_p2[4] <- s_e_p2[3]", "", model_string_jags, fixed = TRUE) }
+      if(ind == FALSE) {model_string_jags <- gsub("beta_f_p2[4] <- beta_f_p2[1]" , "", model_string_jags, fixed = TRUE) }
+    }
+    if(d_list$n_patterns[2] == 3){
+      if(d_list$d2$d2_ec_obs == FALSE & d_list$d2$d2_c_obs == TRUE & d_list$d2$d2_e_obs == TRUE & d_list$d2$d2_ec_mis == TRUE & ind == TRUE) {
+        d2 <- ifelse(d2 == 4, 1, d2)
+        if(type == "MNAR" | type == "MNAR_eff") {model_string_jags <- gsub("mu_e_p2[1] <- meane_p2[1]", "mu_e_p2[1] <- meane_p2[1] + Delta_e[2]", model_string_jags, fixed = TRUE) }
+        if(pe > 1) {
+          model_string_jags <- gsub("alpha_p2[1, 1] ~ dnorm(0, 0.0000001)", "alpha_p2[1, 1] <- alpha_p2[1, 3]", model_string_jags, fixed = TRUE) 
+          model_string_jags <- gsub("alpha_p2[j, 1] ~ dnorm(0, 0.0000001)", "alpha_p2[j, 1] <- alpha_p2[j, 3]", model_string_jags, fixed = TRUE) 
+        }
+        if(pe == 1) {model_string_jags <- gsub("alpha_p2[1] ~ dnorm(0, 0.0000001)", "alpha_p2[1] <- alpha_p2[3]", model_string_jags, fixed = TRUE) }
+        if(dist_e == "norm") {model_string_jags <- gsub("ls_e_p2[1] ~ dunif(-5, 10)", "ls_e_p2[1] <- ls_e_p2[3]", model_string_jags, fixed = TRUE) }
+        if(dist_e == "beta") {model_string_jags <- gsub("s_e_p2[1] ~ dunif(0, sqrt(meane_p2[1] * (1 - meane_p2[1])))", "s_e_p2[1] <- s_e_p2[3]", model_string_jags, fixed = TRUE) }
+        if(type == "MNAR" | type == "MNAR_cost") {model_string_jags <- gsub("mu_c_p2[1] <- meanc_p2[1]", "mu_c_p2[1] <- meanc_p2[1] + Delta_c[2]", model_string_jags, fixed = TRUE) }
+        if(pc > 1) {
+          model_string_jags <- gsub("beta_p2[1, 1] ~ dnorm(0, 0.0000001)", "beta_p2[1, 1] <- beta_p2[1, 2]", model_string_jags, fixed = TRUE) 
+          model_string_jags <- gsub("beta_p2[j, 1] ~ dnorm(0, 0.0000001)", "beta_p2[j, 1] <- beta_p2[j, 2]", model_string_jags, fixed = TRUE) 
+        }
+        if(pc == 1) {model_string_jags <- gsub("beta_p2[1] ~ dnorm(0, 0.0000001)", "beta_p2[1] <- beta_p2[2]", model_string_jags, fixed = TRUE) }
+        if(dist_c == "norm") {model_string_jags <- gsub("ls_c_p2[1] ~ dunif(-5, 10)", "ls_c_p2[1] <- ls_c_p2[2]", model_string_jags, fixed = TRUE) }
+        if(dist_c == "lnorm") {model_string_jags <- gsub("ls_c_p2[1] ~ dunif(0, 100)", "ls_c_p2[1] <- ls_c_p2[2]", model_string_jags, fixed = TRUE) }
+        if(dist_c == "gamma") {model_string_jags <- gsub("s_c_p2[1] ~ dunif(0, 10000)", "s_c_p2[1] <- s_c_p2[2]", model_string_jags, fixed = TRUE) }
+      }
+    } 
+    if(d_list$n_patterns[2] == 2) {
+      d2 <- ifelse(d2 == 3, 1, d2)
+      if(type == "MAR" | type == "MNAR_eff") {model_string_jags <- gsub("mu_c_p2[3] <- meanc_p2[3]", "", model_string_jags, fixed = TRUE) }
+      if(type == "MAR" | type == "MNAR_cost") {model_string_jags <- gsub("mu_e_p2[3] <- meane_p2[3]", "", model_string_jags, fixed = TRUE) }
+      if(type == "MNAR" | type == "MNAR_cost") {model_string_jags <- gsub("mu_c_p2[3] <- meanc_p2[3] + Delta_c[2]", "", model_string_jags, fixed = TRUE) }
+      if(type == "MNAR" | type == "MNAR_eff") {model_string_jags <- gsub("mu_e_p2[3] <- meane_p2[3]", "", model_string_jags, fixed = TRUE) }
+      if(pe > 1) {
+        model_string_jags <- gsub("alpha_p2[1, 3] ~ dnorm(0, 0.0000001)", "", model_string_jags, fixed = TRUE) 
+        model_string_jags <- gsub("alpha_p2[1, 2] <- alpha_p2[1, 3]", "alpha_p2[1, 2] <- alpha_p2[1, 1]", model_string_jags, fixed = TRUE) 
+        model_string_jags <- gsub("alpha_p2[j, 3] ~ dnorm(0, 0.0000001)", "", model_string_jags, fixed = TRUE) 
+        model_string_jags <- gsub("alpha_p2[j, 2] <- alpha_p2[j, 3]", "alpha_p2[j, 2] <- alpha_p2[j, 1]", model_string_jags, fixed = TRUE) 
+      }
+      if(pe == 1) {
+        model_string_jags <- gsub("alpha_p2[3] ~ dnorm(0, 0.0000001)", "", model_string_jags, fixed = TRUE) 
+        model_string_jags <- gsub("alpha_p2[2] <- alpha_p2[3]", "alpha_p2[2] <- alpha_p2[1]", model_string_jags, fixed = TRUE) 
+      }
+      if(pc > 1) {
+        model_string_jags <- gsub("beta_p2[1, 3] <- beta_p2[1, 2]", "", model_string_jags, fixed = TRUE) 
+        model_string_jags <- gsub("beta_p2[j, 3] <- beta_p2[j, 2]", "", model_string_jags, fixed = TRUE) 
+      }
+      if(pc == 1) {
+        model_string_jags <- gsub("beta_p2[3] <- beta_p2[2]", "", model_string_jags, fixed = TRUE) 
+      }
+      if(dist_c == "norm" | dist_c == "lnorm") {model_string_jags <- gsub("ls_c_p2[3] <- ls_c_p2[2]", "", model_string_jags, fixed = TRUE) }
+      if(dist_c == "gamma") {model_string_jags <- gsub("s_c_p2[3] <- s_c_p2[2]", "", model_string_jags, fixed = TRUE) }
+      if(dist_e == "norm") {
+        model_string_jags <- gsub("ls_e_p2[3] ~ dunif(-5, 10)", "", model_string_jags, fixed = TRUE) 
+        model_string_jags <- gsub("ls_e_p2[2] <- ls_e_p2[3]", "ls_e_p2[2] <- ls_e_p2[1]", model_string_jags, fixed = TRUE) 
+      }
+      if(dist_e == "beta") {
+        model_string_jags <- gsub("s_e_p2[3] ~ dunif(0, sqrt(meane_p2[3] * (1 - meane_p2[3])))", "", model_string_jags, fixed = TRUE) 
+        model_string_jags <- gsub("s_e_p2[2] <- s_e_p2[3]", "s_e_p2[2] <- s_e_p2[1]", model_string_jags, fixed = TRUE) 
+      }
+      if(ind == FALSE) {model_string_jags <- gsub("beta_f_p2[3] <- beta_f_p2[1]" , "", model_string_jags, fixed = TRUE) }
+      if(type == "MNAR" | type == "MNAR_cost") {model_string_jags <- gsub("mu_c_p2[1] <- meanc_p2[1]", "mu_c_p2[1] <- meanc_p2[1] + Delta_c[2]", model_string_jags, fixed = TRUE) }
+      if(pc > 1) {
+        model_string_jags <- gsub("beta_p2[1, 1] ~ dnorm(0, 0.0000001)", "beta_p2[1, 1] <- beta_p2[1, 2]", model_string_jags, fixed = TRUE) 
+        model_string_jags <- gsub("beta_p2[j, 1] ~ dnorm(0, 0.0000001)", "beta_p2[j, 1] <- beta_p2[j, 2]", model_string_jags, fixed = TRUE) 
+      }
+      if(pc == 1) {model_string_jags <- gsub("beta_p2[1] ~ dnorm(0, 0.0000001)", "beta_p2[1] <- beta_p2[2]", model_string_jags, fixed = TRUE) }
+      if(dist_c == "norm") {model_string_jags <- gsub("ls_c_p2[1] ~ dunif(-5, 10)", "ls_c_p2[1] <- ls_c_p2[2]", model_string_jags, fixed = TRUE) }
+      if(dist_c == "lnorm") {model_string_jags <- gsub("ls_c_p2[1] ~ dunif(0, 100)", "ls_c_p2[1] <- ls_c_p2[2]", model_string_jags, fixed = TRUE) }
+      if(dist_c == "gamma") {model_string_jags <- gsub("s_c_p2[1] ~ dunif(0, 10000)", "s_c_p2[1] <- s_c_p2[2]", model_string_jags, fixed = TRUE) }
+    }
+  }
+  model_string_jags <- prior_pattern(type = type, dist_e = dist_e, dist_c = dist_c, pe = pe, pc = pc, d_list = d_list, restriction = restriction)
   writeLines(model_string_jags, "pattern.txt")
   model_string <- "pattern.txt"
   return(model_string)

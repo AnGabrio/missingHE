@@ -7,8 +7,8 @@
 hurdle(data, model.eff, model.cost, model.se = se ~ 1, model.sc = sc ~
   1, se = 1, sc = 0, dist_e, dist_c, type, prob = c(0.05, 0.95),
   n.chains = 2, n.iter = 20000, n.burnin = floor(n.iter/2),
-  inits = NULL, n.thin = 1, save_model = FALSE, prior = "default",
-  ...)
+  inits = NULL, n.thin = 1, ppc = FALSE, save_model = FALSE,
+  prior = "default", ...)
 }
 \arguments{
 \item{data}{A data frame in which to find the variables supplied in \code{model.eff}, \code{model.cost} (model formulas for effects and costs) 
@@ -40,9 +40,9 @@ no structural value is chosen and a standard model for the effects is run.}
 \item{sc}{Structural value to be found in the cost variables defined in \code{data}. If set to \code{NULL}, 
 no structural value is chosen and a standard model for the costs is run.}
 
-\item{dist_e}{Distribution assumed for the effects. Current available choices are: Normal ('norm') or Beta ('beta').}
+\item{dist_e}{Distribution assumed for the effects. Current available chocies are: Normal ('norm') or Beta ('beta').}
 
-\item{dist_c}{Distribution assumed for the costs. Current available choices are: Normal ('norm'), Gamma ('gamma') or LogNormal ('lnorm').}
+\item{dist_c}{Distribution assumed for the costs. Current available chocies are: Normal ('norm'), Gamma ('gamma') or LogNormal ('lnorm').}
 
 \item{type}{Type of structural value mechanism assumed. Choices are Structural Completely At Random (SCAR),
 and Structural At Random (SAR).}
@@ -61,6 +61,8 @@ CI sample quantiles to be calculated and returned for the imputed values.}
 will generate initial values for all the model parameters.}
 
 \item{n.thin}{Thinning interval.}
+
+\item{ppc}{Logical. If \code{ppc} is \code{TRUE}, the estimates of the parameters that can be used to generate replications from the model are saved.}
 
 \item{save_model}{Logical. If \code{save_model} is \code{TRUE} a \code{txt} file containing the model code is printed
 in the current working directory.}
@@ -92,7 +94,7 @@ An object of the class 'missingHE' containing the following elements
 }
 \description{
 Full Bayesian cost-effectiveness models to handle missing data in the outcomes using Hurdle models
-under alternative parametric distributions for the effect and cost variables. Alternative
+under a variatey of alternative parametric distributions for the effect and cost variables. Alternative
 assumptions about the mechanisms of the structural values are implemented using a hurdle approach. The analysis is performed using the \code{BUGS} language, 
 which is implemented in the software \code{JAGS} using the function \code{\link[R2jags]{jags}}. The output is stored in an object of class 'missingHE'.
 }
@@ -137,13 +139,13 @@ using the arguments in the function \code{hurdle} (see Arguments).
 }
 \examples{
 # Quck example to run using subset of MenSS dataset
-MenSS.subset <- MenSS[1:80, ]
+MenSS.subset <- MenSS[50:100, ]
 
 # Run the model using the hurdle function assuming a SCAR mechanism
 # Use only 100 iterations to run a quick check
 model.hurdle <- hurdle(data = MenSS.subset, model.eff = e ~ 1,model.cost = c ~ 1,
    model.se = se ~ 1, model.sc = sc ~ 1, se = 1, sc = 0, dist_e = "norm", dist_c = "norm",
-   type = "SCAR", n.chains = 2, n.iter = 100)
+   type = "SCAR", n.chains = 2, n.iter = 100,  ppc = FALSE)
 
 # Print the results of the JAGS model
 print(model.hurdle)
@@ -177,7 +179,7 @@ summary(model.hurdle)
 # Further examples which take longer to run
 model.hurdle <- hurdle(data = MenSS, model.eff = e ~ u.0,model.cost = c ~ e,
    model.se = se ~ u.0, model.sc = sc ~ 1, se = 1, sc = 0, dist_e = "norm", dist_c = "norm",
-   type = "SAR", n.chains = 2, n.iter = 1000)
+   type = "SAR", n.chains = 2, n.iter = 500,  ppc = FALSE)
 #
 # Print results for all imputed values
 print(model.hurdle, value.mis = TRUE)

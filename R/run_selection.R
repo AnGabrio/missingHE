@@ -1,21 +1,22 @@
 #' An internal function to execute a JAGS selection model and get posterior results
 #'
-#' This function fits a JAGS using the \code{\link[R2jags]{jags}} function and obtain posterior inferences.
+#' This function fits a JAGS using the \code{\link[R2jags]{jags}} funciton and obtain posterior inferences.
 #' @param type Type of missingness mechanism assumed. Choices are Missing At Random (MAR), Missing Not At Random for the effects (MNAR_eff),
-#' Missing Not At Random for the costs (MNAR_cost), and Missing Not At Random for both (MNAR)
-#' @param dist_e distribution assumed for the effects. Current available choices are: Normal ('norm') or Beta ('beta').
-#' @param dist_c Distribution assumed for the costs. Current available choices are: Normal ('norm'), Gamma ('gamma') or LogNormal ('lnorm')
+#' Missing Not At Random for the costs (MNAR_cost), and Missing Not At Random for both (MNAR).
+#' @param dist_e distribution assumed for the effects. Current available chocies are: Normal ('norm') or Beta ('beta').
+#' @param dist_c Distribution assumed for the costs. Current available chocies are: Normal ('norm'), Gamma ('gamma') or LogNormal ('lnorm').
 #' @param inits a list with elements equal to the number of chains selected; each element of the list is itself a list of starting values for the BUGS model, 
-#' or a function creating (possibly random) initial values. If inits is NULL, JAGS will generate initial values for parameters
+#' or a function creating (possibly random) initial values. If inits is NULL, JAGS will generate initial values for parameters.
+#' @param ppc Logical. If \code{ppc} is \code{TRUE}, the estimates of the parameters that can be used to generate replications from the model are saved.
 #' @keywords JAGS Bayesian selection models 
 #' @examples
-#' # Internal function only
-#' # No examples
+#' #Internal function only
+#' #No examples
 #' #
 #' #
 
 
-run_selection <- function(type, dist_e, dist_c, inits) eval.parent(substitute( {
+run_selection <- function(type, dist_e, dist_c, inits, ppc) eval.parent(substitute( {
   if(!isTRUE(requireNamespace("R2jags", quietly = TRUE))) {
     stop("You need to install the R package 'R2jags'. Please run in your R terminal:\n install.packages('R2jags')")
   }
@@ -47,6 +48,21 @@ run_selection <- function(type, dist_e, dist_c, inits) eval.parent(substitute( {
   params <- params[-deltae_index] }
   if(type == "MNAR_eff" | type == "MAR") {deltac_index <- match("delta_c", params)
   params <- params[-deltac_index] }
+  if(ppc == TRUE) { 
+   if(dist_e == "norm") {
+     ppc_e_params <- c("mu_e1", "mu_e2", "tau_e") 
+   } else if(dist_e == "beta") {
+     ppc_e_params <- c("mu_e1", "tau_e1", "mu_e2", "tau_e2")
+   }
+   if(dist_c == "norm") {
+     ppc_c_params <- c("mu_c1", "mu_c2", "tau_c") 
+   } else if(dist_c == "gamma") {
+     ppc_c_params <- c("mu_c1", "tau_c1", "mu_c2", "tau_c2")
+   } else if(dist_c == "lnorm") {
+     ppc_c_params <- c("lmu_c1", "lmu_c2", "ltau_c")
+   } 
+    params <- c(params, ppc_e_params, ppc_c_params)
+  }
   modelN1 <- R2jags::jags(data = datalist, inits = inits, parameters.to.save = params, model.file = filein, n.chains = n.chains, 
                           n.iter = n.iter, n.burnin = n.burnin, DIC = DIC, n.thin = n.thin)
     mu_e <- modelN1$BUGSoutput$sims.list$mu_e
@@ -114,22 +130,25 @@ run_selection <- function(type, dist_e, dist_c, inits) eval.parent(substitute( {
       model_output_jags <- list("summary" = model_sum, "model summary" = modelN1, "mean_effects" = mu_e, "mean_costs" = mu_c, "sd_effects" = s_e, "sd_costs" = s_c, 
                                 "covariate_parameter_effects" = alpha, "covariate_parameter_costs" = beta, "missingness_probability_effects" = p_e, 
                                 "missingness_parameter_effects" = gamma_e, "missingness_probability_costs" = p_c, "missingness_parameter_costs" = gamma_c, 
-                                "imputed" = imputed, "loglik" = loglik,"type" = "SELECTION", "ind" = ind)
+                                "imputed" = imputed, "loglik" = loglik,"type" = "SELECTION", "ind" = ind, "ppc" = ppc, "dist_e" = dist_e, "dist_c" = dist_c)
     } else if(type == "MNAR") {
       model_output_jags <- list("summary" = model_sum, "model summary" = modelN1, "mean_effects" = mu_e, "mean_costs" = mu_c, "sd_effects" = s_e, "sd_costs" = s_c, 
                                 "covariate_parameter_effects" = alpha, "covariate_parameter_costs" = beta, "missingness_probability_effects" = p_e, 
                                 "missingness_parameter_effects" = gamma_e, "missingness_probability_costs" = p_c, "missingness_parameter_costs" = gamma_c, 
-                                "mnar_parameter_effects" = delta_e, "mnar_parameter_costs" = delta_c, "imputed" = imputed, "loglik" = loglik, "type" = "SELECTION_ec", "ind" = ind)
+                                "mnar_parameter_effects" = delta_e, "mnar_parameter_costs" = delta_c, "imputed" = imputed, "loglik" = loglik, 
+                                "type" = "SELECTION_ec", "ind" = ind, "ppc" = ppc, "dist_e" = dist_e, "dist_c" = dist_c)
     } else if(type == "MNAR_eff") {
       model_output_jags <- list("summary" = model_sum, "model summary" = modelN1, "mean_effects" = mu_e, "mean_costs" = mu_c, "sd_effects" = s_e, "sd_costs" = s_c, 
                                 "covariate_parameter_effects" = alpha, "covariate_parameter_costs" = beta, "missingness_probability_effects" = p_e, 
                                 "missingness_parameter_effects" = gamma_e, "missingness_probability_costs" = p_c, "missingness_parameter_costs" = gamma_c, 
-                                "mnar_parameter_effects" = delta_e, "imputed" = imputed, "loglik" = loglik, "type" = "SELECTION_e", "ind" = ind)
+                                "mnar_parameter_effects" = delta_e, "imputed" = imputed, "loglik" = loglik, "type" = "SELECTION_e", "ind" = ind, "ppc" = ppc,
+                                "dist_e" = dist_e, "dist_c" = dist_c)
     } else if(type == "MNAR_cost") {
       model_output_jags <- list("summary" = model_sum, "model summary" = modelN1, "mean_effects" = mu_e, "mean_costs" = mu_c, "sd_effects" = s_e, "sd_costs" = s_c, 
                                 "covariate_parameter_effects" = alpha, "covariate_parameter_costs" = beta, "missingness_probability_effects" = p_e, 
                                 "missingness_parameter_effects" = gamma_e, "missingness_probability_costs" = p_c, "missingness_parameter_costs" = gamma_c, 
-                                "mnar_parameter_costs" = delta_c, "imputed" = imputed, "loglik" = loglik, "type" = "SELECTION_c", "ind" = ind)
+                                "mnar_parameter_costs" = delta_c, "imputed" = imputed, "loglik" = loglik, "type" = "SELECTION_c", "ind" = ind, "ppc" = ppc, 
+                                "dist_e" = dist_e, "dist_c" = dist_c)
     }
   if(n.chains == 1) {model_output_jags <- model_output_jags[-1] }
   return(model_output_jags = model_output_jags)
