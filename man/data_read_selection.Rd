@@ -38,8 +38,8 @@ This internal function imports the data and outputs only those variables that ar
 according to the information provided by the user.
 }
 \examples{
-# Internal function only
-# no examples
+#Internal function only
+#no examples
 #
 #
 }

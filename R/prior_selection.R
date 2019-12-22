@@ -7,15 +7,16 @@
 #' @param type Type of missingness mechanism assumed. Choices are Missing At Random (MAR), Missing Not At Random for the effects (MNAR_eff),
 #' Missing Not At Random for the costs (MNAR_cost), and Missing Not At Random for both (MNAR). For a complete list of all available hyper parameters 
 #' and types of models see the manual.
-#' @param dist_e distribution assumed for the effects. Current available choices are: Normal ('norm') or Beta ('beta').
-#' @param dist_c Distribution assumed for the costs. Current available choices are: Normal ('norm'), Gamma ('gamma') or LogNormal ('lnorm')
+#' @param dist_e distribution assumed for the effects. Current available chocies are: Normal ('norm'), Beta ('beta'), Gamma ('gamma'), Exponential ('exp'),
+#' Weibull ('weibull'), Logistic ('logis'), Poisson ('pois'), Negative Binomial ('nbinom') or Bernoulli ('bern')
+#' @param dist_c Distribution assumed for the costs. Current available chocies are: Normal ('norm'), Gamma ('gamma') or LogNormal ('lnorm')
 #' @param pe Number of covariates for the effectiveness model
-#' @param pc Number of covariates for the cost model
+#' @param pc Number of cvoariates for the cost model
 #' @param ze Number of covariates or the missingness indicators model for the effectiveness
 #' @param zc Number of covariates or the missingness indicators model for the costs
 #' @examples
-#' # Internal function only
-#' # no examples
+#' #Internal function only
+#' #no examples
 #' #
 #' #
 
@@ -132,6 +133,27 @@ prior_selection <- function(type, dist_e, dist_c, pe, pc, ze, zc) eval.parent( s
         prior_alphae <- sigma.prior.e
         prior_alphae_str <- paste("s_e[t] ~ dunif(", prior_alphae[1], ",", prior_alphae[2])
         model_string_jags <- gsub("s_e[t] ~ dunif(0, sqrt(mu_e[t] * (1 - mu_e[t]))", prior_alphae_str, model_string_jags, fixed = TRUE) }
+  } else if(dist_e == "gamma" | dist_e == "logis") {
+    if(is.null(sigma.prior.e) == FALSE & grepl("s_e[t] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
+      if(length(sigma.prior.e) != 2) {stop("provide correct hyper prior values") }
+      prior_alphae <- sigma.prior.e
+      prior_alphae_str <- paste("s_e[t] ~ dunif(", prior_alphae[1], ",", prior_alphae[2])
+      model_string_jags <- gsub("s_e[t] ~ dunif(0, 10000", prior_alphae_str, model_string_jags, fixed = TRUE) }
+  } else if(dist_e == "exp" | dist_e == "bern" | dist_e == "pois") {
+    if(is.null(sigma.prior.e) == FALSE) {
+      stop("no prior for sigma required for the effects under the 'exp', 'bern', 'pois' distributions") }
+  } else if(dist_e == "weibull") {
+      if(is.null(sigma.prior.e) == FALSE & grepl("s_e[t] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
+        if(length(sigma.prior.e) != 2) {stop("provide correct hyper prior values") }
+        prior_alphae <- sigma.prior.e
+        prior_alphae_str <- paste("s_e[t] ~ dunif(", prior_alphae[1], ",", prior_alphae[2])
+        model_string_jags <- gsub("s_e[t] ~ dunif(0, 100", prior_alphae_str, model_string_jags, fixed = TRUE) }
+  } else if(dist_e == "nbinom") {
+    if(is.null(sigma.prior.e) == FALSE & grepl("tau_e[t] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
+      if(length(sigma.prior.e) != 2) {stop("provide correct hyper prior values") }
+      prior_alphae <- sigma.prior.e
+      prior_alphae_str <- paste("tau_e[t] ~ dunif(", prior_alphae[1], ",", prior_alphae[2])
+      model_string_jags <- gsub("tau_e[t] ~ dunif(0, 100", prior_alphae_str, model_string_jags, fixed = TRUE) }
   }
   if(dist_c == "norm") {
     if(is.null(sigma.prior.c) == FALSE & grepl("ls_c[t] ~ ", model_string_jags, fixed = TRUE) == TRUE) {

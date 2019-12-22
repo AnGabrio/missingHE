@@ -12,7 +12,8 @@ prior_pattern(type, dist_e, dist_c, pe, pc, d_list, restriction)
 Missing Not At Random for the costs (MNAR_cost), and Missing Not At Random for both (MNAR). For a complete list of all available hyper parameters 
 and types of models see the manual.}
 
-\item{dist_e}{distribution assumed for the effects. Current available chocies are: Normal ('norm') or Beta ('beta').}
+\item{dist_e}{distribution assumed for the effects. Current available chocies are: Normal ('norm'), Beta ('beta'), Gamma ('gamma'), Exponential ('exp'),
+Weibull ('weibull'), Logistic ('logis'), Poisson ('pois'), Negative Binomial ('nbinom') or Bernoulli ('bern')}
 
 \item{dist_c}{Distribution assumed for the costs. Current available chocies are: Normal ('norm'), Gamma ('gamma') or LogNormal ('lnorm')}
 

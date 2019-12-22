@@ -1,4 +1,4 @@
-#' Predictive information criteria for Bayesian models fitted in \code{JAGS} using the function \code{\link{selection}}, \code{\link{pattern}} or \code{\link{hurdle}}
+#' Predictive information criteria for Bayesian models fitted in \code{JAGS} using the funciton \code{\link{selection}}, \code{\link{pattern}} or \code{\link{hurdle}}
 #' 
 #' Efficient approximate leave-one-out cross validation (LOO), deviance information criterion (DIC) and widely applicable information criterion (WAIC) for Bayesian models, 
 #' calculated on the observed data.
@@ -34,11 +34,11 @@
 #' @importFrom stats var
 #' @details The Deviance Information Criterion (DIC), Leave-One-Out Information Criterion (LOOIC) and the Widely Applicable Information Criterion (WAIC) are methods for estimating 
 #' out-of-sample predictive accuracy from a Bayesian model using the log-likelihood evaluated at the posterior simulations of the parameters. 
-#' DIC is computationally simple to calculate but it is known to have some problems, arising in part from it not being fully Bayesian in that it is based on a point estimate.
+#' DIC is computationally simple to calculate but it is known to have some problems, arising in part from it not being fully Bayesian in that it is based on a point esitmate.
 #' LOOIC can be computationally expensive but can be easily approximated using importance weights that are smoothed by fitting a generalised Pareto distribution to the upper tail 
 #' of the distribution of the importance weights. For more details about the methods used to compute LOOIC see the PSIS-LOO section in \code{\link{loo-package}}.
 #' WAIC is fully Bayesian and closely approximates Bayesian cross-validation. Unlike DIC, WAIC is invariant to parameterisation and also works for singular models. 
-#' In finite cases, WAIC and LOO give similar estimates, but for influential observations WAIC underestimates the effect of leaving out one observation.
+#' In finite cases, WAIC and LOO give similar esitmates, but for influential observations WAIC underestimates the effect of leaving out one observation.
 #' 
 #' @references  
 #' Plummer, M. \emph{JAGS: A program for analysis of Bayesian graphical models using Gibbs sampling.} (2003).
@@ -56,8 +56,7 @@
 #' 
 #' @export
 #' @examples  
-#' # For examples see the function \code{\link{selection}}, 
-#' # \code{\link{pattern}} or \code{\link{hurdle}}
+#' #For examples see the function selection, pattern or hurdle 
 #' # 
 #' # 
 

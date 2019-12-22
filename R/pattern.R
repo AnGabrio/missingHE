@@ -16,7 +16,8 @@
 #' If there are no covariates, \code{1} should be specified on the right hand side of the formula. 
 #' By default, covariates are placed on the "location" parameter of the distribution through a linear model. A joint bivariate distribution for effects and costs can be specified by
 #' including 'e' on the right-hand side of the formula for the costs model.
-#' @param dist_e Distribution assumed for the effects. Current available chocies are: Normal ('norm') or Beta ('beta').
+#' @param dist_e Distribution assumed for the effects. Current available chocies are: Normal ('norm'), Beta ('beta'), Gamma ('gamma'), Exponential ('exp'),
+#' Weibull ('weibull'), Logistic ('logis'), Poisson ('pois'), Negative Binomial ('nbinom') or Bernoulli ('bern').
 #' @param dist_c Distribution assumed for the costs. Current available chocies are: Normal ('norm'), Gamma ('gamma') or LogNormal ('lnorm').
 #' @param Delta_e Range of values for the prior on the sensitivity parameters used to identify the mean of the effects under MNAR. The value must be set to 0 under MAR. 
 #' @param Delta_c Range of values for the prior on the sensitivity parameters used to identify the mean of the costs under MNAR. The value must be set to 0 under MAR.
@@ -207,10 +208,15 @@ pattern <- function(data, model.eff, model.cost, dist_e, dist_c, Delta_e, Delta_
   dist_e <- tolower(dist_e)
   dist_c <- tolower(dist_c)
   if(dist_e == "normal") { dist_e <- "norm" }
+  if(dist_e == "exponential") { dist_e <- "exp" }
+  if(dist_e == "logistic") { dist_e <- "logis" }
+  if(dist_e == "bernoulli") { dist_e <- "bern" }
+  if(dist_e == "poisson") { dist_e <- "pois" }
+  if(dist_e == "negative binomial") { dist_e <- "nbinom" }
   if(dist_c == "normal") { dist_c <- "norm" }
   if(dist_c == "lognormal") { dist_c <- "lnorm" }
-  if(!dist_e %in% c("norm", "beta") | !dist_c %in% c("norm", "gamma", "lnorm")) {
-    stop("Distributions available for use are 'norm', 'beta' for the effects and 'norm', 'gamma', 'lnorm' for the costs")
+  if(!dist_e %in% c("norm", "beta", "exp", "weibull", "logis", "bern", "pois", "nbinom", "gamma") | !dist_c %in% c("norm", "gamma", "lnorm")) {
+    stop("Distributions available for use are 'norm', 'beta', 'gamma', 'logis', 'exp', 'weibull', 'nbinom', 'pois', 'bern'  for the effects and 'norm', 'gamma', 'lnorm' for the costs")
   }
   type <- toupper(type)
   if(!type %in% c("MAR", "MNAR")) {

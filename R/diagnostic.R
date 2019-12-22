@@ -170,63 +170,69 @@ diagnostic <- function(x, type = "histogram", param = "all", theme = NULL, ...) 
   check_name_deviance <- grepl("dev", v_name)
   check_index_deviance <- which(check_name_deviance, TRUE)
   if(x$model_output$ppc == TRUE) {
-    if(x$model_output$dist_e == "norm") {
-      check_name_params_e_ppc1 <- grepl("mu_e1",v_name)
-      check_name_params_e_ppc2 <- grepl("mu_e2",v_name)
+    if(x$model_output$dist_e == "norm" | x$model_output$dist_e == "logis" | x$model_output$dist_e == "nbinom") {
+      check_name_params_e_ppc1 <- grepl("mu_e1", v_name)
+      check_name_params_e_ppc2 <- grepl("mu_e2", v_name)
       check_name_params_e_ppc3 <- rep(FALSE, length(v_name))
       check_name_params_e_ppc4 <- rep(FALSE, length(v_name))
       if(grepl("SELECTION", x$model_output$type) == TRUE){
-        check_name_params_e_ppc3 <- grepl("tau_e",v_name)
+        check_name_params_e_ppc3 <- grepl("tau_e", v_name)
       } else if(grepl("PATTERN", x$model_output$type) == TRUE) {
-        check_name_params_e_ppc3 <- grepl("tau_e_p1",v_name)
-        check_name_params_e_ppc4 <- grepl("tau_e_p2",v_name)
+        check_name_params_e_ppc3 <- grepl("tau_e_p1", v_name)
+        check_name_params_e_ppc4 <- grepl("tau_e_p2", v_name)
       } else if(grepl("HURDLE", x$model_output$type) == TRUE) {
-        check_name_params_e_ppc3 <- grepl("tau_e1",v_name)
-        check_name_params_e_ppc4 <- grepl("tau_e2",v_name)
+        check_name_params_e_ppc3 <- grepl("tau_e1", v_name)
+        check_name_params_e_ppc4 <- grepl("tau_e2", v_name)
       }
-    } else if(x$model_output$dist_e == "beta") {
-      check_name_params_e_ppc1 <- grepl("mu_e1",v_name)
-      check_name_params_e_ppc2 <- grepl("mu_e2",v_name)
-      check_name_params_e_ppc3 <- grepl("tau_e1",v_name)
-      check_name_params_e_ppc4 <- grepl("tau_e2",v_name)
+      check_index_params_e_ppc <- c(which(check_name_params_e_ppc1, TRUE), which(check_name_params_e_ppc2, TRUE), which(check_name_params_e_ppc3, TRUE), which(check_name_params_e_ppc4, TRUE))
+    } else if(x$model_output$dist_e == "exp" | x$model_output$dist_e == "bern" | x$model_output$dist_e == "pois") {
+      check_name_params_e_ppc1 <- grepl("mu_e1", v_name)
+      check_name_params_e_ppc2 <- grepl("mu_e2", v_name)
+      check_index_params_e_ppc <- c(which(check_name_params_e_ppc1, TRUE), which(check_name_params_e_ppc2, TRUE))
+    } else if(x$model_output$dist_e == "beta" | x$model_output$dist_e == "gamma" | x$model_output$dist_e == "weibull") {
+      check_name_params_e_ppc1 <- grepl("mu_e1", v_name)
+      check_name_params_e_ppc2 <- grepl("mu_e2", v_name)
+      check_name_params_e_ppc3 <- grepl("tau_e1", v_name)
+      check_name_params_e_ppc4 <- grepl("tau_e2", v_name)
+      check_index_params_e_ppc <- c(which(check_name_params_e_ppc1, TRUE), which(check_name_params_e_ppc2, TRUE), which(check_name_params_e_ppc3, TRUE), which(check_name_params_e_ppc4, TRUE))
     }
-    check_index_params_e_ppc <- c(which(check_name_params_e_ppc1, TRUE), which(check_name_params_e_ppc2, TRUE), which(check_name_params_e_ppc3, TRUE), which(check_name_params_e_ppc4, TRUE))
     if(x$model_output$dist_c == "norm") {
-      check_name_params_c_ppc1 <- grepl("mu_c1",v_name)
-      check_name_params_c_ppc2 <- grepl("mu_c2",v_name)
+      check_name_params_c_ppc1 <- grepl("mu_c1", v_name)
+      check_name_params_c_ppc2 <- grepl("mu_c2", v_name)
       check_name_params_c_ppc3 <- rep(FALSE, length(v_name))
       check_name_params_c_ppc4 <- rep(FALSE, length(v_name))
       if(grepl("SELECTION", x$model_output$type) == TRUE){
-        check_name_params_c_ppc3 <- grepl("tau_c",v_name)
+        check_name_params_c_ppc3 <- grepl("tau_c", v_name)
       } else if(grepl("PATTERN", x$model_output$type) == TRUE) {
-        check_name_params_c_ppc3 <- grepl("tau_c_p1",v_name)
-        check_name_params_c_ppc4 <- grepl("tau_c_p2",v_name)
+        check_name_params_c_ppc3 <- grepl("tau_c_p1", v_name)
+        check_name_params_c_ppc4 <- grepl("tau_c_p2", v_name)
       } else if(grepl("HURDLE", x$model_output$type) == TRUE) {
-        check_name_params_c_ppc3 <- grepl("tau_c1",v_name)
-        check_name_params_c_ppc4 <- grepl("tau_c2",v_name)
+        check_name_params_c_ppc3 <- grepl("tau_c1", v_name)
+        check_name_params_c_ppc4 <- grepl("tau_c2", v_name)
       }
+      check_index_params_c_ppc <- c(which(check_name_params_c_ppc1, TRUE), which(check_name_params_c_ppc2, TRUE), which(check_name_params_c_ppc3, TRUE), which(check_name_params_c_ppc4, TRUE))
     } else if(x$model_output$dist_c == "gamma") {
-      check_name_params_c_ppc1 <- grepl("mu_c1",v_name)
-      check_name_params_c_ppc2 <- grepl("mu_c2",v_name)
-      check_name_params_c_ppc3 <- grepl("tau_c1",v_name)
-      check_name_params_c_ppc4 <- grepl("tau_c2",v_name)
+      check_name_params_c_ppc1 <- grepl("mu_c1", v_name)
+      check_name_params_c_ppc2 <- grepl("mu_c2", v_name)
+      check_name_params_c_ppc3 <- grepl("tau_c1", v_name)
+      check_name_params_c_ppc4 <- grepl("tau_c2", v_name)
       check_index_params_c_ppc <- c(which(check_name_params_c_ppc1, TRUE), which(check_name_params_c_ppc2, TRUE), which(check_name_params_c_ppc3, TRUE), which(check_name_params_c_ppc4, TRUE))
     } else if(x$model_output$dist_c == "lnorm") {
-      check_name_params_c_ppc1 <- grepl("lmu_c1",v_name)
-      check_name_params_c_ppc2 <- grepl("lmu_c2",v_name)
+      check_name_params_c_ppc1 <- grepl("lmu_c1", v_name)
+      check_name_params_c_ppc2 <- grepl("lmu_c2", v_name)
       check_name_params_c_ppc3 <- rep(FALSE, length(v_name))
       check_name_params_c_ppc4 <- rep(FALSE, length(v_name))
       if(grepl("SELECTION", x$model_output$type) == TRUE){
-        check_name_params_c_ppc3 <- grepl("ltau_c",v_name)
+        check_name_params_c_ppc3 <- grepl("ltau_c", v_name)
       } else if(grepl("PATTERN", x$model_output$type) == TRUE) {
-        check_name_params_c_ppc3 <- grepl("ltau_c_p1",v_name)
-        check_name_params_c_ppc4 <- grepl("ltau_c_p2",v_name)
+        check_name_params_c_ppc3 <- grepl("ltau_c_p1", v_name)
+        check_name_params_c_ppc4 <- grepl("ltau_c_p2", v_name)
       } else if(grepl("HURDLE", x$model_output$type) == TRUE) {
-        check_name_params_c_ppc3 <- grepl("ltau_c1",v_name)
-        check_name_params_c_ppc4 <- grepl("ltau_c2",v_name)
+        check_name_params_c_ppc3 <- grepl("ltau_c1", v_name)
+        check_name_params_c_ppc4 <- grepl("ltau_c2", v_name)
       }
+      check_index_params_c_ppc <- c(which(check_name_params_c_ppc1, TRUE), which(check_name_params_c_ppc2, TRUE), which(check_name_params_c_ppc3, TRUE), which(check_name_params_c_ppc4, TRUE))
     }
-    check_index_params_c_ppc <- c(which(check_name_params_c_ppc1, TRUE), which(check_name_params_c_ppc2, TRUE), which(check_name_params_c_ppc3, TRUE), which(check_name_params_c_ppc4, TRUE))
   }
   check_index <- c(check_index_cost, check_index_eff, check_index_loglik, check_index_deviance)
   if(x$model_output$ppc == TRUE) {check_index <- c(check_index, check_index_params_e_ppc, check_index_params_c_ppc) }

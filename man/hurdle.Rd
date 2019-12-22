@@ -40,7 +40,8 @@ no structural value is chosen and a standard model for the effects is run.}
 \item{sc}{Structural value to be found in the cost variables defined in \code{data}. If set to \code{NULL}, 
 no structural value is chosen and a standard model for the costs is run.}
 
-\item{dist_e}{Distribution assumed for the effects. Current available chocies are: Normal ('norm') or Beta ('beta').}
+\item{dist_e}{Distribution assumed for the effects. Current available chocies are: Normal ('norm'), Beta ('beta'), Gamma ('gamma'), Exponential ('exp'),
+Weibull ('weibull'), Logistic ('logis'), Poisson ('pois'), Negative Binomial ('nbinom') or Bernoulli ('bern').}
 
 \item{dist_c}{Distribution assumed for the costs. Current available chocies are: Normal ('norm'), Gamma ('gamma') or LogNormal ('lnorm').}
 

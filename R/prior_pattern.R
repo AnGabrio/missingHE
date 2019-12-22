@@ -7,7 +7,8 @@
 #' @param type Type of missingness mechanism assumed. Choices are Missing At Random (MAR), Missing Not At Random for the effects (MNAR_eff),
 #' Missing Not At Random for the costs (MNAR_cost), and Missing Not At Random for both (MNAR). For a complete list of all available hyper parameters 
 #' and types of models see the manual.
-#' @param dist_e distribution assumed for the effects. Current available chocies are: Normal ('norm') or Beta ('beta').
+#' @param dist_e distribution assumed for the effects. Current available chocies are: Normal ('norm'), Beta ('beta'), Gamma ('gamma'), Exponential ('exp'),
+#' Weibull ('weibull'), Logistic ('logis'), Poisson ('pois'), Negative Binomial ('nbinom') or Bernoulli ('bern')
 #' @param dist_c Distribution assumed for the costs. Current available chocies are: Normal ('norm'), Gamma ('gamma') or LogNormal ('lnorm')
 #' @param pe Number of covariates for the effectiveness model
 #' @param pc Number of cvoariates for the cost model
@@ -874,6 +875,318 @@ prior_pattern <- function(type, dist_e, dist_c, pe, pc, d_list, restriction) eva
         if(grepl("s_e_p2[1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
           prior_alphae_str <- paste("s_e_p2[1] ~ dunif(", prior_alphae[1], ",", prior_alphae[2])
           model_string_jags <- gsub("s_e_p2[1] ~ dunif(0, sqrt(meane_p2[1] * (1 - meane_p2[1]))", prior_alphae_str, model_string_jags,fixed = TRUE) }
+      }
+    }
+  } else if(dist_e == "gamma" | dist_e == "logis") {
+    if(is.null(sigma.prior.e) == FALSE) {
+      if(length(sigma.prior.e) != 2) {stop("provide correct hyper prior values") }
+      prior_alphae <- sigma.prior.e 
+      if(d_list$n_patterns[1] == 4) {
+        if(grepl("s_e_p1[1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
+          prior_alphae_str <- paste("s_e_p1[1] ~ dunif(", prior_alphae[1], ",", prior_alphae[2])
+          model_string_jags <- gsub("s_e_p1[1] ~ dunif(0, 10000", prior_alphae_str, model_string_jags,fixed = TRUE) }
+        if(grepl("s_e_p1[3] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
+          prior_alphae_str <- paste("s_e_p1[3] ~ dunif(", prior_alphae[1], ",", prior_alphae[2])
+          model_string_jags <- gsub("s_e_p1[3] ~ dunif(0, 10000", prior_alphae_str, model_string_jags,fixed = TRUE) } 
+      } else if(d_list$n_patterns[1] == 3 & d_list$d1$d1_c_obs == FALSE & restriction == "CC") {
+        if(grepl("s_e_p1[1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
+          prior_alphae_str <- paste("s_e_p1[1] ~ dunif(", prior_alphae[1], ",", prior_alphae[2])
+          model_string_jags <- gsub("s_e_p1[1] ~ dunif(0, 10000", prior_alphae_str, model_string_jags,fixed = TRUE) }
+        if(grepl("s_e_p1[3] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
+          prior_alphae_str <- paste("s_e_p1[3] ~ dunif(", prior_alphae[1], ",", prior_alphae[2])
+          model_string_jags <- gsub("s_e_p1[3] ~ dunif(0, 10000", prior_alphae_str, model_string_jags,fixed = TRUE) } 
+      } else if(d_list$n_patterns[1] == 3 & d_list$d1$d1_ec_obs == FALSE & restriction == "AC") {
+        if(grepl("s_e_p1[3] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
+          prior_alphae_str <- paste("s_e_p1[3] ~ dunif(", prior_alphae[1], ",", prior_alphae[2])
+          model_string_jags <- gsub("s_e_p1[3] ~ dunif(0, 10000", prior_alphae_str, model_string_jags,fixed = TRUE) } 
+      } else if(d_list$n_patterns[1] == 3 & d_list$d1$d1_e_obs == FALSE & restriction == "CC") {
+        if(grepl("s_e_p1[1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
+          prior_alphae_str <- paste("s_e_p1[1] ~ dunif(", prior_alphae[1], ",", prior_alphae[2])
+          model_string_jags <- gsub("s_e_p1[1] ~ dunif(0, 10000", prior_alphae_str, model_string_jags,fixed = TRUE) }
+      } else if(d_list$n_patterns[1] == 3 & d_list$d1$d1_ec_mis == FALSE) {
+        if(grepl("s_e_p1[1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
+          prior_alphae_str <- paste("s_e_p1[1] ~ dunif(", prior_alphae[1], ",", prior_alphae[2])
+          model_string_jags <- gsub("s_e_p1[1] ~ dunif(0, 10000", prior_alphae_str, model_string_jags,fixed = TRUE) }
+        if(grepl("s_e_p1[3] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
+          prior_alphae_str <- paste("s_e_p1[3] ~ dunif(", prior_alphae[1], ",", prior_alphae[2])
+          model_string_jags <- gsub("s_e_p1[3] ~ dunif(0, 10000", prior_alphae_str, model_string_jags,fixed = TRUE) } 
+      } else if(d_list$n_patterns[1] == 2 & d_list$d1$d1_c_obs == FALSE & d_list$d1$d1_e_obs == FALSE & restriction == "CC") {
+        if(grepl("s_e_p1[1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
+          prior_alphae_str <- paste("s_e_p1[1] ~ dunif(", prior_alphae[1], ",", prior_alphae[2])
+          model_string_jags <- gsub("s_e_p1[1] ~ dunif(0, 10000", prior_alphae_str, model_string_jags,fixed = TRUE) }
+      } else if(d_list$n_patterns[1] == 2 & d_list$d1$d1_c_obs == FALSE & d_list$d1$d1_ec_mis == FALSE & restriction == "CC") {
+        if(grepl("s_e_p1[1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
+          prior_alphae_str <- paste("s_e_p1[1] ~ dunif(", prior_alphae[1], ",", prior_alphae[2])
+          model_string_jags <- gsub("s_e_p1[1] ~ dunif(0, 10000", prior_alphae_str, model_string_jags,fixed = TRUE) }
+        if(grepl("s_e_p1[2] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
+          prior_alphae_str <- paste("s_e_p1[2] ~ dunif(", prior_alphae[1], ",", prior_alphae[2])
+          model_string_jags <- gsub("s_e_p1[2] ~ dunif(0, 10000", prior_alphae_str, model_string_jags,fixed = TRUE) }
+      } else if(d_list$n_patterns[1] == 2 & d_list$d1$d1_e_obs == FALSE & d_list$d1$d1_ec_mis == FALSE & restriction == "CC") {
+        if(grepl("s_e_p1[1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
+          prior_alphae_str <- paste("s_e_p1[1] ~ dunif(", prior_alphae[1], ",", prior_alphae[2])
+          model_string_jags <- gsub("s_e_p1[1] ~ dunif(0, 10000", prior_alphae_str, model_string_jags,fixed = TRUE) }
+      } else if(d_list$n_patterns[1] == 2 & d_list$d1$d1_ec_obs == FALSE & d_list$d1$d1_ec_mis == FALSE & restriction == "AC") {
+        if(grepl("s_e_p1[1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
+          prior_alphae_str <- paste("s_e_p1[1] ~ dunif(", prior_alphae[1], ",", prior_alphae[2])
+          model_string_jags <- gsub("s_e_p1[1] ~ dunif(0, 10000", prior_alphae_str, model_string_jags,fixed = TRUE) }
+      }
+      if(d_list$n_patterns[2] == 4) {
+        if(grepl("s_e_p2[1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
+          prior_alphae_str <- paste("s_e_p2[1] ~ dunif(", prior_alphae[1], ",", prior_alphae[2])
+          model_string_jags <- gsub("s_e_p2[1] ~ dunif(0, 10000", prior_alphae_str, model_string_jags,fixed = TRUE) }
+        if(grepl("s_e_p2[3] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
+          prior_alphae_str <- paste("s_e_p2[3] ~ dunif(", prior_alphae[1], ",", prior_alphae[2])
+          model_string_jags <- gsub("s_e_p2[3] ~ dunif(0, 10000", prior_alphae_str, model_string_jags,fixed = TRUE) } 
+      } else if(d_list$n_patterns[2] == 3 & d_list$d2$d2_c_obs == FALSE & restriction == "CC") {
+        if(grepl("s_e_p2[1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
+          prior_alphae_str <- paste("s_e_p2[1] ~ dunif(", prior_alphae[1], ",", prior_alphae[2])
+          model_string_jags <- gsub("s_e_p2[1] ~ dunif(0, 10000", prior_alphae_str, model_string_jags,fixed = TRUE) }
+        if(grepl("s_e_p2[3] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
+          prior_alphae_str <- paste("s_e_p2[3] ~ dunif(", prior_alphae[1], ",", prior_alphae[2])
+          model_string_jags <- gsub("s_e_p2[3] ~ dunif(0, 10000", prior_alphae_str, model_string_jags,fixed = TRUE) } 
+      } else if(d_list$n_patterns[2] == 3 & d_list$d2$d2_ec_obs == FALSE & restriction == "AC") {
+        if(grepl("s_e_p2[3] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
+          prior_alphae_str <- paste("s_e_p2[3] ~ dunif(", prior_alphae[1], ",", prior_alphae[2])
+          model_string_jags <- gsub("s_e_p2[3] ~ dunif(0, 10000", prior_alphae_str, model_string_jags,fixed = TRUE) } 
+      } else if(d_list$n_patterns[2] == 3 & d_list$d2$d2_e_obs == FALSE & restriction == "CC") {
+        if(grepl("s_e_p2[1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
+          prior_alphae_str <- paste("s_e_p2[1] ~ dunif(", prior_alphae[1], ",", prior_alphae[2])
+          model_string_jags <- gsub("s_e_p2[1] ~ dunif(0, 10000", prior_alphae_str, model_string_jags,fixed = TRUE) }
+      } else if(d_list$n_patterns[2] == 3 & d_list$d2$d2_ec_mis == FALSE) {
+        if(grepl("s_e_p2[1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
+          prior_alphae_str <- paste("s_e_p2[1] ~ dunif(", prior_alphae[1], ",", prior_alphae[2])
+          model_string_jags <- gsub("s_e_p2[1] ~ dunif(0, 10000", prior_alphae_str, model_string_jags,fixed = TRUE) }
+        if(grepl("s_e_p2[3] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
+          prior_alphae_str <- paste("s_e_p2[3] ~ dunif(", prior_alphae[1], ",", prior_alphae[2])
+          model_string_jags <- gsub("s_e_p2[3] ~ dunif(0, 10000", prior_alphae_str, model_string_jags,fixed = TRUE) } 
+      } else if(d_list$n_patterns[2] == 2 & d_list$d2$d2_c_obs == FALSE & d_list$d2$d2_e_obs == FALSE & restriction == "CC") {
+        if(grepl("s_e_p2[1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
+          prior_alphae_str <- paste("s_e_p2[1] ~ dunif(", prior_alphae[1], ",", prior_alphae[2])
+          model_string_jags <- gsub("s_e_p2[1] ~ dunif(0, 10000", prior_alphae_str, model_string_jags,fixed = TRUE) }
+      } else if(d_list$n_patterns[2] == 2 & d_list$d2$d2_c_obs == FALSE & d_list$d2$d2_ec_mis == FALSE & restriction == "CC") {
+        if(grepl("s_e_p2[1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
+          prior_alphae_str <- paste("s_e_p2[1] ~ dunif(", prior_alphae[1], ",", prior_alphae[2])
+          model_string_jags <- gsub("s_e_p2[1] ~ dunif(0, 10000", prior_alphae_str, model_string_jags,fixed = TRUE) }
+        if(grepl("s_e_p2[2] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
+          prior_alphae_str <- paste("s_e_p2[2] ~ dunif(", prior_alphae[1], ",", prior_alphae[2])
+          model_string_jags <- gsub("s_e_p2[2] ~ dunif(0, 10000", prior_alphae_str, model_string_jags,fixed = TRUE) }
+      } else if(d_list$n_patterns[2] == 2 & d_list$d2$d2_e_obs == FALSE & d_list$d2$d2_ec_mis == FALSE & restriction == "CC") {
+        if(grepl("s_e_p2[1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
+          prior_alphae_str <- paste("s_e_p2[1] ~ dunif(", prior_alphae[1], ",", prior_alphae[2])
+          model_string_jags <- gsub("s_e_p2[1] ~ dunif(0, 10000", prior_alphae_str, model_string_jags,fixed = TRUE) }
+      } else if(d_list$n_patterns[2] == 2 & d_list$d2$d2_ec_obs == FALSE & d_list$d2$d2_ec_mis == FALSE & restriction == "AC") {
+        if(grepl("s_e_p2[1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
+          prior_alphae_str <- paste("s_e_p2[1] ~ dunif(", prior_alphae[1], ",", prior_alphae[2])
+          model_string_jags <- gsub("s_e_p2[1] ~ dunif(0, 10000", prior_alphae_str, model_string_jags,fixed = TRUE) }
+      }
+    }
+  } else if(dist_e == "exp" | dist_e == "bern" | dist_e == "pois") {
+    if(is.null(sigma.prior.e) == FALSE) {
+      stop("no prior for sigma required for the effects under the 'exp', 'bern', 'pois' distributions") }
+  } else if(dist_e == "weibull") {
+    if(is.null(sigma.prior.e) == FALSE) {
+      if(length(sigma.prior.e) != 2) {stop("provide correct hyper prior values") }
+      prior_alphae <- sigma.prior.e 
+      if(d_list$n_patterns[1] == 4) {
+        if(grepl("s_e_p1[1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
+          prior_alphae_str <- paste("s_e_p1[1] ~ dunif(", prior_alphae[1], ",", prior_alphae[2])
+          model_string_jags <- gsub("s_e_p1[1] ~ dunif(0, 100", prior_alphae_str, model_string_jags,fixed = TRUE) }
+        if(grepl("s_e_p1[3] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
+          prior_alphae_str <- paste("s_e_p1[3] ~ dunif(", prior_alphae[1], ",", prior_alphae[2])
+          model_string_jags <- gsub("s_e_p1[3] ~ dunif(0, 100", prior_alphae_str, model_string_jags,fixed = TRUE) } 
+      } else if(d_list$n_patterns[1] == 3 & d_list$d1$d1_c_obs == FALSE & restriction == "CC") {
+        if(grepl("s_e_p1[1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
+          prior_alphae_str <- paste("s_e_p1[1] ~ dunif(", prior_alphae[1], ",", prior_alphae[2])
+          model_string_jags <- gsub("s_e_p1[1] ~ dunif(0, 100", prior_alphae_str, model_string_jags,fixed = TRUE) }
+        if(grepl("s_e_p1[3] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
+          prior_alphae_str <- paste("s_e_p1[3] ~ dunif(", prior_alphae[1], ",", prior_alphae[2])
+          model_string_jags <- gsub("s_e_p1[3] ~ dunif(0, 100", prior_alphae_str, model_string_jags,fixed = TRUE) } 
+      } else if(d_list$n_patterns[1] == 3 & d_list$d1$d1_ec_obs == FALSE & restriction == "AC") {
+        if(grepl("s_e_p1[3] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
+          prior_alphae_str <- paste("s_e_p1[3] ~ dunif(", prior_alphae[1], ",", prior_alphae[2])
+          model_string_jags <- gsub("s_e_p1[3] ~ dunif(0, 100", prior_alphae_str, model_string_jags,fixed = TRUE) } 
+      } else if(d_list$n_patterns[1] == 3 & d_list$d1$d1_e_obs == FALSE & restriction == "CC") {
+        if(grepl("s_e_p1[1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
+          prior_alphae_str <- paste("s_e_p1[1] ~ dunif(", prior_alphae[1], ",", prior_alphae[2])
+          model_string_jags <- gsub("s_e_p1[1] ~ dunif(0, 100", prior_alphae_str, model_string_jags,fixed = TRUE) }
+      } else if(d_list$n_patterns[1] == 3 & d_list$d1$d1_ec_mis == FALSE) {
+        if(grepl("s_e_p1[1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
+          prior_alphae_str <- paste("s_e_p1[1] ~ dunif(", prior_alphae[1], ",", prior_alphae[2])
+          model_string_jags <- gsub("s_e_p1[1] ~ dunif(0, 100", prior_alphae_str, model_string_jags,fixed = TRUE) }
+        if(grepl("s_e_p1[3] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
+          prior_alphae_str <- paste("s_e_p1[3] ~ dunif(", prior_alphae[1], ",", prior_alphae[2])
+          model_string_jags <- gsub("s_e_p1[3] ~ dunif(0, 100", prior_alphae_str, model_string_jags,fixed = TRUE) } 
+      } else if(d_list$n_patterns[1] == 2 & d_list$d1$d1_c_obs == FALSE & d_list$d1$d1_e_obs == FALSE & restriction == "CC") {
+        if(grepl("s_e_p1[1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
+          prior_alphae_str <- paste("s_e_p1[1] ~ dunif(", prior_alphae[1], ",", prior_alphae[2])
+          model_string_jags <- gsub("s_e_p1[1] ~ dunif(0, 100", prior_alphae_str, model_string_jags,fixed = TRUE) }
+      } else if(d_list$n_patterns[1] == 2 & d_list$d1$d1_c_obs == FALSE & d_list$d1$d1_ec_mis == FALSE & restriction == "CC") {
+        if(grepl("s_e_p1[1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
+          prior_alphae_str <- paste("s_e_p1[1] ~ dunif(", prior_alphae[1], ",", prior_alphae[2])
+          model_string_jags <- gsub("s_e_p1[1] ~ dunif(0, 100", prior_alphae_str, model_string_jags,fixed = TRUE) }
+        if(grepl("s_e_p1[2] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
+          prior_alphae_str <- paste("s_e_p1[2] ~ dunif(", prior_alphae[1], ",", prior_alphae[2])
+          model_string_jags <- gsub("s_e_p1[2] ~ dunif(0, 100", prior_alphae_str, model_string_jags,fixed = TRUE) }
+      } else if(d_list$n_patterns[1] == 2 & d_list$d1$d1_e_obs == FALSE & d_list$d1$d1_ec_mis == FALSE & restriction == "CC") {
+        if(grepl("s_e_p1[1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
+          prior_alphae_str <- paste("s_e_p1[1] ~ dunif(", prior_alphae[1], ",", prior_alphae[2])
+          model_string_jags <- gsub("s_e_p1[1] ~ dunif(0, 100", prior_alphae_str, model_string_jags,fixed = TRUE) }
+      } else if(d_list$n_patterns[1] == 2 & d_list$d1$d1_ec_obs == FALSE & d_list$d1$d1_ec_mis == FALSE & restriction == "AC") {
+        if(grepl("s_e_p1[1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
+          prior_alphae_str <- paste("s_e_p1[1] ~ dunif(", prior_alphae[1], ",", prior_alphae[2])
+          model_string_jags <- gsub("s_e_p1[1] ~ dunif(0, 100", prior_alphae_str, model_string_jags,fixed = TRUE) }
+      }
+      if(d_list$n_patterns[2] == 4) {
+        if(grepl("s_e_p2[1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
+          prior_alphae_str <- paste("s_e_p2[1] ~ dunif(", prior_alphae[1], ",", prior_alphae[2])
+          model_string_jags <- gsub("s_e_p2[1] ~ dunif(0, 100", prior_alphae_str, model_string_jags,fixed = TRUE) }
+        if(grepl("s_e_p2[3] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
+          prior_alphae_str <- paste("s_e_p2[3] ~ dunif(", prior_alphae[1], ",", prior_alphae[2])
+          model_string_jags <- gsub("s_e_p2[3] ~ dunif(0, 100", prior_alphae_str, model_string_jags,fixed = TRUE) } 
+      } else if(d_list$n_patterns[2] == 3 & d_list$d2$d2_c_obs == FALSE & restriction == "CC") {
+        if(grepl("s_e_p2[1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
+          prior_alphae_str <- paste("s_e_p2[1] ~ dunif(", prior_alphae[1], ",", prior_alphae[2])
+          model_string_jags <- gsub("s_e_p2[1] ~ dunif(0, 100", prior_alphae_str, model_string_jags,fixed = TRUE) }
+        if(grepl("s_e_p2[3] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
+          prior_alphae_str <- paste("s_e_p2[3] ~ dunif(", prior_alphae[1], ",", prior_alphae[2])
+          model_string_jags <- gsub("s_e_p2[3] ~ dunif(0, 100", prior_alphae_str, model_string_jags,fixed = TRUE) } 
+      } else if(d_list$n_patterns[2] == 3 & d_list$d2$d2_ec_obs == FALSE & restriction == "AC") {
+        if(grepl("s_e_p2[3] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
+          prior_alphae_str <- paste("s_e_p2[3] ~ dunif(", prior_alphae[1], ",", prior_alphae[2])
+          model_string_jags <- gsub("s_e_p2[3] ~ dunif(0, 100", prior_alphae_str, model_string_jags,fixed = TRUE) } 
+      } else if(d_list$n_patterns[2] == 3 & d_list$d2$d2_e_obs == FALSE & restriction == "CC") {
+        if(grepl("s_e_p2[1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
+          prior_alphae_str <- paste("s_e_p2[1] ~ dunif(", prior_alphae[1], ",", prior_alphae[2])
+          model_string_jags <- gsub("s_e_p2[1] ~ dunif(0, 100", prior_alphae_str, model_string_jags,fixed = TRUE) }
+      } else if(d_list$n_patterns[2] == 3 & d_list$d2$d2_ec_mis == FALSE) {
+        if(grepl("s_e_p2[1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
+          prior_alphae_str <- paste("s_e_p2[1] ~ dunif(", prior_alphae[1], ",", prior_alphae[2])
+          model_string_jags <- gsub("s_e_p2[1] ~ dunif(0, 100", prior_alphae_str, model_string_jags,fixed = TRUE) }
+        if(grepl("s_e_p2[3] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
+          prior_alphae_str <- paste("s_e_p2[3] ~ dunif(", prior_alphae[1], ",", prior_alphae[2])
+          model_string_jags <- gsub("s_e_p2[3] ~ dunif(0, 100", prior_alphae_str, model_string_jags,fixed = TRUE) } 
+      } else if(d_list$n_patterns[2] == 2 & d_list$d2$d2_c_obs == FALSE & d_list$d2$d2_e_obs == FALSE & restriction == "CC") {
+        if(grepl("s_e_p2[1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
+          prior_alphae_str <- paste("s_e_p2[1] ~ dunif(", prior_alphae[1], ",", prior_alphae[2])
+          model_string_jags <- gsub("s_e_p2[1] ~ dunif(0, 100", prior_alphae_str, model_string_jags,fixed = TRUE) }
+      } else if(d_list$n_patterns[2] == 2 & d_list$d2$d2_c_obs == FALSE & d_list$d2$d2_ec_mis == FALSE & restriction == "CC") {
+        if(grepl("s_e_p2[1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
+          prior_alphae_str <- paste("s_e_p2[1] ~ dunif(", prior_alphae[1], ",", prior_alphae[2])
+          model_string_jags <- gsub("s_e_p2[1] ~ dunif(0, 100", prior_alphae_str, model_string_jags,fixed = TRUE) }
+        if(grepl("s_e_p2[2] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
+          prior_alphae_str <- paste("s_e_p2[2] ~ dunif(", prior_alphae[1], ",", prior_alphae[2])
+          model_string_jags <- gsub("s_e_p2[2] ~ dunif(0, 100", prior_alphae_str, model_string_jags,fixed = TRUE) }
+      } else if(d_list$n_patterns[2] == 2 & d_list$d2$d2_e_obs == FALSE & d_list$d2$d2_ec_mis == FALSE & restriction == "CC") {
+        if(grepl("s_e_p2[1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
+          prior_alphae_str <- paste("s_e_p2[1] ~ dunif(", prior_alphae[1], ",", prior_alphae[2])
+          model_string_jags <- gsub("s_e_p2[1] ~ dunif(0, 100", prior_alphae_str, model_string_jags,fixed = TRUE) }
+      } else if(d_list$n_patterns[2] == 2 & d_list$d2$d2_ec_obs == FALSE & d_list$d2$d2_ec_mis == FALSE & restriction == "AC") {
+        if(grepl("s_e_p2[1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
+          prior_alphae_str <- paste("s_e_p2[1] ~ dunif(", prior_alphae[1], ",", prior_alphae[2])
+          model_string_jags <- gsub("s_e_p2[1] ~ dunif(0, 100", prior_alphae_str, model_string_jags,fixed = TRUE) }
+      }
+    }
+  } else if(dist_e == "nbinom") {
+    if(is.null(sigma.prior.e) == FALSE) {
+      if(length(sigma.prior.e) != 2) {stop("provide correct hyper prior values") }
+      prior_alphae <- sigma.prior.e 
+      if(d_list$n_patterns[1] == 4) {
+        if(grepl("tau_e_p1[1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
+          prior_alphae_str <- paste("tau_e_p1[1] ~ dunif(", prior_alphae[1], ",", prior_alphae[2])
+          model_string_jags <- gsub("tau_e_p1[1] ~ dunif(0, 100", prior_alphae_str, model_string_jags,fixed = TRUE) }
+        if(grepl("tau_e_p1[3] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
+          prior_alphae_str <- paste("tau_e_p1[3] ~ dunif(", prior_alphae[1], ",", prior_alphae[2])
+          model_string_jags <- gsub("tau_e_p1[3] ~ dunif(0, 100", prior_alphae_str, model_string_jags,fixed = TRUE) } 
+      } else if(d_list$n_patterns[1] == 3 & d_list$d1$d1_c_obs == FALSE & restriction == "CC") {
+        if(grepl("tau_e_p1[1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
+          prior_alphae_str <- paste("tau_e_p1[1] ~ dunif(", prior_alphae[1], ",", prior_alphae[2])
+          model_string_jags <- gsub("tau_e_p1[1] ~ dunif(0, 100", prior_alphae_str, model_string_jags,fixed = TRUE) }
+        if(grepl("tau_e_p1[3] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
+          prior_alphae_str <- paste("tau_e_p1[3] ~ dunif(", prior_alphae[1], ",", prior_alphae[2])
+          model_string_jags <- gsub("tau_e_p1[3] ~ dunif(0, 100", prior_alphae_str, model_string_jags,fixed = TRUE) } 
+      } else if(d_list$n_patterns[1] == 3 & d_list$d1$d1_ec_obs == FALSE & restriction == "AC") {
+        if(grepl("tau_e_p1[3] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
+          prior_alphae_str <- paste("tau_e_p1[3] ~ dunif(", prior_alphae[1], ",", prior_alphae[2])
+          model_string_jags <- gsub("tau_e_p1[3] ~ dunif(0, 100", prior_alphae_str, model_string_jags,fixed = TRUE) } 
+      } else if(d_list$n_patterns[1] == 3 & d_list$d1$d1_e_obs == FALSE & restriction == "CC") {
+        if(grepl("tau_e_p1[1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
+          prior_alphae_str <- paste("tau_e_p1[1] ~ dunif(", prior_alphae[1], ",", prior_alphae[2])
+          model_string_jags <- gsub("tau_e_p1[1] ~ dunif(0, 100", prior_alphae_str, model_string_jags,fixed = TRUE) }
+      } else if(d_list$n_patterns[1] == 3 & d_list$d1$d1_ec_mis == FALSE) {
+        if(grepl("tau_e_p1[1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
+          prior_alphae_str <- paste("tau_e_p1[1] ~ dunif(", prior_alphae[1], ",", prior_alphae[2])
+          model_string_jags <- gsub("tau_e_p1[1] ~ dunif(0, 100", prior_alphae_str, model_string_jags,fixed = TRUE) }
+        if(grepl("tau_e_p1[3] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
+          prior_alphae_str <- paste("tau_e_p1[3] ~ dunif(", prior_alphae[1], ",", prior_alphae[2])
+          model_string_jags <- gsub("tau_e_p1[3] ~ dunif(0, 100", prior_alphae_str, model_string_jags,fixed = TRUE) } 
+      } else if(d_list$n_patterns[1] == 2 & d_list$d1$d1_c_obs == FALSE & d_list$d1$d1_e_obs == FALSE & restriction == "CC") {
+        if(grepl("tau_e_p1[1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
+          prior_alphae_str <- paste("tau_e_p1[1] ~ dunif(", prior_alphae[1], ",", prior_alphae[2])
+          model_string_jags <- gsub("tau_e_p1[1] ~ dunif(0, 100", prior_alphae_str, model_string_jags,fixed = TRUE) }
+      } else if(d_list$n_patterns[1] == 2 & d_list$d1$d1_c_obs == FALSE & d_list$d1$d1_ec_mis == FALSE & restriction == "CC") {
+        if(grepl("tau_e_p1[1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
+          prior_alphae_str <- paste("tau_e_p1[1] ~ dunif(", prior_alphae[1], ",", prior_alphae[2])
+          model_string_jags <- gsub("tau_e_p1[1] ~ dunif(0, 100", prior_alphae_str, model_string_jags,fixed = TRUE) }
+        if(grepl("tau_e_p1[2] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
+          prior_alphae_str <- paste("tau_e_p1[2] ~ dunif(", prior_alphae[1], ",", prior_alphae[2])
+          model_string_jags <- gsub("tau_e_p1[2] ~ dunif(0, 100", prior_alphae_str, model_string_jags,fixed = TRUE) }
+      } else if(d_list$n_patterns[1] == 2 & d_list$d1$d1_e_obs == FALSE & d_list$d1$d1_ec_mis == FALSE & restriction == "CC") {
+        if(grepl("tau_e_p1[1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
+          prior_alphae_str <- paste("tau_e_p1[1] ~ dunif(", prior_alphae[1], ",", prior_alphae[2])
+          model_string_jags <- gsub("tau_e_p1[1] ~ dunif(0, 100", prior_alphae_str, model_string_jags,fixed = TRUE) }
+      } else if(d_list$n_patterns[1] == 2 & d_list$d1$d1_ec_obs == FALSE & d_list$d1$d1_ec_mis == FALSE & restriction == "AC") {
+        if(grepl("tau_e_p1[1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
+          prior_alphae_str <- paste("tau_e_p1[1] ~ dunif(", prior_alphae[1], ",", prior_alphae[2])
+          model_string_jags <- gsub("tau_e_p1[1] ~ dunif(0, 100", prior_alphae_str, model_string_jags,fixed = TRUE) }
+      }
+      if(d_list$n_patterns[2] == 4) {
+        if(grepl("tau_e_p2[1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
+          prior_alphae_str <- paste("tau_e_p2[1] ~ dunif(", prior_alphae[1], ",", prior_alphae[2])
+          model_string_jags <- gsub("tau_e_p2[1] ~ dunif(0, 100", prior_alphae_str, model_string_jags,fixed = TRUE) }
+        if(grepl("tau_e_p2[3] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
+          prior_alphae_str <- paste("tau_e_p2[3] ~ dunif(", prior_alphae[1], ",", prior_alphae[2])
+          model_string_jags <- gsub("tau_e_p2[3] ~ dunif(0, 100", prior_alphae_str, model_string_jags,fixed = TRUE) } 
+      } else if(d_list$n_patterns[2] == 3 & d_list$d2$d2_c_obs == FALSE & restriction == "CC") {
+        if(grepl("tau_e_p2[1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
+          prior_alphae_str <- paste("tau_e_p2[1] ~ dunif(", prior_alphae[1], ",", prior_alphae[2])
+          model_string_jags <- gsub("tau_e_p2[1] ~ dunif(0, 100", prior_alphae_str, model_string_jags,fixed = TRUE) }
+        if(grepl("tau_e_p2[3] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
+          prior_alphae_str <- paste("tau_e_p2[3] ~ dunif(", prior_alphae[1], ",", prior_alphae[2])
+          model_string_jags <- gsub("tau_e_p2[3] ~ dunif(0, 100", prior_alphae_str, model_string_jags,fixed = TRUE) } 
+      } else if(d_list$n_patterns[2] == 3 & d_list$d2$d2_ec_obs == FALSE & restriction == "AC") {
+        if(grepl("tau_e_p2[3] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
+          prior_alphae_str <- paste("tau_e_p2[3] ~ dunif(", prior_alphae[1], ",", prior_alphae[2])
+          model_string_jags <- gsub("tau_e_p2[3] ~ dunif(0, 100", prior_alphae_str, model_string_jags,fixed = TRUE) } 
+      } else if(d_list$n_patterns[2] == 3 & d_list$d2$d2_e_obs == FALSE & restriction == "CC") {
+        if(grepl("tau_e_p2[1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
+          prior_alphae_str <- paste("tau_e_p2[1] ~ dunif(", prior_alphae[1], ",", prior_alphae[2])
+          model_string_jags <- gsub("tau_e_p2[1] ~ dunif(0, 100", prior_alphae_str, model_string_jags,fixed = TRUE) }
+      } else if(d_list$n_patterns[2] == 3 & d_list$d2$d2_ec_mis == FALSE) {
+        if(grepl("tau_e_p2[1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
+          prior_alphae_str <- paste("tau_e_p2[1] ~ dunif(", prior_alphae[1], ",", prior_alphae[2])
+          model_string_jags <- gsub("tau_e_p2[1] ~ dunif(0, 100", prior_alphae_str, model_string_jags,fixed = TRUE) }
+        if(grepl("tau_e_p2[3] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
+          prior_alphae_str <- paste("tau_e_p2[3] ~ dunif(", prior_alphae[1], ",", prior_alphae[2])
+          model_string_jags <- gsub("tau_e_p2[3] ~ dunif(0, 100", prior_alphae_str, model_string_jags,fixed = TRUE) } 
+      } else if(d_list$n_patterns[2] == 2 & d_list$d2$d2_c_obs == FALSE & d_list$d2$d2_e_obs == FALSE & restriction == "CC") {
+        if(grepl("tau_e_p2[1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
+          prior_alphae_str <- paste("tau_e_p2[1] ~ dunif(", prior_alphae[1], ",", prior_alphae[2])
+          model_string_jags <- gsub("tau_e_p2[1] ~ dunif(0, 100", prior_alphae_str, model_string_jags,fixed = TRUE) }
+      } else if(d_list$n_patterns[2] == 2 & d_list$d2$d2_c_obs == FALSE & d_list$d2$d2_ec_mis == FALSE & restriction == "CC") {
+        if(grepl("tau_e_p2[1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
+          prior_alphae_str <- paste("tau_e_p2[1] ~ dunif(", prior_alphae[1], ",", prior_alphae[2])
+          model_string_jags <- gsub("tau_e_p2[1] ~ dunif(0, 100", prior_alphae_str, model_string_jags,fixed = TRUE) }
+        if(grepl("tau_e_p2[2] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
+          prior_alphae_str <- paste("tau_e_p2[2] ~ dunif(", prior_alphae[1], ",", prior_alphae[2])
+          model_string_jags <- gsub("tau_e_p2[2] ~ dunif(0, 100", prior_alphae_str, model_string_jags,fixed = TRUE) }
+      } else if(d_list$n_patterns[2] == 2 & d_list$d2$d2_e_obs == FALSE & d_list$d2$d2_ec_mis == FALSE & restriction == "CC") {
+        if(grepl("tau_e_p2[1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
+          prior_alphae_str <- paste("tau_e_p2[1] ~ dunif(", prior_alphae[1], ",", prior_alphae[2])
+          model_string_jags <- gsub("tau_e_p2[1] ~ dunif(0, 100", prior_alphae_str, model_string_jags,fixed = TRUE) }
+      } else if(d_list$n_patterns[2] == 2 & d_list$d2$d2_ec_obs == FALSE & d_list$d2$d2_ec_mis == FALSE & restriction == "AC") {
+        if(grepl("tau_e_p2[1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
+          prior_alphae_str <- paste("tau_e_p2[1] ~ dunif(", prior_alphae[1], ",", prior_alphae[2])
+          model_string_jags <- gsub("tau_e_p2[1] ~ dunif(0, 100", prior_alphae_str, model_string_jags,fixed = TRUE) }
       }
     }
   }

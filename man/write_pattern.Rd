@@ -11,7 +11,8 @@ write_pattern(dist_e, dist_c, ind, type, pe, pc, d_list, d1, d2,
   restriction)
 }
 \arguments{
-\item{dist_e}{Distribution assumed for the effects. Current available choices are: Normal ('norm') or Beta ('beta')}
+\item{dist_e}{Distribution assumed for the effects. Current available choices are: Normal ('norm'), Beta ('beta'), Gamma ('gamma'), Exponential ('exp'),
+Weibull ('weibull'), Logistic ('logis'), Poisson ('pois'), Negative Binomial ('nbinom') or Bernoulli ('bern')}
 
 \item{dist_c}{Distribution assumed for the costs. Current available choices are: Normal ('norm'), Gamma ('gamma') or LogNormal ('lnorm')}
 

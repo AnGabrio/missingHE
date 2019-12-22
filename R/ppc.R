@@ -32,7 +32,7 @@
 #' @references 
 #' Gelman, A. Carlin, JB., Stern, HS. Rubin, DB.(2003). \emph{Bayesian Data Analysis, 2nd edition}, CRC Press.
 #' @import ggplot2 bayesplot
-#' @importFrom stats rnorm rbeta rgamma rlnorm 
+#' @importFrom stats rnorm rbeta rgamma rlnorm rweibull rnbinom rbinom rpois rlogis rexp
 #' @export 
 #' @examples
 #' #For examples see the function selection, pattern or hurdle
@@ -94,23 +94,138 @@ ppc <- function(x, type = "histogram", outcome = "effects_arm1", ndisplay = 15, 
    if(is.null(dim(mu_e1)) == TRUE | is.null(dim(mu_e2)) == TRUE){
      stop("Not possible to plot posterior predictive checks with a single observed effect value in one arm.")
    }
-   if(grepl("SELECTION", x$model_output$type) == TRUE){
-     sigma_e1 <- 1/sqrt(x$model_output$`model summary`$BUGSoutput$sims.list$tau_e[,1])
-     sigma_e2 <- 1/sqrt(x$model_output$`model summary`$BUGSoutput$sims.list$tau_e[,2])
+    if(grepl("SELECTION", x$model_output$type) == TRUE){
+     sigma_e1 <- 1 / sqrt(x$model_output$`model summary`$BUGSoutput$sims.list$tau_e[, 1])
+     sigma_e2 <- 1 / sqrt(x$model_output$`model summary`$BUGSoutput$sims.list$tau_e[, 2])
      for(i in 1 : nrow(e1_rep)){ e1_rep[i, ] <- rnorm(n1_e, mean = mu_e1[i, ], sd = sigma_e1 [i]) } 
      for(i in 1 : nrow(e2_rep)){ e2_rep[i, ] <- rnorm(n2_e, mean = mu_e2[i, ], sd = sigma_e2 [i]) }
-   } else if(grepl("PATTERN", x$model_output$type) == TRUE) {
-     sigma_e1 <- 1/sqrt(x$model_output$`model summary`$BUGSoutput$sims.list$tau_e_p1)
-     sigma_e2 <- 1/sqrt(x$model_output$`model summary`$BUGSoutput$sims.list$tau_e_p2)
+    } else if(grepl("PATTERN", x$model_output$type) == TRUE) {
+     sigma_e1 <- 1 / sqrt(x$model_output$`model summary`$BUGSoutput$sims.list$tau_e_p1)
+     sigma_e2 <- 1 / sqrt(x$model_output$`model summary`$BUGSoutput$sims.list$tau_e_p2)
      for(i in 1 : nrow(e1_rep)){ e1_rep[i, ] <- rnorm(n1_e, mean = mu_e1[i, ], sd = sigma_e1 [i, ]) }
      for(i in 1 : nrow(e2_rep)){ e2_rep[i, ] <- rnorm(n2_e, mean = mu_e2[i, ], sd = sigma_e2 [i, ]) }
-   } else if(grepl("HURDLE", x$model_output$type) == TRUE) {
-     sigma_e1 <- 1/sqrt(x$model_output$`model summary`$BUGSoutput$sims.list$tau_e1)
-     sigma_e2 <- 1/sqrt(x$model_output$`model summary`$BUGSoutput$sims.list$tau_e2)
+    } else if(grepl("HURDLE", x$model_output$type) == TRUE) {
+     sigma_e1 <- 1 / sqrt(x$model_output$`model summary`$BUGSoutput$sims.list$tau_e1)
+     sigma_e2 <- 1 / sqrt(x$model_output$`model summary`$BUGSoutput$sims.list$tau_e2)
      for(i in 1 : nrow(e1_rep)){ e1_rep[i, ] <- rnorm(n1_e, mean = mu_e1[i, ], sd = sigma_e1 [i, ]) }
      for(i in 1 : nrow(e2_rep)){ e2_rep[i, ] <- rnorm(n2_e, mean = mu_e2[i, ], sd = sigma_e2 [i, ]) }
-   }
-  } else if(x$model_output$dist_e == "beta") {
+    }
+   } else if(x$model_output$dist_e == "logis") {
+     mu_e1 <- x$model_output$`model summary`$BUGSoutput$sims.list$mu_e1[, -index_mis_e1]
+     mu_e2 <- x$model_output$`model summary`$BUGSoutput$sims.list$mu_e2[, -index_mis_e2]
+     if(is.null(dim(mu_e1)) == TRUE | is.null(dim(mu_e2)) == TRUE){
+       stop("Not possible to plot posterior predictive checks with a single observed effect value in one arm.")
+     }
+      if(grepl("SELECTION", x$model_output$type) == TRUE){
+       scale_e1 <- 1 / x$model_output$`model summary`$BUGSoutput$sims.list$tau_e[, 1]
+       scale_e2 <- 1 / x$model_output$`model summary`$BUGSoutput$sims.list$tau_e[, 2]
+       for(i in 1 : nrow(e1_rep)){ e1_rep[i, ] <- rlogis(n1_e, location = mu_e1[i, ], scale = scale_e1 [i]) } 
+       for(i in 1 : nrow(e2_rep)){ e2_rep[i, ] <- rlogis(n2_e, location = mu_e2[i, ], scale = scale_e2 [i]) }
+      } else if(grepl("PATTERN", x$model_output$type) == TRUE) {
+       scale_e1 <- 1 / x$model_output$`model summary`$BUGSoutput$sims.list$tau_e_p1
+       scale_e2 <- 1 / x$model_output$`model summary`$BUGSoutput$sims.list$tau_e_p2
+       for(i in 1 : nrow(e1_rep)){ e1_rep[i, ] <- rlogis(n1_e, location = mu_e1[i, ], scale = scale_e1 [i, ]) }
+       for(i in 1 : nrow(e2_rep)){ e2_rep[i, ] <- rlogis(n2_e, location = mu_e2[i, ], scale = scale_e2 [i, ]) }
+      } else if(grepl("HURDLE", x$model_output$type) == TRUE) {
+       scale_e1 <- 1 / x$model_output$`model summary`$BUGSoutput$sims.list$tau_e1
+       scale_e2 <- 1 / x$model_output$`model summary`$BUGSoutput$sims.list$tau_e2
+       for(i in 1 : nrow(e1_rep)){ e1_rep[i, ] <- rlogis(n1_e, location = mu_e1[i, ], scale = scale_e1 [i, ]) }
+       for(i in 1 : nrow(e2_rep)){ e2_rep[i, ] <- rlogis(n2_e, location = mu_e2[i, ], scale = scale_e2 [i, ]) }
+      }
+   } else if(x$model_output$dist_e == "nbinom") {
+     mu_e1 <- x$model_output$`model summary`$BUGSoutput$sims.list$mu_e1[, -index_mis_e1]
+     mu_e2 <- x$model_output$`model summary`$BUGSoutput$sims.list$mu_e2[, -index_mis_e2]
+     if(is.null(dim(mu_e1)) == TRUE | is.null(dim(mu_e2)) == TRUE){
+       stop("Not possible to plot posterior predictive checks with a single observed effect value in one arm.")
+     }
+     if(grepl("SELECTION", x$model_output$type) == TRUE){
+       prob_e1 <- x$model_output$`model summary`$BUGSoutput$sims.list$tau_e[, 1] / (x$model_output$`model summary`$BUGSoutput$sims.list$tau_e[, 1] + x$model_output$`model summary`$BUGSoutput$sims.list$mu_e1[, -index_mis_e1])
+       prob_e2 <- x$model_output$`model summary`$BUGSoutput$sims.list$tau_e[, 2] / (x$model_output$`model summary`$BUGSoutput$sims.list$tau_e[, 2] + x$model_output$`model summary`$BUGSoutput$sims.list$mu_e2[, -index_mis_e2])
+       size_e1 <- x$model_output$`model summary`$BUGSoutput$sims.list$tau_e[, 1]
+       size_e2 <- x$model_output$`model summary`$BUGSoutput$sims.list$tau_e[, 2]
+       for(i in 1 : nrow(e1_rep)){ e1_rep[i, ] <- rnbinom(n1_e, prob = prob_e1[i, ], size = size_e1 [i]) } 
+       for(i in 1 : nrow(e2_rep)){ e2_rep[i, ] <- rnbinom(n2_e, prob = prob_e2[i, ], size = size_e2 [i]) }
+     } else if(grepl("PATTERN", x$model_output$type) == TRUE) {
+       prob_e1 <- array(NA, dim = c(nrow(e1_rep), dim(mu_e1)[2], dim(x$model_output$`model summary`$BUGSoutput$sims.list$tau_e_p1)[2]))
+        for(j in 1 : dim(x$model_output$`model summary`$BUGSoutput$sims.list$tau_e_p1)[2]) {
+          prob_e1[, , j] <- x$model_output$`model summary`$BUGSoutput$sims.list$tau_e_p1[, j] / (x$model_output$`model summary`$BUGSoutput$sims.list$tau_e_p1[, j] + x$model_output$`model summary`$BUGSoutput$sims.list$mu_e1[, -index_mis_e1])
+        }
+       prob_e2 <- array(NA, dim = c(nrow(e2_rep), dim(mu_e2)[2], dim(x$model_output$`model summary`$BUGSoutput$sims.list$tau_e_p2)[2]))
+       for(j in 1 : dim(x$model_output$`model summary`$BUGSoutput$sims.list$tau_e_p2)[2]) {
+         prob_e2[, , j] <- x$model_output$`model summary`$BUGSoutput$sims.list$tau_e_p2[, j] / (x$model_output$`model summary`$BUGSoutput$sims.list$tau_e_p2[, j] + x$model_output$`model summary`$BUGSoutput$sims.list$mu_e2[, -index_mis_e2])
+       }
+       size_e1 <- x$model_output$`model summary`$BUGSoutput$sims.list$tau_e_p1
+       size_e2 <- x$model_output$`model summary`$BUGSoutput$sims.list$tau_e_p2
+       for(i in 1 : nrow(e1_rep)){ e1_rep[i, ] <- rnbinom(n1_e, prob = prob_e1[i, , ], size = size_e1 [i, ]) } 
+       for(i in 1 : nrow(e2_rep)){ e2_rep[i, ] <- rnbinom(n2_e, prob = prob_e2[i, , ], size = size_e2 [i, ]) }
+     } else if(grepl("HURDLE", x$model_output$type) == TRUE) {
+       if(x$model_output$type %in% c("HURDLE_e", "HURDLE_ec")){
+         prob_e1 <- array(NA, dim = c(nrow(e1_rep), dim(mu_e1)[2], dim(x$model_output$`model summary`$BUGSoutput$sims.list$tau_e1)[2]))
+         for(j in 1 : dim(x$model_output$`model summary`$BUGSoutput$sims.list$tau_e1)[2]) {
+           prob_e1[, , j] <- x$model_output$`model summary`$BUGSoutput$sims.list$tau_e1[, j] / (x$model_output$`model summary`$BUGSoutput$sims.list$tau_e1[, j] + x$model_output$`model summary`$BUGSoutput$sims.list$mu_e1[, -index_mis_e1])
+         }
+         prob_e2 <- array(NA, dim = c(nrow(e2_rep), dim(mu_e2)[2], dim(x$model_output$`model summary`$BUGSoutput$sims.list$tau_e2)[2]))
+         for(j in 1 : dim(x$model_output$`model summary`$BUGSoutput$sims.list$tau_e2)[2]) {
+           prob_e2[, , j] <- x$model_output$`model summary`$BUGSoutput$sims.list$tau_e2[, j] / (x$model_output$`model summary`$BUGSoutput$sims.list$tau_e2[, j] + x$model_output$`model summary`$BUGSoutput$sims.list$mu_e2[, -index_mis_e2])
+         }
+         size_e1 <- x$model_output$`model summary`$BUGSoutput$sims.list$tau_e1
+         size_e2 <- x$model_output$`model summary`$BUGSoutput$sims.list$tau_e2
+         for(i in 1 : nrow(e1_rep)){ e1_rep[i, ] <- rnbinom(n1_e, prob = prob_e1[i, , ], size = size_e1 [i, ]) } 
+         for(i in 1 : nrow(e2_rep)){ e2_rep[i, ] <- rnbinom(n2_e, prob = prob_e2[i, , ], size = size_e2 [i, ]) }
+       } else if(x$model_output$type %in% c("HURDLE_c")){
+       prob_e1 <- as.vector(x$model_output$`model summary`$BUGSoutput$sims.list$tau_e1) / (as.vector(x$model_output$`model summary`$BUGSoutput$sims.list$tau_e1) + x$model_output$`model summary`$BUGSoutput$sims.list$mu_e1[, -index_mis_e1])
+       prob_e2 <- as.vector(x$model_output$`model summary`$BUGSoutput$sims.list$tau_e2) / (as.vector(x$model_output$`model summary`$BUGSoutput$sims.list$tau_e2) + x$model_output$`model summary`$BUGSoutput$sims.list$mu_e2[, -index_mis_e2])
+       size_e1 <- as.vector(x$model_output$`model summary`$BUGSoutput$sims.list$tau_e1)
+       size_e2 <- as.vector(x$model_output$`model summary`$BUGSoutput$sims.list$tau_e2)
+       for(i in 1 : nrow(e1_rep)){ e1_rep[i, ] <- rnbinom(n1_e, prob = prob_e1[i, ], size = size_e1 [i]) } 
+       for(i in 1 : nrow(e2_rep)){ e2_rep[i, ] <- rnbinom(n2_e, prob = prob_e2[i, ], size = size_e2 [i]) }
+       }
+     }
+   } else if(x$model_output$dist_e == "exp") {
+     mu_e1 <- x$model_output$`model summary`$BUGSoutput$sims.list$mu_e1[, -index_mis_e1]
+     mu_e2 <- x$model_output$`model summary`$BUGSoutput$sims.list$mu_e2[, -index_mis_e2]
+     if(is.null(dim(mu_e1)) == TRUE | is.null(dim(mu_e2)) == TRUE){
+       stop("Not possible to plot posterior predictive checks with a single observed effect value in one arm.")
+     }
+     rate_e1 <- 1 / mu_e1
+     rate_e2 <- 1 / mu_e2
+     for(i in 1 : nrow(e1_rep)){ e1_rep[i, ] <- rexp(n1_e, rate  = rate_e1[i, ]) }
+     for(i in 1 : nrow(e2_rep)){ e2_rep[i, ] <- rexp(n2_e, rate  = rate_e2[i, ]) }
+   } else if(x$model_output$dist_e == "bern" | x$model_output$dist_e == "pois") {
+     mu_e1 <- x$model_output$`model summary`$BUGSoutput$sims.list$mu_e1[, -index_mis_e1]
+     mu_e2 <- x$model_output$`model summary`$BUGSoutput$sims.list$mu_e2[, -index_mis_e2]
+      if(is.null(dim(mu_e1)) == TRUE | is.null(dim(mu_e2)) == TRUE){
+       stop("Not possible to plot posterior predictive checks with a single observed effect value in one arm.")
+     }
+      if(x$model_output$dist_e == "bern"){
+       for(i in 1 : nrow(e1_rep)){ e1_rep[i, ] <- rbinom(n1_e, size = 1, prob = mu_e1[i, ]) }
+       for(i in 1 : nrow(e2_rep)){ e2_rep[i, ] <- rbinom(n2_e, size = 1, prob = mu_e2[i, ]) }
+     }
+      if(x$model_output$dist_e == "pois"){
+       for(i in 1 : nrow(e1_rep)){ e1_rep[i, ] <- rpois(n1_e, lambda = mu_e1[i, ]) }
+       for(i in 1 : nrow(e2_rep)){ e2_rep[i, ] <- rpois(n2_e, lambda = mu_e2[i, ]) }
+     }
+   } else if(x$model_output$dist_e == "gamma") {
+     shape_e1 <- x$model_output$`model summary`$BUGSoutput$sims.list$mu_e1[, -index_mis_e1] * x$model_output$`model summary`$BUGSoutput$sims.list$tau_e1[, -index_mis_e1]
+     rate_e1 <-  x$model_output$`model summary`$BUGSoutput$sims.list$tau_e1[, -index_mis_e1]
+     shape_e2 <- x$model_output$`model summary`$BUGSoutput$sims.list$mu_e2[, -index_mis_e2] * x$model_output$`model summary`$BUGSoutput$sims.list$tau_e2[, -index_mis_e2]
+     rate_e2 <-  x$model_output$`model summary`$BUGSoutput$sims.list$tau_e2[, -index_mis_e2]
+     if(is.null(dim(shape_e1)) == TRUE | is.null(dim(shape_e2)) == TRUE){
+       stop("Not possible to plot posterior predictive checks with a single observed effect value in one arm.")
+     }
+     for(i in 1 : nrow(e1_rep)){ e1_rep[i, ] <- rgamma(n1_e, shape = shape_e1[i, ], rate = rate_e1 [i, ]) }
+     for(i in 1 : nrow(e2_rep)){ e2_rep[i, ] <- rgamma(n2_e, shape = shape_e2[i, ], rate = rate_e2 [i, ]) }
+   } else if(x$model_output$dist_e == "weibull") {
+     shape_e1 <- x$model_output$`model summary`$BUGSoutput$sims.list$tau_e1[, -index_mis_e1]
+     shape_e2 <- x$model_output$`model summary`$BUGSoutput$sims.list$tau_e2[, -index_mis_e2]
+     scale_e1 <- x$model_output$`model summary`$BUGSoutput$sims.list$mu_e1[, -index_mis_e1] / exp(lgamma(1 + 1 / x$model_output$`model summary`$BUGSoutput$sims.list$tau_e1[, -index_mis_e1]))
+     scale_e2 <- x$model_output$`model summary`$BUGSoutput$sims.list$mu_e2[, -index_mis_e2] / exp(lgamma(1 + 1 / x$model_output$`model summary`$BUGSoutput$sims.list$tau_e2[, -index_mis_e2]))
+     if(is.null(dim(shape_e1)) == TRUE | is.null(dim(shape_e2)) == TRUE){
+       stop("Not possible to plot posterior predictive checks with a single observed effect value in one arm.")
+     }
+     for(i in 1 : nrow(e1_rep)){ e1_rep[i, ] <- rweibull(n1_c, shape = shape_e1[i, ], scale = scale_e1 [i, ]) }
+     for(i in 1 : nrow(e2_rep)){ e2_rep[i, ] <- rweibull(n2_c, shape = shape_e2[i, ], scale = scale_e2 [i, ]) }
+   } else if(x$model_output$dist_e == "beta") {
     shape1_e1 <- x$model_output$`model summary`$BUGSoutput$sims.list$mu_e1[, -index_mis_e1] * x$model_output$`model summary`$BUGSoutput$sims.list$tau_e1[, -index_mis_e1]
     shape2_e1 <- (1 - x$model_output$`model summary`$BUGSoutput$sims.list$mu_e1[, -index_mis_e1]) * x$model_output$`model summary`$BUGSoutput$sims.list$tau_e1[, -index_mis_e1]
     shape1_e2 <- x$model_output$`model summary`$BUGSoutput$sims.list$mu_e2[, -index_mis_e2] * x$model_output$`model summary`$BUGSoutput$sims.list$tau_e2[, -index_mis_e2]
@@ -128,26 +243,26 @@ ppc <- function(x, type = "histogram", outcome = "effects_arm1", ndisplay = 15, 
       stop("Not possible to plot posterior predictive checks with a single observed cost value in one arm.")
     }
     if(grepl("SELECTION", x$model_output$type) == TRUE){
-      sigma_c1 <- 1/sqrt(x$model_output$`model summary`$BUGSoutput$sims.list$tau_c[,1])
-      sigma_c2 <- 1/sqrt(x$model_output$`model summary`$BUGSoutput$sims.list$tau_c[,2])
+      sigma_c1 <- 1 / sqrt(x$model_output$`model summary`$BUGSoutput$sims.list$tau_c[, 1])
+      sigma_c2 <- 1 / sqrt(x$model_output$`model summary`$BUGSoutput$sims.list$tau_c[, 2])
       for(i in 1 : nrow(c1_rep)){ c1_rep[i, ] <- rnorm(n1_c, mean = mu_c1[i, ], sd = sigma_c1 [i]) }
       for(i in 1 : nrow(c2_rep)){ c2_rep[i, ] <- rnorm(n2_c, mean = mu_c2[i, ], sd = sigma_c2 [i]) }
     } else if(grepl("PATTERN", x$model_output$type) == TRUE) {
-      sigma_c1 <- 1/sqrt(x$model_output$`model summary`$BUGSoutput$sims.list$tau_c_p1)
-      sigma_c2 <- 1/sqrt(x$model_output$`model summary`$BUGSoutput$sims.list$tau_c_p2)
+      sigma_c1 <- 1 / sqrt(x$model_output$`model summary`$BUGSoutput$sims.list$tau_c_p1)
+      sigma_c2 <- 1 / sqrt(x$model_output$`model summary`$BUGSoutput$sims.list$tau_c_p2)
       for(i in 1 : nrow(c1_rep)){ c1_rep[i, ] <- rnorm(n1_c, mean = mu_c1[i, ], sd = sigma_c1 [i, ]) }
       for(i in 1 : nrow(c2_rep)){ c2_rep[i, ] <- rnorm(n2_c, mean = mu_c2[i, ], sd = sigma_c2 [i, ]) }
     } else if(grepl("HURDLE", x$model_output$type) == TRUE) {
-      sigma_c1 <- 1/sqrt(x$model_output$`model summary`$BUGSoutput$sims.list$tau_c1)
-      sigma_c2 <- 1/sqrt(x$model_output$`model summary`$BUGSoutput$sims.list$tau_c2)
+      sigma_c1 <- 1 / sqrt(x$model_output$`model summary`$BUGSoutput$sims.list$tau_c1)
+      sigma_c2 <- 1 / sqrt(x$model_output$`model summary`$BUGSoutput$sims.list$tau_c2)
       for(i in 1 : nrow(c1_rep)){ c1_rep[i, ] <- rnorm(n1_c, mean = mu_c1[i, ], sd = sigma_c1 [i, ]) }
       for(i in 1 : nrow(c2_rep)){ c2_rep[i, ] <- rnorm(n2_c, mean = mu_c2[i, ], sd = sigma_c2 [i, ]) }
     }
   } else if(x$model_output$dist_c == "gamma") {
-    shape_c1 <- x$model_output$`model summary`$BUGSoutput$sims.list$mu_c1[,-index_mis_c1] * x$model_output$`model summary`$BUGSoutput$sims.list$tau_c1[,-index_mis_c1]
-    rate_c1 <-  x$model_output$`model summary`$BUGSoutput$sims.list$tau_c1[,-index_mis_c1]
-    shape_c2 <- x$model_output$`model summary`$BUGSoutput$sims.list$mu_c2[,-index_mis_c2] * x$model_output$`model summary`$BUGSoutput$sims.list$tau_c2[,-index_mis_c2]
-    rate_c2 <-  x$model_output$`model summary`$BUGSoutput$sims.list$tau_c2[,-index_mis_c2]
+    shape_c1 <- x$model_output$`model summary`$BUGSoutput$sims.list$mu_c1[, -index_mis_c1] * x$model_output$`model summary`$BUGSoutput$sims.list$tau_c1[, -index_mis_c1]
+    rate_c1 <-  x$model_output$`model summary`$BUGSoutput$sims.list$tau_c1[, -index_mis_c1]
+    shape_c2 <- x$model_output$`model summary`$BUGSoutput$sims.list$mu_c2[, -index_mis_c2] * x$model_output$`model summary`$BUGSoutput$sims.list$tau_c2[, -index_mis_c2]
+    rate_c2 <-  x$model_output$`model summary`$BUGSoutput$sims.list$tau_c2[, -index_mis_c2]
     if(is.null(dim(shape_c1)) == TRUE | is.null(dim(shape_c2)) == TRUE){
       stop("Not possible to plot posterior predictive checks with a single observed cost value in one arm.")
     }
@@ -160,18 +275,18 @@ ppc <- function(x, type = "histogram", outcome = "effects_arm1", ndisplay = 15, 
       stop("Not possible to plot posterior predictive checks with a single observed cost value in one arm.")
     }
     if(grepl("SELECTION", x$model_output$type) == TRUE){
-      sigma_c1 <- 1/sqrt(x$model_output$`model summary`$BUGSoutput$sims.list$ltau_c[,1])
-      sigma_c2 <- 1/sqrt(x$model_output$`model summary`$BUGSoutput$sims.list$ltau_c[,2])
+      sigma_c1 <- 1 / sqrt(x$model_output$`model summary`$BUGSoutput$sims.list$ltau_c[, 1])
+      sigma_c2 <- 1 / sqrt(x$model_output$`model summary`$BUGSoutput$sims.list$ltau_c[, 2])
       for(i in 1 : nrow(c1_rep)){ c1_rep[i, ] <- rlnorm(n1_c, meanlog = mu_c1[i, ], sdlog = sigma_c1 [i]) }
       for(i in 1 : nrow(c2_rep)){ c2_rep[i, ] <- rlnorm(n2_c, meanlog = mu_c2[i, ], sdlog = sigma_c2 [i]) }
     } else if(grepl("PATTERN", x$model_output$type) == TRUE) {
-      sigma_c1 <- 1/sqrt(x$model_output$`model summary`$BUGSoutput$sims.list$ltau_c_p1)
-      sigma_c2 <- 1/sqrt(x$model_output$`model summary`$BUGSoutput$sims.list$ltau_c_p2)
+      sigma_c1 <- 1 / sqrt(x$model_output$`model summary`$BUGSoutput$sims.list$ltau_c_p1)
+      sigma_c2 <- 1 / sqrt(x$model_output$`model summary`$BUGSoutput$sims.list$ltau_c_p2)
       for(i in 1 : nrow(c1_rep)){ c1_rep[i, ] <- rlnorm(n1_c, meanlog = mu_c1[i, ], sdlog = sigma_c1 [i]) }
       for(i in 1 : nrow(c2_rep)){ c2_rep[i, ] <- rlnorm(n2_c, meanlog = mu_c2[i, ], sdlog = sigma_c2 [i]) }
     } else if(grepl("HURDLE", x$model_output$type) == TRUE) {
-      sigma_c1 <- 1/sqrt(x$model_output$`model summary`$BUGSoutput$sims.list$ltau_c1)
-      sigma_c2 <- 1/sqrt(x$model_output$`model summary`$BUGSoutput$sims.list$ltau_c2)
+      sigma_c1 <- 1 / sqrt(x$model_output$`model summary`$BUGSoutput$sims.list$ltau_c1)
+      sigma_c2 <- 1 / sqrt(x$model_output$`model summary`$BUGSoutput$sims.list$ltau_c2)
       for(i in 1 : nrow(c1_rep)){ c1_rep[i, ] <- rlnorm(n1_c, meanlog = mu_c1[i, ], sdlog = sigma_c1 [i]) }
       for(i in 1 : nrow(c2_rep)){ c2_rep[i, ] <- rlnorm(n2_c, meanlog = mu_c2[i, ], sdlog = sigma_c2 [i]) }
     }
@@ -179,7 +294,7 @@ ppc <- function(x, type = "histogram", outcome = "effects_arm1", ndisplay = 15, 
   bayesplot::color_scheme_set(scheme = scheme_set) 
   if(type == "histogram") {
     if(exists("bins", where = exArgs)) {bins = exArgs$bins} else {bins = 30 }
-    if(exists("binwidth_e", where = exArgs)) {binwidth_e = exArgs$binwidth_e} else {binwidth_e = 1/30 }
+    if(exists("binwidth_e", where = exArgs)) {binwidth_e = exArgs$binwidth_e} else {binwidth_e = 1 / 30 }
     if(exists("binwidth_c", where = exArgs)) {binwidth_c = exArgs$binwidth_c} else {binwidth_c = 30 }
     if(exists("breaks", where = exArgs)) {breaks = exArgs$breaks} else {breaks = NULL }
     if(exists("freq", where = exArgs)) {freq = exArgs$freq} else {freq = TRUE }
@@ -197,7 +312,7 @@ ppc <- function(x, type = "histogram", outcome = "effects_arm1", ndisplay = 15, 
     ppc_plot_c2 <- bayesplot::ppc_boxplot(y = c2_obs, yrep = c2_rep[1 : ndisplay, ], notch = notch, size = size, alpha = alpha)
   } else if(type == "freqpoly") {
     if(exists("bins", where = exArgs)) {bins = exArgs$bins} else {bins = 30 }
-    if(exists("binwidth_e", where = exArgs)) {binwidth_e = exArgs$binwidth_e} else {binwidth_e = 1/30 }
+    if(exists("binwidth_e", where = exArgs)) {binwidth_e = exArgs$binwidth_e} else {binwidth_e = 1 / 30 }
     if(exists("binwidth_c", where = exArgs)) {binwidth_c = exArgs$binwidth_c} else {binwidth_c = 30 }
     if(exists("freq", where = exArgs)) {freq = exArgs$freq} else {freq = TRUE }
     if(exists("size", where = exArgs)) {size = exArgs$size} else {size = 0.25 }
@@ -238,7 +353,7 @@ ppc <- function(x, type = "histogram", outcome = "effects_arm1", ndisplay = 15, 
   } else if(type == "stat") {
     if(exists("bins", where = exArgs)) {bins = exArgs$bins} else {bins = 30 }
     if(exists("stat", where = exArgs)) {stat = exArgs$stat} else {stat = "mean" }
-    if(exists("binwidth_e", where = exArgs)) {binwidth_e = exArgs$binwidth_e} else {binwidth_e = 1/30 }
+    if(exists("binwidth_e", where = exArgs)) {binwidth_e = exArgs$binwidth_e} else {binwidth_e = 1 / 30 }
     if(exists("binwidth_c", where = exArgs)) {binwidth_c = exArgs$binwidth_c} else {binwidth_c = 30 }
     if(exists("freq", where = exArgs)) {freq = exArgs$freq} else {freq = TRUE }
     if(exists("breaks", where = exArgs)) {breaks = exArgs$breaks} else {breaks = NULL }
@@ -255,7 +370,7 @@ ppc <- function(x, type = "histogram", outcome = "effects_arm1", ndisplay = 15, 
     ppc_plot_c1 <- bayesplot::ppc_stat_2d(y = c1_obs, yrep = c1_rep[1 : ndisplay, ], stat = stat, size = size, alpha = alpha)
     ppc_plot_c2 <- bayesplot::ppc_stat_2d(y = c2_obs, yrep = c2_rep[1 : ndisplay, ], stat = stat, size = size, alpha = alpha)
   } else if(type == "error_hist") {
-    if(exists("binwidth_e", where = exArgs)) {binwidth_e = exArgs$binwidth_e} else {binwidth_e = 1/30 }
+    if(exists("binwidth_e", where = exArgs)) {binwidth_e = exArgs$binwidth_e} else {binwidth_e = 1 / 30 }
     if(exists("binwidth_c", where = exArgs)) {binwidth_c = exArgs$binwidth_c} else {binwidth_c = 30 }
     if(exists("freq", where = exArgs)) {freq = exArgs$freq} else {freq = TRUE }
     if(exists("breaks", where = exArgs)) {breaks = exArgs$breaks} else {breaks = NULL }

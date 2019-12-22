@@ -3,7 +3,8 @@
 #' This function fits a JAGS using the \code{\link[R2jags]{jags}} funciton and obtain posterior inferences.
 #' @param type Type of missingness mechanism assumed. Choices are Missing At Random (MAR), Missing Not At Random for the effects (MNAR_eff),
 #' Missing Not At Random for the costs (MNAR_cost), and Missing Not At Random for both (MNAR).
-#' @param dist_e distribution assumed for the effects. Current available chocies are: Normal ('norm') or Beta ('beta').
+#' @param dist_e distribution assumed for the effects. Current available chocies are: Normal ('norm'), Beta ('beta'), Gamma ('gamma'), Exponential ('exp'),
+#' Weibull ('weibull'), Logistic ('logis'), Poisson ('pois'), Negative Binomial ('nbinom') or Bernoulli ('bern').
 #' @param dist_c Distribution assumed for the costs. Current available chocies are: Normal ('norm'), Gamma ('gamma') or LogNormal ('lnorm').
 #' @param inits a list with elements equal to the number of chains selected; each element of the list is itself a list of starting values for the BUGS model, 
 #' or a function creating (possibly random) initial values. If inits is NULL, JAGS will generate initial values for parameters.
@@ -24,8 +25,8 @@ run_pattern <- function(type, dist_e, dist_c, inits, d_list, d1, d2, restriction
   if(!isTRUE(requireNamespace("R2jags", quietly = TRUE))) {
     stop("You need to install the R package 'R2jags'. Please run in your R terminal:\n install.packages('R2jags')")
   }
-  if(!dist_e %in% c("norm", "beta") | !dist_c %in% c("norm", "gamma", "lnorm")) {
-    stop("Distributions available for use are 'norm', 'beta' for the effects and 'norm', 'gamma', 'lnorm' for the costs")
+  if(!dist_e %in% c("norm", "beta", "exp", "bern", "nbinom", "weibull", "gamma", "logis", "pois") | !dist_c %in% c("norm", "gamma", "lnorm")) {
+    stop("Distributions available for use are 'norm', 'beta', 'gamma', 'weibull', 'logis', 'exp', 'bern', 'pois', 'nbinom' for the effects and 'norm', 'gamma', 'lnorm' for the costs")
   }
   if(!type %in% c("MAR", "MNAR", "MNAR_eff", "MNAR_cost")) {
     stop("Types available for use are 'MAR', 'MNAR_eff', 'MNAR_cost'and 'MNAR'")
@@ -69,11 +70,13 @@ run_pattern <- function(type, dist_e, dist_c, inits, d_list, d1, d2, restriction
   if(type == "MNAR_eff" | type == "MAR") {deltac_index <- match("Delta_c", params)
   params <- params[-deltac_index] }
   if(ppc == TRUE) { 
-    if(dist_e == "norm") {
+    if(dist_e %in% c("norm", "nbinom", "logis")) {
       ppc_e_params <- c("mu_e1", "mu_e2", "tau_e_p1", "tau_e_p2") 
-    } else if(dist_e == "beta") {
+    } else if(dist_e %in% c("beta", "gamma", "weibull")) {
       ppc_e_params <- c("mu_e1", "tau_e1", "mu_e2", "tau_e2")
-    }
+    } else if(dist_e %in% c("exp", "bern", "pois")) {
+      ppc_e_params <- c("mu_e1", "mu_e2")
+    } 
     if(dist_c == "norm") {
       ppc_c_params <- c("mu_c1", "mu_c2", "tau_c_p1", "tau_c_p2") 
     } else if(dist_c == "gamma") {
@@ -123,7 +126,7 @@ run_pattern <- function(type, dist_e, dist_c, inits, d_list, d1, d2, restriction
     loglik_c2 <- modelN1$BUGSoutput$sims.list$loglik_c2
     loglik_d1 <- modelN1$BUGSoutput$sims.list$loglik_d1
     loglik_d2 <- modelN1$BUGSoutput$sims.list$loglik_d2
-  if(ind == FALSE & dist_e == "norm" & dist_c == "norm") {
+  if(ind == FALSE) {
     beta_f_p1 <- modelN1$BUGSoutput$sims.list$beta_f_p1
     beta_f_p2 <- modelN1$BUGSoutput$sims.list$beta_f_p2
     beta_p1 <- list("beta_p1" = beta_p1, "beta_f_p1" = beta_f_p1)

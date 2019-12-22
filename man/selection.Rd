@@ -35,7 +35,8 @@ If there are no covariates, \code{1} should be specified on the right hand side 
 term 'mc'(missing costs) and any covariates must be provided on the right-hand side of the formula. 
 If there are no covariates, \code{1} should be specified on the right hand side of the formula. By default, covariates are placed on the "probability" parameter for the missing costs through a logistic-linear model.}
 
-\item{dist_e}{Distribution assumed for the effects. Current available chocies are: Normal ('norm') or Beta ('beta').}
+\item{dist_e}{Distribution assumed for the effects. Current available chocies are: Normal ('norm'), Beta ('beta'), Gamma ('gamma'), Exponential ('exp'),
+Weibull ('weibull'), Logistic ('logis'), Poisson ('pois'), Negative Binomial ('nbinom') or Bernoulli ('bern').}
 
 \item{dist_c}{Distribution assumed for the costs. Current available chocies are: Normal ('norm'), Gamma ('gamma') or LogNormal ('lnorm').}
 

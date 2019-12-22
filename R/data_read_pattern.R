@@ -18,8 +18,8 @@
 #' @importFrom stats na.omit sd as.formula model.matrix model.frame model.response
 #' @export
 #' @examples
-#' # Internal function only
-#' # no examples
+#' #Internal function only
+#' #no examples
 #' #
 #' #
 

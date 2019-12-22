@@ -12,13 +12,14 @@ prior_selection(type, dist_e, dist_c, pe, pc, ze, zc)
 Missing Not At Random for the costs (MNAR_cost), and Missing Not At Random for both (MNAR). For a complete list of all available hyper parameters 
 and types of models see the manual.}
 
-\item{dist_e}{distribution assumed for the effects. Current available choices are: Normal ('norm') or Beta ('beta').}
+\item{dist_e}{distribution assumed for the effects. Current available chocies are: Normal ('norm'), Beta ('beta'), Gamma ('gamma'), Exponential ('exp'),
+Weibull ('weibull'), Logistic ('logis'), Poisson ('pois'), Negative Binomial ('nbinom') or Bernoulli ('bern')}
 
-\item{dist_c}{Distribution assumed for the costs. Current available choices are: Normal ('norm'), Gamma ('gamma') or LogNormal ('lnorm')}
+\item{dist_c}{Distribution assumed for the costs. Current available chocies are: Normal ('norm'), Gamma ('gamma') or LogNormal ('lnorm')}
 
 \item{pe}{Number of covariates for the effectiveness model}
 
-\item{pc}{Number of covariates for the cost model}
+\item{pc}{Number of cvoariates for the cost model}
 
 \item{ze}{Number of covariates or the missingness indicators model for the effectiveness}
 
@@ -29,8 +30,8 @@ This function modifies default hyper prior parameter values in the type of selec
 to the type of missingness mechanism and distributions for the outcomes assumed.
 }
 \examples{
-# Internal function only
-# no examples
+#Internal function only
+#no examples
 #
 #
 }

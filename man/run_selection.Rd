@@ -10,7 +10,8 @@ run_selection(type, dist_e, dist_c, inits, ppc)
 \item{type}{Type of missingness mechanism assumed. Choices are Missing At Random (MAR), Missing Not At Random for the effects (MNAR_eff),
 Missing Not At Random for the costs (MNAR_cost), and Missing Not At Random for both (MNAR).}
 
-\item{dist_e}{distribution assumed for the effects. Current available chocies are: Normal ('norm') or Beta ('beta').}
+\item{dist_e}{distribution assumed for the effects. Current available chocies are: Normal ('norm'), Beta ('beta'), Gamma ('gamma'), Exponential ('exp'),
+Weibull ('weibull'), Logistic ('logis'), Poisson ('pois'), Negative Binomial ('nbinom') or Bernoulli ('bern').}
 
 \item{dist_c}{Distribution assumed for the costs. Current available chocies are: Normal ('norm'), Gamma ('gamma') or LogNormal ('lnorm').}
 

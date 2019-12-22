@@ -25,7 +25,8 @@ If there are no covariates, \code{1} should be specified on the right hand side 
 By default, covariates are placed on the "location" parameter of the distribution through a linear model. A joint bivariate distribution for effects and costs can be specified by
 including 'e' on the right-hand side of the formula for the costs model.}
 
-\item{dist_e}{Distribution assumed for the effects. Current available chocies are: Normal ('norm') or Beta ('beta').}
+\item{dist_e}{Distribution assumed for the effects. Current available chocies are: Normal ('norm'), Beta ('beta'), Gamma ('gamma'), Exponential ('exp'),
+Weibull ('weibull'), Logistic ('logis'), Poisson ('pois'), Negative Binomial ('nbinom') or Bernoulli ('bern').}
 
 \item{dist_c}{Distribution assumed for the costs. Current available chocies are: Normal ('norm'), Gamma ('gamma') or LogNormal ('lnorm').}
 

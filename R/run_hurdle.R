@@ -3,7 +3,8 @@
 #' This function fits a JAGS using the \code{\link[R2jags]{jags}} funciton and obtain posterior inferences.
 #' @param type Type of structural value mechanism assumed. Choices are Structural Completely At Random (SCAR),
 #' and Structural At Random (SAR).
-#' @param dist_e distribution assumed for the effects. Current available chocies are: Normal ('norm') or Beta ('beta').
+#' @param dist_e distribution assumed for the effects. Current available chocies are: Normal ('norm'), Beta ('beta'), Gamma ('gamma'), Exponential ('exp'),
+#' Weibull ('weibull'), Logistic ('logis'), Poisson ('pois'), Negative Binomial ('nbinom') or Bernoulli ('bern')
 #' @param dist_c distribution assumed for the costs. Current available chocies are: Normal ('norm'), Gamma ('gamma') or LogNormal ('lnorm').
 #' @param se Structural value to be found in the effect data. If set to \code{NULL}, 
 #' no structural value is chosen and a standard model for the effects is run.
@@ -28,8 +29,8 @@ run_hurdle <- function(type, dist_e, dist_c, inits, se, sc, sde, sdc, ppc) eval.
   if(!isTRUE(requireNamespace("R2jags", quietly = TRUE))) {
     stop("You need to install the R package 'R2jags'. Please run in your R terminal:\n install.packages('R2jags')")
   }
-  if(!dist_e %in% c("norm", "beta") | !dist_c %in% c("norm", "gamma", "lnorm")) {
-    stop("Distributions available for use are 'norm' or 'beta' for the effects and 'norm', 'gamma', 'lnorm' for the costs")
+  if(!dist_e %in% c("norm", "beta", "exp", "bern", "nbinom", "weibull", "gamma", "logis", "pois") | !dist_c %in% c("norm", "gamma", "lnorm")) {
+    stop("Distributions available for use are 'norm', 'beta', 'gamma', 'weibull', 'logis', 'exp', 'bern', 'pois', 'nbinom' for the effects and 'norm', 'gamma', 'lnorm' for the costs")
   }
   if(!type %in% c("SCAR", "SAR")) {
     stop("Types available for use are 'SCAR', 'SAR'")
@@ -37,9 +38,9 @@ run_hurdle <- function(type, dist_e, dist_c, inits, se, sc, sde, sdc, ppc) eval.
   if(is.null(inits) == FALSE) {inits = inits }
   model <- write_hurdle(type = type , dist_e = dist_e, dist_c = dist_c, ind = ind , pe = pe, pc = pc, ze = ze, zc = zc , se = se, sc = sc)
   filein <- model
-  if(dist_e == "norm") {sde <- log(sde) }
-  if(dist_c == "norm") {sdc <- log(sdc) }
-  if(dist_c == "gamma" | dist_c == "lnorm") {
+  if(dist_e %in% c("norm")) {sde <- log(sde) }
+  if(dist_c %in% c("norm")) {sdc <- log(sdc) }
+  if(dist_c %in% c("gamma", "lnorm")) {
   if(is.null(sc) == FALSE) {
     if(sc == 0) {
       sc = log(0.0000001)
@@ -55,6 +56,27 @@ run_hurdle <- function(type, dist_e, dist_c, inits, se, sc, sde, sdc, ppc) eval.
       sc = log(sc)
     }
    }
+  }
+  if(dist_e %in% c("gamma", "weibull", "exp", "pois", "nbinom")) {
+    if(is.null(se) == FALSE) {
+      if(se == 0) {
+        se = log(0.0000001)
+        if(any(which(eff1 == 0)) == TRUE) {
+          index_e1_0 <- which(eff1 == 0)
+          if(dist_e %in% c("gamma", "weibull", "exp")){
+          eff1[index_e1_0] = 0.0000001
+          }
+        }
+        if(any(which(eff2 == 0)) == TRUE) {
+          index_e2_0 <- which(eff2 == 0)
+          if(dist_e %in% c("gamma", "weibull", "exp")){
+          eff2[index_e2_0] = 0.0000001
+          }
+        }
+      } else {
+        se = log(se)
+      }
+    }
   }
   if(dist_e == "beta") {
     if(is.null(se) == FALSE) {
@@ -178,16 +200,18 @@ run_hurdle <- function(type, dist_e, dist_c, inits, se, sc, sde, sdc, ppc) eval.
   }
   if(ind == FALSE) {params <- c(params, "beta_f") }
   if(ppc == TRUE) { 
-    if(dist_e == "norm") {
+    if(dist_e %in% c("norm", "nbinom", "logis")) {
       ppc_e_params <- c("mu_e1", "mu_e2", "tau_e1", "tau_e2") 
-    } else if(dist_e == "beta") {
+    } else if(dist_e %in% c("beta", "gamma", "weibull")) {
       ppc_e_params <- c("mu_e1", "tau_e1", "mu_e2", "tau_e2")
+    } else if(dist_e %in% c("exp", "bern", "pois")) {
+      ppc_e_params <- c("mu_e1", "mu_e2")
     }
-    if(dist_c == "norm") {
+    if(dist_c %in% c("norm")) {
       ppc_c_params <- c("mu_c1", "mu_c2", "tau_c1", "tau_c2") 
-    } else if(dist_c == "gamma") {
+    } else if(dist_c %in% c("gamma")) {
       ppc_c_params <- c("mu_c1", "tau_c1", "mu_c2", "tau_c2")
-    } else if(dist_c == "lnorm") {
+    } else if(dist_c %in% c("lnorm")) {
       ppc_c_params <- c("lmu_c1", "lmu_c2", "ltau_c1", "ltau_c2")
     } 
     params <- c(params, ppc_e_params, ppc_c_params)

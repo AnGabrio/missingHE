@@ -25,12 +25,12 @@ parameter of the distribution through a linear model.}
 \item{model.se}{A formula expression in conventional \code{R} linear modelling syntax. The response must be a health economics
 effectiveness outcome ('e') whose name must correspond to that used in \code{data}, and 
 any covariates used to estimate the probability of structural effects are given on the right-hand side. If there are no covariates, specify \code{1} on the right hand side.
-By default, covariates are placed on the "probability" parameter for the structural effects through a logistic-linear model.}
+By default, covariates are placed on the "probability" parameter for the strcutural effects through a logistic-linear model.}
 
 \item{model.sc}{A formula expression in conventional \code{R} linear modelling syntax. The response must be a health economics
 cost outcome ('c') whose name must correspond to that used in \code{data}, and 
 any covariates used to estimate the probability of structural costs are given on the right-hand side. If there are no covariates, specify \code{1} on the right hand side.
-By default, covariates are placed on the "probability" parameter for the structural costs through a logistic-linear model.}
+By default, covariates are placed on the "probability" parameter for the strcutural costs through a logistic-linear model.}
 
 \item{se}{Structural value to be found in the effect data defined in \code{data}. If set to \code{NULL}, 
 no structural value is chosen and a standard model for the effects is run.}
@@ -38,7 +38,7 @@ no structural value is chosen and a standard model for the effects is run.}
 \item{sc}{Structural value to be found in the cost data defined in \code{data}. If set to \code{NULL}, 
 no structural value is chosen and a standard model for the costs is run.}
 
-\item{type}{Type of structural value mechanism assumed, either 'SCAR' (Structural Completely At Random) or 'SAR' (Structural At Random).}
+\item{type}{Type of structural value mechanism assumed, either 'SCAR' (Structural Completely At Random) or 'SAR' (Strcutural At Random).}
 
 \item{center}{Logical. If \code{center} is \code{TRUE} all the covariates in the model are centered.}
 }
@@ -47,8 +47,8 @@ This internal function imports the data and outputs only those variables that ar
 according to the information provided by the user.
 }
 \examples{
-# Internal function only
-# no examples
+#Internal function only
+#no examples
 #
 #
 }

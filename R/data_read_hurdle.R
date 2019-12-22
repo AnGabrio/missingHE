@@ -16,23 +16,23 @@
 #' @param model.se A formula expression in conventional \code{R} linear modelling syntax. The response must be a health economics
 #'  effectiveness outcome ('e') whose name must correspond to that used in \code{data}, and 
 #'  any covariates used to estimate the probability of structural effects are given on the right-hand side. If there are no covariates, specify \code{1} on the right hand side.
-#'  By default, covariates are placed on the "probability" parameter for the structural effects through a logistic-linear model.
+#'  By default, covariates are placed on the "probability" parameter for the strcutural effects through a logistic-linear model.
 #' @param model.sc A formula expression in conventional \code{R} linear modelling syntax. The response must be a health economics
 #'  cost outcome ('c') whose name must correspond to that used in \code{data}, and 
 #'  any covariates used to estimate the probability of structural costs are given on the right-hand side. If there are no covariates, specify \code{1} on the right hand side.
-#'  By default, covariates are placed on the "probability" parameter for the structural costs through a logistic-linear model.
+#'  By default, covariates are placed on the "probability" parameter for the strcutural costs through a logistic-linear model.
 #' @param se Structural value to be found in the effect data defined in \code{data}. If set to \code{NULL}, 
 #' no structural value is chosen and a standard model for the effects is run.
 #' @param sc Structural value to be found in the cost data defined in \code{data}. If set to \code{NULL}, 
 #' no structural value is chosen and a standard model for the costs is run.
-#' @param type Type of structural value mechanism assumed, either 'SCAR' (Structural Completely At Random) or 'SAR' (Structural At Random).
+#' @param type Type of structural value mechanism assumed, either 'SCAR' (Structural Completely At Random) or 'SAR' (Strcutural At Random).
 #' @param center Logical. If \code{center} is \code{TRUE} all the covariates in the model are centered.
 #' @keywords read data hurdle models
 #' @importFrom stats na.omit sd as.formula model.matrix model.frame model.response
 #' @export
 #' @examples
-#' # Internal function only
-#' # no examples
+#' #Internal function only
+#' #no examples
 #' #
 #' #
 
@@ -177,6 +177,10 @@ data_read_hurdle <- function(data, model.eff, model.cost, model.se, model.sc, se
   }
   if(is.formula(model.se) == FALSE | is.formula(model.sc) == FALSE) {
     stop("model.se and/or model.sc must be formula objects")
+  }
+  if(all(names(model.frame(model.se, data = data2)) %in% c("se", names(cov_matrix))) == FALSE | 
+     all(names(model.frame(model.sc, data = data2)) %in% c("sc", names(cov_matrix))) == FALSE) {
+    stop("partially-observed covariates cannot be included in the model")
   }
   if(all(names(model.frame(model.se, data = data2)) %in% names(data2)) == FALSE | 
      all(names(model.frame(model.sc, data = data2)) %in% names(data2)) == FALSE) {

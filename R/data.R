@@ -1,11 +1,11 @@
 #' MenSS economic data on STIs
 #'
-#' Data from a pilot RCT trial (The MenSS trial) on young men at risk of Sexually Transmitted Infections (STIs).
+#' Data from a pilot RCT trial (The MenSS trial) on youn men at risk of Sexually Trasmitted Infections (STIs).
 #' A total of 159 individuals were enrolled in trial: 75 in the control (t=1) and 84 in the active intervention (t=2).
-#' Health related quality of life and cost data were collected via self-reported questionnaires at four time points throughout the study: at baseline,
-#' 3 months, 6 months and 12 months follow-up. QALYs and total costs were then computed by combining the utility scores using the area under the curve method
-#' and by summing up the cost components at each time point. Baseline data are available for the utilities (no baseline costs collected), 
-#' age, ethnicity and employment variables 
+#' Clinical and health economic outcome data were collected via self-reported questionnaires at four time points throughout the study: baseline,
+#' 3 months, 6 months and 12 months follow-up. Health economic data include utility scores related to quality of life and costs, from which QALYs and total costs were then computed using the area under the curve method
+#' and by summing up the cost components at each time point. Clinical data include the total number of instances of unprotected sex and whether the individual was associated with an STI diagnosis or not. 
+#' Baseline data are available for the utilities (no baseline costs collected), instances of unprotected sex, sti diagnosis, age, ethnicity and employment variables. 
 #'
 #' \describe{
 #'   \item{id}{id number}
@@ -16,13 +16,17 @@
 #'   \item{ethnicity}{binary: white (1) and other (0)}
 #'   \item{employment}{binary: working (1) and other (0)}
 #'   \item{t}{Treatment arm indicator for the control (t=1) and the active intervention (t=2)}
+#'   \item{sex_inst.0}{baseline number of instances of unprotected sex}
+#'   \item{sex_inst}{number of instances of unprotected sex at 12 months follow-up}
+#'   \item{sti.0}{binary : baseline sti diagnosis (1) and no baseline sti diagnosis (0)}
+#'   \item{sti}{binary : sti diagnosis (1) and no sti diagnosis (0) at 12 months follow-up} 
 #' }
 #'
 #' @docType data
 #' @keywords datasets
 #' @name MenSS
 #' @usage data(MenSS)
-#' @format A data frame with 159 rows and 14 variables
+#' @format A data frame with 159 rows and 12 variables
 #' @references Bailey et al. (2016) Health Technology Assessment 20
 #' (\href{https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5204131/}{PubMed})
 #'

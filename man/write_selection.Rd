@@ -10,9 +10,10 @@ This function selects which type of model to execute.}
 write_selection(dist_e, dist_c, ind, type, pe, pc, ze, zc)
 }
 \arguments{
-\item{dist_e}{Distribution assumed for the effects. Current available choices are: Normal ('norm') or Beta ('beta')}
+\item{dist_e}{Distribution assumed for the effects. Current available chocies are: Normal ('norm'), Beta ('beta'), Gamma ('gamma'), Exponential ('exp'),
+Weibull ('weibull'), Logistic ('logis'), Poisson ('pois'), Negative Binomial ('nbinom') or Bernoulli ('bern')}
 
-\item{dist_c}{Distribution assumed for the costs. Current available choices are: Normal ('norm'), Gamma ('gamma') or LogNormal ('lnorm')}
+\item{dist_c}{Distribution assumed for the costs. Current available chocies are: Normal ('norm'), Gamma ('gamma') or LogNormal ('lnorm')}
 
 \item{ind}{Logical; if TRUE independence between effectiveness and costs is assumed, else correlation is accounted for}
 
@@ -21,7 +22,7 @@ Missing Not At Random for the costs (MNAR_cost), and Missing Not At Random for b
 
 \item{pe}{Number of covariates for the effectiveness model}
 
-\item{pc}{Number of covariates for the cost model}
+\item{pc}{Number of cvoariates for the cost model}
 
 \item{ze}{Number of covariates or the missingness indicators model for the effectiveness}
 
@@ -34,8 +35,8 @@ type of missingness mechanism assumed and independence or joint modelling
 This function selects which type of model to execute.
 }
 \examples{
-# Internal function only
-# No examples
+#Internal function only
+#No examples
 #
 #
 }

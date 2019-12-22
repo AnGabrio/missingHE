@@ -24,8 +24,8 @@
 #' @importFrom stats na.omit sd as.formula model.matrix model.frame model.response
 #' @export
 #' @examples
-#' # Internal function only
-#' # no examples
+#' #Internal function only
+#' #no examples
 #' #
 #' #
 
@@ -169,6 +169,10 @@ data_read_selection <- function(data, model.eff, model.cost, model.me, model.mc,
   data2$mc <- c(m_cost1, m_cost2)
   if(is.formula(model.me) == FALSE | is.formula(model.mc) == FALSE) {
     stop("model.me and/or model.mc must be formula objects")
+  }
+  if(all(names(model.frame(model.me, data = data2)) %in% c("me", names(cov_matrix))) == FALSE | 
+     all(names(model.frame(model.mc, data = data2)) %in% c("mc", names(cov_matrix))) == FALSE) {
+    stop("partially-observed covariates cannot be included in the model")
   }
   if(all(names(model.frame(model.me, data = data2)) %in% names(data2)) == FALSE | 
      all(names(model.frame(model.mc, data = data2)) %in% names(data2)) == FALSE) {
