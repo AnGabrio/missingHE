@@ -170,8 +170,8 @@ data_read_selection <- function(data, model.eff, model.cost, model.me, model.mc,
   if(is.formula(model.me) == FALSE | is.formula(model.mc) == FALSE) {
     stop("model.me and/or model.mc must be formula objects")
   }
-  if(all(names(model.frame(model.me, data = data2)) %in% c("me", names(cov_matrix))) == FALSE | 
-     all(names(model.frame(model.mc, data = data2)) %in% c("mc", names(cov_matrix))) == FALSE) {
+  if(all(names(model.frame(model.me, data = data2)) %in% c("me", "e", names(cov_matrix))) == FALSE | 
+     all(names(model.frame(model.mc, data = data2)) %in% c("mc", "c", names(cov_matrix))) == FALSE) {
     stop("partially-observed covariates cannot be included in the model")
   }
   if(all(names(model.frame(model.me, data = data2)) %in% names(data2)) == FALSE | 
