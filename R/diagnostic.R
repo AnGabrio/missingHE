@@ -37,6 +37,8 @@
 #' \item "sd.c" the standard deviation parameters of the cost variables in the two treatment arms.
 #' \item "alpha" the regression intercept and covariate coefficient parameters for the effect variables in the two treatment arms.
 #' \item "beta" the regression intercept and covariate coefficient parameters for the cost variables in the two treatment arms.
+#' \item "random.alpha" the regression random effects intercept and covariate coefficient parameters for the effect variables in the two treatment arms.
+#' \item "random.beta" the regression random effects intercept and covariate coefficient parameters for the cost variables in the two treatment arms.
 #' \item "p.e" the probability parameters of the missingness or structural values mechanism for the effect variables in the two treatment arms 
 #' (only with the function \code{selection} or \code{hurdle}).
 #' \item "p.c" the probability parameters of the missingness or structural values mechanism for the cost variables in the two treatment arms 
@@ -45,11 +47,19 @@
 #'  for the effect variables in the two treatment arms (only with the function \code{selection} or \code{hurdle}).
 #' \item "gamma.c" the regression intercept and covariate coefficient parameters of the missingness or structural values mechanism 
 #'  for the cost variables in the two treatment arms (only with the function \code{selection} or \code{hurdle}).
+#' \item "random.gamma.e" the random effects regression intercept and covariate coefficient parameters of the missingness or structural values mechanism
+#'  for the effect variables in the two treatment arms (only with the function \code{selection} or \code{hurdle}).
+#' \item "random.gamma.c" the random effects regression intercept and covariate coefficient parameters of the missingness or structural values mechanism 
+#'  for the cost variables in the two treatment arms (only with the function \code{selection} or \code{hurdle}).
 #' \item "pattern" the probabilities associated with the missingness patterns in the data (only with the function \code{pattern}).
 #' \item "delta.e" the mnar parameters of the missingness mechanism for the effect variables in the two treatment arms 
 #' (only with the function \code{selection} or \code{pattern}).
 #' \item "delta.c" the mnar parameters of the missingness mechanism for the cost variables in the two treatment arms 
 #' (only with the function \code{selection} or \code{pattern}).
+#' \item "random.delta.e" the random effects mnar parameters of the missingness mechanism for the effect variables in the two treatment arms 
+#' (only with the function \code{selection}).
+#' \item "random.delta.c" the random effects mnar parameters of the missingness mechanism for the cost variables in the two treatment arms 
+#' (only with the function \code{selection}).
 #' \item "all" all available parameters stored in the object \code{x}.
 #' }
 #' When the object \code{x} is created using the function \code{pattern}, pattern-specific standard deviation ("sd.e", "sd.c") and regression coefficient 
@@ -74,7 +84,7 @@
 #' #
 #' #
 
-diagnostic <- function(x, type = "histogram", param = "all", theme = NULL, ...) {
+diagnostic <- function(x, type = "denplot", param = "all", theme = NULL, ...) {
   exArgs <- list(...)
   if(class(x) != "missingHE") {
     stop("Only objects of class 'missingHE' can be used")
@@ -88,17 +98,31 @@ diagnostic <- function(x, type = "histogram", param = "all", theme = NULL, ...) 
       stop("You must provide one of the available theme styles")
     } 
   }
-  par_hurdle_sar_e <- c("all", "mu.e", "mu.c", "sd.e", "sd.c", "alpha", "beta", "p.e", "gamma.e")
-  par_hurdle_sar_c <- c("all", "mu.e", "mu.c", "sd.e", "sd.c", "alpha", "beta", "p.c", "gamma.c")
-  par_hurdle_sar_ec <- c("all", "mu.e", "mu.c", "sd.e", "sd.c", "alpha", "beta", "p.e", "p.c", "gamma.e", "gamma.c")
-  par_selection_e <- c("all", "mu.e", "mu.c", "sd.e", "sd.c", "alpha", "beta", "p.e", "p.c", "gamma.e", "gamma.c", "delta.e")
-  par_selection_c <- c("all", "mu.e", "mu.c", "sd.e", "sd.c", "alpha", "beta", "p.e", "p.c", "gamma.e", "gamma.c", "delta.c")
-  par_selection_ec <- c("all", "mu.e", "mu.c", "sd.e", "sd.c", "alpha", "beta", "p.e", "p.c", "gamma.e", "gamma.c", "delta.e", "delta.c")
-  par_pattern <- c("all", "mu.e", "mu.c", "mu.e.p", "mu.c.p","sd.e", "sd.c", "alpha", "beta", "pattern")
-  par_pattern_e <- c("all", "mu.e", "mu.c", "mu.e.p", "mu.c.p","sd.e", "sd.c", "alpha", "beta", "pattern", "delta.e")
-  par_pattern_c <- c("all", "mu.e", "mu.c", "mu.e.p", "mu.c.p","sd.e", "sd.c", "alpha", "beta", "pattern", "delta.c")
-  par_pattern_ec <- c("all", "mu.e", "mu.c", "mu.e.p", "mu.c.p","sd.e", "sd.c", "alpha", "beta", "pattern", "delta.e", "delta.c")
-  if(x$model_output$type == "SELECTION_e") {
+  par_hurdle_sar_e <- c("all", "mu.e", "mu.c", "sd.e", "sd.c", "alpha", "beta", "p.e", "gamma.e",
+                        "random.alpha", "random.beta", "random.gamma.e")
+  par_hurdle_sar_c <- c("all", "mu.e", "mu.c", "sd.e", "sd.c", "alpha", "beta", "p.c", "gamma.c",
+                        "random.alpha", "random.beta", "random.gamma.c")
+  par_hurdle_sar_ec <- c("all", "mu.e", "mu.c", "sd.e", "sd.c", "alpha", "beta", "p.e", "p.c", "gamma.e", "gamma.c",
+                         "random.alpha", "random.beta", "random.gamma.e", "random.gamma.c")
+  par_selection <- c("all", "mu.e", "mu.c", "sd.e", "sd.c", "alpha", "beta", "p.e", "p.c", "gamma.e", "gamma.c",
+                     "random.alpha", "random.beta", "random.gamma.e", "random.gamma.c")
+  par_selection_e <- c("all", "mu.e", "mu.c", "sd.e", "sd.c", "alpha", "beta", "p.e", "p.c", "gamma.e", "gamma.c", "delta.e" ,
+                       "random.alpha", "random.beta", "random.gamma.e", "random.gamma.c", "random.delta.e")
+  par_selection_c <- c("all", "mu.e", "mu.c", "sd.e", "sd.c", "alpha", "beta", "p.e", "p.c", "gamma.e", "gamma.c", "delta.c",
+                       "random.alpha", "random.beta", "random.gamma.e", "random.gamma.c", "random.delta.c")
+  par_selection_ec <- c("all", "mu.e", "mu.c", "sd.e", "sd.c", "alpha", "beta", "p.e", "p.c", "gamma.e", "gamma.c", "delta.e", "delta.c",
+                        "random.alpha", "random.beta", "random.gamma.e", "random.gamma.c", "random.delta.e", "random.delta.c")
+  par_pattern <- c("all", "mu.e", "mu.c", "mu.e.p", "mu.c.p","sd.e", "sd.c", "alpha", "beta", "pattern",
+                   "random.alpha", "random.beta")
+  par_pattern_e <- c("all", "mu.e", "mu.c", "mu.e.p", "mu.c.p","sd.e", "sd.c", "alpha", "beta", "pattern", "delta.e",
+                     "random.alpha", "random.beta")
+  par_pattern_c <- c("all", "mu.e", "mu.c", "mu.e.p", "mu.c.p","sd.e", "sd.c", "alpha", "beta", "pattern", "delta.c",
+                     "random.alpha", "random.beta")
+  par_pattern_ec <- c("all", "mu.e", "mu.c", "mu.e.p", "mu.c.p","sd.e", "sd.c", "alpha", "beta", "pattern", "delta.e", "delta.c",
+                      "random.alpha", "random.beta")
+  if(x$model_output$type == "SELECTION") {
+    if(!param %in% par_selection) {stop("You must provide valid parameter names contained in the output of selection") }
+  } else if(x$model_output$type == "SELECTION_e") {
     if(!param %in% par_selection_e) {stop("You must provide valid parameter names contained in the output of selection") }
   } else if(x$model_output$type == "SELECTION_c") {
     if(!param %in% par_selection_c) {stop("You must provide valid parameter names contained in the output of selection") }
@@ -123,41 +147,46 @@ diagnostic <- function(x, type = "histogram", param = "all", theme = NULL, ...) 
   }
   if(length(param) != 1) {
     stop("You can only visualise diagnostic checks for one family of parameters at a time 
-         or for all parameters together setting the default value param='all'")
+         or for all parameters together by setting param ='all'")
   }
   if(!type %in% c("summary", "histogram", "running", "denplot", "compare", "traceplot", "acf", "cross", "Rhat", "geweke", "caterpillar", "pairs")) {
-    stop("Types of diagnostics available for use are 'summary', 'histogram', 'running', 'denplot', 'compare', 'traceplot', 'acf', 'cross', 
-         'Rhat', 'geweke', 'caterpillar', 'pairs'")
+    stop("Types of diagnostics available for use are 'summary', 'histogram', 'running', 'denplot', 'compare', 'traceplot', 'acf', 'cross', 'Rhat', 'geweke', 'caterpillar', 'pairs'")
   }
   labs <- param
-  if(length(grep("^SELECTION",x$model_output$type)) == 1 | length(grep("^HURDLE",x$model_output$type)) == 1) {
-    labs[pmatch("mu.e",labs)] <- "mu_e"
-    labs[pmatch("mu.c",labs)] <- "mu_c"
-    labs[pmatch("sd.e",labs)] <- "s_e"
-    labs[pmatch("sd.c",labs)] <- "s_c"
-    labs[pmatch("alpha",labs)] <- "alpha"
-    labs[pmatch("beta",labs)] <- "beta"
-    labs[pmatch("p.e",labs)] <- "p_e"
-    labs[pmatch("p.c",labs)] <- "p_c"
-    labs[pmatch("gamma.e",labs)] <- "gamma_e"
-    labs[pmatch("gamma.c",labs)] <- "gamma_c"
+  if(length(grep("^SELECTION", x$model_output$type)) == 1 | length(grep("^HURDLE", x$model_output$type)) == 1) {
+    labs[pmatch("mu.e", labs)] <- "mu_e"
+    labs[pmatch("mu.c", labs)] <- "mu_c"
+    labs[pmatch("sd.e", labs)] <- "s_e"
+    labs[pmatch("sd.c", labs)] <- "s_c"
+    labs[pmatch("alpha", labs)] <- "alpha"
+    labs[pmatch("beta", labs)] <- "beta"
+    labs[pmatch("p.e", labs)] <- "p_e"
+    labs[pmatch("p.c", labs)] <- "p_c"
+    labs[pmatch("gamma.e", labs)] <- "gamma_e"
+    labs[pmatch("gamma.c", labs)] <- "gamma_c"
+    labs[pmatch("delta.e", labs)] <- "delta_e"
+    labs[pmatch("delta.c", labs)] <- "delta_c"
+    labs[pmatch("random.alpha", labs)] <- "a"
+    labs[pmatch("random.beta", labs)] <- "b"
+    labs[pmatch("random.gamma.e", labs)] <- "g_e"
+    labs[pmatch("random.gamma.c", labs)] <- "g_c"
+    labs[pmatch("random.delta.e", labs)] <- "d_e"
+    labs[pmatch("random.delta.c", labs)] <- "d_c"
   }
-  if(length(grep("^SELECTION",x$model_output$type)) == 1) {
-    labs[pmatch("delta.e",labs)] <- "delta_e"
-    labs[pmatch("delta.c",labs)] <- "delta_c"
-  }
-  if(length(grep("^PATTERN",x$model_output$type)) == 1) {
-    labs[match("mu.e",labs)] <- "mu_e\\[.\\]"
-    labs[match("mu.c",labs)] <- "mu_c\\[.\\]"
-    labs[match("mu.e.p",labs)] <- "mu_e_p"
-    labs[match("mu.c.p",labs)] <- "mu_c_p"
-    labs[match("sd.e",labs)] <- "s_e_p"
-    labs[match("sd.c",labs)] <- "s_c_p"
-    labs[match("alpha",labs)] <- "alpha_p"
-    labs[match("beta",labs)] <- "beta_p"
-    labs[match("pattern",labs)] <- "p_prob"
-    labs[match("delta.e",labs)] <- "Delta_e"
-    labs[match("delta.c",labs)] <- "Delta_c"
+  if(length(grep("^PATTERN", x$model_output$type)) == 1) {
+    labs[match("mu.e", labs)] <- "mu_e\\[.\\]"
+    labs[match("mu.c", labs)] <- "mu_c\\[.\\]"
+    labs[match("mu.e.p", labs)] <- "mu_e_p"
+    labs[match("mu.c.p", labs)] <- "mu_c_p"
+    labs[match("sd.e", labs)] <- "s_e_p"
+    labs[match("sd.c", labs)] <- "s_c_p"
+    labs[match("alpha", labs)] <- "alpha_p"
+    labs[match("beta", labs)] <- "beta_p"
+    labs[match("pattern", labs)] <- "p_prob"
+    labs[match("delta.e", labs)] <- "Delta_e"
+    labs[match("delta.c", labs)] <- "Delta_c"
+    labs[pmatch("random.alpha", labs)] <- "a"
+    labs[pmatch("random.beta", labs)] <- "b"
   }
   mcmc_object <- coda::as.mcmc(x$model_output$`model summary`)
   v_name <- coda::varnames(mcmc_object[, , drop = FALSE])
@@ -242,11 +271,26 @@ diagnostic <- function(x, type = "histogram", param = "all", theme = NULL, ...) 
   parameters <- gsub(",", '', parameters)
   parameters <- paste(unique(parameters))
   if(x$model_output$type == "PATTERN" | x$model_output$type == "PATTERN_e" | x$model_output$type == "PATTERN_c" | x$model_output$type == "PATTERN_ec") {
-    parameters <- c(paste(parameters,'1', sep = ""), paste(parameters,'2', sep = ""))
+    parameters <- c(paste(parameters, '1', sep = ""), paste(parameters, '2', sep = ""))
     parameters <- gsub("mu_c1", "mu_c", parameters)
     parameters <- gsub("mu_c2", "mu_c", parameters)
     parameters <- gsub("mu_e1", "mu_e", parameters)
     parameters <- gsub("mu_e2", "mu_e", parameters)
+    if(any(c("a1", "a2") %in% parameters)) {
+      index_a <- which(parameters %in% c("a1", "a2"))
+      parameters <- parameters[-index_a]
+      parameters <- c(parameters, "a")
+    }
+    if(any(c("b1", "b2") %in% parameters)) {
+      index_b <- which(parameters %in% c("b1", "b2"))
+      parameters <- parameters[-index_b]
+      parameters <- c(parameters, "b")
+    }
+    if(any(c("b_f1", "b_f2") %in% parameters)) {
+      index_b_f <- which(parameters %in% c("b_f1", "b_f2"))
+      parameters <- parameters[-index_b_f]
+      parameters <- c(parameters, "b_f")
+    }
     parameters <- paste(unique(parameters))
     if(x$model_output$type == "PATTERN_e" | x$model_output$type == "PATTERN_ec") {
       parameters <- gsub("Delta_e1", "Delta_e", parameters) 
@@ -259,15 +303,68 @@ diagnostic <- function(x, type = "histogram", param = "all", theme = NULL, ...) 
       parameters <- paste(unique(parameters))
     } 
   }
+  if(param == "random.alpha") {
+    if(!"a" %in% parameters) { stop("no random effects for alpha found")}
+  }
+  if(param == "random.beta") {
+    if(!"b" %in% parameters & !"b_f" %in% parameters) { stop("no random effects for beta found")}
+  }
+  if(param == "random.gamma.e") {
+    if(!"g_e" %in% parameters) { stop("no random effects for gamma.e found")}
+  }
+  if(param == "random.gamma.c") {
+    if(!"g_c" %in% parameters) { stop("no random effects for gamma.c found")}
+  }
+  if(param == "random.delta.e") {
+    if(!"d_e" %in% parameters) { stop("no random effects for delta.e found")}
+  }
+  if(param == "random.delta.c") {
+    if(!"d_c" %in% parameters) { stop("no random effects for delta.c found")}
+  }
+  if("a" %in% parameters) {
+    index_a <- which(parameters == "a")
+    parameters <- parameters[-index_a]
+    parameters <- c(parameters, "a1", "a2")
+  }
+  if("b" %in% parameters) {
+    index_b <- which(parameters == "b")
+    parameters <- parameters[-index_b]
+    parameters <- c(parameters, "b1", "b2")
+  }
+  if("g_e" %in% parameters) {
+    index_g_e <- which(parameters == "g_e")
+    parameters <- parameters[-index_g_e]
+    parameters <- c(parameters, "g1_e", "g2_e")
+  }
+  if("g_c" %in% parameters) {
+    index_g_c <- which(parameters == "g_c")
+    parameters <- parameters[-index_g_c]
+    parameters <- c(parameters, "g1_c", "g2_c")
+  }
+  if("b_f" %in% parameters) {
+    index_b_f <- which(parameters == "b_f")
+    parameters <- parameters[-index_b_f]
+    parameters <- c(parameters, "b1_f", "b2_f")
+  }
+  if("d_e" %in% parameters) {
+    index_d_e <- which(parameters == "d_e")
+    parameters <- parameters[-index_d_e]
+    parameters <- c(parameters, "d1_e", "d2_e")
+  }
+  if("d_c" %in% parameters) {
+    index_d_c <- which(parameters == "d_c")
+    parameters <- parameters[-index_d_c]
+    parameters <- c(parameters, "d1_c", "d2_c")
+  }
   mcmc_object_subset <- subset(mcmc_object, parameters = parameters)
   if(type == "summary") {
     if(param == "all") {
     parameters.mcmc <- parameters
     } else if(param != "all") {
        parameters.mcmc <- labs
-      if(length(grep("^SELECTION",x$model_output$type)) == 1 | length(grep("^HURDLE",x$model_output$type)) == 1) {
+      if(length(grep("^SELECTION", x$model_output$type)) == 1 | length(grep("^HURDLE", x$model_output$type)) == 1) {
         parameters = labs }
-      if(length(grep("^PATTERN",x$model_output$type)) == 1) {
+      if(length(grep("^PATTERN", x$model_output$type)) == 1) {
         if("mu_e\\[.\\]" %in% labs == TRUE) {
           parameters <- "mu_e" 
           exArgs$leaf.marker = "\\["
@@ -286,6 +383,13 @@ diagnostic <- function(x, type = "histogram", param = "all", theme = NULL, ...) 
         if("Delta_e" %in% labs == TRUE | "Delta_c" %in% labs == TRUE) {parameters <- labs }
         parameters.mcmc <- parameters
       }
+      if(param == "random.alpha") {parameters.mcmc <- c("a1", "a2")}
+      if(param == "random.beta" & x$model_output$ind_random == TRUE) {parameters.mcmc <- c("b1", "b2")}
+      if(param == "random.beta" & x$model_output$ind_random == FALSE) {parameters.mcmc <- c("b1", "b2", "b1_f", "b2_f")}
+      if(param == "random.gamma.e") {parameters.mcmc <- c("g1_e", "g2_e")}
+      if(param == "random.gamma.c") {parameters.mcmc <- c("g1_c", "g2_c")}
+      if(param == "random.delta.e") {parameters.mcmc <- c("d1_e", "d2_e")}
+      if(param == "random.delta.c") {parameters.mcmc <- c("d1_c", "d2_c")}
     } 
     if(exists("regex", where = exArgs)) {regex = exArgs$regex} else {regex = NULL }
     if(exists("leaf.marker", where = exArgs)) {leaf.marker = exArgs$leaf.marker} else {leaf.marker = "[\\[_]" }
@@ -303,7 +407,7 @@ diagnostic <- function(x, type = "histogram", param = "all", theme = NULL, ...) 
     ggmcmc_out <- mcmcplots::mcmcplot(mcmc_object_subset, parms = parameters.mcmc, regex = regex, leaf.marker = leaf.marker, random = random, dir = dir, 
                                       filename = filename, extension = extension, title = title, col = col, lty = lty, xlim = xlim, ylim = ylim, 
                                       style = style, greek = greek)
-    } else {
+  } else {
       if(param == "all") {
         coda::varnames(mcmc_object_subset) <- paste("model", coda::varnames(mcmc_object_subset), sep=".")
         family <- "model"
@@ -311,6 +415,48 @@ diagnostic <- function(x, type = "histogram", param = "all", theme = NULL, ...) 
         family <- labs
       }
     ggmcmc_object <- ggmcmc::ggs(mcmc_object_subset)
+  }
+  if(type != "summary") {
+   if(family == "a" & "alpha" %in% parameters) {
+    index_a <- ggmcmc_object$Parameter[grepl(paste(c("a1", "a2"), collapse = "|"), ggmcmc_object$Parameter)]
+    index_a <- which(ggmcmc_object$Parameter %in% index_a)
+    ggmcmc_object <- ggmcmc_object[index_a, ]
+    family <- "a"
+   }
+   if(family == "b" & "beta" %in% parameters) {
+    index_b <- ggmcmc_object$Parameter[grepl(paste(c("b1", "b2"), collapse = "|"), ggmcmc_object$Parameter)]
+    index_b <- which(ggmcmc_object$Parameter %in% index_b)
+    ggmcmc_object <- ggmcmc_object[index_b, ]
+    family <- "b"
+   }
+   if(family == "g_c" & "gamma_c" %in% parameters | family == "g_c" & "gamma_e" %in% parameters |
+      family == "g_c" & any(c("g1_e", "g2_e") %in% parameters)) {
+    index_g_c <- ggmcmc_object$Parameter[grepl(paste(c("g1_c", "g2_c"), collapse = "|"), ggmcmc_object$Parameter)]
+    index_g_c <- which(ggmcmc_object$Parameter %in% index_g_c)
+    ggmcmc_object <- ggmcmc_object[index_g_c, ]
+    family <- "g"
+   }
+   if(family == "g_e" & "gamma_e" %in% parameters | family == "g_e" & "gamma_c" %in% parameters |
+      family == "g_e" & any(c("g1_c", "g2_c") %in% parameters)) {
+    index_g_e <- ggmcmc_object$Parameter[grepl(paste(c("g1_e", "g2_e"), collapse = "|"), ggmcmc_object$Parameter)]
+    index_g_e <- which(ggmcmc_object$Parameter %in% index_g_e)
+    ggmcmc_object <- ggmcmc_object[index_g_e, ]
+    family <- "g"
+   }
+   if(family == "d_c" & "delta_c" %in% parameters | family == "d_c" & "delta_e" %in% parameters |
+      family == "d_c" & any(c("d1_e", "d2_e") %in% parameters)) {
+    index_d_c <- ggmcmc_object$Parameter[grepl(paste(c("d1_c", "d2_c"), collapse = "|"), ggmcmc_object$Parameter)]
+    index_d_c <- which(ggmcmc_object$Parameter %in% index_d_c)
+    ggmcmc_object <- ggmcmc_object[index_d_c, ]
+    family <- "d"
+   }
+   if(family == "d_e" & "delta_e" %in% parameters | family == "d_e" & "delta_c" %in% parameters |
+      family == "d_e" & any(c("d1_c", "d2_c") %in% parameters)) {
+    index_d_e <- ggmcmc_object$Parameter[grepl(paste(c("d1_e", "d2_e"), collapse = "|"), ggmcmc_object$Parameter)]
+    index_d_e <- which(ggmcmc_object$Parameter %in% index_d_e)
+    ggmcmc_object <- ggmcmc_object[index_d_e, ]
+    family <- "d"
+   }
   }
   if(type == "histogram") {
     if(exists("bins", where = exArgs)) {bins = exArgs$bins} else {bins = 30 }

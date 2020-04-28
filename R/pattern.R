@@ -9,13 +9,13 @@
 #' Among these, effectiveness, cost and treatment indicator (only two arms) variables must always be provided and named 'e', 'c' and 't', respectively. 
 #' @param model.eff A formula expression in conventional \code{R} linear modelling syntax. The response must be a health economic
 #' effectiveness outcome ('e') whose name must correspond to that used in \code{data}. Any covariates in the model must be provided on the right-hand side of the formula.
-#' If there are no covariates, \code{1} should be specified on the right hand side of the formula.
-#' By default, covariates are placed on the "location" parameter of the distribution through a linear model.
+#' If there are no covariates, \code{1} should be specified on the right hand side of the formula. By default, covariates are placed on the "location" parameter of the distribution through a linear model.
+#' Random effects can also be specified for each model parameter. See details for how these can be specified.
 #' @param model.cost A formula expression in conventional \code{R} linear modelling syntax. The response must be a health economic
 #' cost outcome ('c') whose name must correspond to that used in \code{data}. Any covariates in the model must be provided on the right-hand side of the formula.
 #' If there are no covariates, \code{1} should be specified on the right hand side of the formula. 
-#' By default, covariates are placed on the "location" parameter of the distribution through a linear model. A joint bivariate distribution for effects and costs can be specified by
-#' including 'e' on the right-hand side of the formula for the costs model.
+#' By default, covariates are placed on the "location" parameter of the distribution through a linear model. A joint bivariate distribution for effects and costs can be specified by including 'e' on the right-hand side of the formula for the costs model.
+#' Random effects can also be specified for each model parameter. See details for how these can be specified.
 #' @param dist_e Distribution assumed for the effects. Current available chocies are: Normal ('norm'), Beta ('beta'), Gamma ('gamma'), Exponential ('exp'),
 #' Weibull ('weibull'), Logistic ('logis'), Poisson ('pois'), Negative Binomial ('nbinom') or Bernoulli ('bern').
 #' @param dist_c Distribution assumed for the costs. Current available chocies are: Normal ('norm'), Gamma ('gamma') or LogNormal ('lnorm').
@@ -55,7 +55,7 @@
 #' }
 #' @seealso \code{\link[R2jags]{jags}}, \code{\link[BCEA]{bcea}}
 #' @keywords CEA JAGS missing data Pattern Mixture Models
-#' @importFrom stats model.frame 
+#' @importFrom stats model.frame terms
 #' @details Depending on the distributions specified for the outcome variables in the arguments \code{dist_e} and
 #' \code{dist_c} and the type of missingness mechanism specified in the argument \code{type}, different pattern mixture models
 #' are built and run in the background by the function \code{pattern}. The model for the outcomes is fitted in each missingness pattern 
@@ -95,6 +95,12 @@
 #' The only exception is the missingness patterns' probability \eqn{\pi}, denoted with "patterns.prior", whose hyperprior values must be provided as a list
 #' formed by two elements. These must be vectors of the same length equal to the number of patterns in the control (first element) and intervention (second element) group.
 #' 
+#' For each model, random effects can also be specified for each parameter by adding the term + (x | z) to each model formula, 
+#' where x is the fixed regression coefficient for which also the random effects are desired and z is the clustering variable across which 
+#' the random effects are specified (must be the name of a factor variable in the dataset). Multiple random effects can be specified using the 
+#' notation + (x1 + x2 | site) for each covariate that was included in the fixed effects formula. Random intercepts are included by default in the models
+#' if a random effects are specified but they can be removed by adding the term 0 within the random effects formula, e.g. + (0 + x | z). 
+#' 
 #' @author Andrea Gabrio
 #' @references  
 #' Daniels, MJ. Hogan, JW. \emph{Missing Data in Longitudinal Studies: strategies for Bayesian modelling and sensitivity analysis}, CRC/Chapman Hall.
@@ -114,16 +120,19 @@
 #' # Use only 100 iterations to run a quick check
 #' model.pattern <- pattern(data = MenSS.subset,model.eff = e~1,model.cost = c~1,
 #'    dist_e = "norm", dist_c = "norm",type = "MAR", Delta_e = 0, Delta_c = 0, 
-#'    n.chains = 2, n.iter = 100, ppc = TRUE)
+#'    n.chains = 2, n.iter = 100, ppc = FALSE)
 #' 
 #' # Print the results of the JAGS model
 #' print(model.pattern)
 #' #
 #'
-#' # Use dic information criterion and predictive checks to assess model fit
+#' # Use dic information criterion to assess model fit
 #' pic.dic <- pic(model.pattern, criterion = "dic", module = "total")
 #' pic.dic
-#' ppc(model.pattern, type = "histogram", ndisplay = 5)
+#' #
+#' 
+#' # Extract regression coefficient estimates
+#' coef(model.pattern)
 #' #
 #' 
 #' \dontshow{
@@ -172,7 +181,7 @@
 #' #
 
 
-pattern <- function(data, model.eff, model.cost, dist_e, dist_c, Delta_e, Delta_c, type, restriction = "CC", prob = c(0.05, 0.95), n.chains = 2, n.iter = 20000, 
+pattern <- function(data, model.eff, model.cost, dist_e, dist_c, Delta_e, Delta_c, type, restriction = "CC", prob = c(0.025, 0.975), n.chains = 2, n.iter = 20000, 
                     n.burnin = floor(n.iter / 2), inits = NULL, n.thin = 1, ppc = FALSE, save_model = FALSE, prior = "default", ...) {
   filein <- NULL
   if(is.data.frame(data) == FALSE) {
@@ -234,6 +243,16 @@ pattern <- function(data, model.eff, model.cost, dist_e, dist_c, Delta_e, Delta_
     center = exArgs$center 
   } else {center = FALSE }
   data_read <- data_read_pattern(data = data, model.eff = model.eff, model.cost = model.cost, type = type, center = center)
+  model_e_fixed <- labels(terms(data_read$model_formula$mf_model.e_fixed))
+  model_c_fixed <- labels(terms(data_read$model_formula$mf_model.c_fixed))
+  if(as.character(data_read$model_formula$mf_model.e_random)[3] == "1") {
+    model_e_random <- c("1")
+  } else { model_e_random <- labels(terms(data_read$model_formula$mf_model.e_random)) }
+  if(as.character(data_read$model_formula$mf_model.c_random)[3] == "1") {
+    model_c_random <- c("1")
+  } else if(as.character(data_read$model_formula$mf_model.c_random)[3] == "1 + e") {
+    model_c_random <- c("1", "e")
+  } else { model_c_random <- labels(terms(data_read$model_formula$mf_model.c_random)) }
   if(is.vector(Delta_e) == FALSE & is.matrix(Delta_e) == FALSE) {
     stop("Delta parameters values or ranges must be provided as vectors or matrices")
   }
@@ -264,53 +283,97 @@ pattern <- function(data, model.eff, model.cost, dist_e, dist_c, Delta_e, Delta_
       type = "MNAR"
    }
   }
-  N1 <- data_read$arm_lengths[1]
-  N2 <- data_read$arm_lengths[2]
-  pe <- ncol(data_read$covariates_effects$Intervention)
-  pc <- ncol(data_read$covariates_costs$Intervention)
-  n_patterns1 <- data_read$patterns_list$n_patterns[1]
-  n_patterns2 <- data_read$patterns_list$n_patterns[2]
-  d1_list <- data_read$patterns_list$d1
-  d2_list <- data_read$patterns_list$d2
-  d1 <- data_read$patterns$Control
-  d2 <- data_read$patterns$Intervention
+  N1 <- data_read$data_raw$arm_lengths[1]
+  N2 <- data_read$data_raw$arm_lengths[2]
+  pe_fixed <- ncol(data_read$data_raw$covariates_effects_fixed$Intervention)
+  pc_fixed <- ncol(data_read$data_raw$covariates_costs_fixed$Intervention)
+  pe_random <- ncol(data_read$data_raw$covariates_effects_random$Intervention)
+  if(length(pe_random) == 0) {pe_random <- 0 }
+  pc_random <- ncol(data_read$data_raw$covariates_costs_random$Intervention)
+  if(length(pc_random) == 0) {pc_random <- 0 }
+  n_patterns1 <- data_read$data_raw$patterns_list$n_patterns[1]
+  n_patterns2 <- data_read$data_raw$patterns_list$n_patterns[2]
+  d1_list <- data_read$data_raw$patterns_list$d1
+  d2_list <- data_read$data_raw$patterns_list$d2
+  d1 <- data_read$data_raw$patterns$Control
+  d2 <- data_read$data_raw$patterns$Intervention
   range_e <- Delta_e
   range_c <- Delta_c
-  m_eff1 <- data_read$missing_effects$Control
-  m_eff2 <- data_read$missing_effects$Intervention
-  m_cost1 <- data_read$missing_costs$Control
-  m_cost2 <- data_read$missing_costs$Intervention
-  eff1 <- data_read$raw_effects$Control
-  eff2 <- data_read$raw_effects$Intervention
-  cost1 <- data_read$raw_costs$Control
-  cost2 <- data_read$raw_costs$Intervention
+  m_eff1 <- data_read$data_raw$missing_effects$Control
+  m_eff2 <- data_read$data_raw$missing_effects$Intervention
+  m_cost1 <- data_read$data_raw$missing_costs$Control
+  m_cost2 <- data_read$data_raw$missing_costs$Intervention
+  eff1 <- data_read$data_raw$raw_effects$Control
+  eff2 <- data_read$data_raw$raw_effects$Intervention
+  cost1 <- data_read$data_raw$raw_costs$Control
+  cost2 <- data_read$data_raw$raw_costs$Intervention
+  clus1_e <- data_read$data_raw$clus_e$Control
+  clus2_e <- data_read$data_raw$clus_e$Intervention
+  clus1_c <- data_read$data_raw$clus_c$Control
+  clus2_c <- data_read$data_raw$clus_c$Intervention
+  n1_clus_e <- length(unique(clus1_e))
+  n2_clus_e <- length(unique(clus2_e))
+  n1_clus_c <- length(unique(clus1_c))
+  n2_clus_c <- length(unique(clus2_c))
   if(length(which(is.na(c(eff1, eff2)))) == 0 & length(which(is.na(c(cost1, cost2)))) == 0) {
     stop("At leat one missing value is required in either the effects or costs variables")
   }
-  N1_cc <- data_read$arm_lengths_cc[, 1]
-  N2_cc <- data_read$arm_lengths_cc[, 2]
-  N1_mis <- data_read$arm_missing_data[, 1]
-  N2_mis <- data_read$arm_missing_data[, 2]
-  X1_e <- as.matrix(data_read$covariates_effects$Control)
-  X2_e <- as.matrix(data_read$covariates_effects$Intervention)
-  X1_c <- as.matrix(data_read$covariates_costs$Control)
-  X2_c <- as.matrix(data_read$covariates_costs$Intervention)
-  if(pe == 1) {
-    X1_e <- as.vector(X1_e)
-    X2_e <- as.vector(X2_e)
+  N1_cc <- data_read$data_raw$arm_lengths_cc[, 1]
+  N2_cc <- data_read$data_raw$arm_lengths_cc[, 2]
+  N1_mis <- data_read$data_raw$arm_missing_data[, 1]
+  N2_mis <- data_read$data_raw$arm_missing_data[, 2]
+  X1_e_fixed <- as.matrix(data_read$data_raw$covariates_effects_fixed$Control)
+  X2_e_fixed <- as.matrix(data_read$data_raw$covariates_effects_fixed$Intervention)
+  X1_c_fixed <- as.matrix(data_read$data_raw$covariates_costs_fixed$Control)
+  X2_c_fixed <- as.matrix(data_read$data_raw$covariates_costs_fixed$Intervention)
+  if(pe_fixed == 1) {
+    X1_e_fixed <- as.vector(X1_e_fixed)
+    X2_e_fixed <- as.vector(X2_e_fixed)
   }
-  if(pc == 1) {
-    X1_c <- as.vector(X1_c)
-    X2_c <- as.vector(X2_c)
+  if(pc_fixed == 1) {
+    X1_c_fixed <- as.vector(X1_c_fixed)
+    X2_c_fixed <- as.vector(X2_c_fixed)
   }
-  mean_cov_e1 <- as.vector(data_read$mean_cov_effects$Control)
-  mean_cov_e2 <- as.vector(data_read$mean_cov_effects$Intervention)
-  mean_cov_c1 <- as.vector(data_read$mean_cov_costs$Control)
-  mean_cov_c2 <- as.vector(data_read$mean_cov_costs$Intervention)
-  corr_assumption <- model.frame(formula = model.cost, data = data)
-  if("e" %in% names(corr_assumption)) {
-    ind = FALSE  
-  } else {ind = TRUE}
+  mean_cov_e1_fixed <- as.vector(data_read$data_raw$mean_cov_effects_fixed$Control)
+  mean_cov_e2_fixed <- as.vector(data_read$data_raw$mean_cov_effects_fixed$Intervention)
+  mean_cov_c1_fixed <- as.vector(data_read$data_raw$mean_cov_costs_fixed$Control)
+  mean_cov_c2_fixed <- as.vector(data_read$data_raw$mean_cov_costs_fixed$Intervention)
+  if(length(model_e_random) != 0 & pe_random != 0) { 
+    X1_e_random <- as.matrix(data_read$data_raw$covariates_effects_random$Control)
+    X2_e_random <- as.matrix(data_read$data_raw$covariates_effects_random$Intervention)
+    if(pe_random == 1) {
+      X1_e_random <- as.vector(X1_e_random)
+      X2_e_random <- as.vector(X2_e_random)
+    }
+    mean_cov_e1_random <- as.vector(data_read$data_raw$mean_cov_effects_random$Control)
+    mean_cov_e2_random <- as.vector(data_read$data_raw$mean_cov_effects_random$Intervention)
+  } else { 
+    X1_e_random <- X2_e_random <- NULL
+    mean_cov_e1_random <- mean_cov_e2_random <- NULL }
+  if(length(model_c_random) != 0 & pc_random != 0) { 
+    X1_c_random <- as.matrix(data_read$data_raw$covariates_costs_random$Control)
+    X2_c_random <- as.matrix(data_read$data_raw$covariates_costs_random$Intervention)
+    if(pc_random == 1) {
+      X1_c_random <- as.vector(X1_c_random)
+      X2_c_random <- as.vector(X2_c_random)
+    }
+    mean_cov_c1_random <- as.vector(data_read$data_raw$mean_cov_costs_random$Control)
+    mean_cov_c2_random <- as.vector(data_read$data_raw$mean_cov_costs_random$Intervention)
+  } else { 
+    X1_c_random <- X2_c_random <- NULL 
+    mean_cov_c1_random <- mean_cov_c2_random <- NULL }
+  corr_assumption_fixed <- model.frame(formula = data_read$model_formula$mf_model.c_fixed, data = data)
+  if("e" %in% names(corr_assumption_fixed)) {
+    ind_fixed = FALSE  
+  } else {
+    ind_fixed = TRUE 
+    ind_random = TRUE 
+  }
+  if(ind_fixed == FALSE & "e" %in% model_c_random) {
+    ind_random = FALSE
+  } else if(ind_fixed == FALSE & !("e" %in% model_c_random)) {
+    ind_random = TRUE
+  }
   if(anyDuplicated(names(prior)) > 0) {
     stop("you cannot provide multiple priors with the same name") 
   }
@@ -321,19 +384,43 @@ pattern <- function(data, model.eff, model.cost, dist_e, dist_c, Delta_e, Delta_
     if(all(as.logical(list_check_vector)) == FALSE) {
       stop("all user-supplied priors should be in vector format")
     }
-    par_prior <- c("alpha0.prior", "beta0.prior", "sigma.prior.e", "sigma.prior.c", "patterns.prior", "alpha.prior", "beta.prior", "beta_f.prior")
+    par_prior_fixed <- c("alpha0.prior", "beta0.prior", "sigma.prior.e", "sigma.prior.c", "patterns.prior", 
+                         "alpha.prior", "beta.prior", "beta_f.prior")
+    par_prior_random <- c("mu.a0.prior", "mu.b0.prior", "mu.a.prior", "mu.b.prior", "mu.b_f.prior",
+                          "s.a0.prior", "s.b0.prior", "s.a.prior", "s.b.prior", "s.b_f.prior")
     stop_mes <- "priors can be assigned only using specific character names depending on the type of model assumed. Type ''help(pattern)'' for more details"
-    if(!all(names(list_check_vector) %in% par_prior == TRUE)) {stop(stop_mes) }
-    if(is.vector(X1_e) == TRUE & identical(X1_e,rep(1,N1))) {
-      if("alpha.prior" %in% names(list_check_vector)) {stop(stop_mes) }
+    if(is.vector(X1_e_fixed) == TRUE & identical(X1_e_fixed, rep(1, N1))) {
+      if("alpha.prior" %in% names(list_check_vector)) { stop(stop_mes) }
     }
-    if(is.vector(X1_c) == TRUE & identical(X1_c,rep(1,N1))) {
-      if("beta.prior" %in% names(list_check_vector)) {stop(stop_mes) }
+    if(is.vector(X1_c_fixed) == TRUE & identical(X1_c_fixed, rep(1, N1))) {
+      if("beta.prior" %in% names(list_check_vector)) { stop(stop_mes) }
     }
-    if(ind == TRUE) {
-      if("beta_f.prior" %in% names(list_check_vector)) {stop(stop_mes) } 
+    if(length(model_e_random) == 0 | pe_random == 0) {
+      if("mu.a0.prior" %in% names(list_check_vector) | "s.a0.prior" %in% names(list_check_vector) |
+         "mu.a.prior" %in% names(list_check_vector) | "s.a.prior" %in% names(list_check_vector)) { stop(stop_mes)}
+    } else if(length(model_e_random) != 0 & pe_random == 1) { 
+      if("mu.a.prior" %in% names(list_check_vector) | "s.a.prior" %in% names(list_check_vector)) { stop(stop_mes) }
+    }
+    if(length(model_c_random) == 0 | pc_random == 0) {
+      if("mu.b0.prior" %in% names(list_check_vector) | "s.b0.prior" %in% names(list_check_vector) |
+         "mu.b.prior" %in% names(list_check_vector) | "s.b.prior" %in% names(list_check_vector)) { stop(stop_mes)}
+    } else if(length(model_c_random) != 0 & pc_random == 1) { 
+      if("mu.b.prior" %in% names(list_check_vector) | "s.b.prior" %in% names(list_check_vector)) { stop(stop_mes) }
+    }
+    if(ind_fixed == TRUE) {
+      if("beta_f.prior" %in% names(list_check_vector)) { stop(stop_mes) } 
+      if("b_f.prior" %in% names(list_check_vector)) { stop(stop_mes) } 
+    }
+    if(ind_fixed == FALSE & ind_random == TRUE) {
+      if("mu.b_f.prior" %in% names(list_check_vector) | "s.b_f.prior" %in% names(list_check_vector)) { stop(stop_mes) } 
     }
   }
+  if(length(model_c_random) == 1) {
+    if(model_c_random == "e") {is_c_random_c <- TRUE} else {is_c_random_c <- FALSE}
+  } else {is_c_random_c <- FALSE }
+  if(length(model_c_random) == 2) {
+    if(all(model_c_random == c("1", "e")) == TRUE) {is_int_c_random_c <- TRUE} else {is_int_c_random_c <- FALSE}
+  } else {is_int_c_random_c <- FALSE }
   if(exists("sigma.prior.e", where = prior)) {sigma.prior.e = prior$sigma.prior.e} else {sigma.prior.e = NULL }
   if(exists("sigma.prior.c", where = prior)) {sigma.prior.c = prior$sigma.prior.c} else {sigma.prior.c = NULL }
   if(exists("alpha0.prior", where = prior)) {alpha0.prior = prior$alpha0.prior} else {alpha0.prior = NULL }
@@ -342,6 +429,16 @@ pattern <- function(data, model.eff, model.cost, dist_e, dist_c, Delta_e, Delta_
   if(exists("beta.prior", where = prior)) {beta.prior = prior$beta.prior} else {beta.prior = NULL }
   if(exists("patterns.prior", where = prior)) {patterns.prior = prior$patterns.prior} else {patterns.prior = NULL }
   if(exists("beta_f.prior", where = prior)) {beta_f.prior = prior$beta_f.prior} else {beta_f.prior = NULL }
+  if(exists("mu.a0.prior", where = prior)) {mu.a0.prior = prior$mu.a0.prior} else {mu.a0.prior = NULL }
+  if(exists("s.a0.prior", where = prior)) {s.a0.prior = prior$s.a0.prior} else {s.a0.prior = NULL }
+  if(exists("mu.b0.prior", where = prior)) {mu.b0.prior = prior$mu.b0.prior} else {mu.b0.prior = NULL }
+  if(exists("s.b0.prior", where = prior)) {s.b0.prior = prior$s.b0.prior} else {s.b0.prior = NULL }
+  if(exists("mu.a.prior", where = prior)) {mu.a.prior = prior$mu.a.prior} else {mu.a.prior = NULL }
+  if(exists("s.a.prior", where = prior)) {s.a.prior = prior$s.a.prior} else {s.a.prior = NULL }
+  if(exists("mu.b.prior", where = prior)) {mu.b.prior = prior$mu.b.prior} else {mu.b.prior = NULL }
+  if(exists("s.b.prior", where = prior)) {s.b.prior = prior$s.b.prior} else {s.b.prior = NULL }
+  if(exists("mu.b_f.prior", where = prior)) {mu.b_f.prior = prior$mu.b_f.prior} else {mu.b_f.prior = NULL }
+  if(exists("s.b_f.prior", where = prior)) {s.b_f.prior = prior$s.b_f.prior} else {s.b_f.prior = NULL }
   if(n_patterns1 < 2 | n_patterns2 < 2) { 
     stop("at least two patterns are required in each group to fit the model") }
   if(restriction == "CC"){
@@ -352,7 +449,7 @@ pattern <- function(data, model.eff, model.cost, dist_e, dist_c, Delta_e, Delta_
     if(any(d1 == 3, na.rm = TRUE) == FALSE | any(d2 == 3, na.rm = TRUE) == FALSE |
        any(d1 == 2, na.rm = TRUE) == FALSE | any(d2 == 2, na.rm = TRUE) == FALSE) {
       stop("some non-completers for both outcomes must be observed in both treatment groups to fit the model") }
-    if(ind == FALSE){
+    if(ind_fixed == FALSE){
       if(any(d1 == 1, na.rm = TRUE) == FALSE | any(d2 == 1, na.rm = TRUE) == FALSE) {
         stop("some completers must be observed in both treatment groups when 'e' is included in the model of 'c' under AC restriction") }
       if(n_patterns1 == 2 | n_patterns2 == 2){
@@ -368,22 +465,23 @@ pattern <- function(data, model.eff, model.cost, dist_e, dist_c, Delta_e, Delta_
   d_list[[2]] <- d1_list
   d_list[[3]] <- d2_list
   names(d_list) <- c("n_patterns", "d1", "d2")
-  data_set <- list("effects" = data_read$raw_effects, "costs" = data_read$raw_costs, "N in reference arm" = N1, "N in comparator arm" = N2, 
+  data_set <- list("effects" = data_read$data_raw$raw_effects, "costs" = data_read$data_raw$raw_costs, "N in reference arm" = N1, "N in comparator arm" = N2, 
                    "N observed in reference arm" = N1_cc, "N observed in comparator arm" = N2_cc, "N missing in reference arm" = N1_mis, "N missing in comparator arm"= N2_mis, 
-                   "patterns in comparator arm" = data_read$patterns$Control, "patterns in reference arm" = data_read$patterns$Intervention, "covariates_effects" = data_read$covariates_effects, 
-                   "covariates_costs" = data_read$covariates_costs, "missing_effects" = data_read$missing_effects, "missing_costs" = data_read$missing_costs)
-  model_output <- run_pattern(type = type, dist_e = dist_e, dist_c = dist_c, inits = inits, d_list = d_list, d1 = d1, d2 = d2, 
-                              restriction = restriction, ppc = ppc)
+                   "patterns in comparator arm" = data_read$data_raw$patterns$Control, "patterns in reference arm" = data_read$data_raw$patterns$Intervention, 
+                   "covariates_effects_fixed" = data_read$data_raw$covariates_effects_fixed, "covariates_costs_fixed" = data_read$data_raw$covariates_costs_fixed,
+                   "covariates_effects_random" = data_read$data_raw$covariates_effects_random, "covariates_costs_random" = data_read$data_raw$covariates_costs_random, 
+                   "missing_effects" = data_read$data_raw$missing_effects, "missing_costs" = data_read$data_raw$missing_costs, "clus_effects" = data_read$data_raw$clus_e, "clus_costs" = data_read$data_raw$clus_c)
+  model_output <- run_pattern(type = type, dist_e = dist_e, dist_c = dist_c, inits = inits, d_list = d_list, d1 = d1, d2 = d2, restriction = restriction, ppc = ppc)
   if(save_model == FALSE) {
     unlink(filein)
   }
-    if(exists("ref", where = exArgs)) {ref = exArgs$ref } else {ref = 2 }
-    if(exists("interventions", where = exArgs)) {interventions = exArgs$interventions } else {interventions = NULL }
-    if(exists("Kmax", where = exArgs)) {Kmax = exArgs$Kmax } else {Kmax = 50000 }
-    if(exists("wtp", where = exArgs)) {wtp = exArgs$wtp } else {wtp = NULL }
-    if(exists("plot", where = exArgs)) {plot = exArgs$plot } else {plot = FALSE }
-    cea <- BCEA::bcea(e = model_output$mean_effects, c = model_output$mean_costs, ref = ref, interventions = interventions, Kmax = Kmax, wtp = wtp, plot = plot)
-    res <- list(data_set = data_set, model_output = model_output, cea = cea, type = type)
+  if(exists("ref", where = exArgs)) {ref = exArgs$ref } else {ref = 2 }
+  if(exists("interventions", where = exArgs)) {interventions = exArgs$interventions } else {interventions = NULL }
+  if(exists("Kmax", where = exArgs)) {Kmax = exArgs$Kmax } else {Kmax = 50000 }
+  if(exists("wtp", where = exArgs)) {wtp = exArgs$wtp } else {wtp = NULL }
+  if(exists("plot", where = exArgs)) {plot = exArgs$plot } else {plot = FALSE }
+  cea <- BCEA::bcea(e = model_output$mean_effects, c = model_output$mean_costs, ref = ref, interventions = interventions, Kmax = Kmax, wtp = wtp, plot = plot)
+  res <- list(data_set = data_set, model_output = model_output, cea = cea, type = type)
   class(res) <- "missingHE"
   return(res)
 }

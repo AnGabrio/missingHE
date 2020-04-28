@@ -66,9 +66,9 @@ summary.missingHE <- function(object, ...) {
   cat(paste("\n Cost-effectiveness analysis summary \n \n", "Comparator intervention:", object$cea$interventions[1], "\n","Reference intervention:", 
             object$cea$interventions[2], "\n \n", "Parameter estimates under", object$type, "assumption"))
   cat("\n \n Comparator intervention \n")
-  print(table1,quote = F, digits = 3, justify = "center")
+  print(table1, quote = FALSE, digits = 3, justify = "center")
   cat("\n Reference intervention \n")
-  print(table2,quote = F, digits = 3, justify = "center")
+  print(table2, quote = FALSE, digits = 3, justify = "center")
   cat("\n Incremental results \n")
-  print(table3,quote = F, digits = 3, justify = "center")
+  print(table3, quote = FALSE, digits = 3, justify = "center")
  }

@@ -4,11 +4,27 @@
 \alias{pattern}
 \title{Full Bayesian Models to handle missingness in Economic Evaluations (Pattern Mixture Models)}
 \usage{
-pattern(data, model.eff, model.cost, dist_e, dist_c, Delta_e, Delta_c,
-  type, restriction = "CC", prob = c(0.05, 0.95), n.chains = 2,
-  n.iter = 20000, n.burnin = floor(n.iter/2), inits = NULL,
-  n.thin = 1, ppc = FALSE, save_model = FALSE, prior = "default",
-  ...)
+pattern(
+  data,
+  model.eff,
+  model.cost,
+  dist_e,
+  dist_c,
+  Delta_e,
+  Delta_c,
+  type,
+  restriction = "CC",
+  prob = c(0.025, 0.975),
+  n.chains = 2,
+  n.iter = 20000,
+  n.burnin = floor(n.iter/2),
+  inits = NULL,
+  n.thin = 1,
+  ppc = FALSE,
+  save_model = FALSE,
+  prior = "default",
+  ...
+)
 }
 \arguments{
 \item{data}{A data frame in which to find the variables supplied in \code{model.eff}, \code{model.cost} (model formulas for effects and costs).
@@ -16,14 +32,14 @@ Among these, effectiveness, cost and treatment indicator (only two arms) variabl
 
 \item{model.eff}{A formula expression in conventional \code{R} linear modelling syntax. The response must be a health economic
 effectiveness outcome ('e') whose name must correspond to that used in \code{data}. Any covariates in the model must be provided on the right-hand side of the formula.
-If there are no covariates, \code{1} should be specified on the right hand side of the formula.
-By default, covariates are placed on the "location" parameter of the distribution through a linear model.}
+If there are no covariates, \code{1} should be specified on the right hand side of the formula. By default, covariates are placed on the "location" parameter of the distribution through a linear model.
+Random effects can also be specified for each model parameter. See details for how these can be specified.}
 
 \item{model.cost}{A formula expression in conventional \code{R} linear modelling syntax. The response must be a health economic
 cost outcome ('c') whose name must correspond to that used in \code{data}. Any covariates in the model must be provided on the right-hand side of the formula.
 If there are no covariates, \code{1} should be specified on the right hand side of the formula. 
-By default, covariates are placed on the "location" parameter of the distribution through a linear model. A joint bivariate distribution for effects and costs can be specified by
-including 'e' on the right-hand side of the formula for the costs model.}
+By default, covariates are placed on the "location" parameter of the distribution through a linear model. A joint bivariate distribution for effects and costs can be specified by including 'e' on the right-hand side of the formula for the costs model.
+Random effects can also be specified for each model parameter. See details for how these can be specified.}
 
 \item{dist_e}{Distribution assumed for the effects. Current available chocies are: Normal ('norm'), Beta ('beta'), Gamma ('gamma'), Exponential ('exp'),
 Weibull ('weibull'), Logistic ('logis'), Poisson ('pois'), Negative Binomial ('nbinom') or Bernoulli ('bern').}
@@ -125,6 +141,12 @@ Specifically, the names for the parameters indexing the model which are accepted
 } 
 The only exception is the missingness patterns' probability \eqn{\pi}, denoted with "patterns.prior", whose hyperprior values must be provided as a list
 formed by two elements. These must be vectors of the same length equal to the number of patterns in the control (first element) and intervention (second element) group.
+
+For each model, random effects can also be specified for each parameter by adding the term + (x | z) to each model formula, 
+where x is the fixed regression coefficient for which also the random effects are desired and z is the clustering variable across which 
+the random effects are specified (must be the name of a factor variable in the dataset). Multiple random effects can be specified using the 
+notation + (x1 + x2 | site) for each covariate that was included in the fixed effects formula. Random intercepts are included by default in the models
+if a random effects are specified but they can be removed by adding the term 0 within the random effects formula, e.g. + (0 + x | z).
 }
 \examples{
 # Quck example to run using subset of MenSS dataset
@@ -134,16 +156,19 @@ MenSS.subset <- MenSS[50:100, ]
 # Use only 100 iterations to run a quick check
 model.pattern <- pattern(data = MenSS.subset,model.eff = e~1,model.cost = c~1,
    dist_e = "norm", dist_c = "norm",type = "MAR", Delta_e = 0, Delta_c = 0, 
-   n.chains = 2, n.iter = 100, ppc = TRUE)
+   n.chains = 2, n.iter = 100, ppc = FALSE)
 
 # Print the results of the JAGS model
 print(model.pattern)
 #
 
-# Use dic information criterion and predictive checks to assess model fit
+# Use dic information criterion to assess model fit
 pic.dic <- pic(model.pattern, criterion = "dic", module = "total")
 pic.dic
-ppc(model.pattern, type = "histogram", ndisplay = 5)
+#
+
+# Extract regression coefficient estimates
+coef(model.pattern)
 #
 
 \dontshow{

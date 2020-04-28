@@ -4,11 +4,26 @@
 \alias{selection}
 \title{Full Bayesian Models to handle missingness in Economic Evaluations (Selection Models)}
 \usage{
-selection(data, model.eff, model.cost, model.me = me ~ 1, model.mc = mc
-  ~ 1, dist_e, dist_c, type, prob = c(0.05, 0.95), n.chains = 2,
-  n.iter = 20000, n.burnin = floor(n.iter/2), inits = NULL,
-  n.thin = 1, ppc = FALSE, save_model = FALSE, prior = "default",
-  ...)
+selection(
+  data,
+  model.eff,
+  model.cost,
+  model.me = me ~ 1,
+  model.mc = mc ~ 1,
+  dist_e,
+  dist_c,
+  type,
+  prob = c(0.025, 0.975),
+  n.chains = 2,
+  n.iter = 20000,
+  n.burnin = floor(n.iter/2),
+  inits = NULL,
+  n.thin = 1,
+  ppc = FALSE,
+  save_model = FALSE,
+  prior = "default",
+  ...
+)
 }
 \arguments{
 \item{data}{A data frame in which to find the variables supplied in \code{model.eff}, \code{model.cost} (model formulas for effects and costs) 
@@ -17,23 +32,23 @@ effectiveness, cost and treatment indicator (only two arms) variables must alway
 
 \item{model.eff}{A formula expression in conventional \code{R} linear modelling syntax. The response must be a health economic
 effectiveness outcome ('e') whose name must correspond to that used in \code{data}. Any covariates in the model must be provided on the right-hand side of the formula.
-If there are no covariates, \code{1} should be specified on the right hand side of the formula.
-By default, covariates are placed on the "location" parameter of the distribution through a linear model.}
+If there are no covariates, \code{1} should be specified on the right hand side of the formula. By default, covariates are placed on the "location" parameter of the distribution through a linear model.
+Random effects can also be specified for each model parameter. See details for how these can be specified.}
 
 \item{model.cost}{A formula expression in conventional \code{R} linear modelling syntax. The response must be a health economic
-cost outcome ('c') whose name must correspond to that used in \code{data}. 
-and any covariates are given on the right-hand side. Any covariates in the model must be provided on the right-hand side of the formula.
-If there are no covariates, \code{1} should be specified on the right hand side of the formula.
-By default, covariates are placed on the "location" parameter of the distribution through a linear model. A joint bivariate distribution for effects and costs can be specified by
-including 'e' on the right-hand side of the formula for the costs model.}
+cost outcome ('c') whose name must correspond to that used in \code{data}. Any covariates in the model must be provided on the right-hand side of the formula.
+If there are no covariates, \code{1} should be specified on the right hand side of the formula. By default, covariates are placed on the "location" parameter of the distribution through a linear model. 
+A joint bivariate distribution for effects and costs can be specified by including 'e' on the right-hand side of the formula for the costs model.
+Random effects can also be specified for each model parameter. See details for how these can be specified.}
 
 \item{model.me}{A formula expression in conventional \code{R} linear modelling syntax. The response must be indicated with the 
-term 'me'(missing effects) and any covariates must be provided on the right-hand side of the formula. 
-If there are no covariates, \code{1} should be specified on the right hand side of the formula. By default, covariates are placed on the "probability" parameter for the missing effects through a logistic-linear model.}
+term 'me'(missing effects) and any covariates must be provided on the right-hand side of the formula. If there are no covariates, \code{1} should be specified on the right hand side of the formula. 
+By default, covariates are placed on the "probability" parameter for the missing effects through a logistic-linear model.
+Random effects can also be specified for each model parameter. See details for how these can be specified.}
 
-\item{model.mc}{A formula expression in conventional \code{R} linear modelling syntax. The response must be indicated with the 
-term 'mc'(missing costs) and any covariates must be provided on the right-hand side of the formula. 
-If there are no covariates, \code{1} should be specified on the right hand side of the formula. By default, covariates are placed on the "probability" parameter for the missing costs through a logistic-linear model.}
+\item{model.mc}{A formula expression in conventional \code{R} linear modelling syntax. The response must be indicated with the term 'mc'(missing costs) and any covariates must be provided on the right-hand side of the formula. 
+If there are no covariates, \code{1} should be specified on the right hand side of the formula. By default, covariates are placed on the "probability" parameter for the missing costs through a logistic-linear model.
+Random effects can also be specified for each model parameter. See details for how these can be specified.}
 
 \item{dist_e}{Distribution assumed for the effects. Current available chocies are: Normal ('norm'), Beta ('beta'), Gamma ('gamma'), Exponential ('exp'),
 Weibull ('weibull'), Logistic ('logis'), Poisson ('pois'), Negative Binomial ('nbinom') or Bernoulli ('bern').}
@@ -93,8 +108,7 @@ which is implemented in the software \code{JAGS} using the function \code{\link[
 Depending on the distributions specified for the outcome variables in the arguments \code{dist_e} and
 \code{dist_c} and the type of missingness mechanism specified in the argument \code{type}, different selection models
 are built and run in the background by the function \code{selection}. These models consist in logistic regressions that are used to estimate
-the probability of missingness in one or both the outcomes. 
-A simple example can be used to show how selection models are specified. 
+the probability of missingness in one or both the outcomes. A simple example can be used to show how selection models are specified. 
 Consider a data set comprising a response variable \eqn{y} and a set of centered covariate \eqn{X_j}. For each subject in the trial \eqn{i = 1, ..., n}
 we define an indicator variable \eqn{m_i} taking value \code{1} if the \eqn{i}-th individual is associated with a missing value and \code{0} otherwise.
 This is modelled as:
@@ -128,6 +142,12 @@ Specifically, the names for the parameters indexing the model which are accepted
 For simplicity, here we have assumed that the set of covariates \eqn{X_j} used in the models for the effects/costs and in the 
 model of the missing effect/cost values is the same. However, it is possible to specify different sets of covariates for each model
 using the arguments in the function \code{selection} (see Arguments).
+
+For each model, random effects can also be specified for each parameter by adding the term + (x | z) to each model formula, 
+where x is the fixed regression coefficient for which also the random effects are desired and z is the clustering variable across which 
+the random effects are specified (must be the name of a factor variable in the dataset). Multiple random effects can be specified using the 
+notation + (x1 + x2 | site) for each covariate that was included in the fixed effects formula. Random intercepts are included by default in the models
+if a random effects are specified but they can be removed by adding the term 0 within the random effects formula, e.g. + (0 + x | z).
 }
 \examples{
 # Quck example to run using subset of MenSS dataset
@@ -143,10 +163,13 @@ model.selection <- selection(data = MenSS.subset, model.eff = e ~ 1,model.cost =
 print(model.selection)
 #
 
-# Use dic information criterion and predictive checks to assess model fit
+# Use dic information criterion to assess model fit
 pic.dic <- pic(model.selection, criterion = "dic", module = "total")
 pic.dic
-ppc(model.selection, type = "histogram", ndisplay = 5)
+#
+
+# Extract regression coefficient estimates
+coef(model.selection)
 #
 
 \dontshow{

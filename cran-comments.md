@@ -1,13 +1,13 @@
 ## Resubmission
-* This is a resubmission. In this version I have made two main changes:
+* This is a resubmission. In this version I have made the following main changes:
 
-* I added the choice of using two different restriction methods (CC or AC) to fit pattern mixture models (via the function pattern).
+* I added more distributions among which the user can choose to fit the models using the selection, pattern and hurdle functions (including gamma, exponential, weibull, logistic, poisson, negative binomial and bernoulli)
 
-* I added an accessory function for generating different types of graphical posterior predictive checks (function is named ppc) to assess the fit of all three types of models in the package (selection, pattern and hurdle). 
+* I added more variables in the dataset "MenSS" built inside the package, including binary and discrete data. 
 
 * I made few other changes to some of the other functions of the package to fix some minor bugs and updated the description of the functions accordingly.
 
-* Updated the version of the package in the DESCRIPTION file to 1.2.1.
+* Updated the version of the package in the DESCRIPTION file to 1.3.2.
 
 ## Test environments
 * Windows 10 64-bit install, R 3.5.2 and R 3.5.3 (local)

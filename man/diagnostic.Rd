@@ -4,7 +4,7 @@
 \alias{diagnostic}
 \title{Diagnostic checks for assessing MCMC convergence of Bayesian models fitted in \code{JAGS} using the function \code{\link{selection}}, \code{\link{pattern}} or \code{\link{hurdle}}}
 \usage{
-diagnostic(x, type = "histogram", param = "all", theme = NULL, ...)
+diagnostic(x, type = "denplot", param = "all", theme = NULL, ...)
 }
 \arguments{
 \item{x}{An object of class "missingHE" containing the posterior results of a full Bayesian model implemented using the function \code{\link{selection}}, 
@@ -52,6 +52,8 @@ must be specified in the argument \code{param} according to the specific model i
 \item "sd.c" the standard deviation parameters of the cost variables in the two treatment arms.
 \item "alpha" the regression intercept and covariate coefficient parameters for the effect variables in the two treatment arms.
 \item "beta" the regression intercept and covariate coefficient parameters for the cost variables in the two treatment arms.
+\item "random.alpha" the regression random effects intercept and covariate coefficient parameters for the effect variables in the two treatment arms.
+\item "random.beta" the regression random effects intercept and covariate coefficient parameters for the cost variables in the two treatment arms.
 \item "p.e" the probability parameters of the missingness or structural values mechanism for the effect variables in the two treatment arms 
 (only with the function \code{selection} or \code{hurdle}).
 \item "p.c" the probability parameters of the missingness or structural values mechanism for the cost variables in the two treatment arms 
@@ -60,11 +62,19 @@ must be specified in the argument \code{param} according to the specific model i
  for the effect variables in the two treatment arms (only with the function \code{selection} or \code{hurdle}).
 \item "gamma.c" the regression intercept and covariate coefficient parameters of the missingness or structural values mechanism 
  for the cost variables in the two treatment arms (only with the function \code{selection} or \code{hurdle}).
+\item "random.gamma.e" the random effects regression intercept and covariate coefficient parameters of the missingness or structural values mechanism
+ for the effect variables in the two treatment arms (only with the function \code{selection} or \code{hurdle}).
+\item "random.gamma.c" the random effects regression intercept and covariate coefficient parameters of the missingness or structural values mechanism 
+ for the cost variables in the two treatment arms (only with the function \code{selection} or \code{hurdle}).
 \item "pattern" the probabilities associated with the missingness patterns in the data (only with the function \code{pattern}).
 \item "delta.e" the mnar parameters of the missingness mechanism for the effect variables in the two treatment arms 
 (only with the function \code{selection} or \code{pattern}).
 \item "delta.c" the mnar parameters of the missingness mechanism for the cost variables in the two treatment arms 
 (only with the function \code{selection} or \code{pattern}).
+\item "random.delta.e" the random effects mnar parameters of the missingness mechanism for the effect variables in the two treatment arms 
+(only with the function \code{selection}).
+\item "random.delta.c" the random effects mnar parameters of the missingness mechanism for the cost variables in the two treatment arms 
+(only with the function \code{selection}).
 \item "all" all available parameters stored in the object \code{x}.
 }
 When the object \code{x} is created using the function \code{pattern}, pattern-specific standard deviation ("sd.e", "sd.c") and regression coefficient 

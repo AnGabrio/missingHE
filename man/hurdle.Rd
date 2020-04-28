@@ -4,11 +4,28 @@
 \alias{hurdle}
 \title{Full Bayesian Models to handle missingness in Economic Evaluations (Hurdle Models)}
 \usage{
-hurdle(data, model.eff, model.cost, model.se = se ~ 1, model.sc = sc ~
-  1, se = 1, sc = 0, dist_e, dist_c, type, prob = c(0.05, 0.95),
-  n.chains = 2, n.iter = 20000, n.burnin = floor(n.iter/2),
-  inits = NULL, n.thin = 1, ppc = FALSE, save_model = FALSE,
-  prior = "default", ...)
+hurdle(
+  data,
+  model.eff,
+  model.cost,
+  model.se = se ~ 1,
+  model.sc = sc ~ 1,
+  se = 1,
+  sc = 0,
+  dist_e,
+  dist_c,
+  type,
+  prob = c(0.025, 0.975),
+  n.chains = 2,
+  n.iter = 20000,
+  n.burnin = floor(n.iter/2),
+  inits = NULL,
+  n.thin = 1,
+  ppc = FALSE,
+  save_model = FALSE,
+  prior = "default",
+  ...
+)
 }
 \arguments{
 \item{data}{A data frame in which to find the variables supplied in \code{model.eff}, \code{model.cost} (model formulas for effects and costs) 
@@ -17,22 +34,24 @@ effectiveness, cost and treatment indicator (only two arms) variables must alway
 
 \item{model.eff}{A formula expression in conventional \code{R} linear modelling syntax. The response must be a health economic
 effectiveness outcome ('e') whose name must correspond to that used in \code{data}. Any covariates in the model must be provided on the right-hand side of the formula. 
-If there are no covariates, \code{1} should be specified on the right hand side of the formula.
-By default, covariates are placed on the "location" parameter of the distribution through a linear model.}
+If there are no covariates, \code{1} should be specified on the right hand side of the formula. By default, covariates are placed on the "location" parameter of the distribution through a linear model.
+Random effects can also be specified for each model parameter. See details for how these can be specified.}
 
 \item{model.cost}{A formula expression in conventional \code{R} linear modelling syntax. The response must be a health economic
 cost outcome ('c') whose name must correspond to that used in \code{data}. Any covariates in the model must be provided on the right-hand side of the formula.
 If there are no covariates, \code{1} should be specified on the right hand side of the formula. By default, covariates are placed on the "location" 
-parameter of the distribution through a linear model. A joint bivariate distribution for effects and costs can be specified by
-including 'e' on the right-hand side of the formula for the costs model.}
+parameter of the distribution through a linear model. A joint bivariate distribution for effects and costs can be specified by including 'e' on the right-hand side of the formula for the costs model.
+Random effects can also be specified for each model parameter. See details for how these can be specified.}
 
 \item{model.se}{A formula expression in conventional \code{R} linear modelling syntax. The response must be indicated with the 
 term 'se'(structural effects). Any covariates in the model must be provided on the right-hand side of the formula. 
-If there are no covariates, \code{1} should be specified on the right hand side of the formula. By default, covariates are placed on the "probability" parameter for the structural effects through a logistic-linear model.}
+If there are no covariates, \code{1} should be specified on the right hand side of the formula. By default, covariates are placed on the "probability" parameter for the structural effects through a logistic-linear model.
+Random effects can also be specified for each model parameter. See details for how these can be specified.}
 
 \item{model.sc}{A formula expression in conventional \code{R} linear modelling syntax. The response must be indicated with the 
 term 'sc'(structural costs). Any covariates in the model must be provided on the right-hand side of the formula. 
-If there are no covariates, \code{1} should be specified on the right hand side of the formula. By default, covariates are placed on the "probability" parameter for the structural costs through a logistic-linear model.}
+If there are no covariates, \code{1} should be specified on the right hand side of the formula. By default, covariates are placed on the "probability" parameter for the structural costs through a logistic-linear model.
+Random effects can also be specified for each model parameter. See details for how these can be specified.}
 
 \item{se}{Structural value to be found in the effect variables defined in \code{data}. If set to \code{NULL}, 
 no structural value is chosen and a standard model for the effects is run.}
@@ -137,6 +156,12 @@ Specifically, the names accepted by \strong{missingHE} are the following:
 For simplicity, here we have assumed that the set of covariates \eqn{X_j} used in the models for the effects/costs and in the 
 model of the structural effect/cost values is the same. However, it is possible to specify different sets of covariates for each model
 using the arguments in the function \code{hurdle} (see Arguments).
+
+For each model, random effects can also be specified for each parameter by adding the term + (x | z) to each model formula, 
+where x is the fixed regression coefficient for which also the random effects are desired and z is the clustering variable across which 
+the random effects are specified (must be the name of a factor variable in the dataset). Multiple random effects can be specified using the 
+notation + (x1 + x2 | site) for each covariate that was included in the fixed effects formula. Random intercepts are included by default in the models
+if a random effects are specified but they can be removed by adding the term 0 within the random effects formula, e.g. + (0 + x | z).
 }
 \examples{
 # Quck example to run using subset of MenSS dataset
@@ -155,6 +180,10 @@ print(model.hurdle)
 # Use dic information criterion to assess model fit
 pic.dic <- pic(model.hurdle, criterion = "dic", module = "total")
 pic.dic
+#
+
+# Extract regression coefficient estimates
+coef(model.hurdle)
 #
 
 \dontshow{

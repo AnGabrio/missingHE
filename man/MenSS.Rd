@@ -4,7 +4,9 @@
 \name{MenSS}
 \alias{MenSS}
 \title{MenSS economic data on STIs}
-\format{A data frame with 159 rows and 12 variables}
+\format{
+A data frame with 159 rows and 12 variables
+}
 \usage{
 data(MenSS)
 }
@@ -30,6 +32,7 @@ Baseline data are available for the utilities (no baseline costs collected), ins
   \item{sex_inst}{number of instances of unprotected sex at 12 months follow-up}
   \item{sti.0}{binary : baseline sti diagnosis (1) and no baseline sti diagnosis (0)}
   \item{sti}{binary : sti diagnosis (1) and no sti diagnosis (0) at 12 months follow-up} 
+  \item{site}{site number}
 }
 }
 \examples{

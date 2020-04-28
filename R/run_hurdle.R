@@ -36,7 +36,9 @@ run_hurdle <- function(type, dist_e, dist_c, inits, se, sc, sde, sdc, ppc) eval.
     stop("Types available for use are 'SCAR', 'SAR'")
   }
   if(is.null(inits) == FALSE) {inits = inits }
-  model <- write_hurdle(type = type , dist_e = dist_e, dist_c = dist_c, ind = ind , pe = pe, pc = pc, ze = ze, zc = zc , se = se, sc = sc)
+  model <- write_hurdle(type = type , dist_e = dist_e, dist_c = dist_c, pe_fixed = pe_fixed, pc_fixed = pc_fixed, ze_fixed = ze_fixed, zc_fixed = zc_fixed, ind_fixed = ind_fixed,
+                        pe_random = pe_random, pc_random = pc_random, ze_random = ze_random, zc_random = zc_random, ind_random = ind_random, 
+                        model_e_random = model_e_random, model_c_random = model_c_random, model_se_random = model_se_random, model_sc_random = model_sc_random, se = se, sc = sc)
   filein <- model
   if(dist_e %in% c("norm")) {sde <- log(sde) }
   if(dist_c %in% c("norm")) {sdc <- log(sdc) }
@@ -105,89 +107,71 @@ run_hurdle <- function(type, dist_e, dist_c, inits, se, sc, sde, sdc, ppc) eval.
       }
     }
   }
-  if(type == "SCAR") {
-        datalist <- list("N1", "N2", "eff1", "eff2", "cost1", "cost2", "d_eff1", "d_eff2", "d_cost1", "d_cost2", 
-                         "X1_e", "X2_e", "X1_c", "X2_c", "mean_cov_e1", "mean_cov_e2", "mean_cov_c1", "se", "sc", 
-                         "mean_cov_c2", "pe", "pc", "sde", "sdc")
-        if(pe == 1) {pe_index <- match("pe", datalist)
-          datalist <- datalist[-pe_index] }
-        if(pc == 1) {pc_index <- match("pc", datalist)
-        datalist <- datalist[-pc_index] }
-        if(is.null(se) == TRUE) {
-          d_eff1_index <- match("d_eff1", datalist)
-          d_eff2_index <- match("d_eff2", datalist)
-          se_index <- match("se", datalist)
-          sde_index <- match("sde", datalist)
-          datalist <- datalist[-c(d_eff1_index, d_eff2_index, se_index, sde_index)]
-        }
-        if(is.null(sc) == TRUE) {
-          d_cost1_index <- match("d_cost1", datalist)
-          d_cost2_index <- match("d_cost2", datalist)
-          sc_index <- match("sc", datalist)
-          sdc_index <- match("sdc", datalist)
-          datalist <- datalist[-c(d_cost1_index, d_cost2_index, sc_index, sdc_index)]
-        }
+  datalist <- list("N1", "N2", "eff1", "eff2", "cost1", "cost2", "d_eff1", "d_eff2", "d_cost1", "d_cost2", 
+                   "X1_e_fixed", "X2_e_fixed", "X1_c_fixed", "X2_c_fixed", "Z1_e_fixed", "Z2_e_fixed", "Z1_c_fixed", "Z2_c_fixed", 
+                   "mean_cov_e1_fixed", "mean_cov_e2_fixed", "mean_cov_c1_fixed", "mean_cov_c2_fixed", "mean_z_e1_fixed", "mean_z_e2_fixed", "mean_z_c1_fixed", "mean_z_c2_fixed", 
+                   "pe_fixed", "pc_fixed", "ze_fixed", "zc_fixed", "X1_e_random", "X2_e_random","mean_cov_e1_random", "mean_cov_e2_random", "pe_random", 
+                   "clus1_e", "clus2_e", "n1_clus_e", "n2_clus_e", "X1_c_random", "X2_c_random","mean_cov_c1_random", "mean_cov_c2_random", "pc_random", 
+                   "clus1_c", "clus2_c", "n1_clus_c", "n2_clus_c", "Z1_e_random", "Z2_e_random","mean_z_e1_random", "mean_z_e2_random", "ze_random", 
+                   "clus1_se", "clus2_se", "n1_clus_se", "n2_clus_se", "Z1_c_random", "Z2_c_random","mean_z_c1_random", "mean_z_c2_random", "zc_random", 
+                   "clus1_sc", "clus2_sc", "n1_clus_sc", "n2_clus_sc", "se", "sc", "sde", "sdc")
+  e_random_list <- c("X1_e_random", "X2_e_random","mean_cov_e1_random", "mean_cov_e2_random", "pe_random", "clus1_e", "clus2_e", "n1_clus_e", "n2_clus_e")
+  c_random_list <- c("X1_c_random", "X2_c_random","mean_cov_c1_random", "mean_cov_c2_random", "pc_random", "clus1_c", "clus2_c", "n1_clus_c", "n2_clus_c")
+  se_fixed_list <- c("Z1_e_fixed", "Z2_e_fixed","mean_z_e1_fixed", "mean_z_e2_fixed", "ze_fixed")
+  sc_fixed_list <- c("Z1_c_fixed", "Z2_c_fixed","mean_z_c1_fixed", "mean_z_c2_fixed", "zc_fixed")
+  se_random_list <- c("Z1_e_random", "Z2_e_random","mean_z_e1_random", "mean_z_e2_random", "ze_random", "clus1_se", "clus2_se", "n1_clus_se", "n2_clus_se")
+  sc_random_list <- c("Z1_c_random", "Z2_c_random","mean_z_c1_random", "mean_z_c2_random", "zc_random", "clus1_sc", "clus2_sc", "n1_clus_sc", "n2_clus_sc")
+  if(pe_fixed == 1) {pe_fixed_index <- match("pe_fixed", datalist)
+  datalist <- datalist[-pe_fixed_index] }
+  if(pc_fixed == 1) {pc_fixed_index <- match("pc_fixed", datalist)
+  datalist <- datalist[-pc_fixed_index] }
+  if(ze_fixed == 0) {ze_fixed_index <- match(se_fixed_list, datalist)
+  datalist <- datalist[-ze_fixed_index] }
+  if(zc_fixed == 0) {zc_fixed_index <- match(sc_fixed_list, datalist)
+  datalist <- datalist[-zc_fixed_index] }
+  if(ze_fixed == 1) {ze_fixed_index <- match("ze_fixed", datalist)
+  datalist <- datalist[-ze_fixed_index] }
+  if(zc_fixed == 1) {zc_fixed_index <- match("zc_fixed", datalist)
+  datalist <- datalist[-zc_fixed_index] }
+  if(length(model_e_random) != 0) {
+    if(pe_random == 1) {pe_random_index <- match("pe_random", datalist)
+    datalist <- datalist[-pe_random_index] }
+  } else if(length(model_e_random) == 0) { e_random_index <- match(e_random_list, datalist)
+  datalist <- datalist[-e_random_index] }
+  if(length(model_c_random) != 0 & is_c_random_c == FALSE) {
+    if(pc_random == 1 | length(model_c_random) != 0 & is_c_random_c == TRUE) {
+      pc_random_index <- match("pc_random", datalist)
+      datalist <- datalist[-pc_random_index] }
+  } else if(length(model_c_random) != 0 & is_c_random_c == TRUE) {
+    c_random_index <- match(c_random_list[1:5], datalist)
+    datalist <- datalist[-c_random_index] 
+  } else if(length(model_c_random) == 0) { 
+    c_random_index <- match(c_random_list, datalist)
+    datalist <- datalist[-c_random_index] 
   }
-  if(type == "SAR") {
-    datalist <- list("N1", "N2", "eff1", "eff2", "cost1", "cost2", "d_eff1", "d_eff2", "d_cost1", "d_cost2", 
-                     "X1_e", "X2_e", "X1_c", "X2_c", "Z1_e", "Z2_e", "Z1_c", "Z2_c", "mean_cov_e1", "mean_cov_e2", "mean_cov_c1", "sc", "se", 
-                     "mean_cov_c2", "mean_z_e1", "mean_z_e2", "mean_z_c1", "mean_z_c2", "pe", "pc", "ze", "zc", "sde", "sdc")
-    if(pe == 1) {pe_index <- match("pe", datalist)
-    datalist <- datalist[-pe_index] }
-    if(pc == 1) {pc_index <- match("pc", datalist)
-    datalist <- datalist[-pc_index] }
-    if(is.null(ze) == FALSE) {
-    if(ze == 1) {ze_index <- match("ze", datalist)
-    datalist <- datalist[-ze_index] }
-    } else if(is.null(ze) == TRUE) {
-      ze_index <- match("ze", datalist)
-      datalist <- datalist[-ze_index]
-      Z1_e_index <- match("Z1_e", datalist)
-      datalist <- datalist[-Z1_e_index]
-      Z2_e_index <- match("Z2_e", datalist)
-      datalist <- datalist[-Z2_e_index]
-      mean_z_e1_index <- match("mean_z_e1", datalist)
-      datalist <- datalist[-mean_z_e1_index]
-      mean_z_e2_index <- match("mean_z_e2", datalist)
-      datalist <- datalist[-mean_z_e2_index]
-    }
-    if(is.null(zc) == FALSE) {
-      if(zc == 1) {zc_index <- match("zc", datalist)
-      datalist <- datalist[-zc_index] }
-    } else if(is.null(zc) == TRUE) {
-      zc_index <- match("zc", datalist)
-      datalist <- datalist[-zc_index]
-      Z1_c_index <- match("Z1_c", datalist)
-      datalist <- datalist[-Z1_c_index]
-      Z2_c_index <- match("Z2_c", datalist)
-      datalist <- datalist[-Z2_c_index]
-      mean_z_c1_index <- match("mean_z_c1", datalist)
-      datalist <- datalist[-mean_z_c1_index]
-      mean_z_c2_index <- match("mean_z_c2", datalist)
-      datalist <- datalist[-mean_z_c2_index]
-    }
-    if(is.null(se) == TRUE) {
-      d_eff1_index <- match("d_eff1", datalist)
-      d_eff2_index <- match("d_eff2", datalist)
-      se_index <- match("se", datalist)
-      sde_index <- match("sde", datalist)
-      datalist <- datalist[-c(d_eff1_index, d_eff2_index, se_index, sde_index)]
-      if(any(datalist == "ze") == TRUE) {
-        ze_index2 <- match("ze", datalist)
-        datalist <- datalist[-ze_index2]
-      }
-    }
-    if(is.null(sc) == TRUE) {
-      d_cost1_index <- match("d_cost1", datalist)
-      d_cost2_index <- match("d_cost2", datalist)
-      sc_index <- match("sc", datalist)
-      sdc_index <- match("sdc", datalist)
-      datalist <- datalist[-c(d_cost1_index, d_cost2_index, sc_index, sdc_index)]
-      if(any(datalist == "zc") == TRUE) {
-        zc_index2 <- match("zc", datalist)
-        datalist <- datalist[-zc_index2]
-      }
-    }
+  if(length(model_se_random) != 0) {
+    if(ze_random == 1) {ze_random_index <- match("ze_random", datalist)
+    datalist <- datalist[-ze_random_index] }
+  } else if(length(model_se_random) == 0) { se_random_index <- match(se_random_list, datalist)
+  datalist <- datalist[-se_random_index] }
+  if(length(model_sc_random) != 0) {
+    if(zc_random == 1) {zc_random_index <- match("zc_random", datalist)
+    datalist <- datalist[-zc_random_index] }
+  } else if(length(model_sc_random) == 0) { sc_random_index <- match(sc_random_list, datalist)
+  datalist <- datalist[-sc_random_index] }
+  if(is.null(se) == TRUE) {
+    d_eff1_index <- match("d_eff1", datalist)
+    d_eff2_index <- match("d_eff2", datalist)
+    se_index <- match("se", datalist)
+    sde_index <- match("sde", datalist)
+    datalist <- datalist[-c(d_eff1_index, d_eff2_index, se_index, sde_index)]
+  }
+  if(is.null(sc) == TRUE) {
+    d_cost1_index <- match("d_cost1", datalist)
+    d_cost2_index <- match("d_cost2", datalist)
+    sc_index <- match("sc", datalist)
+    sdc_index <- match("sdc", datalist)
+    datalist <- datalist[-c(d_cost1_index, d_cost2_index, sc_index, sdc_index)]
   }
   DIC <- TRUE
   if(is.null(se) == TRUE) {params <- c("eff1", "eff2", "cost1", "cost2", "mu_e", "mu_c", "s_e", "s_c", "p_c", "beta", "alpha", "gamma_c", 
@@ -198,7 +182,12 @@ run_hurdle <- function(type, dist_e, dist_c, inits, se, sc, sde, sdc, ppc) eval.
   params <- c("eff1", "eff2", "cost1", "cost2", "mu_e", "mu_c", "s_e", "s_c", "p_e", "p_c", "beta", "alpha", "gamma_e", "gamma_c", 
               "loglik_e1", "loglik_e2", "loglik_c1", "loglik_c2", "loglik_de1", "loglik_de2", "loglik_dc1", "loglik_dc2") 
   }
-  if(ind == FALSE) {params <- c(params, "beta_f") }
+  if(ind_fixed == FALSE) {params <- c(params, "beta_f") }
+  if(length(model_e_random) != 0){params <- c(params, "a1", "a2") }
+  if(length(model_c_random) != 0 & is_c_random_c == FALSE){params <- c(params, "b1", "b2") }
+  if(length(model_se_random) != 0){params <- c(params, "g1_e", "g2_e") }
+  if(length(model_sc_random) != 0){params <- c(params, "g1_c", "g2_c") }
+  if(length(model_c_random) != 0 & ind_random == FALSE) {params <- c(params, "b1_f", "b2_f") }
   if(ppc == TRUE) { 
     if(dist_e %in% c("norm", "nbinom", "logis")) {
       ppc_e_params <- c("mu_e1", "mu_e2", "tau_e1", "tau_e2") 
@@ -228,16 +217,37 @@ run_hurdle <- function(type, dist_e, dist_c, inits, se, sc, sde, sdc, ppc) eval.
     loglik_e2 <- modelN1$BUGSoutput$sims.list$loglik_e2
     loglik_c1 <- modelN1$BUGSoutput$sims.list$loglik_c1
     loglik_c2 <- modelN1$BUGSoutput$sims.list$loglik_c2
+    a <- b <- g_e <- g_c <- NULL
+    if(length(model_e_random) != 0) { 
+      a1 <- modelN1$BUGSoutput$sims.list$a1
+      a2 <- modelN1$BUGSoutput$sims.list$a2 
+      a <- list("a1" = a1, "a2" = a2) 
+    }
+    if(length(model_c_random) != 0 & is_c_random_c == FALSE) { 
+      b1 <- modelN1$BUGSoutput$sims.list$b1
+      b2 <- modelN1$BUGSoutput$sims.list$b2 
+      b <- list("b1" = b1, "b2" = b2) 
+    }
     if(is.null(se) == TRUE & is.null(sc) == FALSE) {
       p_c <- modelN1$BUGSoutput$sims.list$p_c
       gamma_c <- modelN1$BUGSoutput$sims.list$gamma_c
       loglik_dc1 <- modelN1$BUGSoutput$sims.list$loglik_dc1
       loglik_dc2 <- modelN1$BUGSoutput$sims.list$loglik_dc2
+      if(length(model_sc_random) != 0) { 
+        g1_c <- modelN1$BUGSoutput$sims.list$g1_c
+        g2_c <- modelN1$BUGSoutput$sims.list$g2_c
+        g_c <- list("g1_c" = g1_c, "g2_c" = g2_c) 
+      }
     } else if(is.null(sc) == TRUE & is.null(se) == FALSE) {
       p_e <- modelN1$BUGSoutput$sims.list$p_e
       gamma_e <- modelN1$BUGSoutput$sims.list$gamma_e
       loglik_de1 <- modelN1$BUGSoutput$sims.list$loglik_de1
       loglik_de2 <- modelN1$BUGSoutput$sims.list$loglik_de2
+      if(length(model_se_random) != 0) { 
+        g1_e <- modelN1$BUGSoutput$sims.list$g1_e
+        g2_e <- modelN1$BUGSoutput$sims.list$g2_e
+        g_e <- list("g1_e" = g1_e, "g2_e" = g2_e) 
+      }
     } else if(is.null(se) == FALSE & is.null(sc) == FALSE) {
       p_c <- modelN1$BUGSoutput$sims.list$p_c
       gamma_c <- modelN1$BUGSoutput$sims.list$gamma_c
@@ -247,6 +257,16 @@ run_hurdle <- function(type, dist_e, dist_c, inits, se, sc, sde, sdc, ppc) eval.
       loglik_dc2 <- modelN1$BUGSoutput$sims.list$loglik_dc2
       loglik_de1 <- modelN1$BUGSoutput$sims.list$loglik_de1
       loglik_de2 <- modelN1$BUGSoutput$sims.list$loglik_de2
+      if(length(model_se_random) != 0) { 
+        g1_e <- modelN1$BUGSoutput$sims.list$g1_e
+        g2_e <- modelN1$BUGSoutput$sims.list$g2_e
+        g_e <- list("g1_e" = g1_e, "g2_e" = g2_e) 
+      }
+      if(length(model_sc_random) != 0) { 
+        g1_c <- modelN1$BUGSoutput$sims.list$g1_c
+        g2_c <- modelN1$BUGSoutput$sims.list$g2_c
+        g_c <- list("g1_c" = g1_c, "g2_c" = g2_c) 
+      }
     }
     eff1_pos <- matrix(eff1, N1, 3)
     cost1_pos <- matrix(cost1, N1, 3)
@@ -264,10 +284,19 @@ run_hurdle <- function(type, dist_e, dist_c, inits, se, sc, sde, sdc, ppc) eval.
     cost2_pos[, 1] <- apply(modelN1$BUGSoutput$sims.list$cost2, 2, mean)
     cost2_pos[, 2] <- apply(modelN1$BUGSoutput$sims.list$cost2, 2, quantile, probs = prob[1])
     cost2_pos[, 3] <- apply(modelN1$BUGSoutput$sims.list$cost2, 2, quantile, probs = prob[2])
-  if(ind == FALSE){
-    beta_f <- modelN1$BUGSoutput$sims.list$beta_f
-    beta <- list("beta" = beta, "beta_f" = beta_f)
-  }
+    if(ind_fixed == FALSE) {
+      beta_f <- modelN1$BUGSoutput$sims.list$beta_f
+      beta <- list("beta" = beta, "beta_f" = beta_f)
+    }
+    if(length(model_c_random) != 0 & ind_random == FALSE) {
+      b1_f <- modelN1$BUGSoutput$sims.list$b1_f
+      b2_f <- modelN1$BUGSoutput$sims.list$b2_f
+      if(length(model_c_random) != 0 & "e" %in% model_c_random & is_c_random_c == TRUE) {
+        b <- list("b1_f" = b1_f, "b2_f" = b2_f) 
+      } else if(length(model_c_random) != 0 & "e" %in% model_c_random & is_c_random_c == FALSE) {
+        b <- list("b1" = b1, "b1_f" = b1_f, "b2" = b2, "b2_f" = b2_f)
+      }
+    }
   if(is.null(se) == FALSE & is.null(sc) == FALSE){
    if(n.chains >1 ) {
      model_sum <- round(jagsresults(x = modelN1, params = c('eff1', 'eff2', 'cost1', 'cost2', 'loglik_e1', 'loglik_e2',
@@ -303,19 +332,22 @@ run_hurdle <- function(type, dist_e, dist_c, inits, se, sc, sde, sdc, ppc) eval.
     imputed <- list("effects1" = eff1_pos, "effects2" = eff2_pos, "costs1" = cost1_pos, "costs2" = cost2_pos)
     if(is.null(se) == TRUE) {
       model_output_jags <- list("summary" = model_sum, "model summary" = modelN1, "mean_effects" = mu_e, "mean_costs" = mu_c, "sd_effects" = s_e, "sd_costs" = s_c, 
-                                "covariate_parameter_effects" = alpha, "covariate_parameter_costs" = beta, "structural_probability_costs" = p_c, 
-                                "structural_parameter_costs" = gamma_c, "loglik" = loglik, "imputed" = imputed, "type" = "HURDLE_c", "ind" = ind,
+                                "covariate_parameter_effects_fixed" = alpha, "covariate_parameter_costs_fixed" = beta, "structural_probability_costs" = p_c, 
+                                "structural_parameter_costs_fixed" = gamma_c, "covariate_parameter_effects_random" = a, "covariate_parameter_costs_random" = b,
+                                "structural_parameter_costs_random" = g_c, "loglik" = loglik, "imputed" = imputed, "type" = "HURDLE_c", "ind_fixed" = ind_fixed, "ind_random" = ind_random,
                                 "ppc" = ppc, "dist_e" = dist_e, "dist_c" = dist_c)
     } else if(is.null(sc) == TRUE) {
       model_output_jags <- list("summary" = model_sum, "model summary" = modelN1, "mean_effects" = mu_e, "mean_costs" = mu_c, "sd_effects" = s_e, "sd_costs" = s_c, 
-                                "covariate_parameter_effects" = alpha, "covariate_parameter_costs" = beta, "structural_probability_effects" = p_e, 
-                                "structural_parameter_effects" = gamma_e, "loglik" = loglik, "imputed" = imputed, "type" = "HURDLE_e", "ind" = ind,
+                                "covariate_parameter_effects_fixed" = alpha, "covariate_parameter_costs_fixed" = beta, "structural_probability_effects" = p_e, 
+                                "structural_parameter_effects_fixed" = gamma_e, "covariate_parameter_effects_random" = a, "covariate_parameter_costs_random" = b,
+                                "structural_parameter_effects_random" = g_e, "loglik" = loglik, "imputed" = imputed, "type" = "HURDLE_e", "ind_fixed" = ind_fixed, "ind_random" = ind_random,
                                 "ppc" = ppc, "dist_e" = dist_e, "dist_c" = dist_c)
     } else if(is.null(se) == FALSE & is.null(sc) == FALSE) {
       model_output_jags <- list("summary" = model_sum, "model summary" = modelN1, "mean_effects" = mu_e, "mean_costs" = mu_c, "sd_effects" = s_e, "sd_costs" = s_c, 
-                                "covariate_parameter_effects" = alpha, "covariate_parameter_costs" = beta, "structural_probability_effects" = p_e, 
-                                "structural_parameter_effects" = gamma_e, "structural_probability_costs" = p_c, "structural_parameter_costs" = gamma_c, 
-                                "loglik" = loglik, "imputed" = imputed, "type" = "HURDLE_ec", "ind" = ind, "ppc" = ppc, "dist_e" = dist_e, "dist_c" = dist_c)
+                                "covariate_parameter_effects_fixed" = alpha, "covariate_parameter_costs_fixed" = beta, "structural_probability_effects" = p_e, "structural_probability_costs" = p_c,
+                                "structural_parameter_effects_fixed" = gamma_e, "structural_parameter_costs_fixed" = gamma_c, "covariate_parameter_effects_random" = a, "covariate_parameter_costs_random" = b,
+                                "structural_parameter_effects_random" = g_e, "structural_parameter_costs_random" = g_c, "loglik" = loglik, "imputed" = imputed, "type" = "HURDLE_ec", "ind_fixed" = ind_fixed, "ind_random" = ind_random,
+                                "ppc" = ppc, "dist_e" = dist_e, "dist_c" = dist_c)
     }
   if(n.chains == 1) {model_output_jags <- model_output_jags[-1] }
   return(model_output_jags = model_output_jags)

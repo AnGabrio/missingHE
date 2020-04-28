@@ -4,8 +4,7 @@
 \alias{print.missingHE}
 \title{Print method for the posterior results contained in the objects of class \code{missingHE}}
 \usage{
-\method{print}{missingHE}(x, value.mis = FALSE, only.means = FALSE,
-  ...)
+\method{print}{missingHE}(x, value.mis = FALSE, only.means = TRUE, ...)
 }
 \arguments{
 \item{x}{A \code{missingHE} object containing the results of the Bayesian model run using the function \code{\link{selection}}, \code{\link{pattern}} or \code{\link{hurdle}}.}
@@ -25,8 +24,8 @@ Prints the summary table for the model fitted, with the estimate of the paramete
 }
 \examples{
  
-# For examples see the function \\code{\\link{selection}}, 
-# \\code{\\link{pattern}} or \\code{\\link{hurdle}}
+# For examples see the function \code{\link{selection}}, 
+# \code{\link{pattern}} or \code{\link{hurdle}}
 # 
 # 
 }

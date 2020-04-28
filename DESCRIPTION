@@ -1,7 +1,7 @@
 Package: missingHE
 Type: Package
 Title: Missing Outcome Data in Health Economic Evaluation
-Version: 1.3.2
+Version: 1.4.0
 Authors@R: person("Andrea", "Gabrio", email = "ucakgab@ucl.ac.uk", role = c("aut", "cre"))
 Description: Contains a suite of functions for health economic evaluations with missing outcome data. 
   The package can fit different types of statistical models under a fully Bayesian approach using the software 'JAGS' (which should be installed locally and which is loaded in 'missingHE' via the 'R' package 'R2jags'). 
@@ -12,5 +12,5 @@ Depends: R (>= 3.5.0)
 License: GPL-2
 Encoding: UTF-8
 LazyData: true
-Imports: mcmcplots, ggmcmc, ggthemes, BCEA, ggplot2, grid, gridExtra, bayesplot, methods, R2jags, loo, coda, mcmcr
-RoxygenNote: 6.1.1
+Imports: mcmcplots, ggpubr, ggmcmc, ggthemes, BCEA, ggplot2, grid, gridExtra, bayesplot, methods, R2jags, loo, coda, mcmcr
+RoxygenNote: 7.1.0

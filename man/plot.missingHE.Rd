@@ -4,14 +4,19 @@
 \alias{plot.missingHE}
 \title{Plot method for the imputed data contained in the objects of class \code{missingHE}}
 \usage{
-\method{plot}{missingHE}(x, prob = c(0.05, 0.95), class = "scatter",
-  outcome = "all", theme = NULL, ...)
+\method{plot}{missingHE}(
+  x,
+  prob = c(0.025, 0.975),
+  class = "scatter",
+  outcome = "all",
+  theme = NULL,
+  ...
+)
 }
 \arguments{
 \item{x}{A \code{missingHE} object containing the results of the Bayesian model for cost-effectiveness analysis.}
 
-\item{prob}{A numeric vector of probabilities within range [0, 1], representing the upper and lower
-CI sample quantiles to be calculated and returned for the imputed values.}
+\item{prob}{A numeric vector of probabilities representing the upper and lower CI sample quantiles to be calculated and returned for the imputed values.}
 
 \item{class}{Type of the plot comparing the observed and imputed outcome data. Available choices are
 'histogram' and 'scatter' for a histogram or a scatter plot of the observed and imputed outcome data, respectively.}

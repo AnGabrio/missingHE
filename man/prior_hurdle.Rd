@@ -5,7 +5,25 @@
 \title{An internal function to change the hyperprior parameters in the hurdle model provided by the user depending on the type of
 structural value mechanism and outcome distributions assumed}
 \usage{
-prior_hurdle(type, dist_e, dist_c, pe, pc, ze, zc, se, sc)
+prior_hurdle(
+  type,
+  dist_e,
+  dist_c,
+  pe_fixed,
+  pc_fixed,
+  ze_fixed,
+  zc_fixed,
+  model_e_random,
+  model_c_random,
+  model_se_random,
+  model_sc_random,
+  pe_random,
+  pc_random,
+  ze_random,
+  zc_random,
+  se,
+  sc
+)
 }
 \arguments{
 \item{type}{Type of structural value mechanism assumed. Choices are Structural Completely At Random (SCAR),
@@ -17,13 +35,29 @@ Weibull ('weibull'), Logistic ('logis'), Poisson ('pois'), Negative Binomial ('n
 
 \item{dist_c}{distribution assumed for the costs. Current available chocies are: Normal ('norm'), Gamma ('gamma') or LogNormal ('lnorm')}
 
-\item{pe}{Number of covariates for the effectiveness model}
+\item{pe_fixed}{Number of fixed effects for the effectiveness model}
 
-\item{pc}{Number of cvoariates for the cost model}
+\item{pc_fixed}{Number of fixed effects for the cost model}
 
-\item{ze}{Number of covariates or the structural indicators model for the effectiveness}
+\item{ze_fixed}{Number of fixed effects or the structural indicators model for the effectiveness}
 
-\item{zc}{Number of covariates or the structural indicators model for the costs}
+\item{zc_fixed}{Number of fixed effects or the structural indicators model for the costs}
+
+\item{model_e_random}{Random effects formula for the effectiveness model}
+
+\item{model_c_random}{Random effects formula for the costs model}
+
+\item{model_se_random}{Random effects formula for the structural indicators model for the effectiveness}
+
+\item{model_sc_random}{Random effects formula for the structural indicators model for the costs}
+
+\item{pe_random}{Number of random effects for the effectiveness model}
+
+\item{pc_random}{Number of random effects for the cost model}
+
+\item{ze_random}{Number of random effects or the structural indicators model for the effectiveness}
+
+\item{zc_random}{Number of random effects or the structural indicators model for the costs}
 
 \item{se}{Structural value for the effectiveness}
 

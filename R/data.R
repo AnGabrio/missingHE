@@ -20,6 +20,7 @@
 #'   \item{sex_inst}{number of instances of unprotected sex at 12 months follow-up}
 #'   \item{sti.0}{binary : baseline sti diagnosis (1) and no baseline sti diagnosis (0)}
 #'   \item{sti}{binary : sti diagnosis (1) and no sti diagnosis (0) at 12 months follow-up} 
+#'   \item{site}{site number}
 #' }
 #'
 #' @docType data

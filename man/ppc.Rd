@@ -4,8 +4,16 @@
 \alias{ppc}
 \title{Posterior predictive checks for assessing the fit to the observed data of Bayesian models implemented in \code{JAGS} using the function \code{\link{selection}}, \code{\link{pattern}} or \code{\link{hurdle}}}
 \usage{
-ppc(x, type = "histogram", outcome = "effects_arm1", ndisplay = 15,
-  theme = NULL, scheme_set = NULL, legend = TRUE, ...)
+ppc(
+  x,
+  type = "histogram",
+  outcome = "all",
+  ndisplay = 15,
+  theme = NULL,
+  scheme_set = NULL,
+  legend = "top",
+  ...
+)
 }
 \arguments{
 \item{x}{An object of class "missingHE" containing the posterior results of a full Bayesian model implemented using the function \code{\link{selection}}, 
@@ -17,8 +25,8 @@ the value of some statistics evaluated on the observed data with the replicated 
 'error_scatter', 'error_scatter_avg' and 'error_binned', which display the predictive errors of the model; 'intervals' and 'ribbon', which compare medians and
 central interval estmates of the replications with the observed data overlaid; 'scatter' and 'scatter_avg', which display scatterplots of the observed and replicated data.}
 
-\item{outcome}{The outcome variables that should be displayed. Only separate plots for a specific outcome in a specific treatment arm are available. 
-These can be displayed using the names 'effects_arm1', effects_arm2', 'costs_arm1' or 'costs_arm2' for the effectiveness and cost outcomes in the control and treatment groups, respectively.}
+\item{outcome}{The outcome variables that should be displayed. Use the names 'effects_arm1' and effects_arm2' for the effectiveness in the control and intervention arm; 
+use costs_arm1' or 'costs_arm2' for the costs; use "effects" or "costs" for the respective outcome in both arms; use "all" for all outcomes.}
 
 \item{ndisplay}{Number of posterior replications to be displayed in the plots.}
 
@@ -26,7 +34,7 @@ These can be displayed using the names 'effects_arm1', effects_arm2', 'costs_arm
 
 \item{scheme_set}{Type of scheme sets among some pre-defined schemes, mostly taken from the package \strong{bayesplot}. For a full list of available themes see details.}
 
-\item{legend}{Logical. If \code{legend} is \code{TRUE}, a legend is added to the plot.}
+\item{legend}{Position of the legend: available choices are: "top", "left", "right", "bottom" and "none".}
 
 \item{...}{Additional parameters that can be provided to manage the output of \code{ppc}. For more details see \strong{bayesplot}.}
 }
@@ -49,8 +57,8 @@ The arguments \code{theme} and \code{scheme_set} allow to customise the graphica
 pre-defined themes and scheme sets taken form the package \strong{ggtheme} and \code{bayesplot}. For a complete list of the available character names for each theme and scheme set, see \strong{ggthemes} and \strong{bayesplot}.
 }
 \examples{
-#For examples see the function selection, pattern or hurdle
-#
+# For examples see the function \code{\link{selection}}, 
+# \code{\link{pattern}} or \code{\link{hurdle}}
 #
 }
 \references{

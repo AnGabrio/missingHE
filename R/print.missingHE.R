@@ -19,7 +19,7 @@
 #' # 
 
 
-print.missingHE <- function(x, value.mis = FALSE, only.means=FALSE, ...) {
+print.missingHE <- function(x, value.mis = FALSE, only.means = TRUE, ...) {
   exArgs <- list(...)
   if(exists("digits", where = exArgs)) {digits = exArgs$digits} else {digits = 3}
   if(class(x) != "missingHE") { 

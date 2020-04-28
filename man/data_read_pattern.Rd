@@ -4,7 +4,7 @@
 \alias{data_read_pattern}
 \title{A function to read and re-arrange the data in different ways}
 \usage{
-data_read_pattern(data, model.eff, model.cost, type = type, center)
+data_read_pattern(data, model.eff, model.cost, type, center)
 }
 \arguments{
 \item{data}{A data frame in which to find variables supplied in \code{model.eff} and \code{model.cost}. Among these,
@@ -13,12 +13,13 @@ effectiveness, cost and treatment indicator (only two arms) variables must alway
 \item{model.eff}{A formula expression in conventional \code{R} linear modelling syntax. The response must be a health economics
 effectiveness outcome ('e') whose name must correspond to that used in \code{data}, and 
 any covariates are given on the right-hand side. If there are no covariates, specify \code{1} on the right hand side.
-By default, covariates are placed on the "location" parameter of the distribution through a linear model.}
+By default, covariates are placed on the "location" parameter of the distribution through a linear model. 
+Random effects can also be specified for each model parameter.}
 
 \item{model.cost}{A formula expression in conventional \code{R} linear modelling syntax. The response must be a health economics
 cost outcome ('c') whose name must correspond to that used in \code{data}, and any covariates are given on the right-hand side.
 If there are no covariates, specify \code{1} on the right hand side. By default, covariates are placed on the "location" 
-parameter of the distribution through a linear model.}
+parameter of the distribution through a linear model. Random effects can also be specified for each model parameter.}
 
 \item{type}{Type of missingness mechanism assumed. Choices are Missing At Random (MAR) and Missing Not At Random (MNAR).}
 

@@ -5,8 +5,7 @@
 #' The graphical layout is obtained from the functions contained in the package \strong{ggplot2} and \strong{ggthemes}.
 #' @keywords plot missing data 
 #' @param x A \code{missingHE} object containing the results of the Bayesian model for cost-effectiveness analysis.
-#' @param prob A numeric vector of probabilities within range [0, 1], representing the upper and lower
-#' CI sample quantiles to be calculated and returned for the imputed values.
+#' @param prob A numeric vector of probabilities representing the upper and lower CI sample quantiles to be calculated and returned for the imputed values.
 #' @param class Type of the plot comparing the observed and imputed outcome data. Available choices are
 #' 'histogram' and 'scatter' for a histogram or a scatter plot of the observed and imputed outcome data, respectively.
 #' @param outcome The outcome variables that should be displayed. Options are: 'all' (default) which shows the plots
@@ -37,7 +36,7 @@
 #' #
 #' #
 
-plot.missingHE <- function(x, prob = c(0.05, 0.95), class = "scatter", outcome = "all", theme = NULL, ...) {
+plot.missingHE <- function(x, prob = c(0.025, 0.975), class = "scatter", outcome = "all", theme = NULL, ...) {
   if(!isTRUE(requireNamespace("gridExtra")) | !isTRUE(requireNamespace("grid")) | !isTRUE(requireNamespace("ggplot2")) | !isTRUE(requireNamespace("ggthemes"))) {
     stop("You need to install the R packages 'gridExtra', 'grid' and 'ggplot2'. Please run in your R terminal:\n install.packages('gridExtra', 'grid', 'ggplot2', 'ggthemes')")
   }
@@ -61,7 +60,7 @@ plot.missingHE <- function(x, prob = c(0.05, 0.95), class = "scatter", outcome =
   }
   if(length(prob) != 2 | is.numeric(prob) == FALSE | any(prob < 0) != FALSE | any(prob > 1) != FALSE) {
     stop("You must provide valid lower/upper quantiles for the imputed data distribution")
-    }
+  }
     eff1_pos <- matrix(x$data_set$effects[[1]], x$data_set$`N in reference arm`, 3)
     cost1_pos <- matrix(x$data_set$costs[[1]], x$data_set$`N in reference arm`, 3)
     eff2_pos <- matrix(x$data_set$effects[[2]], x$data_set$`N in comparator arm`, 3)

@@ -13,12 +13,12 @@
 #' the value of some statistics evaluated on the observed data with the replicated values for those statistics from the posterior predictions; 'error_hist', 
 #' 'error_scatter', 'error_scatter_avg' and 'error_binned', which display the predictive errors of the model; 'intervals' and 'ribbon', which compare medians and
 #' central interval estmates of the replications with the observed data overlaid; 'scatter' and 'scatter_avg', which display scatterplots of the observed and replicated data.   
-#' @param outcome The outcome variables that should be displayed. Only separate plots for a specific outcome in a specific treatment arm are available. 
-#' These can be displayed using the names 'effects_arm1', effects_arm2', 'costs_arm1' or 'costs_arm2' for the effectiveness and cost outcomes in the control and treatment groups, respectively.
+#' @param outcome The outcome variables that should be displayed. Use the names 'effects_arm1' and effects_arm2' for the effectiveness in the control and intervention arm; 
+#' use costs_arm1' or 'costs_arm2' for the costs; use "effects" or "costs" for the respective outcome in both arms; use "all" for all outcomes.
 #' @param ndisplay Number of posterior replications to be displayed in the plots.
 #' @param theme Type of ggplot theme among some pre-defined themes, mostly taken from the package \strong{ggthemes}. For a full list of available themes see details.
 #' @param scheme_set Type of scheme sets among some pre-defined schemes, mostly taken from the package \strong{bayesplot}. For a full list of available themes see details.
-#' @param legend Logical. If \code{legend} is \code{TRUE}, a legend is added to the plot.
+#' @param legend Position of the legend: available choices are: "top", "left", "right", "bottom" and "none".
 #' @param ... Additional parameters that can be provided to manage the output of \code{ppc}. For more details see \strong{bayesplot}.  
 #' @return A \code{ggplot} object containing the plots specified in the argument \code{type}.
 #' @seealso \code{\link{selection}} \code{\link{pattern}} \code{\link{hurdle}} \code{\link{diagnostic}}
@@ -31,17 +31,17 @@
 #' @author Andrea Gabrio
 #' @references 
 #' Gelman, A. Carlin, JB., Stern, HS. Rubin, DB.(2003). \emph{Bayesian Data Analysis, 2nd edition}, CRC Press.
-#' @import ggplot2 bayesplot
-#' @importFrom stats rnorm rbeta rgamma rlnorm rweibull rnbinom rbinom rpois rlogis rexp
+#' @import ggplot2 bayesplot ggpubr
+#' @importFrom stats rnorm rbeta rgamma rlnorm rweibull rnbinom rbinom rpois rlogis rexp complete.cases
 #' @export 
 #' @examples
-#' #For examples see the function selection, pattern or hurdle
-#' #
+#' # For examples see the function \code{\link{selection}}, 
+#' # \code{\link{pattern}} or \code{\link{hurdle}}
 #' #
 
-ppc <- function(x, type = "histogram", outcome = "effects_arm1", ndisplay = 15, theme = NULL, scheme_set = NULL, legend = TRUE, ...) {
-  if(!isTRUE(requireNamespace("ggplot2")) | !isTRUE(requireNamespace("ggthemes")) | !isTRUE(requireNamespace("bayesplot"))) {
-    stop("You need to install the R packages 'ggplot2' and 'bayesplot'. Please run in your R terminal:\n install.packages('ggplot2', 'ggthemes', 'bayesplot')")
+ppc <- function(x, type = "histogram", outcome = "all", ndisplay = 15, theme = NULL, scheme_set = NULL, legend = "top", ...) {
+  if(!isTRUE(requireNamespace("ggplot2")) | !isTRUE(requireNamespace("ggthemes")) | !isTRUE(requireNamespace("bayesplot")) | !isTRUE(requireNamespace("ggpubr"))) {
+    stop("You need to install the R packages 'ggplot2' and 'bayesplot'. Please run in your R terminal:\n install.packages('ggplot2', 'ggthemes', 'bayesplot', 'ggpubr')")
   }
   if(x$model_output$ppc == FALSE) {
     stop("No posterior estimates that can be used to generate replications are detected. Try running the function 'selection', 'pattern' or 'hurdle' and set the argument ppc = TRUE")
@@ -59,23 +59,44 @@ ppc <- function(x, type = "histogram", outcome = "effects_arm1", ndisplay = 15, 
                   "error_scatter", "error_scatter_avg", "error_binned", "intervals", "ribbon", "scatter", "scatter_avg")) {
     stop("You must provide a plot type among those available")
   }
-  if(!outcome %in% c("effects_arm1", "costs_arm1", "effects_arm2", "costs_arm2")) {
+  if(!outcome %in% c("effects_arm1", "costs_arm1", "effects_arm2", "costs_arm2", "effects", "costs", "all")) {
     stop("You must provide a plot outcome among those available")
   }
   if(is.numeric(ndisplay) == FALSE |  ndisplay < 1 | ndisplay > dim(x$model_output$`model summary`$BUGSoutput$sims.list$mu_e1)[1]) {
     stop("number of replications to display is not valid")
   }
-  if(is.logical(legend) == FALSE) {
-    stop("legend is a logical argument and should be either TRUE or FALSE")
+  if(!legend %in% c("top", "right", "left", "bottom", "none")) {
+    stop("Please provide a valid name for 'legend' to indicate the position of the legend")
   }
   exArgs <- list(...)
   if(class(x) != "missingHE") {
     stop("Only objects of class 'missingHE' can be used")
   }
+  if(exists("corr", where = exArgs)) {corr = exArgs$corr} else {corr = NULL }
+  if(!is.null(corr) & outcome != "all" | !is.null(corr) & !is.function(corr)) {
+    stop("The argument 'corr' must be a function and is available only if 'all' outcomes selected ")
+  }
+  if(exists("stat", where = exArgs)) {stat = exArgs$stat} else {stat = NULL }
+  if(exists("bpp", where = exArgs)) {bpp = exArgs$bpp} else {bpp = FALSE }
+  if(bpp == TRUE & type == "stat_2d") { stop("Bayesian p-values not available for 'stat_2d' type")}
+  if(type == "stat" & is.null(corr)) {
+  if(is.null(stat) == TRUE | length(stat) !=1 | !is.function(stat)) {
+    stop("Please use the argument 'stat' to provide a single function for computing statistics on replications")
+   } 
+  }
+  if(type == "stat_2d" & is.null(stat) == TRUE | type == "stat_2d" & length(stat) !=2 | type == "stat_2d" & any(sapply(stat, is.function)) == FALSE) {
+    stop("Please use the argument 'stat' to provide a vector of two functions for computing statistics on replications")
+  }
   index_mis_e1 <- which(is.na(x$data_set$effects$Control))
   index_mis_e2 <- which(is.na(x$data_set$effects$Intervention))
   index_mis_c1 <- which(is.na(x$data_set$costs$Control))
   index_mis_c2 <- which(is.na(x$data_set$costs$Intervention))
+  if(length(index_mis_e1) == 0 | length(index_mis_e2) == 0) {
+    stop("Missing values not found for the effects in both arms")
+  } 
+  if(length(index_mis_c1) == 0 | length(index_mis_c2) == 0) {
+    stop("Missing values not found for the costs in both arms")
+  } 
   e1_obs <- as.numeric(x$data_set$effects$Control[-index_mis_e1])
   e2_obs <- as.numeric(x$data_set$effects$Intervention[-index_mis_e2])
   c1_obs <- as.numeric(x$data_set$costs$Control[-index_mis_c1])
@@ -293,15 +314,14 @@ ppc <- function(x, type = "histogram", outcome = "effects_arm1", ndisplay = 15, 
   }
   bayesplot::color_scheme_set(scheme = scheme_set) 
   if(type == "histogram") {
-    if(exists("bins", where = exArgs)) {bins = exArgs$bins} else {bins = 30 }
     if(exists("binwidth_e", where = exArgs)) {binwidth_e = exArgs$binwidth_e} else {binwidth_e = 1 / 30 }
     if(exists("binwidth_c", where = exArgs)) {binwidth_c = exArgs$binwidth_c} else {binwidth_c = 30 }
     if(exists("breaks", where = exArgs)) {breaks = exArgs$breaks} else {breaks = NULL }
     if(exists("freq", where = exArgs)) {freq = exArgs$freq} else {freq = TRUE }
-    ppc_plot_e1 <- bayesplot::ppc_hist(y = e1_obs, yrep = e1_rep[1 : ndisplay, ], binwidth = binwidth_e, breaks = breaks, freq = freq) + ggplot2::stat_bin(bins = bins)
-    ppc_plot_e2 <- bayesplot::ppc_hist(y = e2_obs, yrep = e2_rep[1 : ndisplay, ], binwidth = binwidth_e, breaks = breaks, freq = freq) + ggplot2::stat_bin(bins = bins)
-    ppc_plot_c1 <- bayesplot::ppc_hist(y = c1_obs, yrep = c1_rep[1 : ndisplay, ], binwidth = binwidth_c, breaks = breaks, freq = freq) + ggplot2::stat_bin(bins = bins)
-    ppc_plot_c2 <- bayesplot::ppc_hist(y = c2_obs, yrep = c2_rep[1 : ndisplay, ], binwidth = binwidth_c, breaks = breaks, freq = freq) + ggplot2::stat_bin(bins = bins)
+    ppc_plot_e1 <- bayesplot::ppc_hist(y = e1_obs, yrep = e1_rep[1 : ndisplay, ], binwidth = binwidth_e, breaks = breaks, freq = freq)
+    ppc_plot_e2 <- bayesplot::ppc_hist(y = e2_obs, yrep = e2_rep[1 : ndisplay, ], binwidth = binwidth_e, breaks = breaks, freq = freq)
+    ppc_plot_c1 <- bayesplot::ppc_hist(y = c1_obs, yrep = c1_rep[1 : ndisplay, ], binwidth = binwidth_c, breaks = breaks, freq = freq)
+    ppc_plot_c2 <- bayesplot::ppc_hist(y = c2_obs, yrep = c2_rep[1 : ndisplay, ], binwidth = binwidth_c, breaks = breaks, freq = freq)
   } else if(type == "boxplot") {
     if(exists("notch", where = exArgs)) {notch = exArgs$notch} else {notch = FALSE }
     if(exists("size", where = exArgs)) {size = exArgs$size} else {size = 0.5 }
@@ -311,16 +331,15 @@ ppc <- function(x, type = "histogram", outcome = "effects_arm1", ndisplay = 15, 
     ppc_plot_c1 <- bayesplot::ppc_boxplot(y = c1_obs, yrep = c1_rep[1 : ndisplay, ], notch = notch, size = size, alpha = alpha)
     ppc_plot_c2 <- bayesplot::ppc_boxplot(y = c2_obs, yrep = c2_rep[1 : ndisplay, ], notch = notch, size = size, alpha = alpha)
   } else if(type == "freqpoly") {
-    if(exists("bins", where = exArgs)) {bins = exArgs$bins} else {bins = 30 }
     if(exists("binwidth_e", where = exArgs)) {binwidth_e = exArgs$binwidth_e} else {binwidth_e = 1 / 30 }
     if(exists("binwidth_c", where = exArgs)) {binwidth_c = exArgs$binwidth_c} else {binwidth_c = 30 }
     if(exists("freq", where = exArgs)) {freq = exArgs$freq} else {freq = TRUE }
     if(exists("size", where = exArgs)) {size = exArgs$size} else {size = 0.25 }
     if(exists("alpha", where = exArgs)) {alpha = exArgs$alpha} else {alpha = 1 }
-    ppc_plot_e1 <- bayesplot::ppc_freqpoly(y = e1_obs, yrep = e1_rep[1 : ndisplay, ], binwidth = binwidth_e, freq = freq, size = size, alpha = alpha) + ggplot2::stat_bin(bins = bins)
-    ppc_plot_e2 <- bayesplot::ppc_freqpoly(y = e2_obs, yrep = e2_rep[1 : ndisplay, ], binwidth = binwidth_e, freq = freq, size = size, alpha = alpha) + ggplot2::stat_bin(bins = bins)
-    ppc_plot_c1 <- bayesplot::ppc_freqpoly(y = c1_obs, yrep = c1_rep[1 : ndisplay, ], binwidth = binwidth_c, freq = freq, size = size, alpha = alpha) + ggplot2::stat_bin(bins = bins)
-    ppc_plot_c2 <- bayesplot::ppc_freqpoly(y = c2_obs, yrep = c2_rep[1 : ndisplay, ], binwidth = binwidth_c, freq = freq, size = size, alpha = alpha) + ggplot2::stat_bin(bins = bins)
+    ppc_plot_e1 <- bayesplot::ppc_freqpoly(y = e1_obs, yrep = e1_rep[1 : ndisplay, ], binwidth = binwidth_e, freq = freq, size = size, alpha = alpha)
+    ppc_plot_e2 <- bayesplot::ppc_freqpoly(y = e2_obs, yrep = e2_rep[1 : ndisplay, ], binwidth = binwidth_e, freq = freq, size = size, alpha = alpha)
+    ppc_plot_c1 <- bayesplot::ppc_freqpoly(y = c1_obs, yrep = c1_rep[1 : ndisplay, ], binwidth = binwidth_c, freq = freq, size = size, alpha = alpha)
+    ppc_plot_c2 <- bayesplot::ppc_freqpoly(y = c2_obs, yrep = c2_rep[1 : ndisplay, ], binwidth = binwidth_c, freq = freq, size = size, alpha = alpha)
   } else if(type == "dens") {
     if(exists("trim", where = exArgs)) {trim = exArgs$trim} else {trim = FALSE }
     if(exists("size", where = exArgs)) {size = exArgs$size} else {size = 0.5 }
@@ -350,17 +369,144 @@ ppc <- function(x, type = "histogram", outcome = "effects_arm1", ndisplay = 15, 
     ppc_plot_e2 <- bayesplot::ppc_ecdf_overlay(y = e2_obs, yrep = e2_rep[1 : ndisplay, ], size = size, alpha = alpha, discrete = discrete, pad = pad)
     ppc_plot_c1 <- bayesplot::ppc_ecdf_overlay(y = c1_obs, yrep = c1_rep[1 : ndisplay, ], size = size, alpha = alpha, discrete = discrete, pad = pad)
     ppc_plot_c2 <- bayesplot::ppc_ecdf_overlay(y = c2_obs, yrep = c2_rep[1 : ndisplay, ], size = size, alpha = alpha, discrete = discrete, pad = pad)
-  } else if(type == "stat") {
-    if(exists("bins", where = exArgs)) {bins = exArgs$bins} else {bins = 30 }
-    if(exists("stat", where = exArgs)) {stat = exArgs$stat} else {stat = "mean" }
+  } else if(type == "stat" & is.null(corr) == TRUE) {
+    if(bpp == FALSE){
     if(exists("binwidth_e", where = exArgs)) {binwidth_e = exArgs$binwidth_e} else {binwidth_e = 1 / 30 }
     if(exists("binwidth_c", where = exArgs)) {binwidth_c = exArgs$binwidth_c} else {binwidth_c = 30 }
     if(exists("freq", where = exArgs)) {freq = exArgs$freq} else {freq = TRUE }
     if(exists("breaks", where = exArgs)) {breaks = exArgs$breaks} else {breaks = NULL }
-    ppc_plot_e1 <- bayesplot::ppc_stat(y = e1_obs, yrep = e1_rep[1 : ndisplay, ], stat = stat, binwidth = binwidth_e, breaks = breaks, freq = freq) + ggplot2::stat_bin(bins = bins)
-    ppc_plot_e2 <- bayesplot::ppc_stat(y = e2_obs, yrep = e2_rep[1 : ndisplay, ], stat = stat, binwidth = binwidth_e, breaks = breaks, freq = freq) + ggplot2::stat_bin(bins = bins)
-    ppc_plot_c1 <- bayesplot::ppc_stat(y = c1_obs, yrep = c1_rep[1 : ndisplay, ], stat = stat, binwidth = binwidth_c, breaks = breaks, freq = freq) + ggplot2::stat_bin(bins = bins)
-    ppc_plot_c2 <- bayesplot::ppc_stat(y = c2_obs, yrep = c2_rep[1 : ndisplay, ], stat = stat, binwidth = binwidth_c, breaks = breaks, freq = freq) + ggplot2::stat_bin(bins = bins)
+    ppc_plot_e1 <- bayesplot::ppc_stat(y = e1_obs, yrep = e1_rep[1 : ndisplay, ], stat = stat, binwidth = binwidth_e, breaks = breaks, freq = freq)
+    ppc_plot_e2 <- bayesplot::ppc_stat(y = e2_obs, yrep = e2_rep[1 : ndisplay, ], stat = stat, binwidth = binwidth_e, breaks = breaks, freq = freq)
+    ppc_plot_c1 <- bayesplot::ppc_stat(y = c1_obs, yrep = c1_rep[1 : ndisplay, ], stat = stat, binwidth = binwidth_c, breaks = breaks, freq = freq)
+    ppc_plot_c2 <- bayesplot::ppc_stat(y = c2_obs, yrep = c2_rep[1 : ndisplay, ], stat = stat, binwidth = binwidth_c, breaks = breaks, freq = freq)
+    }
+    if(bpp == TRUE){
+    if(exists("trim", where = exArgs)) {trim = exArgs$trim} else {trim = FALSE }
+    if(exists("size", where = exArgs)) {size = exArgs$size} else {size = 0.5 }
+    if(exists("alpha", where = exArgs)) {alpha = exArgs$alpha} else {alpha = 1 }    
+      stat_e1 <- stat(e1_obs)
+      stat_c1 <- stat(c1_obs)
+      values_e1 <- apply(e1_rep[1 : ndisplay, ], 1, stat)
+      values_c1 <- apply(c1_rep[1 : ndisplay, ], 1, stat)
+      df1<-data.frame(values_e1, values_c1)
+      stat_e2 <- stat(e2_obs)
+      stat_c2 <- stat(c2_obs)
+      values_e2 <- apply(e2_rep[1 : ndisplay, ], 1, stat)
+      values_c2 <- apply(c2_rep[1 : ndisplay, ], 1, stat)
+      df2 <- data.frame(values_e2, values_c2)
+      pval_e1 <- sum(values_e1 > stat_e1) / length(values_e1)
+      pval_c1 <- sum(values_c1 > stat_c1) / length(values_c1)
+      pval_e2 <- sum(values_e2 > stat_e2) / length(values_e2)
+      pval_c2 <- sum(values_c2 > stat_c2) / length(values_c2)
+      color_sheme_rep <- bayesplot::color_scheme_get()[1]
+      color_sheme_rep_border <- bayesplot::color_scheme_get()[2]
+      color_sheme_obs <- bayesplot::color_scheme_get()[5]
+      color_sheme_obs_border <- bayesplot::color_scheme_get()[6]
+      set_theme <- bayesplot::bayesplot_theme_get()
+      ggplot2::theme_set(set_theme)
+      paste_p_e1 <- sprintf("Prob (T(y[rep]) > T(y)) == '%0.3f'", pval_e1)
+      paste_p_c1 <- sprintf("Prob (T(y[rep]) > T(y)) == '%0.3f'", pval_c1)
+      paste_p_e2 <- sprintf("Prob (T(y[rep]) > T(y)) == '%0.3f'", pval_e2)
+      paste_p_c2 <- sprintf("Prob (T(y[rep]) > T(y)) == '%0.3f'", pval_c2)
+      ppc_plot_e1 <- ggplot2::ggplot(df1, ggplot2::aes(x = values_e1)) + 
+        ggplot2::geom_density(fill = color_sheme_rep$light, color = color_sheme_rep_border$light_highlight, 
+                              trim = trim, size = size, alpha = alpha) +
+        ggplot2::geom_vline(xintercept = stat_e1, color = color_sheme_obs$dark, size = 1, linetype = "dashed") +
+        ggplot2::scale_y_continuous(expand = c(0, 0)) +
+        ggplot2::theme(axis.text.y = ggplot2::element_blank(), axis.ticks.y = ggplot2::element_blank(), 
+                       axis.title.y = ggplot2::element_blank(), axis.title.x = ggplot2::element_blank()) +
+        ggplot2::annotate("text", x = -Inf, y = Inf, label = paste_p_e1, parse = TRUE, hjust = -0.1, vjust = 2, size = 4)
+      ppc_plot_c1 <- ggplot2::ggplot(df1, ggplot2::aes(x = values_c1)) + 
+        ggplot2::geom_density(fill = color_sheme_rep$light, color = color_sheme_rep_border$light_highlight, 
+                              trim = trim, size = size, alpha = alpha) +
+        ggplot2::geom_vline(xintercept = stat_c1, color = color_sheme_obs$dark, size = 1, linetype = "dashed") +
+        ggplot2::scale_y_continuous(expand = c(0, 0)) +
+        ggplot2::theme(axis.text.y = ggplot2::element_blank(), axis.ticks.y = ggplot2::element_blank(), 
+                       axis.title.y = ggplot2::element_blank(), axis.title.x = ggplot2::element_blank()) +
+        ggplot2::annotate("text", x = -Inf, y = Inf, label = paste_p_c1, parse = TRUE, hjust = -0.1, vjust = 2, size = 4)
+      ppc_plot_e2 <- ggplot2::ggplot(df2, ggplot2::aes(x = values_e2)) + 
+        ggplot2::geom_density(fill = color_sheme_rep$light, color = color_sheme_rep_border$light_highlight, 
+                              trim = trim, size = size, alpha = alpha) +
+        ggplot2::geom_vline(xintercept = stat_e2, color = color_sheme_obs$dark, size = 1, linetype = "dashed") +
+        ggplot2::scale_y_continuous(expand = c(0, 0)) +
+        ggplot2::theme(axis.text.y = ggplot2::element_blank(), axis.ticks.y = ggplot2::element_blank(), 
+                       axis.title.y = ggplot2::element_blank(), axis.title.x = ggplot2::element_blank()) +
+        ggplot2::annotate("text", x = -Inf, y = Inf, label = paste_p_e2, parse = TRUE, hjust = -0.1, vjust = 2, size = 4)
+      ppc_plot_c2 <- ggplot2::ggplot(df2, ggplot2::aes(x = values_c2)) + 
+        ggplot2::geom_density(fill = color_sheme_rep$light, color = color_sheme_rep_border$light_highlight, 
+                              trim = trim, size = size, alpha = alpha) +
+        ggplot2::geom_vline(xintercept = stat_c2, color = color_sheme_obs$dark, size = 1, linetype = "dashed") +
+        ggplot2::scale_y_continuous(expand = c(0, 0)) +
+        ggplot2::theme(axis.text.y = ggplot2::element_blank(), axis.ticks.y = ggplot2::element_blank(), 
+                       axis.title.y = ggplot2::element_blank(), axis.title.x = ggplot2::element_blank()) +
+        ggplot2::annotate("text", x = -Inf, y = Inf, label = paste_p_c2, parse = TRUE, hjust = -0.1, vjust = 2, size = 4)
+     }
+  } else if(type == "stat" & is.null(corr) == FALSE) {
+      ec_arm1 <- cbind(x$data_set$effects$Control, x$data_set$costs$Control)[complete.cases(cbind(x$data_set$effects$Control, x$data_set$costs$Control)), ]
+      stat_biv1 <- corr(ec_arm1[, 1], ec_arm1[, 2])
+      array_1 <- array(data = NA, dim = c(nrow(e1_rep[1 : ndisplay, ]), nrow(ec_arm1), 2))
+      array_1[, , 1] <- e1_rep[1 : ndisplay, 1:nrow(ec_arm1)]
+      array_1[, , 2] <- c1_rep[1 : ndisplay, 1:nrow(ec_arm1)]
+      values_biv1 <- apply(array_1, 1, corr)[2, ]
+      df1 <- data.frame(values_biv1)
+      ec_arm2 <- cbind(x$data_set$effects$Intervention, x$data_set$costs$Intervention)[complete.cases(cbind(x$data_set$effects$Intervention, x$data_set$costs$Intervention)), ]
+      stat_biv2 <- corr(ec_arm2[, 1], ec_arm2[, 2])
+      array_2 <- array(data = NA, dim = c(nrow(e2_rep[1 : ndisplay, ]), nrow(ec_arm2), 2))
+      array_2[, , 1] <- e2_rep[1 : ndisplay, 1:nrow(ec_arm2)]
+      array_2[, , 2] <- c2_rep[1 : ndisplay, 1:nrow(ec_arm2)]
+      values_biv2 <- apply(array_2, 1, corr)[2, ]
+      df2 <- data.frame(values_biv2)
+      pval_1 <- sum(values_biv1 > stat_biv1) / length(values_biv1)
+      pval_2 <- sum(values_biv2 > stat_biv2) / length(values_biv2)
+      paste_p_biv1 <- sprintf("Prob (T(y[rep]) > T(y)) == '%0.3f'", pval_1)
+      paste_p_biv2 <- sprintf("Prob (T(y[rep]) > T(y)) == '%0.3f'", pval_2)
+      color_sheme_rep <- bayesplot::color_scheme_get()[1]
+      color_sheme_rep_border <- bayesplot::color_scheme_get()[2]
+      color_sheme_obs <- bayesplot::color_scheme_get()[5]
+      color_sheme_obs_border <- bayesplot::color_scheme_get()[6]
+      set_theme <- bayesplot::bayesplot_theme_get()
+      if(bpp == FALSE) {
+      if(exists("binwidth", where = exArgs)) {binwidth = exArgs$binwidth} else {binwidth = 1 / 30 }
+      ppc_plot_e1 <- ggplot2::ggplot(df1, ggplot2::aes(x = values_biv1)) + 
+        ggplot2::geom_histogram(fill = color_sheme_rep$light, 
+                                color = color_sheme_rep_border$light_highlight, 
+                                binwidth = binwidth) +
+        ggplot2::geom_vline(xintercept = stat_biv1, color = color_sheme_obs$dark, size = 2) +
+        ggplot2::scale_y_continuous(expand = c(0, 0)) +
+        ggplot2::theme(axis.text.y = ggplot2::element_blank(), axis.ticks.y = ggplot2::element_blank(), 
+                       axis.title.y = ggplot2::element_blank(), axis.title.x = ggplot2::element_blank()) 
+      ppc_plot_c2 <- ggplot2::ggplot(df2, ggplot2::aes(x = values_biv2)) + 
+        ggplot2::geom_histogram(fill = color_sheme_rep$light, 
+                                color = color_sheme_rep_border$light_highlight, 
+                                binwidth = binwidth) +
+        ggplot2::geom_vline(xintercept = stat_biv2, color = color_sheme_obs$dark, size = 2) +
+        ggplot2::scale_y_continuous(expand = c(0, 0)) +
+        ggplot2::theme(axis.text.y = ggplot2::element_blank(), axis.ticks.y = ggplot2::element_blank(), 
+                       axis.title.y = ggplot2::element_blank(), axis.title.x = ggplot2::element_blank())
+      }
+      if(bpp == TRUE) {
+        if(exists("trim", where = exArgs)) {trim = exArgs$trim} else {trim = FALSE }
+        if(exists("size", where = exArgs)) {size = exArgs$size} else {size = 0.5 }
+        if(exists("alpha", where = exArgs)) {alpha = exArgs$alpha} else {alpha = 1 } 
+        ppc_plot_e1 <- ggplot2::ggplot(df1, ggplot2::aes(x = values_biv1)) +
+          ggplot2::geom_density(fill = color_sheme_rep$light, 
+                                color = color_sheme_rep_border$light_highlight, trim = trim, size = size, alpha = alpha) +
+          ggplot2::geom_vline(xintercept = stat_biv1, color = color_sheme_obs$dark, size = 1, linetype = "dashed") +
+          ggplot2::scale_y_continuous(expand = c(0, 0)) +
+          ggplot2::theme(axis.text.y = ggplot2::element_blank(), axis.ticks.y = ggplot2::element_blank(), 
+                         axis.title.y = ggplot2::element_blank(), axis.title.x = ggplot2::element_blank()) +
+          ggplot2::annotate("text", x = -Inf, y = Inf, 
+                            label = paste_p_biv1, parse = TRUE, hjust = -0.1, vjust = 2, size=4)
+        ppc_plot_c2 <- ggplot2::ggplot(df2, ggplot2::aes(x = values_biv2)) +
+          ggplot2::geom_density(fill = color_sheme_rep$light, 
+                                color = color_sheme_rep_border$light_highlight, trim = trim, size = size, alpha = alpha) +
+          ggplot2::geom_vline(xintercept = stat_biv2, color = color_sheme_obs$dark, size = 1, linetype = "dashed") +
+          ggplot2::scale_y_continuous(expand = c(0, 0)) +
+          ggplot2::theme(axis.text.y = ggplot2::element_blank(), axis.ticks.y = ggplot2::element_blank(), 
+                         axis.title.y = ggplot2::element_blank(), axis.title.x = ggplot2::element_blank()) +
+          ggplot2::annotate("text", x = -Inf, y = Inf, 
+                            label = paste_p_biv2, parse = TRUE, hjust = -0.1, vjust = 2, size=4)
+      }
   } else if(type == "stat_2d") {
     if(exists("size", where = exArgs)) {size = exArgs$size} else {size = 2.5 }
     if(exists("alpha", where = exArgs)) {alpha = exArgs$alpha} else {alpha = 0.7 }
@@ -441,7 +587,20 @@ ppc <- function(x, type = "histogram", outcome = "effects_arm1", ndisplay = 15, 
     ppc_plot_output <- ppc_plot_c1
   } else if(outcome == "costs_arm2"){
     ppc_plot_output <- ppc_plot_c2
+  } else if(outcome == "effects") {
+    ppc_plot_output <- ggpubr::ggarrange(ppc_plot_e1, ppc_plot_e2, labels = c("effects (t=1)", "effects (t=2)"), ncol = 2, nrow = 1, common.legend = TRUE, legend = legend)
+  } else if(outcome == "costs") {
+    ppc_plot_output <- ggpubr::ggarrange(ppc_plot_c1, ppc_plot_c2, labels = c("costs (t=1)", "costs (t=2)"), ncol = 2, nrow = 1, common.legend = TRUE, legend = legend)
+  } else if(outcome == "all") {
+    if(is.null(corr) == TRUE) {
+    ppc_plot_output <- ggpubr::ggarrange(ppc_plot_e1, ppc_plot_e2, ppc_plot_c1, ppc_plot_c2, 
+                                         labels = c("effects (t=1)", "effects (t=2)", "costs (t=1)", "costs (t=2)"), ncol = 2, nrow = 2, common.legend = TRUE, legend = legend)
+    }
+    if(is.null(corr) == FALSE) {
+      ppc_plot_output <- ggpubr::ggarrange(ppc_plot_e1, ppc_plot_c2, labels = c("control", "intervention"), ncol = 2, nrow = 1, common.legend = TRUE, legend = legend)
+    }
   }
+  ppc_plot_output <- ppc_plot_output + ggplot2::theme(legend.position = legend)
   if(length(theme) != 0) {
     if(theme == "base") ppc_plot_output <- ppc_plot_output + ggthemes::theme_base()
     if(theme == "calc") ppc_plot_output <- ppc_plot_output + ggthemes::theme_calc()
