@@ -1387,8 +1387,8 @@ write_hurdle <- function(dist_e , dist_c, type, pe_fixed, pc_fixed, ze_fixed, zc
      if(zc_fixed == 1) {
        inprod_c1 <- "Z1_c_fixed[i] * gamma_c[1]"
        inprod_c2 <- "Z2_c_fixed[i] * gamma_c[2]"
-       inprod_mean_c1 <- "mean_z_c1_fixed * gamma_c[1]"
-       inprod_mean_c2 <- "mean_z_c2_fixed * gamma_c[2]"
+       inprod_mean_c1 <- "ilogit(mean_z_c1_fixed * gamma_c[1])"
+       inprod_mean_c2 <- "ilogit(mean_z_c2_fixed * gamma_c[2])"
        begin_prior_gamma <- "#begin gamma priors costs"
        begin_prior_gamma2 <- "#"
        prior_gamma_c1 <- "gamma_c[1] ~ dlogis(0, 1)"
@@ -1502,8 +1502,8 @@ write_hurdle <- function(dist_e , dist_c, type, pe_fixed, pc_fixed, ze_fixed, zc
        model_string_jags <- gsub("s_a_hat[j, t] ~ dunif(0, 100) }", "", model_string_jags, fixed = TRUE)
      } 
      if(length(model_c_random) == 0) {
-       model_string_jags <- gsub(" + inprod(X1_c_random[i, ], b1[, clus1_c[i]]) * ((d_cost1[i] - 1) * -1)", "", model_string_jags, fixed = TRUE)
-       model_string_jags <- gsub(" + inprod(X2_c_random[i, ], b2[, clus2_c[i]]) * ((d_cost2[i] - 1) * -1)", "", model_string_jags, fixed = TRUE)
+       model_string_jags <- gsub(" + inprod(X1_c_random[i, ], b1[, clus1_c[i]])", "", model_string_jags, fixed = TRUE)
+       model_string_jags <- gsub(" + inprod(X2_c_random[i, ], b2[, clus2_c[i]])", "", model_string_jags, fixed = TRUE)
        model_string_jags <- gsub("for(j in 1:pc_random) {tau_b_hat[j, t] <- 1 / ss_b_hat[j, t]", "", model_string_jags, fixed = TRUE)
        model_string_jags <- gsub("ss_b_hat[j, t] <- s_b_hat[j, t] * s_b_hat[j, t] }", "", model_string_jags, fixed = TRUE)
        model_string_jags <- gsub(" + inprod(mean_cov_c1_random[], mu_b_hat[, 1])", "", model_string_jags, fixed = TRUE)
@@ -1983,8 +1983,8 @@ write_hurdle <- function(dist_e , dist_c, type, pe_fixed, pc_fixed, ze_fixed, zc
      if(ze_fixed == 1) {
        inprod_e1 <- "Z1_e_fixed[i] * gamma_e[1]"
        inprod_e2 <- "Z2_e_fixed[i] * gamma_e[2]"
-       inprod_mean_e1 <- "mean_z_e1_fixed * gamma_e[1]"
-       inprod_mean_e2 <- "mean_z_e2_fixed * gamma_e[2]"
+       inprod_mean_e1 <- "ilogit(mean_z_e1_fixed * gamma_e[1])"
+       inprod_mean_e2 <- "ilogit(mean_z_e2_fixed * gamma_e[2])"
        begin_prior_gamma <- "#begin gamma priors effects"
        begin_prior_gamma2 <- "#"
        prior_gamma_e1 <- "gamma_e[1] ~ dlogis(0, 1)"
