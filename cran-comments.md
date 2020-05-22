@@ -3,6 +3,8 @@
 
 * Fixed a couple of bugs in the code for the hurdle function which displayed incorrect results. 
 
+* Added a tutorial for using the package functions with a vignette.
+
 * Updated the version of the package in the DESCRIPTION file to 1.4.1.
 
 ## Test environments

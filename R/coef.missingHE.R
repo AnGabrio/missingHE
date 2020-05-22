@@ -371,8 +371,8 @@ coef.missingHE <- function(object, prob = c(0.025, 0.975), random = FALSE, digit
     qu_cov_c_fixed_arm2 <- qu_cov_c2_fixed
   }
    if(length(grep("^PATTERN", object$model_output$type)) == 1) {
-     pat_arm1 <- max(as.numeric(object$data_set$`patterns in comparator arm`))
-     pat_arm2 <- max(as.numeric(object$data_set$`patterns in reference arm`))
+     pat_arm1 <- length(unique(as.numeric(object$data_set$`patterns in comparator arm`)))
+     pat_arm2 <- length(unique(as.numeric(object$data_set$`patterns in reference arm`)))
      pat_e1_index <- sort(rep(seq(1:pat_arm1), p_e_fixed))
      pat_e2_index <- sort(rep(seq(1:pat_arm2), p_e_fixed))
      table_e1_fixed <- matrix(NA, nrow = length(pat_e1_index), ncol = 4)

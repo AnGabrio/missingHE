@@ -9,6 +9,8 @@ Description: Contains a suite of functions for health economic evaluations with 
   In addition to model fitting, 'missingHE' provides a set of specialised functions to assess model convergence and fit, and to summarise the statistical and economic results using different types of measures and graphs. 
   The methods implemented are described in Mason (2018) <doi:10.1002/hec.3793>, Molenberghs (2000) <doi:10.1007/978-1-4419-0300-6_18> and Gabrio (2019) <doi:10.1002/sim.8045>.
 Depends: R (>= 3.5.0)
+Suggests: knitr, rmarkdown
+VignetteBuilder: knitr
 License: GPL-2
 Encoding: UTF-8
 LazyData: true
