@@ -19,7 +19,7 @@ which installs the package from a [CRAN mirror](https://cran.r-project.org/index
 It is also possible to install `missingHE` using the "development" version - this will usually be updated frequently and may be continuously tested. On Windows machines, you need to install a few dependencies, including [Rtools](https://cran.r-project.org/bin/windows/Rtools/) first, e.g. by running
 
 ``` r
-pkgs <- c("R2jags","ggplot2","gridExtra","BCEA","ggmcmc","loo","Rtools","devtools")
+pkgs <- c("R2jags","ggplot2","gridExtra","BCEA","ggmcmc","loo","Rtools","devtools", "utils")
 repos <- c("https://cran.rstudio.com") 
 install.packages(pkgs,repos=repos,dependencies = "Depends")
 ```
@@ -27,7 +27,14 @@ install.packages(pkgs,repos=repos,dependencies = "Depends")
 before installing the package using `devtools`:
 
 ``` r
-devtools::install_github("AnGabrio/missingHE")
+devtools::install_github("AnGabrio/missingHE", build_vignettes = TRUE)
 ```
+The optional argument `build_vignettes = TRUE` allows to install the vignettes of the package locally on your computer. These consist in brief tutorials to guid the user on how to use and customise the models in `missingHE` using different functions of the package. Once the package is installed, they can be accessed by using the command
+
+``` r
+utils::browseVignettes(package = "missingHE")
+```
+which shows all the vignettes available for the package.
+
 All models implemented in `missingHE` are written in the BUGS language using the software [JAGS](http://mcmc-jags.sourceforge.net/), which needs to be installed from its own repository and instructions for installations under different OS can be found online. Once installed, the software is called in `missingHE` via the R package [R2jags](https://cran.r-project.org/package=R2jags).
 Note that the `missingHE` package is currently under active development and therefore it is advisable to reinstall the package directly from GitHub before each use to ensure that you are using the most updated version.
