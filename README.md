@@ -29,7 +29,7 @@ before installing the package using `devtools`:
 ``` r
 devtools::install_github("AnGabrio/missingHE", build_vignettes = TRUE)
 ```
-The optional argument `build_vignettes = TRUE` allows to install the vignettes of the package locally on your computer. These consist in brief tutorials to guid the user on how to use and customise the models in `missingHE` using different functions of the package. Once the package is installed, they can be accessed by using the command
+The optional argument `build_vignettes = TRUE` allows to install the vignettes of the package locally on your computer. These consist in brief tutorials to guide the user on how to use and customise the models in `missingHE` using different functions of the package. Once the package is installed, they can be accessed using the command
 
 ``` r
 utils::browseVignettes(package = "missingHE")

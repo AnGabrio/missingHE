@@ -14,5 +14,10 @@ VignetteBuilder: knitr
 License: GPL-2
 Encoding: UTF-8
 LazyData: true
-Imports: mcmcplots, ggpubr, ggmcmc, ggthemes, BCEA, ggplot2, grid, gridExtra, bayesplot, methods, R2jags, loo, coda, mcmcr
+Imports: mcmcplots, ggpubr, ggmcmc, ggthemes, BCEA, ggplot2, grid,
+        gridExtra, bayesplot, methods, R2jags, loo, coda, mcmcr
 RoxygenNote: 7.1.0
+NeedsCompilation: no
+Packaged: 2020-06-25 19:04:02 UTC; andre
+Author: Andrea Gabrio [aut, cre]
+Maintainer: Andrea Gabrio <ucakgab@ucl.ac.uk>
