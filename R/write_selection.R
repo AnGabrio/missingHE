@@ -685,18 +685,18 @@ write_selection <- function(dist_e , dist_c, type, pe_fixed, pc_fixed, ze_fixed,
     model_string_jags <- gsub("mu_e[2] <- inprod(mean_cov_e2_fixed[], alpha[, 2]) + inprod(mean_cov_e2_random[], mu_a_hat[, 2])", "mu_e[2] <- exp(inprod(mean_cov_e2_fixed[], alpha[, 2]) + inprod(mean_cov_e2_random[], mu_a_hat[, 2]))", model_string_jags, fixed = TRUE)
     }
   } else if(dist_e == "weibull"){
-  model_string_jags <- gsub("eff1[i] ~ dnorm(mu_e1[i], tau_e[1])", "eff1[i] ~ dweib(tau_e1[i], pow(1 / (mu_e1[i] / exp(loggam(1 + 1/tau_e1[i]))), tau_e1[i]))", model_string_jags, fixed = TRUE)
+  model_string_jags <- gsub("eff1[i] ~ dnorm(mu_e1[i], tau_e[1])", "eff1[i] ~ dweib(tau_e1[i], mu_e1[i] / exp(loggam(1 + 1/tau_e1[i])))", model_string_jags, fixed = TRUE)
   model_string_jags <- gsub("#derive mean and std effects1", "tau_e1[i] <- pow(s_e[1] / mu_e1[i], - 1.086)", model_string_jags, fixed = TRUE)
   model_string_jags <- gsub("mu_e1[i] <- ", "log(mu_e1[i]) <- ", model_string_jags, fixed = TRUE)
-  model_string_jags <- gsub("eff2[i] ~ dnorm(mu_e2[i], tau_e[2])", "eff2[i] ~ dweib(tau_e2[i], pow(1 / (mu_e2[i] / exp(loggam(1 + 1/tau_e2[i]))), tau_e2[i]))", model_string_jags, fixed = TRUE)
+  model_string_jags <- gsub("eff2[i] ~ dnorm(mu_e2[i], tau_e[2])", "eff2[i] ~ dweib(tau_e2[i], mu_e2[i] / exp(loggam(1 + 1/tau_e2[i])))", model_string_jags, fixed = TRUE)
   model_string_jags <- gsub("#derive mean and std effects2", "tau_e2[i] <- pow(s_e[2] / mu_e2[i], - 1.086)", model_string_jags, fixed = TRUE)
   model_string_jags <- gsub("mu_e2[i] <- ", "log(mu_e2[i]) <- ", model_string_jags, fixed = TRUE)
   model_string_jags <- gsub("tau_e[t] <- 1 / ss_e[t]", "", model_string_jags, fixed = TRUE)
   model_string_jags <- gsub("ss_e[t] <- s_e[t] * s_e[t]", "", model_string_jags, fixed = TRUE)
   model_string_jags <- gsub("s_e[t] <- exp(ls_e[t])", "", model_string_jags, fixed = TRUE)
   model_string_jags <- gsub("ls_e[t] ~ dunif(-5, 10)", "s_e[t] ~ dunif(0, 100)", model_string_jags, fixed = TRUE)
-  model_string_jags <- gsub("loglik_e1[i] <- logdensity.norm(eff1[i], mu_e1[i], tau_e[1])", "loglik_e1[i] <- logdensity.weib(eff1[i], tau_e1[i], pow(1 / (mu_e1[i] / exp(loggam(1 + 1/tau_e1[i]))), tau_e1[i]))", model_string_jags, fixed = TRUE)
-  model_string_jags <- gsub("loglik_e2[i] <- logdensity.norm(eff2[i], mu_e2[i], tau_e[2])", "loglik_e2[i] <- logdensity.weib(eff2[i], tau_e2[i], pow(1 / (mu_e2[i] / exp(loggam(1 + 1/tau_e2[i]))), tau_e2[i]))", model_string_jags, fixed = TRUE)
+  model_string_jags <- gsub("loglik_e1[i] <- logdensity.norm(eff1[i], mu_e1[i], tau_e[1])", "loglik_e1[i] <- logdensity.weib(eff1[i], tau_e1[i], mu_e1[i] / exp(loggam(1 + 1/tau_e1[i])))", model_string_jags, fixed = TRUE)
+  model_string_jags <- gsub("loglik_e2[i] <- logdensity.norm(eff2[i], mu_e2[i], tau_e[2])", "loglik_e2[i] <- logdensity.weib(eff2[i], tau_e2[i], mu_e2[i] / exp(loggam(1 + 1/tau_e2[i])))", model_string_jags, fixed = TRUE)
     if(length(model_e_random) == 0) {
     model_string_jags <- gsub("mu_e[1] <- inprod(mean_cov_e1_fixed[], alpha[, 1])", "mu_e[1] <- exp(inprod(mean_cov_e1_fixed[], alpha[, 1]))", model_string_jags, fixed = TRUE)
     model_string_jags <- gsub("mu_e[2] <- inprod(mean_cov_e2_fixed[], alpha[, 2])", "mu_e[2] <- exp(inprod(mean_cov_e2_fixed[], alpha[, 2]))", model_string_jags, fixed = TRUE)
