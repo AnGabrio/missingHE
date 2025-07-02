@@ -1,5 +1,5 @@
 
-missingHE [![Travis-CI Build Status](https://travis-ci.org/AnGabrio/missingHE.svg?branch=master)](https://travis-ci.org/AnGabrio/missingHE)[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/AnGabrio/missingHE?branch=master&svg=true)](https://ci.appveyor.com/project/AnGabrio/missingHE)[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/missingHE)](https://cran.r-project.org/package=missingHE)[![CRAN_Download_Badge](http://cranlogs.r-pkg.org/badges/missingHE)](https://cran.r-project.org/package=missingHE)[![CRAN_Download_Badge](https://cranlogs.r-pkg.org:443/badges/grand-total/missingHE?color=orange)](https://cranlogs.r-pkg.org:443/badges/grand-total/missingHE?color=orange)
+missingHE [![Travis-CI Build Status](https://travis-ci.org/AnGabrio/missingHE.svg?branch=master)](https://travis-ci.org/AnGabrio/missingHE)[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/AnGabrio/missingHE?branch=master&svg=true)](https://ci.appveyor.com/project/AnGabrio/missingHE)[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/missingHE)](https://cran.r-project.org/package=missingHE)[![CRAN_Download_Badge](http://cranlogs.r-pkg.org/badges/missingHE)](https://cran.r-project.org/package=missingHE)[![CRAN_Download_Badge](http://cranlogs.r-pkg.org/badges/grand-total/missingHE?color=orange)](http://cranlogs.r-pkg.org/badges/grand-total/missingHE?color=orange)
 ===========================================================================================================================================
 
 Missing Outcome Data in Health Economic Evaluation
@@ -36,5 +36,5 @@ utils::browseVignettes(package = "missingHE")
 ```
 which shows all the vignettes available for the package.
 
-All models implemented in `missingHE` are written in the BUGS language using the software [JAGS](https://mcmc-jags.sourceforge.io/), which needs to be installed from its own repository and instructions for installations under different OS can be found online. Once installed, the software is called in `missingHE` via the R package [R2jags](https://cran.r-project.org/package=R2jags).
+All models implemented in `missingHE` are written in the BUGS language using the software [JAGS](http://mcmc-jags.sourceforge.net/), which needs to be installed from its own repository and instructions for installations under different OS can be found online. Once installed, the software is called in `missingHE` via the R package [R2jags](https://cran.r-project.org/package=R2jags).
 Note that the `missingHE` package is currently under active development and therefore it is advisable to reinstall the package directly from GitHub before each use to ensure that you are using the most updated version.
