@@ -75,7 +75,7 @@
 #' Gelman, A. Carlin, JB., Stern, HS. Rubin, DB.(2003). \emph{Bayesian Data Analysis, 2nd edition}, CRC Press.
 #'
 #' Brooks, S. Gelman, A. Jones, JL. Meng, XL. (2011). \emph{Handbook of Markov Chain Monte Carlo}, CRC/Chapman and Hall.
-#' @import ggplot2 coda 
+#' @import ggplot2 coda mcmcr
 #' @importFrom stats quantile
 #' @export 
 #' @examples 
@@ -188,6 +188,7 @@ diagnostic <- function(x, type = "denplot", param = "all", theme = NULL, ...) {
     labs[pmatch("random.beta", labs)] <- "b"
   }
   mcmc_object <- coda::as.mcmc(x$model_output$`model summary`)
+  mcmc_nchains <- mcmcr::nchains(mcmc_object)
   v_name <- coda::varnames(mcmc_object[, , drop = FALSE])
   check_name_eff <- grepl("eff", v_name)
   check_index_eff <- which(check_name_eff, TRUE)

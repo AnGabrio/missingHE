@@ -31,8 +31,9 @@
 #' @author Andrea Gabrio
 #' @references 
 #' Gelman, A. Carlin, JB., Stern, HS. Rubin, DB.(2003). \emph{Bayesian Data Analysis, 2nd edition}, CRC Press.
-#' @import ggplot2 bayesplot ggpubr
+#' @import ggplot2 ggpubr
 #' @importFrom stats rnorm rbeta rgamma rlnorm rweibull rnbinom rbinom rpois rlogis rexp complete.cases
+#' @importFrom bayesplot color_scheme_set ppc_hist ppc_boxplot ppc_freqpoly ppc_dens ppc_dens_overlay ppc_ecdf_overlay ppc_stat color_scheme_get bayesplot_theme_get ppc_stat_2d ppc_error_hist ppc_error_scatter ppc_error_scatter_avg ppc_error_binned ppc_intervals ppc_ribbon ppc_scatter ppc_scatter_avg legend_none
 #' @export 
 #' @examples
 #' # For examples see the function \code{\link{selection}}, 
@@ -312,42 +313,42 @@ ppc <- function(x, type = "histogram", outcome = "all", ndisplay = 15, theme = N
       for(i in 1 : nrow(c2_rep)){ c2_rep[i, ] <- rlnorm(n2_c, meanlog = mu_c2[i, ], sdlog = sigma_c2 [i]) }
     }
   }
-  bayesplot::color_scheme_set(scheme = scheme_set) 
+  color_scheme_set(scheme = scheme_set) 
   if(type == "histogram") {
     if(exists("binwidth_e", where = exArgs)) {binwidth_e = exArgs$binwidth_e} else {binwidth_e = 1 / 30 }
     if(exists("binwidth_c", where = exArgs)) {binwidth_c = exArgs$binwidth_c} else {binwidth_c = 30 }
     if(exists("breaks", where = exArgs)) {breaks = exArgs$breaks} else {breaks = NULL }
     if(exists("freq", where = exArgs)) {freq = exArgs$freq} else {freq = TRUE }
-    ppc_plot_e1 <- bayesplot::ppc_hist(y = e1_obs, yrep = e1_rep[1 : ndisplay, ], binwidth = binwidth_e, breaks = breaks, freq = freq)
-    ppc_plot_e2 <- bayesplot::ppc_hist(y = e2_obs, yrep = e2_rep[1 : ndisplay, ], binwidth = binwidth_e, breaks = breaks, freq = freq)
-    ppc_plot_c1 <- bayesplot::ppc_hist(y = c1_obs, yrep = c1_rep[1 : ndisplay, ], binwidth = binwidth_c, breaks = breaks, freq = freq)
-    ppc_plot_c2 <- bayesplot::ppc_hist(y = c2_obs, yrep = c2_rep[1 : ndisplay, ], binwidth = binwidth_c, breaks = breaks, freq = freq)
+    ppc_plot_e1 <- ppc_hist(y = e1_obs, yrep = e1_rep[1 : ndisplay, ], binwidth = binwidth_e, breaks = breaks, freq = freq)
+    ppc_plot_e2 <- ppc_hist(y = e2_obs, yrep = e2_rep[1 : ndisplay, ], binwidth = binwidth_e, breaks = breaks, freq = freq)
+    ppc_plot_c1 <- ppc_hist(y = c1_obs, yrep = c1_rep[1 : ndisplay, ], binwidth = binwidth_c, breaks = breaks, freq = freq)
+    ppc_plot_c2 <- ppc_hist(y = c2_obs, yrep = c2_rep[1 : ndisplay, ], binwidth = binwidth_c, breaks = breaks, freq = freq)
   } else if(type == "boxplot") {
     if(exists("notch", where = exArgs)) {notch = exArgs$notch} else {notch = FALSE }
     if(exists("size", where = exArgs)) {size = exArgs$size} else {size = 0.5 }
     if(exists("alpha", where = exArgs)) {alpha = exArgs$alpha} else {alpha = 1 }
-    ppc_plot_e1 <- bayesplot::ppc_boxplot(y = e1_obs, yrep = e1_rep[1 : ndisplay, ], notch = notch, size = size, alpha = alpha)
-    ppc_plot_e2 <- bayesplot::ppc_boxplot(y = e2_obs, yrep = e2_rep[1 : ndisplay, ], notch = notch, size = size, alpha = alpha)
-    ppc_plot_c1 <- bayesplot::ppc_boxplot(y = c1_obs, yrep = c1_rep[1 : ndisplay, ], notch = notch, size = size, alpha = alpha)
-    ppc_plot_c2 <- bayesplot::ppc_boxplot(y = c2_obs, yrep = c2_rep[1 : ndisplay, ], notch = notch, size = size, alpha = alpha)
+    ppc_plot_e1 <- ppc_boxplot(y = e1_obs, yrep = e1_rep[1 : ndisplay, ], notch = notch, size = size, alpha = alpha)
+    ppc_plot_e2 <- ppc_boxplot(y = e2_obs, yrep = e2_rep[1 : ndisplay, ], notch = notch, size = size, alpha = alpha)
+    ppc_plot_c1 <- ppc_boxplot(y = c1_obs, yrep = c1_rep[1 : ndisplay, ], notch = notch, size = size, alpha = alpha)
+    ppc_plot_c2 <- ppc_boxplot(y = c2_obs, yrep = c2_rep[1 : ndisplay, ], notch = notch, size = size, alpha = alpha)
   } else if(type == "freqpoly") {
     if(exists("binwidth_e", where = exArgs)) {binwidth_e = exArgs$binwidth_e} else {binwidth_e = 1 / 30 }
     if(exists("binwidth_c", where = exArgs)) {binwidth_c = exArgs$binwidth_c} else {binwidth_c = 30 }
     if(exists("freq", where = exArgs)) {freq = exArgs$freq} else {freq = TRUE }
     if(exists("size", where = exArgs)) {size = exArgs$size} else {size = 0.25 }
     if(exists("alpha", where = exArgs)) {alpha = exArgs$alpha} else {alpha = 1 }
-    ppc_plot_e1 <- bayesplot::ppc_freqpoly(y = e1_obs, yrep = e1_rep[1 : ndisplay, ], binwidth = binwidth_e, freq = freq, size = size, alpha = alpha)
-    ppc_plot_e2 <- bayesplot::ppc_freqpoly(y = e2_obs, yrep = e2_rep[1 : ndisplay, ], binwidth = binwidth_e, freq = freq, size = size, alpha = alpha)
-    ppc_plot_c1 <- bayesplot::ppc_freqpoly(y = c1_obs, yrep = c1_rep[1 : ndisplay, ], binwidth = binwidth_c, freq = freq, size = size, alpha = alpha)
-    ppc_plot_c2 <- bayesplot::ppc_freqpoly(y = c2_obs, yrep = c2_rep[1 : ndisplay, ], binwidth = binwidth_c, freq = freq, size = size, alpha = alpha)
+    ppc_plot_e1 <- ppc_freqpoly(y = e1_obs, yrep = e1_rep[1 : ndisplay, ], binwidth = binwidth_e, freq = freq, size = size, alpha = alpha)
+    ppc_plot_e2 <- ppc_freqpoly(y = e2_obs, yrep = e2_rep[1 : ndisplay, ], binwidth = binwidth_e, freq = freq, size = size, alpha = alpha)
+    ppc_plot_c1 <- ppc_freqpoly(y = c1_obs, yrep = c1_rep[1 : ndisplay, ], binwidth = binwidth_c, freq = freq, size = size, alpha = alpha)
+    ppc_plot_c2 <- ppc_freqpoly(y = c2_obs, yrep = c2_rep[1 : ndisplay, ], binwidth = binwidth_c, freq = freq, size = size, alpha = alpha)
   } else if(type == "dens") {
     if(exists("trim", where = exArgs)) {trim = exArgs$trim} else {trim = FALSE }
     if(exists("size", where = exArgs)) {size = exArgs$size} else {size = 0.5 }
     if(exists("alpha", where = exArgs)) {alpha = exArgs$alpha} else {alpha = 1 }
-    ppc_plot_e1 <- bayesplot::ppc_dens(y = e1_obs, yrep = e1_rep[1 : ndisplay, ], size = size, alpha = alpha, trim = FALSE)
-    ppc_plot_e2 <- bayesplot::ppc_dens(y = e2_obs, yrep = e2_rep[1 : ndisplay, ], size = size, alpha = alpha, trim = FALSE)
-    ppc_plot_c1 <- bayesplot::ppc_dens(y = c1_obs, yrep = c1_rep[1 : ndisplay, ], size = size, alpha = alpha, trim = FALSE)
-    ppc_plot_c2 <- bayesplot::ppc_dens(y = c2_obs, yrep = c2_rep[1 : ndisplay, ], size = size, alpha = alpha, trim = FALSE)
+    ppc_plot_e1 <- ppc_dens(y = e1_obs, yrep = e1_rep[1 : ndisplay, ], size = size, alpha = alpha, trim = FALSE)
+    ppc_plot_e2 <- ppc_dens(y = e2_obs, yrep = e2_rep[1 : ndisplay, ], size = size, alpha = alpha, trim = FALSE)
+    ppc_plot_c1 <- ppc_dens(y = c1_obs, yrep = c1_rep[1 : ndisplay, ], size = size, alpha = alpha, trim = FALSE)
+    ppc_plot_c2 <- ppc_dens(y = c2_obs, yrep = c2_rep[1 : ndisplay, ], size = size, alpha = alpha, trim = FALSE)
   } else if(type == "dens_overlay") {
     if(exists("adjust", where = exArgs)) {adjust = exArgs$adjust} else {adjust = 1 }
     if(exists("bw", where = exArgs)) {bw = exArgs$bw} else {bw = "nrd0" }
@@ -356,29 +357,29 @@ ppc <- function(x, type = "histogram", outcome = "all", ndisplay = 15, theme = N
     if(exists("alpha", where = exArgs)) {alpha = exArgs$alpha} else {alpha = 0.7 }
     if(exists("kernel", where = exArgs)) {kernel = exArgs$kernel} else {kernel = "gaussian" }
     if(exists("n_dens", where = exArgs)) {n_dens = exArgs$n_dens} else {n_dens = 1024 }
-    ppc_plot_e1 <- bayesplot::ppc_dens_overlay(y = e1_obs, yrep = e1_rep[1 : ndisplay, ], size = size, alpha = alpha, trim = FALSE, bw = bw, adjust = adjust, kernel = kernel, n_dens = n_dens)
-    ppc_plot_e2 <- bayesplot::ppc_dens_overlay(y = e2_obs, yrep = e2_rep[1 : ndisplay, ], size = size, alpha = alpha, trim = FALSE, bw = bw, adjust = adjust, kernel = kernel, n_dens = n_dens)
-    ppc_plot_c1 <- bayesplot::ppc_dens_overlay(y = c1_obs, yrep = c1_rep[1 : ndisplay, ], size = size, alpha = alpha, trim = FALSE, bw = bw, adjust = adjust, kernel = kernel, n_dens = n_dens)
-    ppc_plot_c2 <- bayesplot::ppc_dens_overlay(y = c2_obs, yrep = c2_rep[1 : ndisplay, ], size = size, alpha = alpha, trim = FALSE, bw = bw, adjust = adjust, kernel = kernel, n_dens = n_dens)
+    ppc_plot_e1 <- ppc_dens_overlay(y = e1_obs, yrep = e1_rep[1 : ndisplay, ], size = size, alpha = alpha, trim = FALSE, bw = bw, adjust = adjust, kernel = kernel, n_dens = n_dens)
+    ppc_plot_e2 <- ppc_dens_overlay(y = e2_obs, yrep = e2_rep[1 : ndisplay, ], size = size, alpha = alpha, trim = FALSE, bw = bw, adjust = adjust, kernel = kernel, n_dens = n_dens)
+    ppc_plot_c1 <- ppc_dens_overlay(y = c1_obs, yrep = c1_rep[1 : ndisplay, ], size = size, alpha = alpha, trim = FALSE, bw = bw, adjust = adjust, kernel = kernel, n_dens = n_dens)
+    ppc_plot_c2 <- ppc_dens_overlay(y = c2_obs, yrep = c2_rep[1 : ndisplay, ], size = size, alpha = alpha, trim = FALSE, bw = bw, adjust = adjust, kernel = kernel, n_dens = n_dens)
   } else if(type == "ecdf_overlay") {
     if(exists("size", where = exArgs)) {size = exArgs$size} else {size = 0.25 }
     if(exists("alpha", where = exArgs)) {alpha = exArgs$alpha} else {alpha = 0.7 }
     if(exists("pad", where = exArgs)) {pad = exArgs$pad} else {pad = TRUE }
     if(exists("discrete", where = exArgs)) {discrete = exArgs$discrete} else {discrete = FALSE }
-    ppc_plot_e1 <- bayesplot::ppc_ecdf_overlay(y = e1_obs, yrep = e1_rep[1 : ndisplay, ], size = size, alpha = alpha, discrete = discrete, pad = pad)
-    ppc_plot_e2 <- bayesplot::ppc_ecdf_overlay(y = e2_obs, yrep = e2_rep[1 : ndisplay, ], size = size, alpha = alpha, discrete = discrete, pad = pad)
-    ppc_plot_c1 <- bayesplot::ppc_ecdf_overlay(y = c1_obs, yrep = c1_rep[1 : ndisplay, ], size = size, alpha = alpha, discrete = discrete, pad = pad)
-    ppc_plot_c2 <- bayesplot::ppc_ecdf_overlay(y = c2_obs, yrep = c2_rep[1 : ndisplay, ], size = size, alpha = alpha, discrete = discrete, pad = pad)
+    ppc_plot_e1 <- ppc_ecdf_overlay(y = e1_obs, yrep = e1_rep[1 : ndisplay, ], size = size, alpha = alpha, discrete = discrete, pad = pad)
+    ppc_plot_e2 <- ppc_ecdf_overlay(y = e2_obs, yrep = e2_rep[1 : ndisplay, ], size = size, alpha = alpha, discrete = discrete, pad = pad)
+    ppc_plot_c1 <- ppc_ecdf_overlay(y = c1_obs, yrep = c1_rep[1 : ndisplay, ], size = size, alpha = alpha, discrete = discrete, pad = pad)
+    ppc_plot_c2 <- ppc_ecdf_overlay(y = c2_obs, yrep = c2_rep[1 : ndisplay, ], size = size, alpha = alpha, discrete = discrete, pad = pad)
   } else if(type == "stat" & is.null(corr) == TRUE) {
     if(bpp == FALSE){
     if(exists("binwidth_e", where = exArgs)) {binwidth_e = exArgs$binwidth_e} else {binwidth_e = 1 / 30 }
     if(exists("binwidth_c", where = exArgs)) {binwidth_c = exArgs$binwidth_c} else {binwidth_c = 30 }
     if(exists("freq", where = exArgs)) {freq = exArgs$freq} else {freq = TRUE }
     if(exists("breaks", where = exArgs)) {breaks = exArgs$breaks} else {breaks = NULL }
-    ppc_plot_e1 <- bayesplot::ppc_stat(y = e1_obs, yrep = e1_rep[1 : ndisplay, ], stat = stat, binwidth = binwidth_e, breaks = breaks, freq = freq)
-    ppc_plot_e2 <- bayesplot::ppc_stat(y = e2_obs, yrep = e2_rep[1 : ndisplay, ], stat = stat, binwidth = binwidth_e, breaks = breaks, freq = freq)
-    ppc_plot_c1 <- bayesplot::ppc_stat(y = c1_obs, yrep = c1_rep[1 : ndisplay, ], stat = stat, binwidth = binwidth_c, breaks = breaks, freq = freq)
-    ppc_plot_c2 <- bayesplot::ppc_stat(y = c2_obs, yrep = c2_rep[1 : ndisplay, ], stat = stat, binwidth = binwidth_c, breaks = breaks, freq = freq)
+    ppc_plot_e1 <- ppc_stat(y = e1_obs, yrep = e1_rep[1 : ndisplay, ], stat = stat, binwidth = binwidth_e, breaks = breaks, freq = freq)
+    ppc_plot_e2 <- ppc_stat(y = e2_obs, yrep = e2_rep[1 : ndisplay, ], stat = stat, binwidth = binwidth_e, breaks = breaks, freq = freq)
+    ppc_plot_c1 <- ppc_stat(y = c1_obs, yrep = c1_rep[1 : ndisplay, ], stat = stat, binwidth = binwidth_c, breaks = breaks, freq = freq)
+    ppc_plot_c2 <- ppc_stat(y = c2_obs, yrep = c2_rep[1 : ndisplay, ], stat = stat, binwidth = binwidth_c, breaks = breaks, freq = freq)
     }
     if(bpp == TRUE){
     if(exists("trim", where = exArgs)) {trim = exArgs$trim} else {trim = FALSE }
@@ -398,11 +399,11 @@ ppc <- function(x, type = "histogram", outcome = "all", ndisplay = 15, theme = N
       pval_c1 <- sum(values_c1 > stat_c1) / length(values_c1)
       pval_e2 <- sum(values_e2 > stat_e2) / length(values_e2)
       pval_c2 <- sum(values_c2 > stat_c2) / length(values_c2)
-      color_sheme_rep <- bayesplot::color_scheme_get()[1]
-      color_sheme_rep_border <- bayesplot::color_scheme_get()[2]
-      color_sheme_obs <- bayesplot::color_scheme_get()[5]
-      color_sheme_obs_border <- bayesplot::color_scheme_get()[6]
-      set_theme <- bayesplot::bayesplot_theme_get()
+      color_sheme_rep <- color_scheme_get()[1]
+      color_sheme_rep_border <- color_scheme_get()[2]
+      color_sheme_obs <- color_scheme_get()[5]
+      color_sheme_obs_border <- color_scheme_get()[6]
+      set_theme <- bayesplot_theme_get()
       ggplot2::theme_set(set_theme)
       paste_p_e1 <- sprintf("Prob (T(y[rep]) > T(y)) == '%0.3f'", pval_e1)
       paste_p_c1 <- sprintf("Prob (T(y[rep]) > T(y)) == '%0.3f'", pval_c1)
@@ -460,11 +461,11 @@ ppc <- function(x, type = "histogram", outcome = "all", ndisplay = 15, theme = N
       pval_2 <- sum(values_biv2 > stat_biv2) / length(values_biv2)
       paste_p_biv1 <- sprintf("Prob (T(y[rep]) > T(y)) == '%0.3f'", pval_1)
       paste_p_biv2 <- sprintf("Prob (T(y[rep]) > T(y)) == '%0.3f'", pval_2)
-      color_sheme_rep <- bayesplot::color_scheme_get()[1]
-      color_sheme_rep_border <- bayesplot::color_scheme_get()[2]
-      color_sheme_obs <- bayesplot::color_scheme_get()[5]
-      color_sheme_obs_border <- bayesplot::color_scheme_get()[6]
-      set_theme <- bayesplot::bayesplot_theme_get()
+      color_sheme_rep <- color_scheme_get()[1]
+      color_sheme_rep_border <- color_scheme_get()[2]
+      color_sheme_obs <- color_scheme_get()[5]
+      color_sheme_obs_border <- color_scheme_get()[6]
+      set_theme <- bayesplot_theme_get()
       if(bpp == FALSE) {
       if(exists("binwidth", where = exArgs)) {binwidth = exArgs$binwidth} else {binwidth = 1 / 30 }
       ppc_plot_e1 <- ggplot2::ggplot(df1, ggplot2::aes(x = values_biv1)) + 
@@ -511,73 +512,73 @@ ppc <- function(x, type = "histogram", outcome = "all", ndisplay = 15, theme = N
     if(exists("size", where = exArgs)) {size = exArgs$size} else {size = 2.5 }
     if(exists("alpha", where = exArgs)) {alpha = exArgs$alpha} else {alpha = 0.7 }
     if(exists("stat", where = exArgs)) {stat = exArgs$stat} else {stat = c("mean", "sd") }
-    ppc_plot_e1 <- bayesplot::ppc_stat_2d(y = e1_obs, yrep = e1_rep[1 : ndisplay, ], stat = stat, size = size, alpha = alpha)
-    ppc_plot_e2 <- bayesplot::ppc_stat_2d(y = e2_obs, yrep = e2_rep[1 : ndisplay, ], stat = stat, size = size, alpha = alpha)
-    ppc_plot_c1 <- bayesplot::ppc_stat_2d(y = c1_obs, yrep = c1_rep[1 : ndisplay, ], stat = stat, size = size, alpha = alpha)
-    ppc_plot_c2 <- bayesplot::ppc_stat_2d(y = c2_obs, yrep = c2_rep[1 : ndisplay, ], stat = stat, size = size, alpha = alpha)
+    ppc_plot_e1 <- ppc_stat_2d(y = e1_obs, yrep = e1_rep[1 : ndisplay, ], stat = stat, size = size, alpha = alpha)
+    ppc_plot_e2 <- ppc_stat_2d(y = e2_obs, yrep = e2_rep[1 : ndisplay, ], stat = stat, size = size, alpha = alpha)
+    ppc_plot_c1 <- ppc_stat_2d(y = c1_obs, yrep = c1_rep[1 : ndisplay, ], stat = stat, size = size, alpha = alpha)
+    ppc_plot_c2 <- ppc_stat_2d(y = c2_obs, yrep = c2_rep[1 : ndisplay, ], stat = stat, size = size, alpha = alpha)
   } else if(type == "error_hist") {
     if(exists("binwidth_e", where = exArgs)) {binwidth_e = exArgs$binwidth_e} else {binwidth_e = 1 / 30 }
     if(exists("binwidth_c", where = exArgs)) {binwidth_c = exArgs$binwidth_c} else {binwidth_c = 30 }
     if(exists("freq", where = exArgs)) {freq = exArgs$freq} else {freq = TRUE }
     if(exists("breaks", where = exArgs)) {breaks = exArgs$breaks} else {breaks = NULL }
-    ppc_plot_e1 <- bayesplot::ppc_error_hist(y = e1_obs, yrep = e1_rep[1 : ndisplay, ], binwidth = binwidth_e, breaks = breaks, freq = freq)
-    ppc_plot_e2 <- bayesplot::ppc_error_hist(y = e2_obs, yrep = e2_rep[1 : ndisplay, ], binwidth = binwidth_e, breaks = breaks, freq = freq)
-    ppc_plot_c1 <- bayesplot::ppc_error_hist(y = c1_obs, yrep = c1_rep[1 : ndisplay, ], binwidth = binwidth_c, breaks = breaks, freq = freq)
-    ppc_plot_c2 <- bayesplot::ppc_error_hist(y = c2_obs, yrep = c2_rep[1 : ndisplay, ], binwidth = binwidth_c, breaks = breaks, freq = freq)
+    ppc_plot_e1 <- ppc_error_hist(y = e1_obs, yrep = e1_rep[1 : ndisplay, ], binwidth = binwidth_e, breaks = breaks, freq = freq)
+    ppc_plot_e2 <- ppc_error_hist(y = e2_obs, yrep = e2_rep[1 : ndisplay, ], binwidth = binwidth_e, breaks = breaks, freq = freq)
+    ppc_plot_c1 <- ppc_error_hist(y = c1_obs, yrep = c1_rep[1 : ndisplay, ], binwidth = binwidth_c, breaks = breaks, freq = freq)
+    ppc_plot_c2 <- ppc_error_hist(y = c2_obs, yrep = c2_rep[1 : ndisplay, ], binwidth = binwidth_c, breaks = breaks, freq = freq)
   } else if(type == "error_scatter") {
     if(exists("size", where = exArgs)) {size = exArgs$size} else {size = 2.5 }
     if(exists("alpha", where = exArgs)) {alpha = exArgs$alpha} else {alpha = 0.8 }
-    ppc_plot_e1<-bayesplot::ppc_error_scatter(y = e1_obs, yrep = e1_rep[1 : ndisplay, ], size = size, alpha = alpha)
-    ppc_plot_e2<-bayesplot::ppc_error_scatter(y = e2_obs, yrep = e2_rep[1 : ndisplay, ], size = size, alpha = alpha)
-    ppc_plot_c1<-bayesplot::ppc_error_scatter(y = c1_obs, yrep = c1_rep[1 : ndisplay, ], size = size, alpha = alpha)
-    ppc_plot_c2<-bayesplot::ppc_error_scatter(y = c2_obs, yrep = c2_rep[1 : ndisplay, ], size = size, alpha = alpha)
+    ppc_plot_e1<- ppc_error_scatter(y = e1_obs, yrep = e1_rep[1 : ndisplay, ], size = size, alpha = alpha)
+    ppc_plot_e2<- ppc_error_scatter(y = e2_obs, yrep = e2_rep[1 : ndisplay, ], size = size, alpha = alpha)
+    ppc_plot_c1<- ppc_error_scatter(y = c1_obs, yrep = c1_rep[1 : ndisplay, ], size = size, alpha = alpha)
+    ppc_plot_c2<- ppc_error_scatter(y = c2_obs, yrep = c2_rep[1 : ndisplay, ], size = size, alpha = alpha)
   } else if(type == "error_scatter_avg") {
     if(exists("size", where = exArgs)) {size = exArgs$size} else {size = 2.5 }
     if(exists("alpha", where = exArgs)) {alpha = exArgs$alpha} else {alpha = 0.8 }
-    ppc_plot_e1 <- bayesplot::ppc_error_scatter_avg(y = e1_obs, yrep = e1_rep[1 : ndisplay, ], size = size, alpha = alpha)
-    ppc_plot_e2 <- bayesplot::ppc_error_scatter_avg(y = e2_obs, yrep = e2_rep[1 : ndisplay, ], size = size, alpha = alpha)
-    ppc_plot_c1 <- bayesplot::ppc_error_scatter_avg(y = c1_obs, yrep = c1_rep[1 : ndisplay, ], size = size, alpha = alpha)
-    ppc_plot_c2 <- bayesplot::ppc_error_scatter_avg(y = c2_obs, yrep = c2_rep[1 : ndisplay, ], size = size, alpha = alpha)
+    ppc_plot_e1 <- ppc_error_scatter_avg(y = e1_obs, yrep = e1_rep[1 : ndisplay, ], size = size, alpha = alpha)
+    ppc_plot_e2 <- ppc_error_scatter_avg(y = e2_obs, yrep = e2_rep[1 : ndisplay, ], size = size, alpha = alpha)
+    ppc_plot_c1 <- ppc_error_scatter_avg(y = c1_obs, yrep = c1_rep[1 : ndisplay, ], size = size, alpha = alpha)
+    ppc_plot_c2 <- ppc_error_scatter_avg(y = c2_obs, yrep = c2_rep[1 : ndisplay, ], size = size, alpha = alpha)
   } else if(type == "error_binned") {
     if(exists("bins", where = exArgs)) {bins = exArgs$bins} else {bins = NULL }
     if(exists("size", where = exArgs)) {size = exArgs$size} else {size = 1 }
     if(exists("alpha", where = exArgs)) {alpha = exArgs$alpha} else {alpha = 0.25 }
-    ppc_plot_e1 <- bayesplot::ppc_error_binned(y = e1_obs, yrep = e1_rep[1 : ndisplay, ], bins = bins, size = size, alpha = alpha)
-    ppc_plot_e2 <- bayesplot::ppc_error_binned(y = e2_obs, yrep = e2_rep[1 : ndisplay, ], bins = bins, size = size, alpha = alpha)
-    ppc_plot_c1 <- bayesplot::ppc_error_binned(y = c1_obs, yrep = c1_rep[1 : ndisplay, ], bins = bins, size = size, alpha = alpha)
-    ppc_plot_c2 <- bayesplot::ppc_error_binned(y = c2_obs, yrep = c2_rep[1 : ndisplay, ], bins = bins, size = size, alpha = alpha)
+    ppc_plot_e1 <- ppc_error_binned(y = e1_obs, yrep = e1_rep[1 : ndisplay, ], bins = bins, size = size, alpha = alpha)
+    ppc_plot_e2 <- ppc_error_binned(y = e2_obs, yrep = e2_rep[1 : ndisplay, ], bins = bins, size = size, alpha = alpha)
+    ppc_plot_c1 <- ppc_error_binned(y = c1_obs, yrep = c1_rep[1 : ndisplay, ], bins = bins, size = size, alpha = alpha)
+    ppc_plot_c2 <- ppc_error_binned(y = c2_obs, yrep = c2_rep[1 : ndisplay, ], bins = bins, size = size, alpha = alpha)
   } else if(type == "intervals") {
     if(exists("prob", where = exArgs)) {prob = exArgs$prob} else {prob = 0.5 }
     if(exists("prob_outer", where = exArgs)) {prob_outer = exArgs$prob_outer} else {prob_outer = 0.9 }
     if(exists("size", where = exArgs)) {size = exArgs$size} else {size = 1 }
     if(exists("fatten", where = exArgs)) {fatten = exArgs$fatten} else {fatten = 3 }
-    ppc_plot_e1 <- bayesplot::ppc_intervals(y = e1_obs, yrep = e1_rep[1 : ndisplay, ], prob = prob, prob_outer = prob_outer, size = size, fatten = fatten)
-    ppc_plot_e2 <- bayesplot::ppc_intervals(y = e2_obs, yrep = e2_rep[1 : ndisplay, ], prob = prob, prob_outer = prob_outer, size = size, fatten = fatten)
-    ppc_plot_c1 <- bayesplot::ppc_intervals(y = c1_obs, yrep = c1_rep[1 : ndisplay, ], prob = prob, prob_outer = prob_outer, size = size, fatten = fatten)
-    ppc_plot_c2 <- bayesplot::ppc_intervals(y = c2_obs, yrep = c2_rep[1 : ndisplay, ], prob = prob, prob_outer = prob_outer, size = size, fatten = fatten)
+    ppc_plot_e1 <- ppc_intervals(y = e1_obs, yrep = e1_rep[1 : ndisplay, ], prob = prob, prob_outer = prob_outer, size = size, fatten = fatten)
+    ppc_plot_e2 <- ppc_intervals(y = e2_obs, yrep = e2_rep[1 : ndisplay, ], prob = prob, prob_outer = prob_outer, size = size, fatten = fatten)
+    ppc_plot_c1 <- ppc_intervals(y = c1_obs, yrep = c1_rep[1 : ndisplay, ], prob = prob, prob_outer = prob_outer, size = size, fatten = fatten)
+    ppc_plot_c2 <- ppc_intervals(y = c2_obs, yrep = c2_rep[1 : ndisplay, ], prob = prob, prob_outer = prob_outer, size = size, fatten = fatten)
   } else if(type == "ribbon") {
     if(exists("prob", where = exArgs)) {prob = exArgs$prob} else {prob = 0.5 }
     if(exists("prob_outer", where = exArgs)) {prob_outer = exArgs$prob_outer} else {prob_outer = 0.9 }
     if(exists("size", where = exArgs)) {size = exArgs$size} else {size = 0.25 }
     if(exists("alpha", where = exArgs)) {alpha = exArgs$alpha} else {alpha = 0.33 }
-    ppc_plot_e1 <- bayesplot::ppc_ribbon(y = e1_obs, yrep = e1_rep[1 : ndisplay, ], prob = prob, prob_outer = prob_outer, alpha = alpha, size = size)
-    ppc_plot_e2 <- bayesplot::ppc_ribbon(y = e2_obs, yrep = e2_rep[1 : ndisplay, ], prob = prob, prob_outer = prob_outer, alpha = alpha, size = size)
-    ppc_plot_c1 <- bayesplot::ppc_ribbon(y = c1_obs, yrep = c1_rep[1 : ndisplay, ], prob = prob, prob_outer = prob_outer, alpha = alpha, size = size)
-    ppc_plot_c2 <- bayesplot::ppc_ribbon(y = c2_obs, yrep = c2_rep[1 : ndisplay, ], prob = prob, prob_outer = prob_outer, alpha = alpha, size = size)
+    ppc_plot_e1 <- ppc_ribbon(y = e1_obs, yrep = e1_rep[1 : ndisplay, ], prob = prob, prob_outer = prob_outer, alpha = alpha, size = size)
+    ppc_plot_e2 <- ppc_ribbon(y = e2_obs, yrep = e2_rep[1 : ndisplay, ], prob = prob, prob_outer = prob_outer, alpha = alpha, size = size)
+    ppc_plot_c1 <- ppc_ribbon(y = c1_obs, yrep = c1_rep[1 : ndisplay, ], prob = prob, prob_outer = prob_outer, alpha = alpha, size = size)
+    ppc_plot_c2 <- ppc_ribbon(y = c2_obs, yrep = c2_rep[1 : ndisplay, ], prob = prob, prob_outer = prob_outer, alpha = alpha, size = size)
   } else if(type == "scatter") {
     if(exists("size", where = exArgs)) {size = exArgs$size} else {size = 2.5 }
     if(exists("alpha", where = exArgs)) {alpha = exArgs$alpha} else {alpha = 0.8 }
-    ppc_plot_e1 <- bayesplot::ppc_scatter(y = e1_obs, yrep = e1_rep[1 : ndisplay, ], alpha = alpha, size = size)
-    ppc_plot_e2 <- bayesplot::ppc_scatter(y = e2_obs, yrep = e2_rep[1 : ndisplay, ], alpha = alpha, size = size)
-    ppc_plot_c1 <- bayesplot::ppc_scatter(y = c1_obs, yrep = c1_rep[1 : ndisplay, ], alpha = alpha, size = size)
-    ppc_plot_c2 <- bayesplot::ppc_scatter(y = c2_obs, yrep = c2_rep[1 : ndisplay, ], alpha = alpha, size = size)
+    ppc_plot_e1 <- ppc_scatter(y = e1_obs, yrep = e1_rep[1 : ndisplay, ], alpha = alpha, size = size)
+    ppc_plot_e2 <- ppc_scatter(y = e2_obs, yrep = e2_rep[1 : ndisplay, ], alpha = alpha, size = size)
+    ppc_plot_c1 <- ppc_scatter(y = c1_obs, yrep = c1_rep[1 : ndisplay, ], alpha = alpha, size = size)
+    ppc_plot_c2 <- ppc_scatter(y = c2_obs, yrep = c2_rep[1 : ndisplay, ], alpha = alpha, size = size)
   } else if(type == "scatter_avg") {
     if(exists("size", where = exArgs)) {size = exArgs$size} else {size = 2.5 }
     if(exists("alpha", where = exArgs)) {alpha = exArgs$alpha} else {alpha = 0.8 }
-    ppc_plot_e1 <- bayesplot::ppc_scatter_avg(y = e1_obs, yrep = e1_rep[1 : ndisplay, ], alpha = alpha, size = size)
-    ppc_plot_e2 <- bayesplot::ppc_scatter_avg(y = e2_obs, yrep = e2_rep[1 : ndisplay, ], alpha = alpha, size = size)
-    ppc_plot_c1 <- bayesplot::ppc_scatter_avg(y = c1_obs, yrep = c1_rep[1 : ndisplay, ], alpha = alpha, size = size)
-    ppc_plot_c2 <- bayesplot::ppc_scatter_avg(y = c2_obs, yrep = c2_rep[1 : ndisplay, ], alpha = alpha, size = size)
+    ppc_plot_e1 <- ppc_scatter_avg(y = e1_obs, yrep = e1_rep[1 : ndisplay, ], alpha = alpha, size = size)
+    ppc_plot_e2 <- ppc_scatter_avg(y = e2_obs, yrep = e2_rep[1 : ndisplay, ], alpha = alpha, size = size)
+    ppc_plot_c1 <- ppc_scatter_avg(y = c1_obs, yrep = c1_rep[1 : ndisplay, ], alpha = alpha, size = size)
+    ppc_plot_c2 <- ppc_scatter_avg(y = c2_obs, yrep = c2_rep[1 : ndisplay, ], alpha = alpha, size = size)
   }
   if(outcome == "effects_arm1") {
     ppc_plot_output <- ppc_plot_e1
