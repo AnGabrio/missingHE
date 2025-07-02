@@ -22,7 +22,7 @@ When analysing partially-observed data, any statistical method makes either expl
 
 Each of the three types of missingness models in `missingHE`, namely **selection**, **pattern mixture**, and **hurdle** models, can be fitted under MNAR for either or both the effectiveness and cost outcomes. In `missingHE`, MNAR assumptions are codified in terms of some suitably-defined departures from MAR for the mean effectiveness and cost parameters, which are the main quantities of interest in the economic evaluation. This tutorial shows how MNAR assumptions can be specified for each type of model in `missingHE`. Throughout, we will use the built-in dataset called `MenSS` as a toy example, which is directly available when installing and loading `missingHE` in your `R` workspace. See the vignette called *Introduction to missingHE* for an introductory tutorial of each function in `missingHE` and a general presentation of the data from the `MenSS` dataset. See also the vignette called *Model customisation in missingHE* for few examples on how to customise the functions in `missingHE` to handle different types of issues in the analysis.
 
-If you would like to have more information on the package, or would like to point out potential issues in the current version, feel free to contact the maintainer at <a.gabrio@maastrichtuniversity.nl>. Suggestions on how to improve the package are also very welcome.
+If you would like to have more information on the package, or would like to point out potential issues in the current version, feel free to contact the maintainer at <ucakgab@ucl.ac.uk>. Suggestions on how to improve the package are also very welcome.
 
 
 ## Handling MNAR with selection models

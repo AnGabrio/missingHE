@@ -20,7 +20,7 @@ set.seed(1234)
 
 For each of the three types of models that can be fitted using `missingHE`, namely **selection**, **pattern mixture**, and **hurdle** models, the package provides a series of customisation options to allow a flexible specification of the models in terms of modelling assumptions and prior choices. These can be extremely useful for handling the typical features of trial-based CEA data, such as non-normality, clustering, and type of missingness mechanism. This tutorial shows how it is possible to customise different aspects of the models using the arguments of each type of function in the package. Throughout, we will use the built-in dataset called `MenSS` as a toy example, which is directly available when installing and loading `missingHE` in your `R` workspace. See the vignette called *Introduction to missingHE* for an introductory tutorial of each function in `missingHE` and a general presentation of the data from the `MenSS` dataset.
 
-If you would like to have more information on the package, or would like to point out potential issues in the current version, feel free to contact the maintainer at <a.gabrio@maastrichtuniversity.nl>. Suggestions on how to improve the package are also very welcome.
+If you would like to have more information on the package, or would like to point out potential issues in the current version, feel free to contact the maintainer at <ucakgab@ucl.ac.uk>. Suggestions on how to improve the package are also very welcome.
 
 
 ## Changing the distributional assumptions
@@ -39,7 +39,7 @@ MenSS2$e <- MenSS$sex_inst
 head(MenSS2$e, n = 10)
 ```
 
-The new effectiveness outcome is now a discrete variable and therefore the use of discrete distributions is likely to be more appropriate for modelling purposes compared to standard normality assumptions. We can check the empirical histograms of $e$ by treatment group by typing
+The new effectiveness outcome is now a discrete variable and therefore the use of discrete distribtuions is likely to be more appropriate for modelling purposes compared to standard normality assumptions. We can check the empirical histograms of $e$ by treatment group by typing
 
 ```{r hist_sex, eval=TRUE, echo=TRUE, comment=NA,warning=FALSE,error=FALSE,message=FALSE, fig.width=15,fig.height=9,out.width='65%',fig.align='center'}
 par(mfrow=c(1,2))
@@ -176,7 +176,7 @@ The names above have the following interpretations in terms of the model paramet
 
 * `"sigma.prior.c"` is the standard deviation of the model of $c$. The first and second elements inside the vector for this parameter are the lower and upper bounds that should be used for the uniform prior given to this parameter by `missingHE`. 
 
-The values shown above are the default values set in `missingHE` for each of these parameters. It is possible to change the priors by providing different values, for example by increasing the precision for some of the coefficient estimates or decreasing the upper bound for standard deviation parameters. Different names should be used to indicate for which parameter the prior should be modified, keeping in mind that the full list of names that can be used varies depending on the type of models and modelling assumptions specified. The full list of parameter names for each type of model can be assessed using the `help`command on each function of `missingHE`.
+The values shown above are the default values set in `missingHE` for each of these parameters. It is possible to change the priors by providing different values, for example by increasing the precision for some of the coefficient estimates or descreasing the upper bound for standard deviation parameters. Different names should be used to indicate for which parameter the prior should be modified, keeping in mind that the full list of names that can be used varies depending on the type of models and modelling assumptions specified. The full list of parameter names for each type of model can be assessed using the `help`command on each function of `missingHE`.
 
 We can now fit the hurdle model using our priors by typing 
 
