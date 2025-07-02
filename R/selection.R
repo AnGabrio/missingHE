@@ -56,7 +56,6 @@
 #'   \item{cea}{A list containing the output of the economic evaluation performed using the function \code{\link[BCEA]{bcea}}}
 #'   \item{type}{A character variable that indicate which type of missingness mechanism has been used to run the model, 
 #'   either \code{MAR} or \code{MNAR} (see details)}
-#'   \item{data_format}{A character variable that indicate which type of analysis was conducted, either using a \code{wide} or \code{longitudinal} dataset}
 #' }
 #' @seealso \code{\link[R2jags]{jags}}, \code{\link[BCEA]{bcea}}
 #' @keywords CEA JAGS missing data Selection Models
@@ -121,7 +120,7 @@
 #' # Quck example to run using subset of MenSS dataset
 #' MenSS.subset <- MenSS[50:100, ]
 #' 
-#' # Run the model using the selection function assuming a MAR mechanism
+#' # Run the model using the selection function assuming a SCAR mechanism
 #' # Use only 100 iterations to run a quick check
 #' model.selection <- selection(data = MenSS.subset, model.eff = e ~ 1,model.cost = c ~ 1,
 #'    model.me = me ~ 1, model.mc = mc ~ 1, dist_e = "norm", dist_c = "norm",
@@ -214,6 +213,7 @@ selection <- function(data, model.eff, model.cost, model.me = me ~ 1, model.mc =
   dist_c <- tolower(dist_c)
   if(dist_e == "normal") { dist_e <- "norm" }
   if(dist_e == "exponential") { dist_e <- "exp" }
+  if(dist_e == "weib") { dist_e <- "weibull" }
   if(dist_e == "logistic") { dist_e <- "logis" }
   if(dist_e == "bernoulli") { dist_e <- "bern" }
   if(dist_e == "poisson") { dist_e <- "pois" }
@@ -503,7 +503,7 @@ selection <- function(data, model.eff, model.cost, model.me = me ~ 1, model.mc =
     } 
     if(ind_fixed == TRUE) {
       if("beta_f.prior" %in% names(list_check_vector)) { stop(stop_mes) } 
-      if("mu.b_f.prior" %in% names(list_check_vector) | "s.b_f.prior" %in% names(list_check_vector)) { stop(stop_mes) } 
+      if("b_f.prior" %in% names(list_check_vector)) { stop(stop_mes) } 
     }
     if(ind_fixed == FALSE & ind_random == TRUE) {
       if("mu.b_f.prior" %in% names(list_check_vector) | "s.b_f.prior" %in% names(list_check_vector)) { stop(stop_mes) } 
@@ -579,9 +579,8 @@ selection <- function(data, model.eff, model.cost, model.me = me ~ 1, model.mc =
   if(exists("Kmax", where = exArgs)) {Kmax = exArgs$Kmax } else {Kmax = 50000 }
   if(exists("wtp", where = exArgs)) {wtp = exArgs$wtp } else {wtp = NULL }
   if(exists("plot", where = exArgs)) {plot = exArgs$plot } else {plot = FALSE }
-  cea <- BCEA::bcea(e = model_output$mean_effects, c = model_output$mean_costs, ref = ref, interventions = interventions, Kmax = Kmax, k = wtp, plot = plot)
-  format <- "wide"
-  res <- list(data_set = data_set, model_output = model_output, cea = cea, type = type, data_format = format)
+  cea <- BCEA::bcea(e = model_output$mean_effects, c = model_output$mean_costs, ref = ref, interventions = interventions, Kmax = Kmax, wtp = wtp, plot = plot)
+  res <- list(data_set = data_set, model_output = model_output, cea = cea, type = type)
   class(res) <- "missingHE"
   return(res)
 }
