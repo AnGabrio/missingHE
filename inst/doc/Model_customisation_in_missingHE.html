@@ -14,30 +14,22 @@
 
 <title>Model Customisation in missingHE</title>
 
-<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
-// be compatible with the behavior of Pandoc < 2.8).
-document.addEventListener('DOMContentLoaded', function(e) {
-  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
-  var i, h, a;
-  for (i = 0; i < hs.length; i++) {
-    h = hs[i];
-    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
-    a = h.attributes;
-    while (a.length > 0) h.removeAttribute(a[0].name);
+<script>// Hide empty <a> tag within highlighted CodeBlock for screen reader accessibility (see https://github.com/jgm/pandoc/issues/6352#issuecomment-626106786) -->
+// v0.0.1
+// Written by JooYoung Seo (jooyoung@psu.edu) and Atsushi Yasumoto on June 1st, 2020.
+
+document.addEventListener('DOMContentLoaded', function() {
+  const codeList = document.getElementsByClassName("sourceCode");
+  for (var i = 0; i < codeList.length; i++) {
+    var linkList = codeList[i].getElementsByTagName('a');
+    for (var j = 0; j < linkList.length; j++) {
+      if (linkList[j].innerHTML === "") {
+        linkList[j].setAttribute('aria-hidden', 'true');
+      }
+    }
   }
 });
 </script>
-
-<style type="text/css">
-code{white-space: pre-wrap;}
-span.smallcaps{font-variant: small-caps;}
-span.underline{text-decoration: underline;}
-div.column{display: inline-block; vertical-align: top; width: 50%;}
-div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-ul.task-list{list-style: none;}
-</style>
-
-
 
 
 
@@ -239,74 +231,25 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 
 
-<p>For each of the three types of models that can be fitted using
-<code>missingHE</code>, namely <strong>selection</strong>,
-<strong>pattern mixture</strong>, and <strong>hurdle</strong> models,
-the package provides a series of customisation options to allow a
-flexible specification of the models in terms of modelling assumptions
-and prior choices. These can be extremely useful for handling the
-typical features of trial-based CEA data, such as non-normality,
-clustering, and type of missingness mechanism. This tutorial shows how
-it is possible to customise different aspects of the models using the
-arguments of each type of function in the package. Throughout, we will
-use the built-in dataset called <code>MenSS</code> as a toy example,
-which is directly available when installing and loading
-<code>missingHE</code> in your <code>R</code> workspace. See the
-vignette called <em>Introduction to missingHE</em> for an introductory
-tutorial of each function in <code>missingHE</code> and a general
-presentation of the data from the <code>MenSS</code> dataset.</p>
-<p>If you would like to have more information on the package, or would
-like to point out potential issues in the current version, feel free to
-contact the maintainer at <a href="mailto:a.gabrio@maastrichtuniversity.nl" class="email">a.gabrio@maastrichtuniversity.nl</a>. Suggestions on how
-to improve the package are also very welcome.</p>
+<p>For each of the three types of models that can be fitted using <code>missingHE</code>, namely <strong>selection</strong>, <strong>pattern mixture</strong>, and <strong>hurdle</strong> models, the package provides a series of customisation options to allow a flexible specification of the models in terms of modelling assumptions and prior choices. These can be extremely useful for handling the typical features of trial-based CEA data, such as non-normality, clustering, and type of missingness mechanism. This tutorial shows how it is possible to customise different aspects of the models using the arguments of each type of function in the package. Throughout, we will use the built-in dataset called <code>MenSS</code> as a toy example, which is directly available when installing and loading <code>missingHE</code> in your <code>R</code> workspace. See the vignette called <em>Introduction to missingHE</em> for an introductory tutorial of each function in <code>missingHE</code> and a general presentation of the data from the <code>MenSS</code> dataset.</p>
+<p>If you would like to have more information on the package, or would like to point out potential issues in the current version, feel free to contact the maintainer at <a href="mailto:ucakgab@ucl.ac.uk" class="email">ucakgab@ucl.ac.uk</a>. Suggestions on how to improve the package are also very welcome.</p>
 <div id="changing-the-distributional-assumptions" class="section level2">
 <h2>Changing the distributional assumptions</h2>
-<p>A general concern when analysing trial-based CEA data is that, in
-many cases, both effectiveness and costs are characterised by highly
-skewed distributions, which may cause standard normality modelling
-assumptions to be difficult to justify, especially for small samples.
-<code>missingHE</code> allows to chose among a range of parametric
-distributions for modelling both outcome variables, which were selected
-based on the most common choices in standard practice and the
-literature.</p>
-<p>In each model, the specific type of distributions for the
-effectiveness (<span class="math inline">\(e\)</span>) and cost (<span class="math inline">\(c\)</span>) outcome can be selected by setting the
-arguments <code>dist_e</code> and <code>dist_c</code> to specific
-character names. Available choices include: Normal (<code>&quot;norm&quot;</code>)
-and Beta (<code>&quot;beta&quot;</code>) distributions for <span class="math inline">\(e\)</span> and Normal (<code>&quot;norm&quot;</code>) and
-Gamma (<code>&quot;gamma&quot;</code>) for <span class="math inline">\(c\)</span>.
-Distributions for modelling both discrete and binary effectiveness
-variables are also available, such as Poisson (<code>&quot;pois&quot;</code>) and
-Bernoulli (<code>bern</code>) distributions. The full list of available
-distributions for each type of outcome can be seen by using the
-<code>help</code> function on each function of the package.</p>
-<p>In the <code>MenSS</code> dataset the default effectiveness variables
-are the QALYs. However, in general, other types of effectiveness
-measures may be of interest in the economic analysis (e.g. the primary
-outcome from a trial). In our dataset we have the number of instances of
-unprotected sex at <span class="math inline">\(12\)</span> months
-follow-up, denoted as <code>sex_inst</code>, which could be used in the
-CEA instead of QALYs. Thus, we create a second dataset called
-<code>MenSS2</code>, where we assign the name <span class="math inline">\(e\)</span> to the variable <code>sex_inst</code>,
-which allows <code>missingHE</code> to identify this variable as the
-main effectiveness variable for the analysis. This can be done by
-typing</p>
+<p>A general concern when analysing trial-based CEA data is that, in many cases, both effectiveness and costs are characterised by highly skewed distributions, which may cause standard normality modelling assumptions to be difficult to justify, especially for small samples. <code>missingHE</code> allows to chose among a range of parametric distributions for modelling both outcome variables, which were selected based on the most common choices in standard practice and the literature.</p>
+<p>In each model, the specific type of distributions for the effectiveness (<span class="math inline">\(e\)</span>) and cost (<span class="math inline">\(c\)</span>) outcome can be selected by setting the arguments <code>dist_e</code> and <code>dist_c</code> to specific character names. Available choices include: Normal (<code>&quot;norm&quot;</code>) and Beta (<code>&quot;beta&quot;</code>) distributions for <span class="math inline">\(e\)</span> and Normal (<code>&quot;norm&quot;</code>) and Gamma (<code>&quot;gamma&quot;</code>) for <span class="math inline">\(c\)</span>. Distributions for modelling both discrete and binary effectiveness variables are also available, such as Poisson (<code>&quot;pois&quot;</code>) and Bernoulli (<code>bern</code>) distributions. The full list of available distributions for each type of outcome can be seen by using the <code>help</code> function on each function of the package.</p>
+<p>In the <code>MenSS</code> dataset the default effectiveness variables are the QALYs. However, in general, other types of effectiveness measures may be of interest in the economic analysis (e.g. the primary outcome from a trial). In our dataset we have the number of instances of unprotected sex at <span class="math inline">\(12\)</span> months follow-up, denoted as <code>sex_inst</code>, which could be used in the CEA instead of QALYs. Thus, we create a second dataset called <code>MenSS2</code>, where we assign the name <span class="math inline">\(e\)</span> to the variable <code>sex_inst</code>, which allows <code>missingHE</code> to identify this variable as the main effectiveness variable for the analysis. This can be done by typing</p>
 <pre class="text"><code>&gt; MenSS2 &lt;- MenSS
 &gt; MenSS2$e &lt;- MenSS$sex_inst
 &gt; 
 &gt; #first 10 entries of e
 &gt; head(MenSS2$e, n = 10)
  [1] NA 50  3  0 99 NA 20 NA NA NA</code></pre>
-<p>The new effectiveness outcome is now a discrete variable and
-therefore the use of discrete distributions is likely to be more
-appropriate for modelling purposes compared to standard normality
-assumptions. We can check the empirical histograms of <span class="math inline">\(e\)</span> by treatment group by typing</p>
+<p>The new effectiveness outcome is now a discrete variable and therefore the use of discrete distribtuions is likely to be more appropriate for modelling purposes compared to standard normality assumptions. We can check the empirical histograms of <span class="math inline">\(e\)</span> by treatment group by typing</p>
 <pre class="text"><code>&gt; par(mfrow=c(1,2))
 &gt; hist(MenSS2$e[MenSS2$t==1], main = &quot;N sex instances - Control&quot;)
 &gt; hist(MenSS2$e[MenSS2$t==2], main = &quot;N sex instances - Intervention&quot;)</code></pre>
 <p><img src="data:image/png;base64,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" width="65%" style="display: block; margin: auto;" /></p>
-<p>We can also see that the proportion of missing values in <span class="math inline">\(e\)</span> is considerably large in both treatment
-groups.</p>
+<p>We can also see that the proportion of missing values in <span class="math inline">\(e\)</span> is considerably large in both treatment groups.</p>
 <pre class="text"><code>&gt; #proportions of missing values in the control group
 &gt; sum(is.na(MenSS2$e[MenSS$t==1])) / length(MenSS2$e[MenSS$t==1])  
 [1] 0.48</code></pre>
@@ -314,62 +257,19 @@ groups.</p>
 &gt; #proportions of missing values in the intervention group
 &gt; sum(is.na(MenSS2$e[MenSS$t==2])) / length(MenSS2$e[MenSS$t==2])  
 [1] 0.5238095</code></pre>
-<p>As an example, we fit a selection model assuming Poisson
-distributions to handle the discrete nature of <span class="math inline">\(e\)</span>, and we choose Gamma distributions to
-capture the skewness in the costs. We note that, in case some of
-individuals have costs that are equal to zero (as in the
-<code>MenSS</code> dataset), standard parametric distributions with a
-positive support are not typically defined at <span class="math inline">\(0\)</span> (e.g. the Gamma distributions), making
-their implementation impossible. Thus, in these cases, it is necessary
-to use a trick to modify the boundary values before fitting the model. A
-common approach is to add a small constant to the cost variables. These
-can be done by typing</p>
+<p>As an example, we fit a selection model assuming Poisson distributions to handle the discrete nature of <span class="math inline">\(e\)</span>, and we choose Gamma distributions to capture the skewness in the costs. We note that, in case some of individuals have costs that are equal to zero (as in the <code>MenSS</code> dataset), standard parametric distributions with a positive support are not typically defined at <span class="math inline">\(0\)</span> (e.g. the Gamma distributions), making their implementation impossible. Thus, in these cases, it is necessary to use a trick to modify the boundary values before fitting the model. A common approach is to add a small constant to the cost variables. These can be done by typing</p>
 <pre class="text"><code>&gt;  MenSS2$c &lt;- MenSS2$c + 0.01</code></pre>
-<p>We note that, although simple, this strategy has the potential
-drawback that results may be affected by the choice of the constant
-added and therefore sensitivity analysis to the value used is typically
-recommended. <code>missingHE</code> provides an alternative way to deal
-with this issue by means of fitting a two-part regression or
-<em>hurdle</em> model which does not require the use of any constant.
-For more information on hurdle models, type
-<code>help(hurdle)</code>.</p>
-<p>We are now ready to fit our selection model to the
-<code>MenSS2</code> dataset using the following command</p>
+<p>We note that, although simple, this strategy has the potential drawback that results may be affected by the choice of the constant added and therefore sensitivity analysis to the value used is typically recommended. <code>missingHE</code> provides an alternative way to deal with this issue by means of fitting a two-part regression or <em>hurdle</em> model which does not require the use of any constant. For more information on hurdle models, type <code>help(hurdle)</code>.</p>
+<p>We are now ready to fit our selection model to the <code>MenSS2</code> dataset using the following command</p>
 <pre class="text"><code>&gt; PG.sel=selection(data = MenSS2, model.eff = e ~ sex_inst.0, model.cost = c ~ 1, 
 +   model.me = me ~ age + ethnicity + employment, 
 +   model.mc = mc ~ age + ethnicity + employment, type = &quot;MAR&quot;, 
 +   n.iter = 1000, dist_e = &quot;pois&quot;, dist_c = &quot;gamma&quot;)</code></pre>
-<p>The arguments <code>dist_e = &quot;pois&quot;</code> and
-<code>dist_c = &quot;gamma&quot;</code> specify the distributions assumed for the
-outcome variables and, in the model of <span class="math inline">\(e\)</span>, we also adjust for the baseline
-outcome values (<code>sex_inst.0</code>). According to the type of
-distributions chosen, <code>missingHE</code> automatically models the
-dependence between covariates and the mean outcome on a specific scale
-to reduce the chance of incurring into numerical problems due to the
-constraints of the distributions. For example, for both Poisson and
-Gamma distributions means are modelled on the log scale, while for Beta
-and Bernoulli distirbutions they are modelled on the logit scale. To see
-the modelling scale used by <code>missingHE</code> according to the type
-of distribution selected, use the <code>help</code> command on each
-function of the package.</p>
-<p>The model assumes MAR conditional on <code>age</code>,
-<code>ethnicity</code> and <code>employment</code> as auxiliary
-variables for predicting missingness in both outcomes. We can look at
-how the model generate imputations for the outcomes by treatment group
-using the generic function <code>plot</code>. For example, we can look
-at how the missing <span class="math inline">\(e\)</span> are imputed by
-typing</p>
+<p>The arguments <code>dist_e = &quot;pois&quot;</code> and <code>dist_c = &quot;gamma&quot;</code> specify the distributions assumed for the outcome variables and, in the model of <span class="math inline">\(e\)</span>, we also adjust for the baseline outcome values (<code>sex_inst.0</code>). According to the type of distributions chosen, <code>missingHE</code> automatically models the dependence between covariates and the mean outcome on a specific scale to reduce the chance of incurring into numerical problems due to the constraints of the distributions. For example, for both Poisson and Gamma distributions means are modelled on the log scale, while for Beta and Bernoulli distirbutions they are modelled on the logit scale. To see the modelling scale used by <code>missingHE</code> according to the type of distribution selected, use the <code>help</code> command on each function of the package.</p>
+<p>The model assumes MAR conditional on <code>age</code>, <code>ethnicity</code> and <code>employment</code> as auxiliary variables for predicting missingness in both outcomes. We can look at how the model generate imputations for the outcomes by treatment group using the generic function <code>plot</code>. For example, we can look at how the missing <span class="math inline">\(e\)</span> are imputed by typing</p>
 <pre class="text"><code>&gt; plot(PG.sel, outcome = &quot;effects&quot;)</code></pre>
 <p><img src="data:image/png;base64,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" width="65%" style="display: block; margin: auto;" /></p>
-<p>Summary results of our model from a statistical perspective can be
-inspected using the command <code>coef</code>, which extracts the
-estimates of the mean regression coefficients for <span class="math inline">\(e\)</span> and <span class="math inline">\(c\)</span> by treatment group. By default, the
-lower and upper bounds provide the <span class="math inline">\(95\%\)</span> credibile intervals for each
-estimate (based on the <span class="math inline">\(0.025\)</span> and
-<span class="math inline">\(0.975\)</span> quantiles of the posterior
-distribution). However, it is possible to modify these values using the
-argument <code>prob</code> to change the level of the intervals to match
-the one desired. For example, if we want <span class="math inline">\(90\%\)</span> intervals, we can type</p>
+<p>Summary results of our model from a statistical perspective can be inspected using the command <code>coef</code>, which extracts the estimates of the mean regression coefficients for <span class="math inline">\(e\)</span> and <span class="math inline">\(c\)</span> by treatment group. By default, the lower and upper bounds provide the <span class="math inline">\(95\%\)</span> credibile intervals for each estimate (based on the <span class="math inline">\(0.025\)</span> and <span class="math inline">\(0.975\)</span> quantiles of the posterior distribution). However, it is possible to modify these values using the argument <code>prob</code> to change the level of the intervals to match the one desired. For example, if we want <span class="math inline">\(90\%\)</span> intervals, we can type</p>
 <pre class="text"><code>&gt; coef(PG.sel, prob = c(0.05, 0.95))
 $Comparator
 $Comparator$Effects
@@ -391,12 +291,7 @@ sex_inst.0  0.011 0.002 0.007 0.015
 $Reference$Costs
             mean    sd lower upper
 (Intercept) 5.48 0.482 4.699 6.211</code></pre>
-<p>The entire posterior distribution for each parameter of the model can
-also be extracted from the output of the model by typing
-<code>PG.sel$model_output</code>, which returns a list object containing
-the posterior estimates for each model parameter. An overall summary of
-the economic analysis based on the model estimates can be obtained using
-the <code>summary</code> command</p>
+<p>The entire posterior distribution for each parameter of the model can also be extracted from the output of the model by typing <code>PG.sel$model_output</code>, which returns a list object containing the posterior estimates for each model parameter. An overall summary of the economic analysis based on the model estimates can be obtained using the <code>summary</code> command</p>
 <pre class="text"><code>&gt; summary(PG.sel)
 
  Cost-effectiveness analysis summary 
@@ -421,50 +316,17 @@ mean costs (t = 2)   269.266 135.37 109.892 498.09
 delta effects -1.433   1.524   -3.764    1.03
 delta costs    3.199 162.358 -251.133 255.221
 ICER          -2.233                         </code></pre>
-<p>which shows summary statistics for the mean effectiveness and costs
-in each treatment group, for the mean differentials and the estimate of
-the ICER.</p>
+<p>which shows summary statistics for the mean effectiveness and costs in each treatment group, for the mean differentials and the estimate of the ICER.</p>
 </div>
 <div id="including-random-effects-terms" class="section level2">
 <h2>Including random effects terms</h2>
-<p>For each type of model, <code>missingHE</code> allows the inclusion
-of random effects terms to handle clustered data. To be precise, the
-term <em>random effects</em> does not have much meaning within a
-Bayesian approach since all parameters are in fact random variables.
-However, this terminology is quite useful to explain the structure of
-the model.</p>
-<p>We show how random effects can be added to the model of <span class="math inline">\(e\)</span> and <span class="math inline">\(c\)</span> within a pattern mixture model fitted
-to the <code>MenSS2</code> dataset using the function
-<code>pattern</code>. The clustering variable over which the random
-effects are specified is the factor variable <code>site</code>,
-representing the centres at which data were collected in the trial.
-Using the same distributional assumptions of the selection model, we fit
-the pattern mixture model by typing</p>
+<p>For each type of model, <code>missingHE</code> allows the inclusion of random effects terms to handle clustered data. To be precise, the term <em>random effects</em> does not have much meaning within a Bayesian approach since all parameters are in fact random variables. However, this terminology is quite useful to explain the structure of the model.</p>
+<p>We show how random effects can be added to the model of <span class="math inline">\(e\)</span> and <span class="math inline">\(c\)</span> within a pattern mixture model fitted to the <code>MenSS2</code> dataset using the function <code>pattern</code>. The clustering variable over which the random effects are specified is the factor variable <code>site</code>, representing the centres at which data were collected in the trial. Using the same distributional assumptions of the selection model, we fit the pattern mixture model by typing</p>
 <pre class="text"><code>&gt; PG.pat=pattern(data = MenSS2, model.eff = e ~ sex_inst.0 + (1 | site), 
 +                model.cost = c ~ 1 + (1 | site), type = &quot;MAR&quot;, restriction = &quot;AC&quot;, 
 +                n.iter = 1000, Delta_e = 0, Delta_c = 0, dist_e = &quot;pois&quot;, dist_c = &quot;gamma&quot;)</code></pre>
-<p>The function fits a random intercept only model for <span class="math inline">\(e\)</span> and <span class="math inline">\(c\)</span>, as indicated by the notation
-<code>(1 | site)</code>and <code>(1 | site)</code>. In both models,
-<code>site</code> is the clustering variable over which the random
-coefficients are estimated. <code>missingHE</code> allows the user to
-choose among different clustering variables for the model of <span class="math inline">\(e\)</span> and <span class="math inline">\(c\)</span> if these are available in the dataset.
-Random intercept and slope models can be specified using the notation
-<code>(1 + sex_inst.0 | site)</code>, where <code>sex_inst.0</code> is
-the name of a covariate which should be inlcuded as fixed effects in the
-corresponding outcome model. Finally, it is also possible to specify
-random slope only models using the notation
-<code>(0 + sex_inst.0 | site)</code>, where <code>0</code> indicates the
-removal of the random intercept. The same notation can be applied when
-using the <code>selection</code> and <code>hurdle</code> functions
-inside <code>missingHE</code>, with the addition that for these models
-random effects can also be specified for the missingness and structural
-value mechanisms. Use the <code>help</code> command to obtain more
-information on how random effects can be specified for each type of
-model.</p>
-<p>Coefficient estimates for the random effects can be extracted using
-the <code>coef</code> function and setting the argument
-<code>random = TRUE</code> (if set to <code>FALSE</code> then the fixed
-effects estimates are displayed).</p>
+<p>The function fits a random intercept only model for <span class="math inline">\(e\)</span> and <span class="math inline">\(c\)</span>, as indicated by the notation <code>(1 | site)</code>and <code>(1 | site)</code>. In both models, <code>site</code> is the clustering variable over which the random coefficients are estimated. <code>missingHE</code> allows the user to choose among different clustering variables for the model of <span class="math inline">\(e\)</span> and <span class="math inline">\(c\)</span> if these are available in the dataset. Random intercept and slope models can be specified using the notation <code>(1 + sex_inst.0 | site)</code>, where <code>sex_inst.0</code> is the name of a covariate which should be inlcuded as fixed effects in the corresponding outcome model. Finally, it is also possible to specify random slope only models using the notation <code>(0 + sex_inst.0 | site)</code>, where <code>0</code> indicates the removal of the random intercept. The same notation can be applied when using the <code>selection</code> and <code>hurdle</code> functions inside <code>missingHE</code>, with the addition that for these models random effects can also be specified for the missingness and structural value mechanisms. Use the <code>help</code> command to obtain more information on how random effects can be specified for each type of model.</p>
+<p>Coefficient estimates for the random effects can be extracted using the <code>coef</code> function and setting the argument <code>random = TRUE</code> (if set to <code>FALSE</code> then the fixed effects estimates are displayed).</p>
 <pre class="text"><code>&gt; coef(PG.pat, random = TRUE)
 $Comparator
 $Comparator$Effects
@@ -492,41 +354,14 @@ $Reference$Costs
 (Intercept) 1 2.892 1.982  0.176 5.683
 (Intercept) 2 2.698 2.000 -0.208 5.446
 (Intercept) 3 2.945 2.020  0.179 5.703</code></pre>
-<p>For both <span class="math inline">\(e\)</span> and <span class="math inline">\(c\)</span> models, summary statistics for the
-random coefficient estimates are displayed for each treatment group and
-each of the <span class="math inline">\(3\)</span> clusters in
-<code>site</code>.</p>
+<p>For both <span class="math inline">\(e\)</span> and <span class="math inline">\(c\)</span> models, summary statistics for the random coefficient estimates are displayed for each treatment group and each of the <span class="math inline">\(3\)</span> clusters in <code>site</code>.</p>
 </div>
 <div id="changing-the-priors" class="section level2">
 <h2>Changing the priors</h2>
-<p>By default, all models in <code>missingHE</code> are fitted using
-vague prior distributions so that posterior results are essentially
-derived based on the information from the observed data alone. This
-ensures a rough approximation to results obtained under a frequentist
-approach based on the same type of models.</p>
-<p>However, in some cases, it may be reasonable to use more informative
-priors to ensure a better stability of the posterior estimates by
-restricting the range over which estimates can be obtained. For example
-if, based on previous evidence or knowledge, the range over which a
-specific parameter is likely to vary is known, then priors can be
-specified so to give less weight to values outside that range when
-deriving the posterior estimates. However, unless the user is familiar
-with the choice of informative priors, it is generally recommended not
-to change the default priors of <code>missingHE</code> as the unintended
-use of informative priors may substantially drive posterior estimates
-and lead to incorrect results.</p>
-<p>For each type of model in <code>missingHE</code>, priors can be
-modified using the argument <code>prior</code>, which allows to change
-the hyperprior values for each model parameter. The interpretation of
-the prior values change according to the type of parameter and model
-considered. For example, we can fit a hurdle model using
-<code>hurdle</code> to the <code>MenSS2</code> dataset using more
-informative priors on some parameters.</p>
-<p>Prior values can be modified by first creating a list object which,
-for example, we call <code>my.prior</code>. Within this list, we create
-a number of elements (vectors of length two) which should be assigned
-specific names based on the type of parameters which priors we want to
-change.</p>
+<p>By default, all models in <code>missingHE</code> are fitted using vague prior distributions so that posterior results are essentially derived based on the information from the observed data alone. This ensures a rough approximation to results obtained under a frequentist approach based on the same type of models.</p>
+<p>However, in some cases, it may be reasonable to use more informative priors to ensure a better stability of the posterior estimates by restricting the range over which estimates can be obtained. For example if, based on previous evidence or knowledge, the range over which a specific parameter is likely to vary is known, then priors can be specified so to give less weight to values outside that range when deriving the posterior estimates. However, unless the user is familiar with the choice of informative priors, it is generally recommended not to change the default priors of <code>missingHE</code> as the unintended use of informative priors may substantially drive posterior estimates and lead to incorrect results.</p>
+<p>For each type of model in <code>missingHE</code>, priors can be modified using the argument <code>prior</code>, which allows to change the hyperprior values for each model parameter. The interpretation of the prior values change according to the type of parameter and model considered. For example, we can fit a hurdle model using <code>hurdle</code> to the <code>MenSS2</code> dataset using more informative priors on some parameters.</p>
+<p>Prior values can be modified by first creating a list object which, for example, we call <code>my.prior</code>. Within this list, we create a number of elements (vectors of length two) which should be assigned specific names based on the type of parameters which priors we want to change.</p>
 <pre class="text"><code>&gt; my.prior &lt;- list(
 +   &quot;alpha0.prior&quot; = c(0 , 0.0000001),
 +   &quot;alpha.prior&quot; = c(0, 0.0000001),
@@ -539,70 +374,20 @@ change.</p>
 +   &quot;s.g0.prior.c&quot;= c(0, 100),
 +   &quot;sigma.prior.c&quot; = c(0, 10000)
 + )</code></pre>
-<p>The names above have the following interpretations in terms of the
-model parameters:</p>
+<p>The names above have the following interpretations in terms of the model parameters:</p>
 <ul>
-<li><p><code>&quot;alpha0.prior&quot;</code> is the intercept of the model of
-<span class="math inline">\(e\)</span>. The first and second elements
-inside the vector for this parameter are the mean and precision (inverse
-of variance) that should be used for the normal prior given to this
-parameter by <code>missingHE</code>.</p></li>
-<li><p><code>&quot;alpha.prior&quot;</code> are the regression coefficients
-(exclusing the intercept) of the model of <span class="math inline">\(e\)</span>. The first and second elements inside
-the vector for this parameter are the mean and precision (inverse of
-variance) that should be used for the normal priors given to each
-coefficient by <code>missingHE</code>.</p></li>
-<li><p><code>&quot;beta0.prior&quot;</code> is the intercept of the model of <span class="math inline">\(c\)</span>. The first and second elements inside
-the vector for this parameter are the mean and precision (inverse of
-variance) that should be used for the normal prior given to this
-parameter by <code>missingHE</code>.</p></li>
-<li><p><code>&quot;gamma0.prior.c&quot;</code> is the intercept of the model of
-<span class="math inline">\(sc\)</span>. The first and second elements
-inside the vector for this parameter are the mean and precision (inverse
-of variance) that should be used for the logistic prior given to this
-parameter by <code>missingHE</code>.</p></li>
-<li><p><code>&quot;gamma.prior.c&quot;</code> are the regression coefficients
-(exclusing the intercept) of the model of <span class="math inline">\(sc\)</span>. The first and second elements inside
-the vector for this parameter are the mean and precision (inverse of
-variance) that should be used for the normal priors given to each
-coefficient by <code>missingHE</code>.</p></li>
-<li><p><code>&quot;mu.b0.prior&quot;</code> is the mean of the random intercept of
-the model of <span class="math inline">\(c\)</span>. The first and
-second elements inside the vector for this parameter are the mean and
-precision (inverse of variance) that should be used for the normal prior
-given to this parameter by <code>missingHE</code>.</p></li>
-<li><p><code>&quot;s.b0.prior&quot;</code> is the standard deviation of the random
-intercept of the model of <span class="math inline">\(c\)</span>. The
-first and second elements inside the vector for this parameter are the
-lower and upper bounds that should be used for the uniform prior given
-to this parameter by <code>missingHE</code>.</p></li>
-<li><p><code>&quot;mu.g0.prior&quot;</code> is the mean of the random intercept of
-the model of <span class="math inline">\(sc\)</span>. The first and
-second elements inside the vector for this parameter are the mean and
-precision (inverse of variance) that should be used for the normal prior
-given to this parameter by <code>missingHE</code>.</p></li>
-<li><p><code>&quot;s.g0.prior&quot;</code> is the standard deviation of the random
-intercept of the model of <span class="math inline">\(sc\)</span>. The
-first and second elements inside the vector for this parameter are the
-lower and upper bounds that should be used for the uniform prior given
-to this parameter by <code>missingHE</code>.</p></li>
-<li><p><code>&quot;sigma.prior.c&quot;</code> is the standard deviation of the
-model of <span class="math inline">\(c\)</span>. The first and second
-elements inside the vector for this parameter are the lower and upper
-bounds that should be used for the uniform prior given to this parameter
-by <code>missingHE</code>.</p></li>
+<li><p><code>&quot;alpha0.prior&quot;</code> is the intercept of the model of <span class="math inline">\(e\)</span>. The first and second elements inside the vector for this parameter are the mean and precision (inverse of variance) that should be used for the normal prior given to this parameter by <code>missingHE</code>.</p></li>
+<li><p><code>&quot;alpha.prior&quot;</code> are the regression coefficients (exclusing the intercept) of the model of <span class="math inline">\(e\)</span>. The first and second elements inside the vector for this parameter are the mean and precision (inverse of variance) that should be used for the normal priors given to each coefficient by <code>missingHE</code>.</p></li>
+<li><p><code>&quot;beta0.prior&quot;</code> is the intercept of the model of <span class="math inline">\(c\)</span>. The first and second elements inside the vector for this parameter are the mean and precision (inverse of variance) that should be used for the normal prior given to this parameter by <code>missingHE</code>.</p></li>
+<li><p><code>&quot;gamma0.prior.c&quot;</code> is the intercept of the model of <span class="math inline">\(sc\)</span>. The first and second elements inside the vector for this parameter are the mean and precision (inverse of variance) that should be used for the logistic prior given to this parameter by <code>missingHE</code>.</p></li>
+<li><p><code>&quot;gamma.prior.c&quot;</code> are the regression coefficients (exclusing the intercept) of the model of <span class="math inline">\(sc\)</span>. The first and second elements inside the vector for this parameter are the mean and precision (inverse of variance) that should be used for the normal priors given to each coefficient by <code>missingHE</code>.</p></li>
+<li><p><code>&quot;mu.b0.prior&quot;</code> is the mean of the random intercept of the model of <span class="math inline">\(c\)</span>. The first and second elements inside the vector for this parameter are the mean and precision (inverse of variance) that should be used for the normal prior given to this parameter by <code>missingHE</code>.</p></li>
+<li><p><code>&quot;s.b0.prior&quot;</code> is the standard deviation of the random intercept of the model of <span class="math inline">\(c\)</span>. The first and second elements inside the vector for this parameter are the lower and upper bounds that should be used for the uniform prior given to this parameter by <code>missingHE</code>.</p></li>
+<li><p><code>&quot;mu.g0.prior&quot;</code> is the mean of the random intercept of the model of <span class="math inline">\(sc\)</span>. The first and second elements inside the vector for this parameter are the mean and precision (inverse of variance) that should be used for the normal prior given to this parameter by <code>missingHE</code>.</p></li>
+<li><p><code>&quot;s.g0.prior&quot;</code> is the standard deviation of the random intercept of the model of <span class="math inline">\(sc\)</span>. The first and second elements inside the vector for this parameter are the lower and upper bounds that should be used for the uniform prior given to this parameter by <code>missingHE</code>.</p></li>
+<li><p><code>&quot;sigma.prior.c&quot;</code> is the standard deviation of the model of <span class="math inline">\(c\)</span>. The first and second elements inside the vector for this parameter are the lower and upper bounds that should be used for the uniform prior given to this parameter by <code>missingHE</code>.</p></li>
 </ul>
-<p>The values shown above are the default values set in
-<code>missingHE</code> for each of these parameters. It is possible to
-change the priors by providing different values, for example by
-increasing the precision for some of the coefficient estimates or
-decreasing the upper bound for standard deviation parameters. Different
-names should be used to indicate for which parameter the prior should be
-modified, keeping in mind that the full list of names that can be used
-varies depending on the type of models and modelling assumptions
-specified. The full list of parameter names for each type of model can
-be assessed using the <code>help</code>command on each function of
-<code>missingHE</code>.</p>
+<p>The values shown above are the default values set in <code>missingHE</code> for each of these parameters. It is possible to change the priors by providing different values, for example by increasing the precision for some of the coefficient estimates or descreasing the upper bound for standard deviation parameters. Different names should be used to indicate for which parameter the prior should be modified, keeping in mind that the full list of names that can be used varies depending on the type of models and modelling assumptions specified. The full list of parameter names for each type of model can be assessed using the <code>help</code>command on each function of <code>missingHE</code>.</p>
 <p>We can now fit the hurdle model using our priors by typing</p>
 <pre class="text"><code>&gt; #remove added constant from costs
 &gt; #MenSS2$c &lt;- MenSS2$c - 0.01
@@ -610,10 +395,7 @@ be assessed using the <code>help</code>command on each function of
 &gt; PG.hur=hurdle(data = MenSS2, model.eff = e ~ sex_inst.0, model.cost = c ~ 1 + (1 | site),
 +   model.se = se ~ 1, model.sc = sc ~ age + (1 | site), type = &quot;SAR&quot;, se = NULL, sc = 0,
 +   n.iter = 1000, dist_e = &quot;pois&quot;, dist_c = &quot;gamma&quot;, prior = my.prior)</code></pre>
-<p>In this case, we do not require handling any structural value in
-<span class="math inline">\(e\)</span> and we pass this information to
-the function by setting <code>se = NULL</code>. Finally, we can inspect
-the statistical results from the model by typing</p>
+<p>In this case, we do not require handling any structural value in <span class="math inline">\(e\)</span> and we pass this information to the function by setting <code>se = NULL</code>. Finally, we can inspect the statistical results from the model by typing</p>
 <pre class="text"><code>&gt; coef(PG.hur, random = FALSE)
 $Comparator
 $Comparator$Effects
