@@ -94,7 +94,6 @@ An object of the class 'missingHE' containing the following elements
   \item{cea}{A list containing the output of the economic evaluation performed using the function \code{\link[BCEA]{bcea}}}
   \item{type}{A character variable that indicate which type of missingness assumption has been used to run the model, 
   either \code{MAR} or \code{MNAR} (see details)}
-  \item{data_format}{A character variable that indicate which type of analysis was conducted, either using a \code{wide} or \code{longitudinal} dataset}
 }
 }
 \description{

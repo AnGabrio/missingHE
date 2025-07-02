@@ -110,7 +110,6 @@ An object of the class 'missingHE' containing the following elements
   \item{cea}{A list containing the output of the economic evaluation performed using the function \code{\link[BCEA]{bcea}}}
   \item{type}{A character variable that indicate which type of structural value mechanism has been used to run the model, 
   either \code{SCAR} or \code{SAR} (see details)}
-  \item{data_format}{A character variable that indicate which type of analysis was conducted, either using a \code{wide} or \code{longitudinal} dataset}
 }
 }
 \description{
@@ -165,14 +164,14 @@ notation + (x1 + x2 | site) for each covariate that was included in the fixed ef
 if a random effects are specified but they can be removed by adding the term 0 within the random effects formula, e.g. + (0 + x | z).
 }
 \examples{
-# Quick example to run using subset of MenSS dataset
+# Quck example to run using subset of MenSS dataset
 MenSS.subset <- MenSS[50:100, ]
 
 # Run the model using the hurdle function assuming a SCAR mechanism
 # Use only 100 iterations to run a quick check
 model.hurdle <- hurdle(data = MenSS.subset, model.eff = e ~ 1,model.cost = c ~ 1,
    model.se = se ~ 1, model.sc = sc ~ 1, se = 1, sc = 0, dist_e = "norm", dist_c = "norm",
-   type = "SCAR", n.chains = 2, n.iter = 50,  ppc = FALSE)
+   type = "SCAR", n.chains = 2, n.iter = 100,  ppc = FALSE)
 
 # Print the results of the JAGS model
 print(model.hurdle)

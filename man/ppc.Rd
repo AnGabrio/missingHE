@@ -2,14 +2,13 @@
 % Please edit documentation in R/ppc.R
 \name{ppc}
 \alias{ppc}
-\title{Posterior predictive checks for assessing the fit to the observed data of Bayesian models implemented in \code{JAGS} using the function \code{\link{selection}}, \code{\link{selection_long}}, \code{\link{pattern}} or \code{\link{hurdle}}}
+\title{Posterior predictive checks for assessing the fit to the observed data of Bayesian models implemented in \code{JAGS} using the function \code{\link{selection}}, \code{\link{pattern}} or \code{\link{hurdle}}}
 \usage{
 ppc(
   x,
   type = "histogram",
   outcome = "all",
   ndisplay = 15,
-  time_plot = NULL,
   theme = NULL,
   scheme_set = NULL,
   legend = "top",
@@ -18,20 +17,18 @@ ppc(
 }
 \arguments{
 \item{x}{An object of class "missingHE" containing the posterior results of a full Bayesian model implemented using the function \code{\link{selection}}, 
-\code{\link{selection_long}}, \code{\link{pattern}} or \code{\link{hurdle}}.}
+\code{\link{pattern}} or \code{\link{hurdle}}.}
 
 \item{type}{Type of posterior predictive check to be plotted for assessing model fit. Available choices include: 'histogram', 'boxplot', 
 'freqpoly', 'dens', 'dens_overlay' and ecdf_overlay', which compare the empirical and repicated distributions of the data; 'stat' and 'stat_2d', which compare
 the value of some statistics evaluated on the observed data with the replicated values for those statistics from the posterior predictions; 'error_hist', 
 'error_scatter', 'error_scatter_avg' and 'error_binned', which display the predictive errors of the model; 'intervals' and 'ribbon', which compare medians and
-central interval estimates of the replications with the observed data overlaid; 'scatter' and 'scatter_avg', which display scatterplots of the observed and replicated data.}
+central interval estmates of the replications with the observed data overlaid; 'scatter' and 'scatter_avg', which display scatterplots of the observed and replicated data.}
 
 \item{outcome}{The outcome variables that should be displayed. Use the names 'effects_arm1' and effects_arm2' for the effectiveness in the control and intervention arm; 
 use costs_arm1' or 'costs_arm2' for the costs; use "effects" or "costs" for the respective outcome in both arms; use "all" for all outcomes.}
 
 \item{ndisplay}{Number of posterior replications to be displayed in the plots.}
-
-\item{time_plot}{Time point for which posterior predictive checks should be displayed (only for longitudinal models).}
 
 \item{theme}{Type of ggplot theme among some pre-defined themes, mostly taken from the package \strong{ggthemes}. For a full list of available themes see details.}
 
@@ -45,31 +42,30 @@ use costs_arm1' or 'costs_arm2' for the costs; use "effects" or "costs" for the 
 A \code{ggplot} object containing the plots specified in the argument \code{type}.
 }
 \description{
-The focus is restricted to full Bayesian models in cost-effectiveness analyses based on the function \code{\link{selection}}, \code{\link{selection_long}},
-\code{\link{pattern}} and \code{\link{hurdle}}, with the fit to the observed data being assessed through graphical checks based on the posterior replications 
-generated from the model. Examples include the comparison of histograms, density plots, intervals, test statistics, evaluated using both the observed and replicated data.
+The focus is restricted to full Bayesian models in cost-effectiveness analyses based on the function \code{\link{selection}}, \code{\link{pattern}} and \code{\link{hurdle}}, 
+with the fit to the observed data being assessed through graphical checks based on the posterior replications generated from the model. 
+Examples include the comparison of histograms, density plots, intervals, test statistics, evaluated using both the observed and replicated data.
 Different types of posterior predictive checks are implemented to assess model fit using functions contained in the package \strong{bayesplot}. 
 Graphics and plots are managed using functions contained in the package \strong{ggplot2} and \strong{ggthemes}.
 }
 \details{
 The funciton produces different types of graphical posterior predictive checks using the estimates from a Bayesian cost-effectiveness model implemented
-with the function \code{\link{selection}}, \code{\link{selection_long}}, \code{\link{pattern}} or \code{\link{hurdle}}. The purpose of these checks is to visually compare the distribution (or some relevant quantity)
+with the function \code{\link{selection}}, \code{\link{pattern}} or \code{\link{hurdle}}. The purpose of these checks is to visually compare the distribution (or some relevant quantity)
 of the observed data with respect to that from the replicated data for both effectiveness and cost outcomes in each treatment arm. Since predictive checks are meaningful 
 only with respect to the observed data, only the observed outcome values are used to assess the fit of the model.
 The arguments \code{theme} and \code{scheme_set} allow to customise the graphical aspect of the plots generated by \code{ppc} and allow to choose among a set of possible 
 pre-defined themes and scheme sets taken form the package \strong{ggtheme} and \code{bayesplot}. For a complete list of the available character names for each theme and scheme set, see \strong{ggthemes} and \strong{bayesplot}.
 }
 \examples{
-# For examples see the function \code{\link{selection}}, \code{\link{selection_long}},
+# For examples see the function \code{\link{selection}}, 
 # \code{\link{pattern}} or \code{\link{hurdle}}
-#
 #
 }
 \references{
 Gelman, A. Carlin, JB., Stern, HS. Rubin, DB.(2003). \emph{Bayesian Data Analysis, 2nd edition}, CRC Press.
 }
 \seealso{
-\code{\link{selection}}, \code{\link{selection_long}}, \code{\link{pattern}} \code{\link{hurdle}} \code{\link{diagnostic}}
+\code{\link{selection}} \code{\link{pattern}} \code{\link{hurdle}} \code{\link{diagnostic}}
 }
 \author{
 Andrea Gabrio

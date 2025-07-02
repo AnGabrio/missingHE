@@ -96,7 +96,6 @@ An object of the class 'missingHE' containing the following elements
   \item{cea}{A list containing the output of the economic evaluation performed using the function \code{\link[BCEA]{bcea}}}
   \item{type}{A character variable that indicate which type of missingness mechanism has been used to run the model, 
   either \code{MAR} or \code{MNAR} (see details)}
-  \item{data_format}{A character variable that indicate which type of analysis was conducted, either using a \code{wide} or \code{longitudinal} dataset}
 }
 }
 \description{
@@ -154,7 +153,7 @@ if a random effects are specified but they can be removed by adding the term 0 w
 # Quck example to run using subset of MenSS dataset
 MenSS.subset <- MenSS[50:100, ]
 
-# Run the model using the selection function assuming a MAR mechanism
+# Run the model using the selection function assuming a SCAR mechanism
 # Use only 100 iterations to run a quick check
 model.selection <- selection(data = MenSS.subset, model.eff = e ~ 1,model.cost = c ~ 1,
    model.me = me ~ 1, model.mc = mc ~ 1, dist_e = "norm", dist_c = "norm",

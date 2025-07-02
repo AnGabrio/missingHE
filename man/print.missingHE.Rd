@@ -7,7 +7,7 @@
 \method{print}{missingHE}(x, value.mis = FALSE, only.means = TRUE, ...)
 }
 \arguments{
-\item{x}{A \code{missingHE} object containing the results of the Bayesian model run using the function \code{\link{selection}}, \code{\link{selection_long}}, \code{\link{pattern}} or \code{\link{hurdle}}.}
+\item{x}{A \code{missingHE} object containing the results of the Bayesian model run using the function \code{\link{selection}}, \code{\link{pattern}} or \code{\link{hurdle}}.}
 
 \item{value.mis}{Logical. If \code{value.mis} is \code{TRUE}, the model results displayed contain also the imputed values,
 else if \code{value.mis} is \code{FALSE} the missing values are hidden.}
@@ -24,7 +24,7 @@ Prints the summary table for the model fitted, with the estimate of the paramete
 }
 \examples{
  
-# For examples see the function \code{\link{selection}}, \code{\link{selection_long}}, 
+# For examples see the function \code{\link{selection}}, 
 # \code{\link{pattern}} or \code{\link{hurdle}}
 # 
 # 
