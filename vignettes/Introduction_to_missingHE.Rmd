@@ -26,7 +26,7 @@ Different types of missing data models exist, each with its own advantages and d
 
 For each model, the package provides a series of ancillary functions for assessing convergence of the algorithm, checking the fit to the data, extracting and summarising the results. This brief tutorial aims at helping getting started with the package and its main functions. Throughout the document, we will use the built-in dataset called `MenSS` as a toy example, which is directly available when installing and loading `missingHE` in your `R` workspace. It is important to remember that `missingHE` only allows the analysis of two-arm studies (comparison of more than two intervantions is not currently supported) and is designed to handle missing values only in the outcome variables (no missing values in the covariates are allowed).
 
-If you would like to have more information on the package, or would like to point out potential issues in the current version, feel free to contact the maintainer at <ucakgab@ucl.ac.uk>. Suggestions on how to improve the package are also very welcome.
+If you would like to have more information on the package, or would like to point out potential issues in the current version, feel free to contact the maintainer at <a.gabrio@maastrichtuniversity.nl>. Suggestions on how to improve the package are also very welcome.
 
 
 ## Data: MenSS
