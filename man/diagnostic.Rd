@@ -8,11 +8,11 @@ diagnostic(x, type = "denplot", param = "all", theme = NULL, ...)
 }
 \arguments{
 \item{x}{An object of class "missingHE" containing the posterior results of a full Bayesian model implemented using the function \code{\link{selection}}, 
-\code{\link{pattern}} or \code{\link{hurdle}}.}
+\code{\link{pattern}}, \code{\link{hurdle}} or \code{\link{long_miss}}.}
 
 \item{type}{Type of diagnostic check to be plotted for the model parameter selected. Available choices include: 'histogram' for histogram plots,
 'denplot' for density plots, 'traceplot' for trace plots, 'acf' for autocorrelation plots, 'running' for running mean plots,
-'compare' for comparing the distribution of the whole chain with only its last part, 'cross' for crosscorrelation plots, 'Rhat' for the potential scale reduction factor, 'geweke' for the geweke diagnostic,
+'compare' for comparing the distribution of the whole chain with only its last part, 'cross' for cross correlation plots, 'Rhat' for the potential scale reduction factor, 'geweke' for the geweke diagnostic,
 'pairs' for posterior correlation among the parameters,'caterpillar' for caterpillar plots.}
 
 \item{param}{Name of the family of parameters to process, as given by a regular expression. For example the mean parameters 
@@ -28,8 +28,8 @@ To see a complete list of all possible parameters by types of models assumed see
 A \strong{ggplot} object containing the plots specified in the argument \code{type}
 }
 \description{
-The focus is restricted to full Bayesian models in cost-effectiveness analyses based on the function \code{\link{selection}}, \code{\link{pattern}} and \code{\link{hurdle}}, 
-with convergence of the MCMC chains that is assessed through graphical checks of the posterior distribution of the parameters of interest,
+The focus is restricted to full Bayesian models in cost-effectiveness analyses based on the function \code{\link{selection}}, \code{\link{pattern}}, 
+\code{\link{hurdle}} and \code{\link{long_miss}}, with convergence of the MCMC chains that is assessed through graphical checks of the posterior distribution of the parameters of interest,
 Examples are density plots, trace plots, autocorrelation plots, etc. Other types of posterior checks are related to some summary MCMC statistics 
 that are able to detect possible issues in the convergence of the algorithm, such as the potential scale reduction factor or the effective sample size.
 Different types of diagnostic tools and statistics are used to assess model convergence using functions contained in the package \strong{ggmcmc}. 
@@ -54,31 +54,39 @@ must be specified in the argument \code{param} according to the specific model i
 \item "random.alpha" the regression random effects intercept and covariate coefficient parameters for the effect variables in the two treatment arms.
 \item "random.beta" the regression random effects intercept and covariate coefficient parameters for the cost variables in the two treatment arms.
 \item "p.e" the probability parameters of the missingness or structural values mechanism for the effect variables in the two treatment arms 
-(only with the function \code{selection} or \code{hurdle}).
+(only with the function \code{selection}, \code{hurdle} or \code{\link{long_miss}}).
 \item "p.c" the probability parameters of the missingness or structural values mechanism for the cost variables in the two treatment arms 
-(only with the function \code{selection} or \code{hurdle}).
+(only with the function \code{selection}, \code{hurdle} or \code{\link{long_miss}}).
 \item "gamma.e" the regression intercept and covariate coefficient parameters of the missingness or structural values mechanism
- for the effect variables in the two treatment arms (only with the function \code{selection} or \code{hurdle}).
+ for the effect variables in the two treatment arms (only with the function \code{selection}, \code{hurdle}).
 \item "gamma.c" the regression intercept and covariate coefficient parameters of the missingness or structural values mechanism 
- for the cost variables in the two treatment arms (only with the function \code{selection} or \code{hurdle}).
+ for the cost variables in the two treatment arms (only with the function \code{selection}, \code{hurdle}).
+\item "gamma.e1" or "gamma.e2" the regression intercept and covariate coefficient parameters of the missingness mechanism for the effect variables
+ in the control or treatment arm (only with the function \code{\link{long_miss}}).
+\item "gamma.c1" or "gamma.c2" the regression intercept and covariate coefficient parameters of the missingness mechanism for the cost variables 
+ in the control or treatment arm (only with the function \code{\link{long_miss}}).  
 \item "random.gamma.e" the random effects regression intercept and covariate coefficient parameters of the missingness or structural values mechanism
- for the effect variables in the two treatment arms (only with the function \code{selection} or \code{hurdle}).
+ for the effect variables in the two treatment arms (only with the function \code{selection}, \code{hurdle} or \code{\link{long_miss}}).
 \item "random.gamma.c" the random effects regression intercept and covariate coefficient parameters of the missingness or structural values mechanism 
- for the cost variables in the two treatment arms (only with the function \code{selection} or \code{hurdle}).
+ for the cost variables in the two treatment arms (only with the function \code{selection}, \code{hurdle} or \code{\link{long_miss}}).
 \item "pattern" the probabilities associated with the missingness patterns in the data (only with the function \code{pattern}).
 \item "delta.e" the mnar parameters of the missingness mechanism for the effect variables in the two treatment arms 
 (only with the function \code{selection} or \code{pattern}).
 \item "delta.c" the mnar parameters of the missingness mechanism for the cost variables in the two treatment arms 
 (only with the function \code{selection} or \code{pattern}).
+\item "delta.e1" or "delta.e2" the mnar parameters of the missingness mechanism for the effect variables in the control or treatment arm 
+(only with the function \code{\link{long_miss}}).
+\item "delta.c1" or "delta.c2" the mnar parameters of the missingness mechanism for the cost variables in the control or treatment arm 
+(only with the function \code{\link{long_miss}}).
 \item "random.delta.e" the random effects mnar parameters of the missingness mechanism for the effect variables in the two treatment arms 
-(only with the function \code{selection}).
+(only with the function \code{selection} or \code{\link{long_miss}}).
 \item "random.delta.c" the random effects mnar parameters of the missingness mechanism for the cost variables in the two treatment arms 
-(only with the function \code{selection}).
+(only with the function \code{selection} or \code{\link{long_miss}}).
 \item "all" all available parameters stored in the object \code{x}.
 }
 When the object \code{x} is created using the function \code{pattern}, pattern-specific standard deviation ("sd.e", "sd.c") and regression coefficient 
 parameters ("alpha", "beta") for both outcomes can be visualised. The parameters associated with a missingness mechanism can be accessed only when \code{x}
-is created using the function \code{selection} or \code{pattern}, while the parameters associated with the model for the structural values mechanism
+is created using the function \code{selection}, \code{pattern} or \code{\link{long_miss}}, while the parameters associated with the model for the structural values mechanism
 can be accessed only when \code{x} is created using the function \code{hurdle}.
 
 The argument \code{theme} allows to customise the graphical output of the plots generated by \code{diagnostic} and
@@ -86,7 +94,8 @@ allows to choose among a set of possible pre-defined themes taken form the packa
 for each theme, see \strong{ggthemes}.
 }
 \examples{
-#For examples see the function selection, pattern or hurdle
+# For examples see the function \code{\link{selection}}, \code{\link{pattern}}, 
+# \code{\link{hurdle}} or \code{\link{long_miss}}
 #
 #
 }
@@ -96,7 +105,7 @@ Gelman, A. Carlin, JB., Stern, HS. Rubin, DB.(2003). \emph{Bayesian Data Analysi
 Brooks, S. Gelman, A. Jones, JL. Meng, XL. (2011). \emph{Handbook of Markov Chain Monte Carlo}, CRC/Chapman and Hall.
 }
 \seealso{
-\code{\link[ggmcmc]{ggs}} \code{\link{selection}} \code{\link{selection}} \code{\link{hurdle}}.
+\code{\link[ggmcmc]{ggs}} \code{\link{selection}} \code{\link{pattern}} \code{\link{hurdle}} \code{\link{long_miss}}.
 }
 \author{
 Andrea Gabrio

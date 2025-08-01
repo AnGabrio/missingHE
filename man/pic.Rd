@@ -2,12 +2,13 @@
 % Please edit documentation in R/pic.R
 \name{pic}
 \alias{pic}
-\title{Predictive information criteria for Bayesian models fitted in \code{JAGS} using the funciton \code{\link{selection}}, \code{\link{pattern}} or \code{\link{hurdle}}}
+\title{Predictive information criteria for Bayesian models fitted in \code{JAGS} using the funciton \code{\link{selection}}, \code{\link{pattern}}, \code{\link{hurdle}} or \code{\link{long_miss}}}
 \usage{
 pic(x, criterion = "dic", module = "total")
 }
 \arguments{
-\item{x}{A \code{missingHE} object containing the results of a Bayesian model fitted in cost-effectiveness analysis using the function \code{\link{selection}}, \code{\link{pattern}} or \code{\link{hurdle}}.}
+\item{x}{A \code{missingHE} object containing the results of a Bayesian model fitted in cost-effectiveness analysis using the function \code{\link{selection}}, \code{\link{pattern}}, 
+\code{\link{hurdle}} or \code{\link{long_miss}}.}
 
 \item{criterion}{type of information criteria to be produced. Available choices are \code{'dic'} for the Deviance Information Criterion, 
 \code{'waic'} for the Widely Applicable Information Criterion, and \code{'looic'} for the Leave-One-Out Information Criterion.}
@@ -53,7 +54,8 @@ In finite cases, WAIC and LOO give similar esitmates, but for influential observ
 }
 \examples{
  
-#For examples see the function selection, pattern or hurdle 
+# For examples see the function \code{\link{selection}}, \code{\link{pattern}}, 
+# \code{\link{hurdle}} or \code{\link{long_miss}}
 # 
 # 
 }

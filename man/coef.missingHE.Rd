@@ -4,7 +4,7 @@
 \alias{coef.missingHE}
 \title{Extract regression coefficient estimates from objects in the class \code{missingHE}}
 \usage{
-\method{coef}{missingHE}(object, prob = c(0.025, 0.975), random = FALSE, digits = 3, ...)
+\method{coef}{missingHE}(object, prob = c(0.025, 0.975), random = FALSE, time = 1, digits = 3, ...)
 }
 \arguments{
 \item{object}{A \code{missingHE} object containing the results of the Bayesian modelling and the economic evaluation}
@@ -14,6 +14,8 @@ CI sample quantiles to be calculated and returned for the estimates.}
 
 \item{random}{Logical. If \code{random} is \code{TRUE}, the estimates of the random effects parameters are printed, when available.}
 
+\item{time}{A number indicating the time point at which posterior results for the model coefficients should be reported (only for longitudinal models).}
+
 \item{digits}{Number of digits to be displayed for each estimate.}
 
 \item{...}{Additional arguments affecting the summary produced.}
@@ -21,21 +23,21 @@ CI sample quantiles to be calculated and returned for the estimates.}
 \value{
 Prints a table with some summary statistics, including posterior mean, standard deviation and lower and upper quantiles based on the
 values specified in \code{prob}, for the posterior distributions of the regression coefficients of the effects and costs models run using the 
-function \code{selection}, \code{pattern} or \code{hurdle}.
+function \code{selection}, \code{pattern}, \code{hurdle} or \code{\link{long_miss}}.
 }
 \description{
 Produces a table printout with summary statistics for the regression coefficients of the health economic evaluation probabilistic model
-run using the function \code{\link{selection}}, \code{\link{pattern}} or \code{\link{hurdle}}.
+run using the function \code{\link{selection}}, \code{\link{pattern}},  \code{\link{hurdle}} or \code{\link{long_miss}}.
 }
 \examples{
  
-# For examples see the function \code{\link{selection}}, 
-# \code{\link{pattern}} or \code{\link{hurdle}}
+# For examples see the function \code{\link{selection}}, \code{\link{pattern}}, 
+# \code{\link{hurdle}} or \code{\link{long_miss}}
 # 
 # 
 }
 \seealso{
-\code{\link{selection}} \code{\link{pattern}} \code{\link{hurdle}} \code{\link{diagnostic}} \code{\link{plot.missingHE}}
+\code{\link{selection}} \code{\link{pattern}} \code{\link{hurdle}} \code{\link{long_miss}} \code{\link{diagnostic}} \code{\link{plot.missingHE}}
 }
 \author{
 Andrea Gabrio

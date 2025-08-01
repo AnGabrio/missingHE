@@ -18,10 +18,10 @@ Summary information on the main parameters of interests is provided.
 }
 \description{
 Produces a table printout with some summary results of the health economic evaluation probabilistic model
-run using the function \code{\link{selection}}, \code{\link{pattern}} or \code{\link{hurdle}}.
+run using the function \code{\link{selection}}, \code{\link{pattern}}, \code{\link{hurdle}} or \code{\link{long_miss}}.
 }
 \examples{
-#For examples see the function selection, pattern or hurdle
+# For examples see the function selection, pattern or hurdle
 #
 #
 }
@@ -29,7 +29,7 @@ run using the function \code{\link{selection}}, \code{\link{pattern}} or \code{\
 Baio, G.(2012). \emph{Bayesian Methods in Health Economcis}. CRC/Chapman Hall, London.
 }
 \seealso{
-\code{\link{selection}} \code{\link{pattern}} \code{\link{hurdle}} \code{\link{diagnostic}} \code{\link{plot.missingHE}}
+\code{\link{selection}} \code{\link{pattern}} \code{\link{hurdle}} \code{\link{long_miss}} \code{\link{diagnostic}} \code{\link{plot.missingHE}}
 }
 \author{
 Andrea Gabrio

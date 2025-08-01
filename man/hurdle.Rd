@@ -110,6 +110,7 @@ An object of the class 'missingHE' containing the following elements
   \item{cea}{A list containing the output of the economic evaluation performed using the function \code{\link[BCEA]{bcea}}}
   \item{type}{A character variable that indicate which type of structural value mechanism has been used to run the model, 
   either \code{SCAR} or \code{SAR} (see details)}
+  \item{data_format}{A character variable that indicate which type of analysis was conducted, either using a \code{wide} or \code{long} dataset}
 }
 }
 \description{
