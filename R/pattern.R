@@ -52,6 +52,7 @@
 #'   \item{cea}{A list containing the output of the economic evaluation performed using the function \code{\link[BCEA]{bcea}}}
 #'   \item{type}{A character variable that indicate which type of missingness assumption has been used to run the model, 
 #'   either \code{MAR} or \code{MNAR} (see details)}
+#'   \item{data_format}{A character variable that indicate which type of analysis was conducted, either using a \code{wide} or \code{long} dataset}
 #' }
 #' @seealso \code{\link[R2jags]{jags}}, \code{\link[BCEA]{bcea}}
 #' @keywords CEA JAGS missing data Pattern Mixture Models
@@ -480,8 +481,9 @@ pattern <- function(data, model.eff, model.cost, dist_e, dist_c, Delta_e, Delta_
   if(exists("Kmax", where = exArgs)) {Kmax = exArgs$Kmax } else {Kmax = 50000 }
   if(exists("wtp", where = exArgs)) {wtp = exArgs$wtp } else {wtp = NULL }
   if(exists("plot", where = exArgs)) {plot = exArgs$plot } else {plot = FALSE }
-  cea <- BCEA::bcea(e = model_output$mean_effects, c = model_output$mean_costs, ref = ref, interventions = interventions, Kmax = Kmax, wtp = wtp, plot = plot)
-  res <- list(data_set = data_set, model_output = model_output, cea = cea, type = type)
+  cea <- BCEA::bcea(e = model_output$mean_effects, c = model_output$mean_costs, ref = ref, interventions = interventions, Kmax = Kmax, k = wtp, plot = plot)
+  format <- "wide"
+  res <- list(data_set = data_set, model_output = model_output, cea = cea, type = type, data_format = format)
   class(res) <- "missingHE"
   return(res)
 }

@@ -1,9 +1,10 @@
-#' Predictive information criteria for Bayesian models fitted in \code{JAGS} using the funciton \code{\link{selection}}, \code{\link{pattern}} or \code{\link{hurdle}}
+#' Predictive information criteria for Bayesian models fitted in \code{JAGS} using the funciton \code{\link{selection}}, \code{\link{pattern}}, \code{\link{hurdle}} or \code{\link{long_miss}}
 #' 
 #' Efficient approximate leave-one-out cross validation (LOO), deviance information criterion (DIC) and widely applicable information criterion (WAIC) for Bayesian models, 
 #' calculated on the observed data.
 #' @keywords loo waic dic JAGS   
-#' @param x A \code{missingHE} object containing the results of a Bayesian model fitted in cost-effectiveness analysis using the function \code{\link{selection}}, \code{\link{pattern}} or \code{\link{hurdle}}.
+#' @param x A \code{missingHE} object containing the results of a Bayesian model fitted in cost-effectiveness analysis using the function \code{\link{selection}}, \code{\link{pattern}}, 
+#' \code{\link{hurdle}} or \code{\link{long_miss}}.
 #' @param criterion type of information criteria to be produced. Available choices are \code{'dic'} for the Deviance Information Criterion, 
 #' \code{'waic'} for the Widely Applicable Information Criterion, and \code{'looic'} for the Leave-One-Out Information Criterion.
 #' @param module The modules with respect to which the information criteria should be computed. Available choices are \code{'total'} for the whole model, 
@@ -56,7 +57,8 @@
 #' 
 #' @export
 #' @examples  
-#' #For examples see the function selection, pattern or hurdle 
+#' # For examples see the function \code{\link{selection}}, \code{\link{pattern}}, 
+#' # \code{\link{hurdle}} or \code{\link{long_miss}}
 #' # 
 #' # 
 
@@ -81,6 +83,7 @@ pic <- function(x, criterion = "dic", module = "total") {
   if(!module %in% c("total", "e", "c", "both")) {
     stop("you must select a character name among those available. For details type 'help(pic)'")
   }
+  if(x$data_format == "wide") {
   m_e1 <- x$data_set$missing_effects$Control
   loglik_e1 <- x$model_output$loglik$effects$control[, m_e1 == 0]
   m_e2 <- x$data_set$missing_effects$Intervention
@@ -190,9 +193,9 @@ pic <- function(x, criterion = "dic", module = "total") {
   }
   if(criterion == "dic") {
       d_bar <- mean(-2 * loglik)
-      pD <- var(-2 * loglik) / 2
+      pD <- var(-2* loglik) / 2
       dic <- d_bar + pD
-      d_hat <- 2 * d_bar - dic 
+      d_hat <- dic - 2 * pD 
       ic <- list("d_bar" = d_bar, "pD" = pD, "dic" = dic, "d_hat" = d_hat)
   }
   if(criterion == "waic") {
@@ -220,20 +223,122 @@ pic <- function(x, criterion = "dic", module = "total") {
     ic <- list("elpd" = elpd, "elpd_se" = elpd_se, "p" = p, "p_se" = p_se, 
                "looic" = looic, "looic_se" = looic_se, "pointwise" = pointwise, "pareto_k" = pareto_k)
   }
+ }
+  if(x$data_format == "long") {
+    m_e1 <- ifelse(is.na(x$data_set$effects$Control) == TRUE, 1, 0)
+    m_e2 <- ifelse(is.na(x$data_set$effects$Intervention) == TRUE, 1, 0)
+    m_c1 <- ifelse(is.na(x$data_set$costs$Control) == TRUE, 1, 0)
+    m_c2 <- ifelse(is.na(x$data_set$costs$Intervention) == TRUE, 1, 0)
+    loglik_e1 <- replicate(dim(m_e1)[2], list())
+    loglik_e2 <- replicate(dim(m_e2)[2], list())
+    loglik_c1 <- replicate(dim(m_c1)[2], list())
+    loglik_c2 <- replicate(dim(m_c2)[2], list())
+    for(time in 1:dim(m_e1)[2]) {
+      loglik_e1[[time]] <- x$model_output$loglik$effects$control[, m_e1[, time] == 0, time]
+      loglik_e2[[time]] <- x$model_output$loglik$effects$intervention[, m_e2[, time] == 0, time]
+      loglik_c1[[time]] <- x$model_output$loglik$costs$control[, m_c1[, time] == 0, time]
+      loglik_c2[[time]] <- x$model_output$loglik$costs$intervention[, m_c2[, time] == 0, time]
+    }
+    if(x$model_output$type == "LONG" | x$model_output$type == "LONG_e" | 
+       x$model_output$type == "LONG_c" | x$model_output$type == "LONG_ec" ) {
+      loglik_me1 <- replicate(dim(m_e1)[2], list())
+      loglik_me2 <- replicate(dim(m_e2)[2], list())
+      loglik_mc1 <- replicate(dim(m_c1)[2], list())
+      loglik_mc2 <- replicate(dim(m_c2)[2], list())
+      for(time in 1:dim(m_e1)[2]) {
+        loglik_me1[[time]] <- x$model_output$loglik$`missing indicators effects`$control[, , time]
+        loglik_me2[[time]] <- x$model_output$loglik$`missing indicators effects`$intervention[, , time]
+        loglik_mc1[[time]] <- x$model_output$loglik$`missing indicators costs`$control[, , time]
+        loglik_mc2[[time]] <- x$model_output$loglik$`missing indicators costs`$intervention[, , time]
+      }
+      if(criterion == "dic") {
+        loglik_e <- replicate(dim(m_e1)[2], list())
+        loglik_c <- replicate(dim(m_e1)[2], list())
+        loglik_me <- replicate(dim(m_e1)[2], list())
+        loglik_mc <- replicate(dim(m_e1)[2], list())
+        loglik_e_c <- replicate(dim(m_e1)[2], list())
+        loglik_total <- replicate(dim(m_e1)[2], list())
+        for(time in 1:dim(m_e1)[2]) {
+          loglik_e[[time]] <- c(rowSums(loglik_e1[[time]]), rowSums(loglik_e2[[time]]))
+          loglik_c[[time]] <- c(rowSums(loglik_c1[[time]]), rowSums(loglik_c2[[time]]))
+          loglik_me[[time]] <- c(rowSums(loglik_me1[[time]]), rowSums(loglik_me2[[time]]))
+          loglik_mc[[time]] <- c(rowSums(loglik_mc1[[time]]), rowSums(loglik_mc2[[time]]))
+          loglik_e_c[[time]] <- c(rowSums(loglik_e1[[time]]), rowSums(loglik_e2[[time]]), rowSums(loglik_c1[[time]]), rowSums(loglik_c2[[time]]))
+          loglik_total[[time]] <- c(rowSums(loglik_e1[[time]]), rowSums(loglik_e2[[time]]), rowSums(loglik_c1[[time]]), rowSums(loglik_c2[[time]]), 
+                                    rowSums(loglik_me1[[time]]), rowSums(loglik_me2[[time]]), loglik_mc1[[time]], rowSums(loglik_mc2[[time]]))
+        }
+      } else if(criterion == "looic" | criterion == "waic"){
+        loglik_e <- replicate(dim(m_e1)[2], list())
+        loglik_c <- replicate(dim(m_e1)[2], list())
+        loglik_me <- replicate(dim(m_e1)[2], list())
+        loglik_mc <- replicate(dim(m_e1)[2], list())
+        loglik_e_c <- replicate(dim(m_e1)[2], list())
+        loglik_total <- replicate(dim(m_e1)[2], list())
+        for(time in 1:dim(m_e1)[2]) {
+          loglik_e[[time]] <- cbind(loglik_e1[[time]], loglik_e2[[time]])
+          loglik_c[[time]] <- cbind(loglik_c1[[time]], loglik_c2[[time]])
+          loglik_me[[time]] <- cbind(loglik_me1[[time]], loglik_me2[[time]])
+          loglik_mc[[time]] <- cbind(loglik_mc1[[time]], loglik_mc2[[time]])
+          loglik_e_c[[time]] <- cbind(loglik_e1[[time]], loglik_e2[[time]], loglik_c1[[time]], loglik_c2[[time]])
+          loglik_total[[time]] <- cbind(loglik_e1[[time]], loglik_e2[[time]], loglik_c1[[time]], loglik_c2[[time]],
+                                        loglik_me1[[time]], loglik_me2[[time]], loglik_mc1[[time]], loglik_mc2[[time]])
+        }
+      }
+    }
+    if(module == "total") { 
+      loglik <- loglik_total
+    } else if(module == "e") {
+      loglik <- loglik_e
+    } else if(module == "c") {
+      loglik <- loglik_c
+    } else if(module == "both") {
+      loglik <- loglik_e_c
+    }
+    if(criterion == "dic") {
+      d_bar <- pD <- rep(NA, dim(m_e1)[2])
+      for(time in 1:dim(m_e1)[2]) { 
+        d_bar[time] <- mean(-2 * loglik[[time]]) 
+        pD[time] <- var(-2* loglik[[time]]) / 2
+      }
+      dic <- d_bar + pD
+      d_hat <- dic - 2 * pD  
+      ic <- list("d_bar" = d_bar, "pD" = pD, "dic" = dic, "d_hat" = d_hat, "sum_dic" = sum(dic), "sum_pD" = sum(pD))
+    }
+    if(criterion == "waic") {
+      waic_l <- pointwise <- replicate(dim(m_e1)[2], list())
+      elpd <- elpd_se <- rep(NA, dim(m_e1)[2])
+      p <- p_se <- waic <- waic_se <- rep(NA, dim(m_e1)[2])
+      for(time in 1:dim(m_e1)[2]) { 
+        waic_l[[time]] <- suppressWarnings(loo::waic(loglik[[time]]))
+        elpd[time] <- waic_l[[time]]$estimates[1, 1]
+        elpd_se[time] <- waic_l[[time]]$estimates[1, 2]
+        p[time] <- waic_l[[time]]$estimates[2, 1]
+        p_se[time] <- waic_l[[time]]$estimates[2, 2]
+        waic[time] <- waic_l[[time]]$estimates[3, 1]
+        waic_se[time] <- waic_l[[time]]$estimates[3, 2]
+        pointwise[[time]] <- waic_l[[time]]$pointwise
+      }
+      ic <- list("elpd" = elpd, "elpd_se" = elpd_se, "p" = p, "p_se" = p_se, "waic" = waic, "waic_se" = waic_se, "pointwise" = pointwise, 
+                 "sum_waic" = sum(waic), "sum_pwaic" = sum(p))
+    }
+    if(criterion == "looic") {
+      loo_l <- pointwise <- pareto_k <- replicate(dim(m_e1)[2], list())
+      elpd <- elpd_se <- rep(NA, dim(m_e1)[2])
+      p <- p_se <- looic <- looic_se <- rep(NA, dim(m_e1)[2])
+      for(time in 1:dim(m_e1)[2]) { 
+        loo_l[[time]] <- suppressWarnings(loo::loo(loglik[[time]]))
+        elpd[time] <- loo_l[[time]]$estimates[1, 1]
+        elpd_se[time] <- loo_l[[time]]$estimates[1, 2]
+        p[time] <- loo_l[[time]]$estimates[2, 1]
+        p_se[time] <- loo_l[[time]]$estimates[2, 2]
+        looic[time] <- loo_l[[time]]$estimates[3, 1]
+        looic_se[time] <- loo_l[[time]]$estimates[3, 2]
+        pointwise[[time]] <- loo_l[[time]]$pointwise
+        pareto_k[[time]] <- loo_l[[time]]$pointwise
+      }
+      ic <- list("elpd" = elpd, "elpd_se" = elpd_se, "p" = p, "p_se" = p_se, "looic" = looic, "looic_se" = looic_se, "pointwise" = pointwise, "pareto_k" = pareto_k, 
+                 "sum_looic" = sum(looic), "sum_plooic" = sum(p))
+    }
+  }
   return(ic)
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

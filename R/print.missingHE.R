@@ -2,7 +2,8 @@
 #' 
 #' Prints the summary table for the model fitted, with the estimate of the parameters and/or missing values.
 #' @keywords print JAGS missing data  
-#' @param x A \code{missingHE} object containing the results of the Bayesian model run using the function \code{\link{selection}}, \code{\link{pattern}} or \code{\link{hurdle}}.
+#' @param x A \code{missingHE} object containing the results of the Bayesian model run using the function \code{\link{selection}}, \code{\link{pattern}},
+#' \code{\link{hurdle}} or \code{\link{long_miss}}.
 #' @param value.mis Logical. If \code{value.mis} is \code{TRUE}, the model results displayed contain also the imputed values,
 #' else if \code{value.mis} is \code{FALSE} the missing values are hidden.
 #' @param only.means Logical. If \code{only.means} is \code{TRUE}, then the \code{print} function only shows the summary
@@ -13,8 +14,8 @@
 #' @author Andrea Gabrio
 #' @export
 #' @examples  
-#' # For examples see the function \code{\link{selection}}, 
-#' # \code{\link{pattern}} or \code{\link{hurdle}}
+#' # For examples see the function \code{\link{selection}}, \code{\link{pattern}}, 
+#' # \code{\link{hurdle}} or \code{\link{long_miss}}
 #' # 
 #' # 
 

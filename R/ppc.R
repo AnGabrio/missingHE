@@ -1,28 +1,29 @@
 #' Posterior predictive checks for assessing the fit to the observed data of Bayesian models implemented in \code{JAGS} using the function \code{\link{selection}}, \code{\link{pattern}} or \code{\link{hurdle}}
 #'
-#' The focus is restricted to full Bayesian models in cost-effectiveness analyses based on the function \code{\link{selection}}, \code{\link{pattern}} and \code{\link{hurdle}}, 
-#' with the fit to the observed data being assessed through graphical checks based on the posterior replications generated from the model. 
+#' The focus is restricted to full Bayesian models in cost-effectiveness analyses based on the function \code{\link{selection}}, \code{\link{pattern}},
+#' \code{\link{hurdle}} or \code{\link{long_miss}} with the fit to the observed data being assessed through graphical checks based on the posterior replications generated from the model. 
 #' Examples include the comparison of histograms, density plots, intervals, test statistics, evaluated using both the observed and replicated data.
 #' Different types of posterior predictive checks are implemented to assess model fit using functions contained in the package \strong{bayesplot}. 
 #' Graphics and plots are managed using functions contained in the package \strong{ggplot2} and \strong{ggthemes}.
 #' @keywords posterior predictive checks MCMC replications 
 #' @param x An object of class "missingHE" containing the posterior results of a full Bayesian model implemented using the function \code{\link{selection}}, 
-#' \code{\link{pattern}} or \code{\link{hurdle}}.
+#' \code{\link{pattern}}, \code{\link{hurdle}} or \code{\link{long_miss}}.
 #' @param type Type of posterior predictive check to be plotted for assessing model fit. Available choices include: 'histogram', 'boxplot', 
 #' 'freqpoly', 'dens', 'dens_overlay' and ecdf_overlay', which compare the empirical and repicated distributions of the data; 'stat' and 'stat_2d', which compare
 #' the value of some statistics evaluated on the observed data with the replicated values for those statistics from the posterior predictions; 'error_hist', 
 #' 'error_scatter', 'error_scatter_avg' and 'error_binned', which display the predictive errors of the model; 'intervals' and 'ribbon', which compare medians and
-#' central interval estmates of the replications with the observed data overlaid; 'scatter' and 'scatter_avg', which display scatterplots of the observed and replicated data.   
+#' central interval estimates of the replications with the observed data overlaid; 'scatter' and 'scatter_avg', which display scatterplots of the observed and replicated data.   
 #' @param outcome The outcome variables that should be displayed. Use the names 'effects_arm1' and effects_arm2' for the effectiveness in the control and intervention arm; 
 #' use costs_arm1' or 'costs_arm2' for the costs; use "effects" or "costs" for the respective outcome in both arms; use "all" for all outcomes.
 #' @param ndisplay Number of posterior replications to be displayed in the plots.
+#' @param time_plot Time point for which posterior predictive checks should be displayed (only for long models).  
 #' @param theme Type of ggplot theme among some pre-defined themes, mostly taken from the package \strong{ggthemes}. For a full list of available themes see details.
 #' @param scheme_set Type of scheme sets among some pre-defined schemes, mostly taken from the package \strong{bayesplot}. For a full list of available themes see details.
 #' @param legend Position of the legend: available choices are: "top", "left", "right", "bottom" and "none".
 #' @param ... Additional parameters that can be provided to manage the output of \code{ppc}. For more details see \strong{bayesplot}.  
 #' @return A \code{ggplot} object containing the plots specified in the argument \code{type}.
-#' @seealso \code{\link{selection}} \code{\link{pattern}} \code{\link{hurdle}} \code{\link{diagnostic}}
-#' @details The funciton produces different types of graphical posterior predictive checks using the estimates from a Bayesian cost-effectiveness model implemented
+#' @seealso \code{\link{selection}} \code{\link{pattern}} \code{\link{hurdle}} \code{\link{long_miss}} \code{\link{diagnostic}}
+#' @details The function produces different types of graphical posterior predictive checks using the estimates from a Bayesian cost-effectiveness model implemented
 #' with the function \code{\link{selection}}, \code{\link{pattern}} or \code{\link{hurdle}}. The purpose of these checks is to visually compare the distribution (or some relevant quantity)
 #' of the observed data with respect to that from the replicated data for both effectiveness and cost outcomes in each treatment arm. Since predictive checks are meaningful 
 #' only with respect to the observed data, only the observed outcome values are used to assess the fit of the model.
@@ -36,11 +37,11 @@
 #' @importFrom bayesplot color_scheme_set ppc_hist ppc_boxplot ppc_freqpoly ppc_dens ppc_dens_overlay ppc_ecdf_overlay ppc_stat color_scheme_get bayesplot_theme_get ppc_stat_2d ppc_error_hist ppc_error_scatter ppc_error_scatter_avg ppc_error_binned ppc_intervals ppc_ribbon ppc_scatter ppc_scatter_avg legend_none
 #' @export 
 #' @examples
-#' # For examples see the function \code{\link{selection}}, 
-#' # \code{\link{pattern}} or \code{\link{hurdle}}
+#' # For examples see the function \code{\link{selection}}, \code{\link{pattern}}, 
+#' # \code{\link{hurdle}} or \code{\link{long_miss}}
 #' #
 
-ppc <- function(x, type = "histogram", outcome = "all", ndisplay = 15, theme = NULL, scheme_set = NULL, legend = "top", ...) {
+ppc <- function(x, type = "histogram", outcome = "all", ndisplay = 15, time_plot = NULL, theme = NULL, scheme_set = NULL, legend = "top", ...) {
   if(!isTRUE(requireNamespace("ggplot2")) | !isTRUE(requireNamespace("ggthemes")) | !isTRUE(requireNamespace("bayesplot")) | !isTRUE(requireNamespace("ggpubr"))) {
     stop("You need to install the R packages 'ggplot2' and 'bayesplot'. Please run in your R terminal:\n install.packages('ggplot2', 'ggthemes', 'bayesplot', 'ggpubr')")
   }
@@ -62,9 +63,6 @@ ppc <- function(x, type = "histogram", outcome = "all", ndisplay = 15, theme = N
   }
   if(!outcome %in% c("effects_arm1", "costs_arm1", "effects_arm2", "costs_arm2", "effects", "costs", "all")) {
     stop("You must provide a plot outcome among those available")
-  }
-  if(is.numeric(ndisplay) == FALSE |  ndisplay < 1 | ndisplay > dim(x$model_output$`model summary`$BUGSoutput$sims.list$mu_e1)[1]) {
-    stop("number of replications to display is not valid")
   }
   if(!legend %in% c("top", "right", "left", "bottom", "none")) {
     stop("Please provide a valid name for 'legend' to indicate the position of the legend")
@@ -88,6 +86,10 @@ ppc <- function(x, type = "histogram", outcome = "all", ndisplay = 15, theme = N
   if(type == "stat_2d" & is.null(stat) == TRUE | type == "stat_2d" & length(stat) !=2 | type == "stat_2d" & any(sapply(stat, is.function)) == FALSE) {
     stop("Please use the argument 'stat' to provide a vector of two functions for computing statistics on replications")
   }
+  if(x$data_format == "wide") {
+    if(is.numeric(ndisplay) == FALSE |  ndisplay < 1 | ndisplay > dim(x$model_output$`model summary`$BUGSoutput$sims.list$mu_e1)[1]) {
+      stop("number of replications to display is not valid")
+    }
   index_mis_e1 <- which(is.na(x$data_set$effects$Control))
   index_mis_e2 <- which(is.na(x$data_set$effects$Intervention))
   index_mis_c1 <- which(is.na(x$data_set$costs$Control))
@@ -412,7 +414,7 @@ ppc <- function(x, type = "histogram", outcome = "all", ndisplay = 15, theme = N
       ppc_plot_e1 <- ggplot2::ggplot(df1, ggplot2::aes(x = values_e1)) + 
         ggplot2::geom_density(fill = color_sheme_rep$light, color = color_sheme_rep_border$light_highlight, 
                               trim = trim, size = size, alpha = alpha) +
-        ggplot2::geom_vline(xintercept = stat_e1, color = color_sheme_obs$dark, size = 1, linetype = "dashed") +
+        ggplot2::geom_vline(xintercept = stat_e1, color = color_sheme_obs$dark, linewidth = 1, linetype = "dashed") +
         ggplot2::scale_y_continuous(expand = c(0, 0)) +
         ggplot2::theme(axis.text.y = ggplot2::element_blank(), axis.ticks.y = ggplot2::element_blank(), 
                        axis.title.y = ggplot2::element_blank(), axis.title.x = ggplot2::element_blank()) +
@@ -420,7 +422,7 @@ ppc <- function(x, type = "histogram", outcome = "all", ndisplay = 15, theme = N
       ppc_plot_c1 <- ggplot2::ggplot(df1, ggplot2::aes(x = values_c1)) + 
         ggplot2::geom_density(fill = color_sheme_rep$light, color = color_sheme_rep_border$light_highlight, 
                               trim = trim, size = size, alpha = alpha) +
-        ggplot2::geom_vline(xintercept = stat_c1, color = color_sheme_obs$dark, size = 1, linetype = "dashed") +
+        ggplot2::geom_vline(xintercept = stat_c1, color = color_sheme_obs$dark, linewidth = 1, linetype = "dashed") +
         ggplot2::scale_y_continuous(expand = c(0, 0)) +
         ggplot2::theme(axis.text.y = ggplot2::element_blank(), axis.ticks.y = ggplot2::element_blank(), 
                        axis.title.y = ggplot2::element_blank(), axis.title.x = ggplot2::element_blank()) +
@@ -428,7 +430,7 @@ ppc <- function(x, type = "histogram", outcome = "all", ndisplay = 15, theme = N
       ppc_plot_e2 <- ggplot2::ggplot(df2, ggplot2::aes(x = values_e2)) + 
         ggplot2::geom_density(fill = color_sheme_rep$light, color = color_sheme_rep_border$light_highlight, 
                               trim = trim, size = size, alpha = alpha) +
-        ggplot2::geom_vline(xintercept = stat_e2, color = color_sheme_obs$dark, size = 1, linetype = "dashed") +
+        ggplot2::geom_vline(xintercept = stat_e2, color = color_sheme_obs$dark, linewidth = 1, linetype = "dashed") +
         ggplot2::scale_y_continuous(expand = c(0, 0)) +
         ggplot2::theme(axis.text.y = ggplot2::element_blank(), axis.ticks.y = ggplot2::element_blank(), 
                        axis.title.y = ggplot2::element_blank(), axis.title.x = ggplot2::element_blank()) +
@@ -436,7 +438,7 @@ ppc <- function(x, type = "histogram", outcome = "all", ndisplay = 15, theme = N
       ppc_plot_c2 <- ggplot2::ggplot(df2, ggplot2::aes(x = values_c2)) + 
         ggplot2::geom_density(fill = color_sheme_rep$light, color = color_sheme_rep_border$light_highlight, 
                               trim = trim, size = size, alpha = alpha) +
-        ggplot2::geom_vline(xintercept = stat_c2, color = color_sheme_obs$dark, size = 1, linetype = "dashed") +
+        ggplot2::geom_vline(xintercept = stat_c2, color = color_sheme_obs$dark, linewidth = 1, linetype = "dashed") +
         ggplot2::scale_y_continuous(expand = c(0, 0)) +
         ggplot2::theme(axis.text.y = ggplot2::element_blank(), axis.ticks.y = ggplot2::element_blank(), 
                        axis.title.y = ggplot2::element_blank(), axis.title.x = ggplot2::element_blank()) +
@@ -472,7 +474,7 @@ ppc <- function(x, type = "histogram", outcome = "all", ndisplay = 15, theme = N
         ggplot2::geom_histogram(fill = color_sheme_rep$light, 
                                 color = color_sheme_rep_border$light_highlight, 
                                 binwidth = binwidth) +
-        ggplot2::geom_vline(xintercept = stat_biv1, color = color_sheme_obs$dark, size = 2) +
+        ggplot2::geom_vline(xintercept = stat_biv1, color = color_sheme_obs$dark, linewidth = 2) +
         ggplot2::scale_y_continuous(expand = c(0, 0)) +
         ggplot2::theme(axis.text.y = ggplot2::element_blank(), axis.ticks.y = ggplot2::element_blank(), 
                        axis.title.y = ggplot2::element_blank(), axis.title.x = ggplot2::element_blank()) 
@@ -480,7 +482,7 @@ ppc <- function(x, type = "histogram", outcome = "all", ndisplay = 15, theme = N
         ggplot2::geom_histogram(fill = color_sheme_rep$light, 
                                 color = color_sheme_rep_border$light_highlight, 
                                 binwidth = binwidth) +
-        ggplot2::geom_vline(xintercept = stat_biv2, color = color_sheme_obs$dark, size = 2) +
+        ggplot2::geom_vline(xintercept = stat_biv2, color = color_sheme_obs$dark, linewidth = 2) +
         ggplot2::scale_y_continuous(expand = c(0, 0)) +
         ggplot2::theme(axis.text.y = ggplot2::element_blank(), axis.ticks.y = ggplot2::element_blank(), 
                        axis.title.y = ggplot2::element_blank(), axis.title.x = ggplot2::element_blank())
@@ -492,12 +494,12 @@ ppc <- function(x, type = "histogram", outcome = "all", ndisplay = 15, theme = N
         ppc_plot_e1 <- ggplot2::ggplot(df1, ggplot2::aes(x = values_biv1)) +
           ggplot2::geom_density(fill = color_sheme_rep$light, 
                                 color = color_sheme_rep_border$light_highlight, trim = trim, size = size, alpha = alpha) +
-          ggplot2::geom_vline(xintercept = stat_biv1, color = color_sheme_obs$dark, size = 1, linetype = "dashed") +
+          ggplot2::geom_vline(xintercept = stat_biv1, color = color_sheme_obs$dark, linewidth = 1, linetype = "dashed") +
           ggplot2::scale_y_continuous(expand = c(0, 0)) +
           ggplot2::theme(axis.text.y = ggplot2::element_blank(), axis.ticks.y = ggplot2::element_blank(), 
                          axis.title.y = ggplot2::element_blank(), axis.title.x = ggplot2::element_blank()) +
           ggplot2::annotate("text", x = -Inf, y = Inf, 
-                            label = paste_p_biv1, parse = TRUE, hjust = -0.1, vjust = 2, size=4)
+                            label = paste_p_biv1, parse = TRUE, hjust = -0.1, vjust = 2, size = 4)
         ppc_plot_c2 <- ggplot2::ggplot(df2, ggplot2::aes(x = values_biv2)) +
           ggplot2::geom_density(fill = color_sheme_rep$light, 
                                 color = color_sheme_rep_border$light_highlight, trim = trim, size = size, alpha = alpha) +
@@ -506,7 +508,7 @@ ppc <- function(x, type = "histogram", outcome = "all", ndisplay = 15, theme = N
           ggplot2::theme(axis.text.y = ggplot2::element_blank(), axis.ticks.y = ggplot2::element_blank(), 
                          axis.title.y = ggplot2::element_blank(), axis.title.x = ggplot2::element_blank()) +
           ggplot2::annotate("text", x = -Inf, y = Inf, 
-                            label = paste_p_biv2, parse = TRUE, hjust = -0.1, vjust = 2, size=4)
+                            label = paste_p_biv2, parse = TRUE, hjust = -0.1, vjust = 2, size = 4)
       }
   } else if(type == "stat_2d") {
     if(exists("size", where = exArgs)) {size = exArgs$size} else {size = 2.5 }
@@ -600,7 +602,641 @@ ppc <- function(x, type = "histogram", outcome = "all", ndisplay = 15, theme = N
     if(is.null(corr) == FALSE) {
       ppc_plot_output <- ggpubr::ggarrange(ppc_plot_e1, ppc_plot_c2, labels = c("control", "intervention"), ncol = 2, nrow = 1, common.legend = TRUE, legend = legend)
     }
+   }
   }
+  if(x$data_format == "long") {
+    if(is.numeric(ndisplay) == FALSE |  ndisplay < 1 | ndisplay > dim(x$model_output$`model summary`$BUGSoutput$sims.list$mu_e1)[1]) {
+      stop("number of replications to display is not valid")
+    }
+    if(is.null(time_plot) == FALSE) {
+      if(time_plot < 1 | time_plot > dim(x$data_set$effects$Control)[2] | is.numeric(time_plot) == FALSE | isTRUE(all.equal(time_plot, as.integer(time_plot))) == FALSE) {
+        stop("Time must be a numeric integer. Minimum time is 1 (baseline) and maximum time is the latest follow-up time in the data")
+      }
+    }
+    index_mis_e1 <- which(is.na(x$data_set$effects$Control), arr.ind = TRUE)
+    index_mis_e2 <- which(is.na(x$data_set$effects$Intervention), arr.ind = TRUE)
+    index_mis_c1 <- which(is.na(x$data_set$costs$Control), arr.ind = TRUE)
+    index_mis_c2 <- which(is.na(x$data_set$costs$Intervention), arr.ind = TRUE)
+    if(length(index_mis_e1) == 0 | length(index_mis_e2) == 0) {
+      stop("Missing values not found for the effects in both arms")
+    } 
+    if(length(index_mis_c1) == 0 | length(index_mis_c2) == 0) {
+      stop("Missing values not found for the costs in both arms")
+    } 
+    mis_e1_na <- is.na(x$data_set$effects$Control)
+    mis_e2_na <- is.na(x$data_set$effects$Intervention)
+    mis_c1_na <- is.na(x$data_set$costs$Control)
+    mis_c2_na <- is.na(x$data_set$costs$Intervention)
+    e1_obs <- replicate(dim(mis_e1_na)[2], list())
+    e2_obs <- replicate(dim(mis_e2_na)[2], list())
+    c1_obs <- replicate(dim(mis_c1_na)[2], list())
+    c2_obs <- replicate(dim(mis_c2_na)[2], list())
+    for(time in 1:dim(mis_e1_na)[2]) {
+      e1_obs[[time]] <- x$data_set$effects$Control[mis_e1_na[, time] == FALSE, time]
+      e2_obs[[time]] <- x$data_set$effects$Intervention[mis_e2_na[, time] == FALSE, time]
+      c1_obs[[time]] <- x$data_set$costs$Control[mis_c1_na[, time] == FALSE, time]
+      c2_obs[[time]] <- x$data_set$costs$Intervention[mis_c2_na[, time] == FALSE, time]
+    }
+    n1_e <- n2_e <- n1_c <- n2_c <- rep(NA, dim(mis_e1_na)[2])
+    n1_e <- unlist(lapply(e1_obs, length))
+    n1_c <- unlist(lapply(c1_obs, length))
+    n2_e <- unlist(lapply(e2_obs, length))
+    n2_c <- unlist(lapply(c2_obs, length))
+    e1_rep <- replicate(dim(mis_e1_na)[2], list())
+    e2_rep <- replicate(dim(mis_e2_na)[2], list())
+    c1_rep <- replicate(dim(mis_c1_na)[2], list())
+    c2_rep <- replicate(dim(mis_c2_na)[2], list())
+    for(time in 1:dim(mis_e1_na)[2]) {
+      e1_rep[[time]] <- matrix(NA, nrow = x$model_output$`model summary`$BUGSoutput$n.iter, n1_e[time])
+      c1_rep[[time]] <- matrix(NA, nrow = x$model_output$`model summary`$BUGSoutput$n.iter, n1_c[time])
+      e2_rep[[time]] <- matrix(NA, nrow = x$model_output$`model summary`$BUGSoutput$n.iter, n2_e[time])
+      c2_rep[[time]] <- matrix(NA, nrow = x$model_output$`model summary`$BUGSoutput$n.iter, n2_c[time])
+    }
+    if(x$model_output$dist_e == "norm") {
+      mu_e1 <- replicate(dim(mis_e1_na)[2], list())
+      mu_e2 <- replicate(dim(mis_e2_na)[2], list())
+      for(time in 1:dim(mis_e1_na)[2]) {
+        mu_e1[[time]] <- x$model_output$`model summary`$BUGSoutput$sims.list$mu_e1[, mis_e1_na[, time] == FALSE, time]
+        mu_e2[[time]] <- x$model_output$`model summary`$BUGSoutput$sims.list$mu_e2[, mis_e2_na[, time] == FALSE, time]
+        if(is.null(dim(mu_e1[[time]])) == TRUE | is.null(dim(mu_e2[[time]])) == TRUE){
+          stop("Not possible to plot posterior predictive checks with a single observed effect value in one arm at any time point.")
+        }
+      }
+      if(grepl("LONG", x$model_output$type) == TRUE){
+        sigma_e1 <- matrix(NA, nrow = x$model_output$`model summary`$BUGSoutput$n.iter, ncol = dim(mis_e1_na)[2])
+        sigma_e2 <- matrix(NA, nrow = x$model_output$`model summary`$BUGSoutput$n.iter, ncol = dim(mis_e2_na)[2])
+        for(time in 1:dim(mis_e1_na)[2]) {
+          sigma_e1[, time] <- 1 / sqrt(x$model_output$`model summary`$BUGSoutput$sims.list$tau_e[, 1, time])
+          sigma_e2[, time] <- 1 / sqrt(x$model_output$`model summary`$BUGSoutput$sims.list$tau_e[, 2, time])
+          for(i in 1 : nrow(e1_rep[[time]])){ e1_rep[[time]][i, ] <- rnorm(n1_e[[time]], mean = mu_e1[[time]][i, ], sd = sigma_e1[i, time]) } 
+          for(i in 1 : nrow(e2_rep[[time]])){ e2_rep[[time]][i, ] <- rnorm(n2_e[[time]], mean = mu_e2[[time]][i, ], sd = sigma_e2[i, time]) }
+        }
+      }
+    } else if(x$model_output$dist_e == "logis") {
+      mu_e1 <- replicate(dim(mis_e1_na)[2], list())
+      mu_e2 <- replicate(dim(mis_e2_na)[2], list())
+      for(time in 1:dim(mis_e1_na)[2]) {
+        mu_e1[[time]] <- x$model_output$`model summary`$BUGSoutput$sims.list$mu_e1[, mis_e1_na[, time] == FALSE, time]
+        mu_e2[[time]] <- x$model_output$`model summary`$BUGSoutput$sims.list$mu_e2[, mis_e2_na[, time] == FALSE, time]
+        if(is.null(dim(mu_e1[[time]])) == TRUE | is.null(dim(mu_e2[[time]])) == TRUE){
+          stop("Not possible to plot posterior predictive checks with a single observed effect value in one arm at any time point.")
+        }
+      }
+      if(grepl("LONG", x$model_output$type) == TRUE){
+        scale_e1 <- matrix(NA, nrow = x$model_output$`model summary`$BUGSoutput$n.iter, ncol = dim(mis_e1_na)[2])
+        scale_e2 <- matrix(NA, nrow = x$model_output$`model summary`$BUGSoutput$n.iter, ncol = dim(mis_e2_na)[2])
+        for(time in 1:dim(mis_e1_na)[2]) {
+          scale_e1[, time] <- 1 / x$model_output$`model summary`$BUGSoutput$sims.list$tau_e[, 1, time]
+          scale_e2[, time] <- 1 / x$model_output$`model summary`$BUGSoutput$sims.list$tau_e[, 2, time]
+          for(i in 1 : nrow(e1_rep[[time]])){ e1_rep[[time]][i, ] <- rlogis(n1_e[[time]], location = mu_e1[[time]][i, ], scale = scale_e1[i, time]) } 
+          for(i in 1 : nrow(e2_rep[[time]])){ e2_rep[[time]][i, ] <- rlogis(n2_e[[time]], location = mu_e2[[time]][i, ], scale = scale_e2[i, time]) }
+        }
+      }
+    } else if(x$model_output$dist_e == "nbinom") {
+      mu_e1 <- replicate(dim(mis_e1_na)[2], list())
+      mu_e2 <- replicate(dim(mis_e2_na)[2], list())
+      for(time in 1:dim(mis_e1_na)[2]) {
+        mu_e1[[time]] <- x$model_output$`model summary`$BUGSoutput$sims.list$mu_e1[, mis_e1_na[, time] == FALSE, time]
+        mu_e2[[time]] <- x$model_output$`model summary`$BUGSoutput$sims.list$mu_e2[, mis_e2_na[, time] == FALSE, time]
+        if(is.null(dim(mu_e1[[time]])) == TRUE | is.null(dim(mu_e2[[time]])) == TRUE){
+          stop("Not possible to plot posterior predictive checks with a single observed effect value in one arm at any time point.")
+        }
+      }
+      if(grepl("LONG", x$model_output$type) == TRUE){
+        prob_e1 <- replicate(dim(mis_e1_na)[2], list())
+        prob_e2 <- replicate(dim(mis_e2_na)[2], list())
+        size_e1 <- matrix(NA, nrow = x$model_output$`model summary`$BUGSoutput$n.iter, ncol = dim(mis_e1_na)[2])
+        size_e2 <- matrix(NA, nrow = x$model_output$`model summary`$BUGSoutput$n.iter, ncol = dim(mis_e2_na)[2])
+        for(time in 1:dim(mis_e1_na)[2]) {
+          prob_e1[[time]] <- x$model_output$`model summary`$BUGSoutput$sims.list$tau_e[, 1, time] / (x$model_output$`model summary`$BUGSoutput$sims.list$tau_e[, 1, time] + x$model_output$`model summary`$BUGSoutput$sims.list$mu_e1[, mis_e1_na[, time] == FALSE, time])
+          prob_e2[[time]] <- x$model_output$`model summary`$BUGSoutput$sims.list$tau_e[, 2, time] / (x$model_output$`model summary`$BUGSoutput$sims.list$tau_e[, 2, time] + x$model_output$`model summary`$BUGSoutput$sims.list$mu_e2[, mis_e2_na[, time] == FALSE, time])
+          size_e1[, time] <- x$model_output$`model summary`$BUGSoutput$sims.list$tau_e[, 1, time]
+          size_e2[, time] <- x$model_output$`model summary`$BUGSoutput$sims.list$tau_e[, 2, time]
+          for(i in 1 : nrow(e1_rep[[time]])){ e1_rep[[time]][i, ] <- rnbinom(n1_e[[time]], prob = prob_e1[[time]][i, ], size = size_e1[i, time]) } 
+          for(i in 1 : nrow(e2_rep[[time]])){ e2_rep[[time]][i, ] <- rnbinom(n2_e[[time]], prob = prob_e2[[time]][i, ], size = size_e2[i, time]) }
+        }
+      }
+    } else if(x$model_output$dist_e == "exp") {
+      mu_e1 <- replicate(dim(mis_e1_na)[2], list())
+      mu_e2 <- replicate(dim(mis_e2_na)[2], list())
+      rate_e1 <- replicate(dim(mis_e1_na)[2], list())
+      rate_e2 <- replicate(dim(mis_e2_na)[2], list())
+      for(time in 1:dim(mis_e1_na)[2]) {
+        mu_e1[[time]] <- x$model_output$`model summary`$BUGSoutput$sims.list$mu_e1[, mis_e1_na[, time] == FALSE, time]
+        mu_e2[[time]] <- x$model_output$`model summary`$BUGSoutput$sims.list$mu_e2[, mis_e2_na[, time] == FALSE, time]
+        if(is.null(dim(mu_e1[[time]])) == TRUE | is.null(dim(mu_e2[[time]])) == TRUE){
+          stop("Not possible to plot posterior predictive checks with a single observed effect value in one arm at any time point.")
+        }
+        rate_e1[[time]] <- 1 / mu_e1[[time]]
+        rate_e2[[time]] <- 1 / mu_e2[[time]]
+        for(i in 1 : nrow(e1_rep[[time]])){ e1_rep[[time]][i, ] <- rexp(n1_e[[time]], rate = rate_e1[[time]][i, ]) } 
+        for(i in 1 : nrow(e2_rep[[time]])){ e2_rep[[time]][i, ] <- rexp(n2_e[[time]], rate = rate_e2[[time]][i, ]) }
+      }
+    } else if(x$model_output$dist_e == "bern" | x$model_output$dist_e == "pois") {
+      mu_e1 <- replicate(dim(mis_e1_na)[2], list())
+      mu_e2 <- replicate(dim(mis_e2_na)[2], list())
+      for(time in 1:dim(mis_e1_na)[2]) {
+        mu_e1[[time]] <- x$model_output$`model summary`$BUGSoutput$sims.list$mu_e1[, mis_e1_na[, time] == FALSE, time]
+        mu_e2[[time]] <- x$model_output$`model summary`$BUGSoutput$sims.list$mu_e2[, mis_e2_na[, time] == FALSE, time]
+        if(is.null(dim(mu_e1[[time]])) == TRUE | is.null(dim(mu_e2[[time]])) == TRUE){
+          stop("Not possible to plot posterior predictive checks with a single observed effect value in one arm at any time point.")
+        }
+        if(x$model_output$dist_e == "bern"){
+          for(i in 1 : nrow(e1_rep[[time]])){ e1_rep[[time]][i, ] <- rbinom(n1_e[[time]], size = 1, prob = mu_e1[[time]][i, ]) } 
+          for(i in 1 : nrow(e2_rep[[time]])){ e2_rep[[time]][i, ] <- rbinom(n2_e[[time]], size = 1, prob = mu_e2[[time]][i, ]) }
+        }
+        if(x$model_output$dist_e == "pois"){
+          for(i in 1 : nrow(e1_rep[[time]])){ e1_rep[[time]][i, ] <- rpois(n1_e[[time]], lambda = mu_e1[[time]][i, ]) } 
+          for(i in 1 : nrow(e2_rep[[time]])){ e2_rep[[time]][i, ] <- rpois(n2_e[[time]], lambda = mu_e2[[time]][i, ]) }
+        }
+      }
+    } else if(x$model_output$dist_e == "gamma") {
+      shape_e1 <- rate_e1 <- replicate(dim(mis_e1_na)[2], list())
+      shape_e2 <- rate_e2 <- replicate(dim(mis_e2_na)[2], list())
+      for(time in 1:dim(mis_e1_na)[2]) {
+        shape_e1[[time]] <- x$model_output$`model summary`$BUGSoutput$sims.list$mu_e1[, mis_e1_na[, time] == FALSE, time] * x$model_output$`model summary`$BUGSoutput$sims.list$tau_e1[, mis_e1_na[, time] == FALSE, time]
+        rate_e1[[time]] <- x$model_output$`model summary`$BUGSoutput$sims.list$tau_e1[, mis_e1_na[, time] == FALSE, time]
+        shape_e2[[time]] <- x$model_output$`model summary`$BUGSoutput$sims.list$mu_e2[, mis_e2_na[, time] == FALSE, time] * x$model_output$`model summary`$BUGSoutput$sims.list$tau_e2[, mis_e2_na[, time] == FALSE, time]
+        rate_e2[[time]] <- x$model_output$`model summary`$BUGSoutput$sims.list$tau_e2[, mis_e2_na[, time] == FALSE, time]
+        if(is.null(dim(shape_e1[[time]])) == TRUE | is.null(dim(shape_e2[[time]])) == TRUE){
+          stop("Not possible to plot posterior predictive checks with a single observed effect value in one arm at any time point.")
+        }
+        for(i in 1 : nrow(e1_rep[[time]])){ e1_rep[[time]][i, ] <- rgamma(n1_e[[time]], shape = shape_e1[[time]][i, ], rate = rate_e1[[time]][i, ]) } 
+        for(i in 1 : nrow(e2_rep[[time]])){ e2_rep[[time]][i, ] <- rgamma(n2_e[[time]], shape = shape_e2[[time]][i, ], rate = rate_e2[[time]][i, ]) }
+      }
+    } else if(x$model_output$dist_e == "weibull") {
+      shape_e1 <- scale_e1 <- replicate(dim(mis_e1_na)[2], list())
+      shape_e2 <- scale_e2 <- replicate(dim(mis_e2_na)[2], list())
+      for(time in 1:dim(mis_e1_na)[2]) {
+        shape_e1[[time]] <- x$model_output$`model summary`$BUGSoutput$sims.list$tau_e1[, mis_e1_na[, time] == FALSE, time]
+        scale_e1[[time]] <- 1/((x$model_output$`model summary`$BUGSoutput$sims.list$mu_e1[, mis_e1_na[, time] == FALSE, time] / exp(lgamma(1 + 1 / x$model_output$`model summary`$BUGSoutput$sims.list$tau_e1[, mis_e1_na[, time] == FALSE, time])))^(1/x$model_output$`model summary`$BUGSoutput$sims.list$tau_e1[, mis_e1_na[, time] == FALSE, time]))
+        shape_e2[[time]] <- x$model_output$`model summary`$BUGSoutput$sims.list$tau_e2[, mis_e2_na[, time] == FALSE, time]
+        scale_e2[[time]] <- 1/((x$model_output$`model summary`$BUGSoutput$sims.list$mu_e2[, mis_e2_na[, time] == FALSE, time] / exp(lgamma(1 + 1 / x$model_output$`model summary`$BUGSoutput$sims.list$tau_e2[, mis_e2_na[, time] == FALSE, time])))^(1/x$model_output$`model summary`$BUGSoutput$sims.list$tau_e2[, mis_e2_na[, time] == FALSE, time]))
+        if(is.null(dim(shape_e1[[time]])) == TRUE | is.null(dim(shape_e2[[time]])) == TRUE){
+          stop("Not possible to plot posterior predictive checks with a single observed effect value in one arm at any time point.")
+        }
+        for(i in 1 : nrow(e1_rep[[time]])){ e1_rep[[time]][i, ] <- rweibull(n1_e[[time]], shape = shape_e1[[time]][i, ], scale = scale_e1[[time]][i, ]) } 
+        for(i in 1 : nrow(e2_rep[[time]])){ e2_rep[[time]][i, ] <- rweibull(n2_e[[time]], shape = shape_e2[[time]][i, ], scale = scale_e2[[time]][i, ]) }
+      }
+    } else if(x$model_output$dist_e == "beta") {
+      shape1_e1 <- shape2_e1 <- replicate(dim(mis_e1_na)[2], list())
+      shape1_e2 <- shape2_e2 <- replicate(dim(mis_e2_na)[2], list())
+      for(time in 1:dim(mis_e1_na)[2]) {
+        shape1_e1[[time]] <- x$model_output$`model summary`$BUGSoutput$sims.list$mu_e1[, mis_e1_na[, time] == FALSE, time] * x$model_output$`model summary`$BUGSoutput$sims.list$tau_e1[, mis_e1_na[, time] == FALSE, time]
+        shape2_e1[[time]] <- (1 - x$model_output$`model summary`$BUGSoutput$sims.list$mu_e1[, mis_e1_na[, time] == FALSE, time]) * x$model_output$`model summary`$BUGSoutput$sims.list$tau_e1[, mis_e1_na[, time] == FALSE, time]
+        shape1_e2[[time]] <- x$model_output$`model summary`$BUGSoutput$sims.list$mu_e2[, mis_e2_na[, time] == FALSE, time] * x$model_output$`model summary`$BUGSoutput$sims.list$tau_e2[, mis_e2_na[, time] == FALSE, time]
+        shape2_e2[[time]] <- (1 - x$model_output$`model summary`$BUGSoutput$sims.list$mu_e2[, mis_e2_na[, time] == FALSE, time]) * x$model_output$`model summary`$BUGSoutput$sims.list$tau_e2[, mis_e2_na[, time] == FALSE, time]
+        if(is.null(dim(shape1_e1[[time]])) == TRUE | is.null(dim(shape1_e2[[time]])) == TRUE){
+          stop("Not possible to plot posterior predictive checks with a single observed effect value in one arm at any time point.")
+        }
+        for(i in 1 : nrow(e1_rep[[time]])){ e1_rep[[time]][i, ] <- rbeta(n1_e[[time]], shape1 = shape1_e1[[time]][i, ], shape2 = shape2_e1[[time]][i, ]) } 
+        for(i in 1 : nrow(e2_rep[[time]])){ e2_rep[[time]][i, ] <- rbeta(n2_e[[time]], shape1 = shape1_e2[[time]][i, ], shape2 = shape2_e1[[time]][i, ]) }
+      }
+    }
+    if(x$model_output$dist_c == "norm") {
+      mu_c1 <- replicate(dim(mis_c1_na)[2], list())
+      mu_c2 <- replicate(dim(mis_c2_na)[2], list())
+      for(time in 1:dim(mis_c1_na)[2]) {
+        mu_c1[[time]] <- x$model_output$`model summary`$BUGSoutput$sims.list$mu_c1[, mis_c1_na[, time] == FALSE, time]
+        mu_c2[[time]] <- x$model_output$`model summary`$BUGSoutput$sims.list$mu_c2[, mis_c2_na[, time] == FALSE, time]
+        if(is.null(dim(mu_c1[[time]])) == TRUE | is.null(dim(mu_c2[[time]])) == TRUE){
+          stop("Not possible to plot posterior predictive checks with a single observed effect value in one arm at any time point.")
+        }
+      }
+      if(grepl("LONG", x$model_output$type) == TRUE){
+        sigma_c1 <- matrix(NA, nrow = x$model_output$`model summary`$BUGSoutput$n.iter, ncol = dim(mis_c1_na)[2])
+        sigma_c2 <- matrix(NA, nrow = x$model_output$`model summary`$BUGSoutput$n.iter, ncol = dim(mis_c2_na)[2])
+        for(time in 1:dim(mis_c1_na)[2]) {
+          sigma_c1[, time] <- 1 / sqrt(x$model_output$`model summary`$BUGSoutput$sims.list$tau_c[, 1, time])
+          sigma_c2[, time] <- 1 / sqrt(x$model_output$`model summary`$BUGSoutput$sims.list$tau_c[, 2, time])
+          for(i in 1 : nrow(c1_rep[[time]])){ c1_rep[[time]][i, ] <- rnorm(n1_c[[time]], mean = mu_c1[[time]][i, ], sd = sigma_c1[i, time]) } 
+          for(i in 1 : nrow(c2_rep[[time]])){ c2_rep[[time]][i, ] <- rnorm(n2_c[[time]], mean = mu_c2[[time]][i, ], sd = sigma_c2[i, time]) }
+        }
+      }
+    } else if(x$model_output$dist_c == "gamma") {
+      shape_c1 <- rate_c1 <- replicate(dim(mis_c1_na)[2], list())
+      shape_c2 <- rate_c2 <- replicate(dim(mis_c2_na)[2], list())
+      for(time in 1:dim(mis_c1_na)[2]) {
+        shape_c1[[time]] <- x$model_output$`model summary`$BUGSoutput$sims.list$mu_c1[, mis_c1_na[, time] == FALSE, time] * x$model_output$`model summary`$BUGSoutput$sims.list$tau_c1[, mis_c1_na[, time] == FALSE, time]
+        rate_c1[[time]] <- x$model_output$`model summary`$BUGSoutput$sims.list$tau_c1[, mis_c1_na[, time] == FALSE, time]
+        shape_c2[[time]] <- x$model_output$`model summary`$BUGSoutput$sims.list$mu_c2[, mis_c2_na[, time] == FALSE, time] * x$model_output$`model summary`$BUGSoutput$sims.list$tau_c2[, mis_c2_na[, time] == FALSE, time]
+        rate_c2[[time]] <- x$model_output$`model summary`$BUGSoutput$sims.list$tau_c2[, mis_c2_na[, time] == FALSE, time]
+        if(is.null(dim(shape_c1[[time]])) == TRUE | is.null(dim(shape_c2[[time]])) == TRUE){
+          stop("Not possible to plot posterior predictive checks with a single observed effect value in one arm at any time point.")
+        }
+        for(i in 1 : nrow(c1_rep[[time]])){ c1_rep[[time]][i, ] <- rgamma(n1_c[[time]], shape = shape_c1[[time]][i, ], rate = rate_c1[[time]][i, ]) } 
+        for(i in 1 : nrow(c2_rep[[time]])){ c2_rep[[time]][i, ] <- rgamma(n2_c[[time]], shape = shape_c2[[time]][i, ], rate = rate_c2[[time]][i, ]) }
+      }
+    } else if(x$model_output$dist_c == "lnorm") {
+      mu_c1 <- replicate(dim(mis_c1_na)[2], list())
+      mu_c2 <- replicate(dim(mis_c2_na)[2], list())
+      for(time in 1:dim(mis_c1_na)[2]) {
+        mu_c1[[time]] <- x$model_output$`model summary`$BUGSoutput$sims.list$lmu_c1[, mis_c1_na[, time] == FALSE, time]
+        mu_c2[[time]] <- x$model_output$`model summary`$BUGSoutput$sims.list$lmu_c2[, mis_c2_na[, time] == FALSE, time]
+        if(is.null(dim(mu_c1[[time]])) == TRUE | is.null(dim(mu_c2[[time]])) == TRUE){
+          stop("Not possible to plot posterior predictive checks with a single observed effect value in one arm at any time point.")
+        }
+      }
+      if(grepl("LONG", x$model_output$type) == TRUE){
+        sigma_c1 <- matrix(NA, nrow = x$model_output$`model summary`$BUGSoutput$n.iter, ncol = dim(mis_c1_na)[2])
+        sigma_c2 <- matrix(NA, nrow = x$model_output$`model summary`$BUGSoutput$n.iter, ncol = dim(mis_c2_na)[2])
+        for(time in 1:dim(mis_c1_na)[2]) {
+          sigma_c1[, time] <- 1 / sqrt(x$model_output$`model summary`$BUGSoutput$sims.list$ltau_c[, 1, time])
+          sigma_c2[, time] <- 1 / sqrt(x$model_output$`model summary`$BUGSoutput$sims.list$ltau_c[, 2, time])
+          for(i in 1 : nrow(c1_rep[[time]])){ c1_rep[[time]][i, ] <- rlnorm(n1_c[[time]], meanlog = mu_c1[[time]][i, ], sdlog = sigma_c1[i, time]) } 
+          for(i in 1 : nrow(c2_rep[[time]])){ c2_rep[[time]][i, ] <- rlnorm(n2_c[[time]], meanlog = mu_c2[[time]][i, ], sdlog = sigma_c2[i, time]) }
+        }
+      } 
+    }
+    color_scheme_set(scheme = scheme_set) 
+    ppc_plot_e1 <- replicate(dim(mis_e1_na)[2], list())
+    ppc_plot_e2 <- replicate(dim(mis_e2_na)[2], list())
+    ppc_plot_c1 <- replicate(dim(mis_c1_na)[2], list())
+    ppc_plot_c2 <- replicate(dim(mis_c2_na)[2], list())
+    if(type == "histogram") {
+      if(exists("binwidth_e", where = exArgs)) {binwidth_e = exArgs$binwidth_e} else {binwidth_e = 1 / 30 }
+      if(exists("binwidth_c", where = exArgs)) {binwidth_c = exArgs$binwidth_c} else {binwidth_c = 30 }
+      if(exists("breaks", where = exArgs)) {breaks = exArgs$breaks} else {breaks = NULL }
+      if(exists("freq", where = exArgs)) {freq = exArgs$freq} else {freq = TRUE }
+      for(time in 1:dim(mis_c1_na)[2]) {
+        ppc_plot_e1[[time]] <- ppc_hist(y = e1_obs[[time]], yrep = e1_rep[[time]][1 : ndisplay, ], binwidth = binwidth_e, breaks = breaks, freq = freq)
+        ppc_plot_e2[[time]] <- ppc_hist(y = e2_obs[[time]], yrep = e2_rep[[time]][1 : ndisplay, ], binwidth = binwidth_e, breaks = breaks, freq = freq)
+        ppc_plot_c1[[time]] <- ppc_hist(y = c1_obs[[time]], yrep = c1_rep[[time]][1 : ndisplay, ], binwidth = binwidth_c, breaks = breaks, freq = freq)
+        ppc_plot_c2[[time]] <- ppc_hist(y = c2_obs[[time]], yrep = c2_rep[[time]][1 : ndisplay, ], binwidth = binwidth_c, breaks = breaks, freq = freq)
+      }
+    } else if(type == "boxplot") {
+      if(exists("notch", where = exArgs)) {notch = exArgs$notch} else {notch = FALSE }
+      if(exists("size", where = exArgs)) {size = exArgs$size} else {size = 0.5 }
+      if(exists("alpha", where = exArgs)) {alpha = exArgs$alpha} else {alpha = 1 }
+      for(time in 1:dim(mis_c1_na)[2]) {
+        ppc_plot_e1[[time]] <- ppc_boxplot(y = e1_obs[[time]], yrep = e1_rep[[time]][1 : ndisplay, ], notch = notch, size = size, alpha = alpha)
+        ppc_plot_e2[[time]] <- ppc_boxplot(y = e2_obs[[time]], yrep = e2_rep[[time]][1 : ndisplay, ], notch = notch, size = size, alpha = alpha)
+        ppc_plot_c1[[time]] <- ppc_boxplot(y = c1_obs[[time]], yrep = c1_rep[[time]][1 : ndisplay, ], notch = notch, size = size, alpha = alpha)
+        ppc_plot_c2[[time]] <- ppc_boxplot(y = c2_obs[[time]], yrep = c2_rep[[time]][1 : ndisplay, ], notch = notch, size = size, alpha = alpha)
+      }
+    } else if(type == "freqpoly") {
+      if(exists("binwidth_e", where = exArgs)) {binwidth_e = exArgs$binwidth_e} else {binwidth_e = 1 / 30 }
+      if(exists("binwidth_c", where = exArgs)) {binwidth_c = exArgs$binwidth_c} else {binwidth_c = 30 }
+      if(exists("freq", where = exArgs)) {freq = exArgs$freq} else {freq = TRUE }
+      if(exists("size", where = exArgs)) {size = exArgs$size} else {size = 0.25 }
+      if(exists("alpha", where = exArgs)) {alpha = exArgs$alpha} else {alpha = 1 }
+      for(time in 1:dim(mis_c1_na)[2]) {
+        ppc_plot_e1[[time]] <- ppc_freqpoly(y = e1_obs[[time]], yrep = e1_rep[[time]][1 : ndisplay, ], binwidth = binwidth_e, freq = freq, size = size, alpha = alpha)
+        ppc_plot_e2[[time]] <- ppc_freqpoly(y = e2_obs[[time]], yrep = e2_rep[[time]][1 : ndisplay, ], binwidth = binwidth_e, freq = freq, size = size, alpha = alpha)
+        ppc_plot_c1[[time]] <- ppc_freqpoly(y = c1_obs[[time]], yrep = c1_rep[[time]][1 : ndisplay, ], binwidth = binwidth_c, freq = freq, size = size, alpha = alpha)
+        ppc_plot_c2[[time]] <- ppc_freqpoly(y = c2_obs[[time]], yrep = c2_rep[[time]][1 : ndisplay, ], binwidth = binwidth_c, freq = freq, size = size, alpha = alpha)
+      }
+    } else if(type == "dens") {
+      if(exists("trim", where = exArgs)) {trim = exArgs$trim} else {trim = FALSE }
+      if(exists("size", where = exArgs)) {size = exArgs$size} else {size = 0.5 }
+      if(exists("alpha", where = exArgs)) {alpha = exArgs$alpha} else {alpha = 1 }
+      for(time in 1:dim(mis_c1_na)[2]) {
+        ppc_plot_e1[[time]] <- ppc_dens(y = e1_obs[[time]], yrep = e1_rep[[time]][1 : ndisplay, ], size = size, alpha = alpha, trim = FALSE)
+        ppc_plot_e2[[time]] <- ppc_dens(y = e2_obs[[time]], yrep = e2_rep[[time]][1 : ndisplay, ], size = size, alpha = alpha, trim = FALSE)
+        ppc_plot_c1[[time]] <- ppc_dens(y = c1_obs[[time]], yrep = c1_rep[[time]][1 : ndisplay, ], size = size, alpha = alpha, trim = FALSE)
+        ppc_plot_c2[[time]] <- ppc_dens(y = c2_obs[[time]], yrep = c2_rep[[time]][1 : ndisplay, ], size = size, alpha = alpha, trim = FALSE)
+      }
+    } else if(type == "dens_overlay") {
+      if(exists("adjust", where = exArgs)) {adjust = exArgs$adjust} else {adjust = 1 }
+      if(exists("bw", where = exArgs)) {bw = exArgs$bw} else {bw = "nrd0" }
+      if(exists("trim", where = exArgs)) {trim = exArgs$trim} else {trim = FALSE }
+      if(exists("size", where = exArgs)) {size = exArgs$size} else {size = 0.25 }
+      if(exists("alpha", where = exArgs)) {alpha = exArgs$alpha} else {alpha = 0.7 }
+      if(exists("kernel", where = exArgs)) {kernel = exArgs$kernel} else {kernel = "gaussian" }
+      if(exists("n_dens", where = exArgs)) {n_dens = exArgs$n_dens} else {n_dens = 1024 }
+      for(time in 1:dim(mis_c1_na)[2]) {
+        ppc_plot_e1[[time]] <- ppc_dens_overlay(y = e1_obs[[time]], yrep = e1_rep[[time]][1 : ndisplay, ], size = size, alpha = alpha, trim = FALSE, bw = bw, adjust = adjust, kernel = kernel, n_dens = n_dens)
+        ppc_plot_e2[[time]] <- ppc_dens_overlay(y = e2_obs[[time]], yrep = e2_rep[[time]][1 : ndisplay, ], size = size, alpha = alpha, trim = FALSE, bw = bw, adjust = adjust, kernel = kernel, n_dens = n_dens)
+        ppc_plot_c1[[time]] <- ppc_dens_overlay(y = c1_obs[[time]], yrep = c1_rep[[time]][1 : ndisplay, ], size = size, alpha = alpha, trim = FALSE, bw = bw, adjust = adjust, kernel = kernel, n_dens = n_dens)
+        ppc_plot_c2[[time]] <- ppc_dens_overlay(y = c2_obs[[time]], yrep = c2_rep[[time]][1 : ndisplay, ], size = size, alpha = alpha, trim = FALSE, bw = bw, adjust = adjust, kernel = kernel, n_dens = n_dens)
+      }
+    } else if(type == "ecdf_overlay") {
+      if(exists("size", where = exArgs)) {size = exArgs$size} else {size = 0.25 }
+      if(exists("alpha", where = exArgs)) {alpha = exArgs$alpha} else {alpha = 0.7 }
+      if(exists("pad", where = exArgs)) {pad = exArgs$pad} else {pad = TRUE }
+      if(exists("discrete", where = exArgs)) {discrete = exArgs$discrete} else {discrete = FALSE }
+      for(time in 1:dim(mis_c1_na)[2]) {
+        ppc_plot_e1[[time]] <- ppc_ecdf_overlay(y = e1_obs[[time]], yrep = e1_rep[[time]][1 : ndisplay, ], size = size, alpha = alpha, discrete = discrete, pad = pad)
+        ppc_plot_e2[[time]] <- ppc_ecdf_overlay(y = e2_obs[[time]], yrep = e2_rep[[time]][1 : ndisplay, ], size = size, alpha = alpha, discrete = discrete, pad = pad)
+        ppc_plot_c1[[time]] <- ppc_ecdf_overlay(y = c1_obs[[time]], yrep = c1_rep[[time]][1 : ndisplay, ], size = size, alpha = alpha, discrete = discrete, pad = pad)
+        ppc_plot_c2[[time]] <- ppc_ecdf_overlay(y = c2_obs[[time]], yrep = c2_rep[[time]][1 : ndisplay, ], size = size, alpha = alpha, discrete = discrete, pad = pad)
+      }
+    } else if(type == "stat" & is.null(corr) == TRUE) {
+      if(bpp == FALSE){
+        if(exists("binwidth_e", where = exArgs)) {binwidth_e = exArgs$binwidth_e} else {binwidth_e = 1 / 30 }
+        if(exists("binwidth_c", where = exArgs)) {binwidth_c = exArgs$binwidth_c} else {binwidth_c = 30 }
+        if(exists("freq", where = exArgs)) {freq = exArgs$freq} else {freq = TRUE }
+        if(exists("breaks", where = exArgs)) {breaks = exArgs$breaks} else {breaks = NULL }
+        for(time in 1:dim(mis_c1_na)[2]) {
+          ppc_plot_e1[[time]] <- ppc_stat(y = e1_obs[[time]], yrep = e1_rep[[time]][1 : ndisplay, ], stat = stat, binwidth = binwidth_e, breaks = breaks, freq = freq)
+          ppc_plot_e2[[time]] <- ppc_stat(y = e2_obs[[time]], yrep = e2_rep[[time]][1 : ndisplay, ], stat = stat, binwidth = binwidth_e, breaks = breaks, freq = freq)
+          ppc_plot_c1[[time]] <- ppc_stat(y = c1_obs[[time]], yrep = c1_rep[[time]][1 : ndisplay, ], stat = stat, binwidth = binwidth_c, breaks = breaks, freq = freq)
+          ppc_plot_c2[[time]] <- ppc_stat(y = c2_obs[[time]], yrep = c2_rep[[time]][1 : ndisplay, ], stat = stat, binwidth = binwidth_c, breaks = breaks, freq = freq)
+        }
+      }
+      if(bpp == TRUE){
+        if(exists("trim", where = exArgs)) {trim = exArgs$trim} else {trim = FALSE }
+        if(exists("size", where = exArgs)) {size = exArgs$size} else {size = 0.5 }
+        if(exists("alpha", where = exArgs)) {alpha = exArgs$alpha} else {alpha = 1 }    
+        stat_e1 <- lapply(e1_obs, stat)
+        stat_c1 <- lapply(c1_obs, stat)
+        values_e1 <- matrix(NA, nrow = ndisplay, ncol = dim(mis_c1_na)[2])
+        values_c1 <- matrix(NA, nrow = ndisplay, ncol = dim(mis_c1_na)[2])
+        df1 <- pval_e1 <- pval_c1 <- replicate(dim(mis_c1_na)[2], list())
+        paste_p_e1 <- paste_p_c1 <- replicate(dim(mis_c1_na)[2], list())
+        for(time in 1:dim(mis_c1_na)[2]) {
+          values_e1[, time] <- apply(e1_rep[[time]][1 : ndisplay, ], 1, stat)
+          values_c1[, time] <- apply(c1_rep[[time]][1 : ndisplay, ], 1, stat)
+          df1[[time]] <- data.frame(values_e1[, time], values_c1[, time])
+          names(df1[[time]]) <- c("values_e1", "values_c1")
+          pval_e1[[time]] <- sum(values_e1[, time] > stat_e1[[time]]) / length(values_e1[, time])
+          pval_c1[[time]] <- sum(values_c1[, time] > stat_c1[[time]]) / length(values_c1[, time])
+          paste_p_e1[[time]] <- sprintf("Prob (T(y[rep]) > T(y)) == '%0.3f'", pval_e1[[time]])
+          paste_p_c1[[time]] <- sprintf("Prob (T(y[rep]) > T(y)) == '%0.3f'", pval_c1[[time]])
+        }
+        stat_e2 <- lapply(e2_obs, stat)
+        stat_c2 <- lapply(c2_obs, stat)
+        values_e2 <- matrix(NA, nrow = ndisplay, ncol = dim(mis_c2_na)[2])
+        values_c2 <- matrix(NA, nrow = ndisplay, ncol = dim(mis_c2_na)[2])
+        df2 <- pval_e2 <- pval_c2 <- replicate(dim(mis_c2_na)[2], list())
+        paste_p_e2 <- paste_p_c2 <- replicate(dim(mis_c2_na)[2], list())
+        for(time in 1:dim(mis_c2_na)[2]) {
+          values_e2[, time] <- apply(e2_rep[[time]][1 : ndisplay, ], 1, stat)
+          values_c2[, time] <- apply(c2_rep[[time]][1 : ndisplay, ], 1, stat)
+          df2[[time]] <- data.frame(values_e2[, time], values_c2[, time])
+          names(df2[[time]]) <- c("values_e2", "values_c2")
+          pval_e2[[time]] <- sum(values_e2[, time] > stat_e2[[time]]) / length(values_e2[, time])
+          pval_c2[[time]] <- sum(values_c2[, time] > stat_c2[[time]]) / length(values_c2[, time])
+          paste_p_e2[[time]] <- sprintf("Prob (T(y[rep]) > T(y)) == '%0.3f'", pval_e2[[time]])
+          paste_p_c2[[time]] <- sprintf("Prob (T(y[rep]) > T(y)) == '%0.3f'", pval_c2[[time]])
+        }
+        color_sheme_rep <- color_scheme_get()[1]
+        color_sheme_rep_border <- color_scheme_get()[2]
+        color_sheme_obs <- color_scheme_get()[5]
+        color_sheme_obs_border <- color_scheme_get()[6]
+        set_theme <- bayesplot_theme_get()
+        ggplot2::theme_set(set_theme)
+        for(time in 1:dim(mis_c2_na)[2]) {
+          ppc_plot_e1[[time]] <- ggplot2::ggplot(df1[[time]], ggplot2::aes(x = values_e1)) + 
+            ggplot2::geom_density(fill = color_sheme_rep$light, color = color_sheme_rep_border$light_highlight, 
+                                  trim = trim, size = size, alpha = alpha) +
+            ggplot2::geom_vline(xintercept = stat_e1[[time]], color = color_sheme_obs$dark, linewidth = 1, linetype = "dashed") +
+            ggplot2::scale_y_continuous(expand = c(0, 0)) +
+            ggplot2::theme(axis.text.y = ggplot2::element_blank(), axis.ticks.y = ggplot2::element_blank(), 
+                           axis.title.y = ggplot2::element_blank(), axis.title.x = ggplot2::element_blank()) +
+            ggplot2::annotate("text", x = -Inf, y = Inf, label = paste_p_e1[[time]], parse = TRUE, hjust = -0.1, vjust = 2, size = 4)
+          ppc_plot_c1[[time]] <- ggplot2::ggplot(df1[[time]], ggplot2::aes(x = values_c1)) + 
+            ggplot2::geom_density(fill = color_sheme_rep$light, color = color_sheme_rep_border$light_highlight, 
+                                  trim = trim, size = size, alpha = alpha) +
+            ggplot2::geom_vline(xintercept = stat_c1[[time]], color = color_sheme_obs$dark, linewidth = 1, linetype = "dashed") +
+            ggplot2::scale_y_continuous(expand = c(0, 0)) +
+            ggplot2::theme(axis.text.y = ggplot2::element_blank(), axis.ticks.y = ggplot2::element_blank(), 
+                           axis.title.y = ggplot2::element_blank(), axis.title.x = ggplot2::element_blank()) +
+            ggplot2::annotate("text", x = -Inf, y = Inf, label = paste_p_c1[[time]], parse = TRUE, hjust = -0.1, vjust = 2, size = 4)
+          ppc_plot_e2[[time]] <- ggplot2::ggplot(df2[[time]], ggplot2::aes(x = values_e2)) + 
+            ggplot2::geom_density(fill = color_sheme_rep$light, color = color_sheme_rep_border$light_highlight, 
+                                  trim = trim, size = size, alpha = alpha) +
+            ggplot2::geom_vline(xintercept = stat_e2[[time]], color = color_sheme_obs$dark, linewidth = 1, linetype = "dashed") +
+            ggplot2::scale_y_continuous(expand = c(0, 0)) +
+            ggplot2::theme(axis.text.y = ggplot2::element_blank(), axis.ticks.y = ggplot2::element_blank(), 
+                           axis.title.y = ggplot2::element_blank(), axis.title.x = ggplot2::element_blank()) +
+            ggplot2::annotate("text", x = -Inf, y = Inf, label = paste_p_e2[[time]], parse = TRUE, hjust = -0.1, vjust = 2, size = 4)
+          ppc_plot_c2[[time]] <- ggplot2::ggplot(df2[[time]], ggplot2::aes(x = values_c2)) + 
+            ggplot2::geom_density(fill = color_sheme_rep$light, color = color_sheme_rep_border$light_highlight, 
+                                  trim = trim, size = size, alpha = alpha) +
+            ggplot2::geom_vline(xintercept = stat_c2[[time]], color = color_sheme_obs$dark, linewidth = 1, linetype = "dashed") +
+            ggplot2::scale_y_continuous(expand = c(0, 0)) +
+            ggplot2::theme(axis.text.y = ggplot2::element_blank(), axis.ticks.y = ggplot2::element_blank(), 
+                           axis.title.y = ggplot2::element_blank(), axis.title.x = ggplot2::element_blank()) +
+            ggplot2::annotate("text", x = -Inf, y = Inf, label = paste_p_c2[[time]], parse = TRUE, hjust = -0.1, vjust = 2, size = 4)
+        }
+      }
+    } else if(type == "stat" & is.null(corr) == FALSE) {
+      ec_arm1 <- array_1 <- values_biv1 <- df1 <- pval_1 <- paste_p_biv1 <- replicate(dim(mis_c1_na)[2], list())
+      stat_biv1 <- rep(NA, dim(mis_c1_na)[2])
+      ec_arm2 <- array_2 <- values_biv2 <- df2 <- pval_2 <- paste_p_biv2 <- replicate(dim(mis_c2_na)[2], list())
+      stat_biv2 <- rep(NA, dim(mis_c2_na)[2])
+      for(time in 1:dim(mis_c2_na)[2]) {
+        ec_arm1[[time]] <- cbind(x$data_set$effects$Control[, time], x$data_set$costs$Control[, time])[complete.cases(cbind(x$data_set$effects$Control[, time], x$data_set$costs$Control[, time])), ]
+        stat_biv1[time] <- corr(ec_arm1[[time]][, 1], ec_arm1[[time]][, 2])
+        array_1[[time]] <- array(data = NA, dim = c(nrow(e1_rep[[time]][1 : ndisplay, ]), nrow(ec_arm1[[time]]), 2))
+        array_1[[time]][, , 1] <- e1_rep[[time]][1 : ndisplay, 1:nrow(ec_arm1[[time]])]
+        array_1[[time]][, , 2] <- c1_rep[[time]][1 : ndisplay, 1:nrow(ec_arm1[[time]])]
+        values_biv1[[time]] <- apply(array_1[[time]], 1, corr)[2, ]
+        df1[[time]] <- data.frame(values_biv1[[time]])
+        pval_1[[time]] <- sum(values_biv1[[time]] > stat_biv1[time]) / length(values_biv1[[time]])
+        paste_p_biv1[[time]] <- sprintf("Prob (T(y[rep]) > T(y)) == '%0.3f'", pval_1[[time]])
+        ec_arm2[[time]] <- cbind(x$data_set$effects$Intervention[, time], x$data_set$costs$Intervention[, time])[complete.cases(cbind(x$data_set$effects$Intervention[, time], x$data_set$costs$Intervention[, time])), ]
+        stat_biv2[time] <- corr(ec_arm2[[time]][, 1], ec_arm2[[time]][, 2])
+        array_2[[time]] <- array(data = NA, dim = c(nrow(e2_rep[[time]][1 : ndisplay, ]), nrow(ec_arm2[[time]]), 2))
+        array_2[[time]][, , 1] <- e2_rep[[time]][1 : ndisplay, 1:nrow(ec_arm2[[time]])]
+        array_2[[time]][, , 2] <- c2_rep[[time]][1 : ndisplay, 1:nrow(ec_arm2[[time]])]
+        values_biv2[[time]] <- apply(array_2[[time]], 1, corr)[2, ]
+        df2[[time]] <- data.frame(values_biv2[[time]])
+        pval_2[[time]] <- sum(values_biv2[[time]] > stat_biv2[time]) / length(values_biv2[[time]])
+        paste_p_biv2[[time]] <- sprintf("Prob (T(y[rep]) > T(y)) == '%0.3f'", pval_2[[time]])
+      }
+      color_sheme_rep <- color_scheme_get()[1]
+      color_sheme_rep_border <- color_scheme_get()[2]
+      color_sheme_obs <- color_scheme_get()[5]
+      color_sheme_obs_border <- color_scheme_get()[6]
+      set_theme <- bayesplot_theme_get()
+      if(bpp == FALSE) {
+        if(exists("binwidth", where = exArgs)) {binwidth = exArgs$binwidth} else {binwidth = 1 / 30 }
+        for(time in 1:dim(mis_c2_na)[2]) {
+          ppc_plot_e1[[time]] <- ggplot2::ggplot(df1[[time]], ggplot2::aes(x = values_biv1[[time]])) + 
+            ggplot2::geom_histogram(fill = color_sheme_rep$light, 
+                                    color = color_sheme_rep_border$light_highlight, 
+                                    binwidth = binwidth) +
+            ggplot2::geom_vline(xintercept = stat_biv1[time], color = color_sheme_obs$dark, linewidth = 2) +
+            ggplot2::scale_y_continuous(expand = c(0, 0)) +
+            ggplot2::theme(axis.text.y = ggplot2::element_blank(), axis.ticks.y = ggplot2::element_blank(), 
+                           axis.title.y = ggplot2::element_blank(), axis.title.x = ggplot2::element_blank()) 
+          ppc_plot_c2[[time]] <- ggplot2::ggplot(df2[[time]], ggplot2::aes(x = values_biv2[[time]])) + 
+            ggplot2::geom_histogram(fill = color_sheme_rep$light, 
+                                    color = color_sheme_rep_border$light_highlight, 
+                                    binwidth = binwidth) +
+            ggplot2::geom_vline(xintercept = stat_biv2[time], color = color_sheme_obs$dark, linewidth = 2) +
+            ggplot2::scale_y_continuous(expand = c(0, 0)) +
+            ggplot2::theme(axis.text.y = ggplot2::element_blank(), axis.ticks.y = ggplot2::element_blank(), 
+                           axis.title.y = ggplot2::element_blank(), axis.title.x = ggplot2::element_blank())
+        }
+        labels_plots_time <- paste0("time", ' ', seq(1:dim(mis_c2_na)[2])) 
+        ppc_plot_output_e1 <- ggpubr::ggarrange(plotlist = ppc_plot_e1, labels = labels_plots_time, common.legend = FALSE)
+        ppc_plot_output_c2 <- ggpubr::ggarrange(plotlist = ppc_plot_c2, labels = labels_plots_time, common.legend = FALSE)
+      }
+      if(bpp == TRUE) {
+        if(exists("trim", where = exArgs)) {trim = exArgs$trim} else {trim = FALSE }
+        if(exists("size", where = exArgs)) {size = exArgs$size} else {size = 0.5 }
+        if(exists("alpha", where = exArgs)) {alpha = exArgs$alpha} else {alpha = 1 } 
+        for(time in 1:dim(mis_c2_na)[2]) {
+          ppc_plot_e1[[time]] <- ggplot2::ggplot(df1[[time]], ggplot2::aes(x = values_biv1[[time]])) +
+            ggplot2::geom_density(fill = color_sheme_rep$light, 
+                                  color = color_sheme_rep_border$light_highlight, trim = trim, size = size, alpha = alpha) +
+            ggplot2::geom_vline(xintercept = stat_biv1[time], color = color_sheme_obs$dark, linewidth = 1, linetype = "dashed") +
+            ggplot2::scale_y_continuous(expand = c(0, 0)) +
+            ggplot2::theme(axis.text.y = ggplot2::element_blank(), axis.ticks.y = ggplot2::element_blank(), 
+                           axis.title.y = ggplot2::element_blank(), axis.title.x = ggplot2::element_blank()) +
+            ggplot2::annotate("text", x = -Inf, y = Inf, 
+                              label = paste_p_biv1[[time]], parse = TRUE, hjust = -0.1, vjust = 2, size = 4)
+          ppc_plot_c2[[time]] <- ggplot2::ggplot(df2[[time]], ggplot2::aes(x = values_biv2[[time]])) +
+            ggplot2::geom_density(fill = color_sheme_rep$light, 
+                                  color = color_sheme_rep_border$light_highlight, trim = trim, size = size, alpha = alpha) +
+            ggplot2::geom_vline(xintercept = stat_biv2[time], color = color_sheme_obs$dark, linewidth = 1, linetype = "dashed") +
+            ggplot2::scale_y_continuous(expand = c(0, 0)) +
+            ggplot2::theme(axis.text.y = ggplot2::element_blank(), axis.ticks.y = ggplot2::element_blank(), 
+                           axis.title.y = ggplot2::element_blank(), axis.title.x = ggplot2::element_blank()) +
+            ggplot2::annotate("text", x = -Inf, y = Inf, 
+                              label = paste_p_biv2[[time]], parse = TRUE, hjust = -0.1, vjust = 2, size = 4)
+        }
+        labels_plots_time <- paste0("time", ' ', seq(1:dim(mis_c2_na)[2])) 
+        ppc_plot_output_e1 <- ggpubr::ggarrange(plotlist = ppc_plot_e1, labels = labels_plots_time, common.legend = FALSE)
+        ppc_plot_output_c2 <- ggpubr::ggarrange(plotlist = ppc_plot_c2, labels = labels_plots_time, common.legend = FALSE)
+      }
+    } else if(type == "stat_2d") {
+      if(exists("size", where = exArgs)) {size = exArgs$size} else {size = 2.5 }
+      if(exists("alpha", where = exArgs)) {alpha = exArgs$alpha} else {alpha = 0.7 }
+      if(exists("stat", where = exArgs)) {stat = exArgs$stat} else {stat = c("mean", "sd") }
+      for(time in 1:dim(mis_c2_na)[2]) {
+        ppc_plot_e1[[time]] <- ppc_stat_2d(y = e1_obs[[time]], yrep = e1_rep[[time]][1 : ndisplay, ], stat = stat, size = size, alpha = alpha)
+        ppc_plot_e2[[time]] <- ppc_stat_2d(y = e2_obs[[time]], yrep = e2_rep[[time]][1 : ndisplay, ], stat = stat, size = size, alpha = alpha)
+        ppc_plot_c1[[time]] <- ppc_stat_2d(y = c1_obs[[time]], yrep = c1_rep[[time]][1 : ndisplay, ], stat = stat, size = size, alpha = alpha)
+        ppc_plot_c2[[time]] <- ppc_stat_2d(y = c2_obs[[time]], yrep = c2_rep[[time]][1 : ndisplay, ], stat = stat, size = size, alpha = alpha)
+      }
+    } else if(type == "error_hist") {
+      if(exists("binwidth_e", where = exArgs)) {binwidth_e = exArgs$binwidth_e} else {binwidth_e = 1 / 30 }
+      if(exists("binwidth_c", where = exArgs)) {binwidth_c = exArgs$binwidth_c} else {binwidth_c = 30 }
+      if(exists("freq", where = exArgs)) {freq = exArgs$freq} else {freq = TRUE }
+      if(exists("breaks", where = exArgs)) {breaks = exArgs$breaks} else {breaks = NULL }
+      for(time in 1:dim(mis_c2_na)[2]) {
+        ppc_plot_e1[[time]] <- ppc_error_hist(y = e1_obs[[time]], yrep = e1_rep[[time]][1 : ndisplay, ], binwidth = binwidth_e, breaks = breaks, freq = freq)
+        ppc_plot_e2[[time]] <- ppc_error_hist(y = e2_obs[[time]], yrep = e2_rep[[time]][1 : ndisplay, ], binwidth = binwidth_e, breaks = breaks, freq = freq)
+        ppc_plot_c1[[time]] <- ppc_error_hist(y = c1_obs[[time]], yrep = c1_rep[[time]][1 : ndisplay, ], binwidth = binwidth_c, breaks = breaks, freq = freq)
+        ppc_plot_c2[[time]] <- ppc_error_hist(y = c2_obs[[time]], yrep = c2_rep[[time]][1 : ndisplay, ], binwidth = binwidth_c, breaks = breaks, freq = freq)
+      }
+    } else if(type == "error_scatter") {
+      if(exists("size", where = exArgs)) {size = exArgs$size} else {size = 2.5 }
+      if(exists("alpha", where = exArgs)) {alpha = exArgs$alpha} else {alpha = 0.8 }
+      for(time in 1:dim(mis_c2_na)[2]) {
+        ppc_plot_e1[[time]] <- ppc_error_scatter(y = e1_obs[[time]], yrep = e1_rep[[time]][1 : ndisplay, ], size = size, alpha = alpha)
+        ppc_plot_e2[[time]] <- ppc_error_scatter(y = e2_obs[[time]], yrep = e2_rep[[time]][1 : ndisplay, ], size = size, alpha = alpha)
+        ppc_plot_c1[[time]] <- ppc_error_scatter(y = c1_obs[[time]], yrep = c1_rep[[time]][1 : ndisplay, ], size = size, alpha = alpha)
+        ppc_plot_c2[[time]] <- ppc_error_scatter(y = c2_obs[[time]], yrep = c2_rep[[time]][1 : ndisplay, ], size = size, alpha = alpha)
+      }
+    } else if(type == "error_scatter_avg") {
+      if(exists("size", where = exArgs)) {size = exArgs$size} else {size = 2.5 }
+      if(exists("alpha", where = exArgs)) {alpha = exArgs$alpha} else {alpha = 0.8 }
+      for(time in 1:dim(mis_c2_na)[2]) {
+        ppc_plot_e1[[time]] <- ppc_error_scatter_avg(y = e1_obs[[time]], yrep = e1_rep[[time]][1 : ndisplay, ], size = size, alpha = alpha)
+        ppc_plot_e2[[time]] <- ppc_error_scatter_avg(y = e2_obs[[time]], yrep = e2_rep[[time]][1 : ndisplay, ], size = size, alpha = alpha)
+        ppc_plot_c1[[time]] <- ppc_error_scatter_avg(y = c1_obs[[time]], yrep = c1_rep[[time]][1 : ndisplay, ], size = size, alpha = alpha)
+        ppc_plot_c2[[time]] <- ppc_error_scatter_avg(y = c2_obs[[time]], yrep = c2_rep[[time]][1 : ndisplay, ], size = size, alpha = alpha)
+      }
+    } else if(type == "error_binned") {
+      if(exists("bins", where = exArgs)) {bins = exArgs$bins} else {bins = NULL }
+      if(exists("size", where = exArgs)) {size = exArgs$size} else {size = 1 }
+      if(exists("alpha", where = exArgs)) {alpha = exArgs$alpha} else {alpha = 0.25 }
+      for(time in 1:dim(mis_c2_na)[2]) {
+        ppc_plot_e1[[time]] <- ppc_error_binned(y = e1_obs[[time]], yrep = e1_rep[[time]][1 : ndisplay, ], bins = bins, size = size, alpha = alpha)
+        ppc_plot_e2[[time]] <- ppc_error_binned(y = e2_obs[[time]], yrep = e2_rep[[time]][1 : ndisplay, ], bins = bins, size = size, alpha = alpha)
+        ppc_plot_c1[[time]] <- ppc_error_binned(y = c1_obs[[time]], yrep = c1_rep[[time]][1 : ndisplay, ], bins = bins, size = size, alpha = alpha)
+        ppc_plot_c2[[time]] <- ppc_error_binned(y = c2_obs[[time]], yrep = c2_rep[[time]][1 : ndisplay, ], bins = bins, size = size, alpha = alpha)
+      }
+    } else if(type == "intervals") {
+      if(exists("prob", where = exArgs)) {prob = exArgs$prob} else {prob = 0.5 }
+      if(exists("prob_outer", where = exArgs)) {prob_outer = exArgs$prob_outer} else {prob_outer = 0.9 }
+      if(exists("size", where = exArgs)) {size = exArgs$size} else {size = 1 }
+      if(exists("fatten", where = exArgs)) {fatten = exArgs$fatten} else {fatten = 3 }
+      for(time in 1:dim(mis_c2_na)[2]) {
+        ppc_plot_e1[[time]] <- ppc_intervals(y = e1_obs[[time]], yrep = e1_rep[[time]][1 : ndisplay, ], prob = prob, prob_outer = prob_outer, size = size, fatten = fatten)
+        ppc_plot_e2[[time]] <- ppc_intervals(y = e2_obs[[time]], yrep = e2_rep[[time]][1 : ndisplay, ], prob = prob, prob_outer = prob_outer, size = size, fatten = fatten)
+        ppc_plot_c1[[time]] <- ppc_intervals(y = c1_obs[[time]], yrep = c1_rep[[time]][1 : ndisplay, ], prob = prob, prob_outer = prob_outer, size = size, fatten = fatten)
+        ppc_plot_c2[[time]] <- ppc_intervals(y = c2_obs[[time]], yrep = c2_rep[[time]][1 : ndisplay, ], prob = prob, prob_outer = prob_outer, size = size, fatten = fatten)
+      }
+    } else if(type == "ribbon") {
+      if(exists("prob", where = exArgs)) {prob = exArgs$prob} else {prob = 0.5 }
+      if(exists("prob_outer", where = exArgs)) {prob_outer = exArgs$prob_outer} else {prob_outer = 0.9 }
+      if(exists("size", where = exArgs)) {size = exArgs$size} else {size = 0.25 }
+      if(exists("alpha", where = exArgs)) {alpha = exArgs$alpha} else {alpha = 0.33 }
+      for(time in 1:dim(mis_c2_na)[2]) {
+        ppc_plot_e1[[time]] <- ppc_ribbon(y = e1_obs[[time]], yrep = e1_rep[[time]][1 : ndisplay, ], prob = prob, prob_outer = prob_outer, alpha = alpha, size = size)
+        ppc_plot_e2[[time]] <- ppc_ribbon(y = e2_obs[[time]], yrep = e2_rep[[time]][1 : ndisplay, ], prob = prob, prob_outer = prob_outer, alpha = alpha, size = size)
+        ppc_plot_c1[[time]] <- ppc_ribbon(y = c1_obs[[time]], yrep = c1_rep[[time]][1 : ndisplay, ], prob = prob, prob_outer = prob_outer, alpha = alpha, size = size)
+        ppc_plot_c2[[time]] <- ppc_ribbon(y = c2_obs[[time]], yrep = c2_rep[[time]][1 : ndisplay, ], prob = prob, prob_outer = prob_outer, alpha = alpha, size = size)
+      }
+    } else if(type == "scatter") {
+      if(exists("size", where = exArgs)) {size = exArgs$size} else {size = 2.5 }
+      if(exists("alpha", where = exArgs)) {alpha = exArgs$alpha} else {alpha = 0.8 }
+      for(time in 1:dim(mis_c2_na)[2]) {
+        ppc_plot_e1[[time]] <- ppc_scatter(y = e1_obs[[time]], yrep = e1_rep[[time]][1 : ndisplay, ], alpha = alpha, size = size)
+        ppc_plot_e2[[time]] <- ppc_scatter(y = e2_obs[[time]], yrep = e2_rep[[time]][1 : ndisplay, ], alpha = alpha, size = size)
+        ppc_plot_c1[[time]] <- ppc_scatter(y = c1_obs[[time]], yrep = c1_rep[[time]][1 : ndisplay, ], alpha = alpha, size = size)
+        ppc_plot_c2[[time]] <- ppc_scatter(y = c2_obs[[time]], yrep = c2_rep[[time]][1 : ndisplay, ], alpha = alpha, size = size)
+      }
+    } else if(type == "scatter_avg") {
+      if(exists("size", where = exArgs)) {size = exArgs$size} else {size = 2.5 }
+      if(exists("alpha", where = exArgs)) {alpha = exArgs$alpha} else {alpha = 0.8 }
+      for(time in 1:dim(mis_c2_na)[2]) {
+        ppc_plot_e1[[time]] <- ppc_scatter_avg(y = e1_obs[[time]], yrep = e1_rep[[time]][1 : ndisplay, ], alpha = alpha, size = size)
+        ppc_plot_e2[[time]] <- ppc_scatter_avg(y = e2_obs[[time]], yrep = e2_rep[[time]][1 : ndisplay, ], alpha = alpha, size = size)
+        ppc_plot_c1[[time]] <- ppc_scatter_avg(y = c1_obs[[time]], yrep = c1_rep[[time]][1 : ndisplay, ], alpha = alpha, size = size)
+        ppc_plot_c2[[time]] <- ppc_scatter_avg(y = c2_obs[[time]], yrep = c2_rep[[time]][1 : ndisplay, ], alpha = alpha, size = size)
+      }
+    }
+    if(outcome == "effects_arm1" & is.null(time_plot) == TRUE) {
+      labels_plots_time <- paste0("time", ' ', seq(1:dim(mis_c2_na)[2])) 
+      ppc_plot_output <- ggpubr::ggarrange(plotlist = ppc_plot_e1, labels = labels_plots_time, common.legend = FALSE)
+    } else if(outcome == "effects_arm1" & is.null(time_plot) == FALSE) {
+      ppc_plot_output <- ppc_plot_e1[[time_plot]]
+    } else if(outcome == "effects_arm2" & is.null(time_plot) == TRUE){
+      labels_plots_time <- paste0("time", ' ', seq(1:dim(mis_c2_na)[2])) 
+      ppc_plot_output <- ggpubr::ggarrange(plotlist = ppc_plot_e2, labels = labels_plots_time, common.legend = FALSE)
+    } else if(outcome == "effects_arm2" & is.null(time_plot) == FALSE) {
+      ppc_plot_output <- ppc_plot_e2[[time_plot]]
+    } else if(outcome == "costs_arm1" & is.null(time_plot) == TRUE){
+      labels_plots_time <- paste0("time", ' ', seq(1:dim(mis_c2_na)[2])) 
+      ppc_plot_output <- ggpubr::ggarrange(plotlist = ppc_plot_c1, labels = labels_plots_time, common.legend = FALSE)
+    } else if(outcome == "costs_arm1" & is.null(time_plot) == FALSE) {
+      ppc_plot_output <- ppc_plot_c1[[time_plot]]
+    } else if(outcome == "costs_arm2" & is.null(time_plot) == TRUE){
+      labels_plots_time <- paste0("time", ' ', seq(1:dim(mis_c2_na)[2])) 
+      ppc_plot_output <- ggpubr::ggarrange(plotlist = ppc_plot_c2, labels = labels_plots_time, common.legend = FALSE)
+    } else if(outcome == "costs_arm2" & is.null(time_plot) == FALSE){
+      ppc_plot_output <- ppc_plot_c2[[time_plot]]
+    } else if(outcome == "effects" & is.null(time_plot) == TRUE) {
+      labels_plots_time <- c(paste0("effects (t=1, time", ' ', seq(1:dim(mis_c2_na)[2]), ")"), paste0("effects (t=2, time", ' ', seq(1:dim(mis_c2_na)[2]), ")")) 
+      ppc_plot_output <- ggpubr::ggarrange(plotlist =  c(ppc_plot_e1, ppc_plot_e2), labels = labels_plots_time, common.legend = TRUE, legend = legend)
+    } else if(outcome == "effects" & is.null(time_plot) == FALSE) {
+      labels_plots_time <- c(paste0("effects (t=1, time", ' ', time_plot, ")"), paste0("effects (t=2, time", ' ', time_plot, ")"))
+      ppc_plot_output <- ggpubr::ggarrange(ppc_plot_e1[[time_plot]], ppc_plot_e2[[time_plot]], labels = labels_plots_time, common.legend = TRUE, legend = legend)
+    } else if(outcome == "costs" & is.null(time_plot) == TRUE) {
+      labels_plots_time <- c(paste0("costs (t=1, time", ' ', seq(1:dim(mis_c2_na)[2]), ")"), paste0("costs (t=2, time", ' ', seq(1:dim(mis_c2_na)[2]), ")")) 
+      ppc_plot_output <- ggpubr::ggarrange(plotlist =  c(ppc_plot_c1, ppc_plot_c2), labels = labels_plots_time, common.legend = TRUE, legend = legend)
+    } else if(outcome == "costs" & is.null(time_plot) == FALSE) {
+      labels_plots_time <- c(paste0("costs (t=1, time", ' ', time_plot, ")"), paste0("costs (t=2, time", ' ', time_plot, ")"))
+      ppc_plot_output <- ggpubr::ggarrange(ppc_plot_c1[[time_plot]], ppc_plot_c2[[time_plot]], labels = labels_plots_time, common.legend = TRUE, legend = legend)
+    } else if(outcome == "all" & is.null(time_plot) == TRUE) {
+      if(is.null(corr) == TRUE) {
+        labels_plots_time <- c(paste0("effects (t=1, time", ' ', seq(1:dim(mis_c2_na)[2]), ")"), paste0("effects (t=2, time", ' ', seq(1:dim(mis_c2_na)[2]), ")"), 
+                               paste0("costs (t=1, time", ' ', seq(1:dim(mis_c2_na)[2]), ")"), paste0("costs (t=2, time", ' ', seq(1:dim(mis_c2_na)[2]), ")")) 
+        ppc_plot_output <- ggpubr::ggarrange(plotlist =  c(ppc_plot_e1, ppc_plot_e2, ppc_plot_c1, ppc_plot_c2), labels = labels_plots_time, common.legend = TRUE, legend = legend)
+      }
+      if(is.null(corr) == FALSE) {
+        labels_plots_time <- c(paste0("control, (time", ' ', seq(1:dim(mis_c2_na)[2]), ")"), paste0("intervention (time", ' ', seq(1:dim(mis_c2_na)[2]), ")")) 
+        ppc_plot_output <- ggpubr::ggarrange(plotlist =  c(ppc_plot_e1, ppc_plot_c2), labels = labels_plots_time, common.legend = TRUE, legend = legend)
+      }
+    } else if(outcome == "all" & is.null(time_plot) == FALSE) {
+      if(is.null(corr) == TRUE) {
+        labels_plots_time <- c(paste0("effects (t=1, time", ' ', time_plot, ")"), paste0("effects (t=2, time", ' ', time_plot, ")"), 
+                               paste0("costs (t=1, time", ' ', time_plot, ")"), paste0("costs (t=2, time", ' ', time_plot, ")")) 
+        ppc_plot_output <- ggpubr::ggarrange(ppc_plot_e1[[time_plot]], ppc_plot_e2[[time_plot]], ppc_plot_c1[[time_plot]], ppc_plot_c2[[time_plot]], labels = labels_plots_time, common.legend = TRUE, legend = legend)
+      }
+      if(is.null(corr) == FALSE) {
+        labels_plots_time <- c(paste0("control, (time", ' ', time_plot, ")"), paste0("intervention (time", ' ', time_plot, ")")) 
+        ppc_plot_output <- ggpubr::ggarrange(ppc_plot_e1[[time_plot]], ppc_plot_c2[[time_plot]], labels = labels_plots_time, common.legend = TRUE, legend = legend)
+      }
+    }
+  }    
   ppc_plot_output <- ppc_plot_output + ggplot2::theme(legend.position = legend)
   if(length(theme) != 0) {
     if(theme == "base") ppc_plot_output <- ppc_plot_output + ggthemes::theme_base()
