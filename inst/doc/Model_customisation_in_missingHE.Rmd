@@ -20,7 +20,7 @@ set.seed(1234)
 
 For each of the three types of models that can be fitted using `missingHE`, namely **selection**, **pattern mixture**, and **hurdle** models, the package provides a series of customisation options to allow a flexible specification of the models in terms of modelling assumptions and prior choices. These can be extremely useful for handling the typical features of trial-based CEA data, such as non-normality, clustering, and type of missingness mechanism. This tutorial shows how it is possible to customise different aspects of the models using the arguments of each type of function in the package. Throughout, we will use the built-in dataset called `MenSS` as a toy example, which is directly available when installing and loading `missingHE` in your `R` workspace. See the vignette called *Introduction to missingHE* for an introductory tutorial of each function in `missingHE` and a general presentation of the data from the `MenSS` dataset.
 
-If you would like to have more information on the package, or would like to point out potential issues in the current version, feel free to contact the maintainer at <ucakgab@ucl.ac.uk>. Suggestions on how to improve the package are also very welcome.
+If you would like to have more information on the package, or would like to point out potential issues in the current version, feel free to contact the maintainer at <a.gabrio@maastrichtuniversity.nl>. Suggestions on how to improve the package are also very welcome.
 
 
 ## Changing the distributional assumptions
