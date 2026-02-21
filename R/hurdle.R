@@ -600,8 +600,8 @@ hurdle <- function(data, model.eff, model.cost, model.se = se ~ 1, model.sc = sc
   if(exists("gamma.prior.c", where = prior)) {gamma.prior.c = prior$gamma.prior.c} else {gamma.prior.c = NULL }
   if(exists("gamma0.prior.e", where = prior)) {gamma0.prior.e = prior$gamma0.prior.e} else {gamma0.prior.e = NULL }
   if(exists("gamma0.prior.c", where = prior)) {gamma0.prior.c = prior$gamma0.prior.c} else {gamma0.prior.c = NULL }
-  if(exists("se.prior", where = prior)) {se.prior = prior$se.prior} else {se.prior = 0.0000001 }
-  if(exists("sc.prior", where = prior)) {sc.prior = prior$sc.prior} else {sc.prior = 0.0000001 }
+  if(exists("se.prior", where = prior)) {se.prior = prior$se.prior} else {se.prior = 0.001 }
+  if(exists("sc.prior", where = prior)) {sc.prior = prior$sc.prior} else {sc.prior = 0.001 }
   if(exists("beta_f.prior", where = prior)) {beta_f.prior = prior$beta_f.prior} else {beta_f.prior = NULL }
   if(exists("mu.a0.prior", where = prior)) {mu.a0.prior = prior$mu.a0.prior} else {mu.a0.prior = NULL }
   if(exists("s.a0.prior", where = prior)) {s.a0.prior = prior$s.a0.prior} else {s.a0.prior = NULL }
