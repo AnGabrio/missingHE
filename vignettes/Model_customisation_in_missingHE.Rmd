@@ -141,9 +141,9 @@ Prior values can be modified by first creating a list object which, for example,
 
 ```{r prior_hurdle1, eval=TRUE, echo=TRUE, comment=NA,warning=FALSE,error=FALSE,message=FALSE}
 my.prior <- list(
-  "alpha0.prior" = c(0 , 0.0000001),
-  "alpha.prior" = c(0, 0.0000001),
-  "beta0.prior" = c(0, 0.0000001),
+  "alpha0.prior" = c(0 , 0.001),
+  "alpha.prior" = c(0, 0.001),
+  "beta0.prior" = c(0, 0.001),
   "gamma0.prior.c"= c(0, 1),
   "gamma.prior.c" = c(0, 0.01),
   "mu.b0.prior" = c(0, 0.001),

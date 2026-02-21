@@ -33,100 +33,100 @@ prior_pattern <- function(type, dist_e, dist_c, pe_fixed, pc_fixed, model_e_rand
          if(d_list$n_patterns[1] == 4) {
            if(grepl("alpha_p1[1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
             prior_mue_str <- paste("alpha_p1[1] ~ dnorm(", prior_mue[1], ",", prior_mue[2])
-            model_string_jags <- gsub("alpha_p1[1] ~ dnorm(0, 0.0000001", prior_mue_str, model_string_jags,fixed = TRUE) }
+            model_string_jags <- gsub("alpha_p1[1] ~ dnorm(0, 0.001", prior_mue_str, model_string_jags,fixed = TRUE) }
            if(grepl("alpha_p1[3] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
             prior_mue_str <- paste("alpha_p1[3] ~ dnorm(", prior_mue[1], ",", prior_mue[2])
-            model_string_jags <- gsub("alpha_p1[3] ~ dnorm(0, 0.0000001", prior_mue_str, model_string_jags,fixed = TRUE) } 
+            model_string_jags <- gsub("alpha_p1[3] ~ dnorm(0, 0.001", prior_mue_str, model_string_jags,fixed = TRUE) } 
          } else if(d_list$n_patterns[1] == 3 & d_list$d1$d1_c_obs == FALSE & restriction == "CC") {
            if(grepl("alpha_p1[1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
              prior_mue_str <- paste("alpha_p1[1] ~ dnorm(", prior_mue[1], ",", prior_mue[2])
-             model_string_jags <- gsub("alpha_p1[1] ~ dnorm(0, 0.0000001", prior_mue_str, model_string_jags,fixed = TRUE) }
+             model_string_jags <- gsub("alpha_p1[1] ~ dnorm(0, 0.001", prior_mue_str, model_string_jags,fixed = TRUE) }
            if(grepl("alpha_p1[3] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
              prior_mue_str <- paste("alpha_p1[3] ~ dnorm(", prior_mue[1], ",", prior_mue[2])
-             model_string_jags <- gsub("alpha_p1[3] ~ dnorm(0, 0.0000001", prior_mue_str, model_string_jags,fixed = TRUE) } 
+             model_string_jags <- gsub("alpha_p1[3] ~ dnorm(0, 0.001", prior_mue_str, model_string_jags,fixed = TRUE) } 
          } else if(d_list$n_patterns[1] == 3 & d_list$d1$d1_ec_obs == FALSE & restriction == "AC") {
            if(grepl("alpha_p1[3] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
              prior_mue_str <- paste("alpha_p1[3] ~ dnorm(", prior_mue[1], ",", prior_mue[2])
-             model_string_jags <- gsub("alpha_p1[3] ~ dnorm(0, 0.0000001", prior_mue_str, model_string_jags,fixed = TRUE) } 
+             model_string_jags <- gsub("alpha_p1[3] ~ dnorm(0, 0.001", prior_mue_str, model_string_jags,fixed = TRUE) } 
          } else if(d_list$n_patterns[1] == 3 & d_list$d1$d1_e_obs == FALSE & restriction == "CC") {
            if(grepl("alpha_p1[1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
              prior_mue_str <- paste("alpha_p1[1] ~ dnorm(", prior_mue[1], ",", prior_mue[2])
-             model_string_jags <- gsub("alpha_p1[1] ~ dnorm(0, 0.0000001", prior_mue_str, model_string_jags,fixed = TRUE) }
+             model_string_jags <- gsub("alpha_p1[1] ~ dnorm(0, 0.001", prior_mue_str, model_string_jags,fixed = TRUE) }
          } else if(d_list$n_patterns[1] == 3 & d_list$d1$d1_ec_mis == FALSE) {
            if(grepl("alpha_p1[1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
              prior_mue_str <- paste("alpha_p1[1] ~ dnorm(", prior_mue[1], ",", prior_mue[2])
-             model_string_jags <- gsub("alpha_p1[1] ~ dnorm(0, 0.0000001", prior_mue_str, model_string_jags,fixed = TRUE) }
+             model_string_jags <- gsub("alpha_p1[1] ~ dnorm(0, 0.001", prior_mue_str, model_string_jags,fixed = TRUE) }
            if(grepl("alpha_p1[3] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
              prior_mue_str <- paste("alpha_p1[3] ~ dnorm(", prior_mue[1], ",", prior_mue[2])
-             model_string_jags <- gsub("alpha_p1[3] ~ dnorm(0, 0.0000001", prior_mue_str, model_string_jags,fixed = TRUE) } 
+             model_string_jags <- gsub("alpha_p1[3] ~ dnorm(0, 0.001", prior_mue_str, model_string_jags,fixed = TRUE) } 
          } else if(d_list$n_patterns[1] == 2 & d_list$d1$d1_c_obs == FALSE & d_list$d1$d1_e_obs == FALSE & restriction == "CC") {
            if(grepl("alpha_p1[1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
              prior_mue_str <- paste("alpha_p1[1] ~ dnorm(", prior_mue[1], ",", prior_mue[2])
-             model_string_jags <- gsub("alpha_p1[1] ~ dnorm(0, 0.0000001", prior_mue_str, model_string_jags,fixed = TRUE) }
+             model_string_jags <- gsub("alpha_p1[1] ~ dnorm(0, 0.001", prior_mue_str, model_string_jags,fixed = TRUE) }
          } else if(d_list$n_patterns[1] == 2 & d_list$d1$d1_c_obs == FALSE & d_list$d1$d1_ec_mis == FALSE & restriction == "CC") {
            if(grepl("alpha_p1[1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
              prior_mue_str <- paste("alpha_p1[1] ~ dnorm(", prior_mue[1], ",", prior_mue[2])
-             model_string_jags <- gsub("alpha_p1[1] ~ dnorm(0, 0.0000001", prior_mue_str, model_string_jags,fixed = TRUE) }
+             model_string_jags <- gsub("alpha_p1[1] ~ dnorm(0, 0.001", prior_mue_str, model_string_jags,fixed = TRUE) }
            if(grepl("alpha_p1[2] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
              prior_mue_str <- paste("alpha_p1[2] ~ dnorm(", prior_mue[1], ",", prior_mue[2])
-             model_string_jags <- gsub("alpha_p1[2] ~ dnorm(0, 0.0000001", prior_mue_str, model_string_jags,fixed = TRUE) }
+             model_string_jags <- gsub("alpha_p1[2] ~ dnorm(0, 0.001", prior_mue_str, model_string_jags,fixed = TRUE) }
          } else if(d_list$n_patterns[1] == 2 & d_list$d1$d1_e_obs == FALSE & d_list$d1$d1_ec_mis == FALSE & restriction == "CC") {
            if(grepl("alpha_p1[1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
              prior_mue_str <- paste("alpha_p1[1] ~ dnorm(", prior_mue[1], ",", prior_mue[2])
-             model_string_jags <- gsub("alpha_p1[1] ~ dnorm(0, 0.0000001", prior_mue_str, model_string_jags,fixed = TRUE) }
+             model_string_jags <- gsub("alpha_p1[1] ~ dnorm(0, 0.001", prior_mue_str, model_string_jags,fixed = TRUE) }
          } else if(d_list$n_patterns[1] == 2 & d_list$d1$d1_ec_obs == FALSE & d_list$d1$d1_ec_mis == FALSE & restriction == "AC") {
            if(grepl("alpha_p1[1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
              prior_mue_str <- paste("alpha_p1[1] ~ dnorm(", prior_mue[1], ",", prior_mue[2])
-             model_string_jags <- gsub("alpha_p1[1] ~ dnorm(0, 0.0000001", prior_mue_str, model_string_jags,fixed = TRUE) }
+             model_string_jags <- gsub("alpha_p1[1] ~ dnorm(0, 0.001", prior_mue_str, model_string_jags,fixed = TRUE) }
          }
         if(d_list$n_patterns[2] == 4) {
           if(grepl("alpha_p2[1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
             prior_mue_str <- paste("alpha_p2[1] ~ dnorm(", prior_mue[1], ",", prior_mue[2])
-            model_string_jags <- gsub("alpha_p2[1] ~ dnorm(0, 0.0000001", prior_mue_str, model_string_jags,fixed = TRUE) }
+            model_string_jags <- gsub("alpha_p2[1] ~ dnorm(0, 0.001", prior_mue_str, model_string_jags,fixed = TRUE) }
           if(grepl("alpha_p2[3] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
             prior_mue_str <- paste("alpha_p2[3] ~ dnorm(", prior_mue[1], ",", prior_mue[2])
-            model_string_jags <- gsub("alpha_p2[3] ~ dnorm(0, 0.0000001", prior_mue_str, model_string_jags,fixed = TRUE) } 
+            model_string_jags <- gsub("alpha_p2[3] ~ dnorm(0, 0.001", prior_mue_str, model_string_jags,fixed = TRUE) } 
         } else if(d_list$n_patterns[2] == 3 & d_list$d2$d2_c_obs == FALSE & restriction == "CC") {
           if(grepl("alpha_p2[1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
             prior_mue_str <- paste("alpha_p2[1] ~ dnorm(", prior_mue[1], ",", prior_mue[2])
-            model_string_jags <- gsub("alpha_p2[1] ~ dnorm(0, 0.0000001", prior_mue_str, model_string_jags,fixed = TRUE) }
+            model_string_jags <- gsub("alpha_p2[1] ~ dnorm(0, 0.001", prior_mue_str, model_string_jags,fixed = TRUE) }
           if(grepl("alpha_p2[3] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
             prior_mue_str <- paste("alpha_p2[3] ~ dnorm(", prior_mue[1], ",", prior_mue[2])
-            model_string_jags <- gsub("alpha_p2[3] ~ dnorm(0, 0.0000001", prior_mue_str, model_string_jags,fixed = TRUE) } 
+            model_string_jags <- gsub("alpha_p2[3] ~ dnorm(0, 0.001", prior_mue_str, model_string_jags,fixed = TRUE) } 
         } else if(d_list$n_patterns[2] == 3 & d_list$d2$d2_ec_obs == FALSE & restriction == "AC") {
           if(grepl("alpha_p2[3] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
             prior_mue_str <- paste("alpha_p2[3] ~ dnorm(", prior_mue[1], ",", prior_mue[2])
-            model_string_jags <- gsub("alpha_p2[3] ~ dnorm(0, 0.0000001", prior_mue_str, model_string_jags,fixed = TRUE) } 
+            model_string_jags <- gsub("alpha_p2[3] ~ dnorm(0, 0.001", prior_mue_str, model_string_jags,fixed = TRUE) } 
         } else if(d_list$n_patterns[2] == 3 & d_list$d2$d2_e_obs == FALSE & restriction == "CC") {
           if(grepl("alpha_p2[1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
             prior_mue_str <- paste("alpha_p2[1] ~ dnorm(", prior_mue[1], ",", prior_mue[2])
-            model_string_jags <- gsub("alpha_p2[1] ~ dnorm(0, 0.0000001", prior_mue_str, model_string_jags,fixed = TRUE) }
+            model_string_jags <- gsub("alpha_p2[1] ~ dnorm(0, 0.001", prior_mue_str, model_string_jags,fixed = TRUE) }
         } else if(d_list$n_patterns[2] == 3 & d_list$d2$d2_ec_mis == FALSE) {
           if(grepl("alpha_p2[1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
             prior_mue_str <- paste("alpha_p2[1] ~ dnorm(", prior_mue[1], ",", prior_mue[2])
-            model_string_jags <- gsub("alpha_p2[1] ~ dnorm(0, 0.0000001", prior_mue_str, model_string_jags,fixed = TRUE) }
+            model_string_jags <- gsub("alpha_p2[1] ~ dnorm(0, 0.001", prior_mue_str, model_string_jags,fixed = TRUE) }
           if(grepl("alpha_p2[3] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
             prior_mue_str <- paste("alpha_p2[3] ~ dnorm(", prior_mue[1], ",", prior_mue[2])
-            model_string_jags <- gsub("alpha_p2[3] ~ dnorm(0, 0.0000001", prior_mue_str, model_string_jags,fixed = TRUE) } 
+            model_string_jags <- gsub("alpha_p2[3] ~ dnorm(0, 0.001", prior_mue_str, model_string_jags,fixed = TRUE) } 
         } else if(d_list$n_patterns[2] == 2 & d_list$d2$d2_c_obs == FALSE & d_list$d2$d2_e_obs == FALSE & restriction == "CC") {
           if(grepl("alpha_p2[1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
             prior_mue_str <- paste("alpha_p2[1] ~ dnorm(", prior_mue[1], ",", prior_mue[2])
-            model_string_jags <- gsub("alpha_p2[1] ~ dnorm(0, 0.0000001", prior_mue_str, model_string_jags,fixed = TRUE) }
+            model_string_jags <- gsub("alpha_p2[1] ~ dnorm(0, 0.001", prior_mue_str, model_string_jags,fixed = TRUE) }
         } else if(d_list$n_patterns[2] == 2 & d_list$d2$d2_c_obs == FALSE & d_list$d2$d2_ec_mis == FALSE & restriction == "CC") {
           if(grepl("alpha_p2[1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
             prior_mue_str <- paste("alpha_p2[1] ~ dnorm(", prior_mue[1], ",", prior_mue[2])
-            model_string_jags <- gsub("alpha_p2[1] ~ dnorm(0, 0.0000001", prior_mue_str, model_string_jags,fixed = TRUE) }
+            model_string_jags <- gsub("alpha_p2[1] ~ dnorm(0, 0.001", prior_mue_str, model_string_jags,fixed = TRUE) }
           if(grepl("alpha_p2[2] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
             prior_mue_str <- paste("alpha_p2[2] ~ dnorm(", prior_mue[1], ",", prior_mue[2])
-            model_string_jags <- gsub("alpha_p2[2] ~ dnorm(0, 0.0000001", prior_mue_str, model_string_jags,fixed = TRUE) }
+            model_string_jags <- gsub("alpha_p2[2] ~ dnorm(0, 0.001", prior_mue_str, model_string_jags,fixed = TRUE) }
         } else if(d_list$n_patterns[2] == 2 & d_list$d2$d2_e_obs == FALSE & d_list$d2$d2_ec_mis == FALSE & restriction == "CC") {
           if(grepl("alpha_p2[1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
             prior_mue_str <- paste("alpha_p2[1] ~ dnorm(", prior_mue[1], ",", prior_mue[2])
-            model_string_jags <- gsub("alpha_p2[1] ~ dnorm(0, 0.0000001", prior_mue_str, model_string_jags,fixed = TRUE) }
+            model_string_jags <- gsub("alpha_p2[1] ~ dnorm(0, 0.001", prior_mue_str, model_string_jags,fixed = TRUE) }
         } else if(d_list$n_patterns[2] == 2 & d_list$d2$d2_ec_obs == FALSE & d_list$d2$d2_ec_mis == FALSE & restriction == "AC") {
           if(grepl("alpha_p2[1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
             prior_mue_str <- paste("alpha_p2[1] ~ dnorm(", prior_mue[1], ",", prior_mue[2])
-            model_string_jags <- gsub("alpha_p2[1] ~ dnorm(0, 0.0000001", prior_mue_str, model_string_jags,fixed = TRUE) }
+            model_string_jags <- gsub("alpha_p2[1] ~ dnorm(0, 0.001", prior_mue_str, model_string_jags,fixed = TRUE) }
         }
       }
     } else if(pe_fixed > 1){
@@ -141,79 +141,79 @@ prior_pattern <- function(type, dist_e, dist_c, pe_fixed, pc_fixed, model_e_rand
              if(is.null(alpha0.prior) == FALSE & grepl("alpha_p1[1, 1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
                prior_mue <- alpha0.prior
                prior_mue_str <- paste("alpha_p1[1, 1] ~ dnorm(", prior_mue[1], ",", prior_mue[2])
-               model_string_jags <- gsub("alpha_p1[1, 1] ~ dnorm(0, 0.0000001", prior_mue_str, model_string_jags,fixed = TRUE) }
+               model_string_jags <- gsub("alpha_p1[1, 1] ~ dnorm(0, 0.001", prior_mue_str, model_string_jags,fixed = TRUE) }
              if(is.null(alpha0.prior) == FALSE & grepl("alpha_p1[1, 3] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
                prior_mue <- alpha0.prior
                prior_mue_str <- paste("alpha_p1[1, 3] ~ dnorm(", prior_mue[1], ",", prior_mue[2])
-               model_string_jags <- gsub("alpha_p1[1, 3] ~ dnorm(0, 0.0000001", prior_mue_str, model_string_jags,fixed = TRUE) } 
+               model_string_jags <- gsub("alpha_p1[1, 3] ~ dnorm(0, 0.001", prior_mue_str, model_string_jags,fixed = TRUE) } 
              if(is.null(alpha.prior) == FALSE & grepl("alpha_p1[j, 1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
                prior_alphae <- alpha.prior
                prior_alphae_str <- paste("alpha_p1[j, 1] ~ dnorm(", prior_alphae[1], ",", prior_alphae[2])
-               model_string_jags <- gsub("alpha_p1[j, 1] ~ dnorm(0, 0.0000001", prior_alphae_str, model_string_jags, fixed = TRUE) 
+               model_string_jags <- gsub("alpha_p1[j, 1] ~ dnorm(0, 0.001", prior_alphae_str, model_string_jags, fixed = TRUE) 
                prior_alphae_str <- paste("alpha_p1[j, 3] ~ dnorm(", prior_alphae[1], ",", prior_alphae[2])
-               model_string_jags <- gsub("alpha_p1[j, 3] ~ dnorm(0, 0.0000001", prior_alphae_str, model_string_jags, fixed = TRUE) }
+               model_string_jags <- gsub("alpha_p1[j, 3] ~ dnorm(0, 0.001", prior_alphae_str, model_string_jags, fixed = TRUE) }
            } else if(d_list$n_patterns[1] == 3 & d_list$d1$d1_c_obs == FALSE & restriction == "CC") {
              if(is.null(alpha0.prior) == FALSE & grepl("alpha_p1[1, 1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
                prior_mue <- alpha0.prior
                prior_mue_str <- paste("alpha_p1[1, 1] ~ dnorm(", prior_mue[1], ",", prior_mue[2])
-               model_string_jags <- gsub("alpha_p1[1, 1] ~ dnorm(0, 0.0000001", prior_mue_str, model_string_jags,fixed = TRUE) }
+               model_string_jags <- gsub("alpha_p1[1, 1] ~ dnorm(0, 0.001", prior_mue_str, model_string_jags,fixed = TRUE) }
              if(is.null(alpha0.prior) == FALSE & grepl("alpha_p1[1, 3] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
                prior_mue <- alpha0.prior
                prior_mue_str <- paste("alpha_p1[1, 3] ~ dnorm(", prior_mue[1], ",", prior_mue[2])
-               model_string_jags <- gsub("alpha_p1[1, 3] ~ dnorm(0, 0.0000001", prior_mue_str, model_string_jags,fixed = TRUE) }
+               model_string_jags <- gsub("alpha_p1[1, 3] ~ dnorm(0, 0.001", prior_mue_str, model_string_jags,fixed = TRUE) }
              if(is.null(alpha.prior) == FALSE & grepl("alpha_p1[j, 1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
                prior_alphae <- alpha.prior
                prior_alphae_str <- paste("alpha_p1[j, 1] ~ dnorm(", prior_alphae[1], ",", prior_alphae[2])
-               model_string_jags <- gsub("alpha_p1[j, 1] ~ dnorm(0, 0.0000001", prior_alphae_str, model_string_jags, fixed = TRUE) 
+               model_string_jags <- gsub("alpha_p1[j, 1] ~ dnorm(0, 0.001", prior_alphae_str, model_string_jags, fixed = TRUE) 
                prior_alphae_str <- paste("alpha_p1[j, 3] ~ dnorm(", prior_alphae[1], ",", prior_alphae[2])
-               model_string_jags <- gsub("alpha_p1[j, 3] ~ dnorm(0, 0.0000001", prior_alphae_str, model_string_jags, fixed = TRUE) }
+               model_string_jags <- gsub("alpha_p1[j, 3] ~ dnorm(0, 0.001", prior_alphae_str, model_string_jags, fixed = TRUE) }
            } else if(d_list$n_patterns[1] == 3 & d_list$d1$d1_ec_obs == FALSE & restriction == "AC") {
              if(is.null(alpha0.prior) == FALSE & grepl("alpha_p1[1, 3] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
                prior_mue <- alpha0.prior
                prior_mue_str <- paste("alpha_p1[1, 3] ~ dnorm(", prior_mue[1], ",", prior_mue[2])
-               model_string_jags <- gsub("alpha_p1[1, 3] ~ dnorm(0, 0.0000001", prior_mue_str, model_string_jags,fixed = TRUE) }
+               model_string_jags <- gsub("alpha_p1[1, 3] ~ dnorm(0, 0.001", prior_mue_str, model_string_jags,fixed = TRUE) }
              if(is.null(alpha.prior) == FALSE & grepl("alpha_p1[j, 3] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
                prior_alphae <- alpha.prior
                prior_alphae_str <- paste("alpha_p1[j, 3] ~ dnorm(", prior_alphae[1], ",", prior_alphae[2])
-               model_string_jags <- gsub("alpha_p1[j, 3] ~ dnorm(0, 0.0000001", prior_alphae_str, model_string_jags, fixed = TRUE) }
+               model_string_jags <- gsub("alpha_p1[j, 3] ~ dnorm(0, 0.001", prior_alphae_str, model_string_jags, fixed = TRUE) }
            } else if(d_list$n_patterns[1] == 3 & d_list$d1$d1_e_obs == FALSE & restriction == "CC") {
              if(is.null(alpha0.prior) == FALSE & grepl("alpha_p1[1, 1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
                prior_mue <- alpha0.prior
                prior_mue_str <- paste("alpha_p1[1, 1] ~ dnorm(", prior_mue[1], ",", prior_mue[2])
-               model_string_jags <- gsub("alpha_p1[1, 1] ~ dnorm(0, 0.0000001", prior_mue_str, model_string_jags,fixed = TRUE) }
+               model_string_jags <- gsub("alpha_p1[1, 1] ~ dnorm(0, 0.001", prior_mue_str, model_string_jags,fixed = TRUE) }
              if(is.null(alpha.prior) == FALSE & grepl("alpha_p1[j, 1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
                prior_alphae <- alpha.prior
                prior_alphae_str <- paste("alpha_p1[j, 1] ~ dnorm(", prior_alphae[1], ",", prior_alphae[2])
-               model_string_jags <- gsub("alpha_p1[j, 1] ~ dnorm(0, 0.0000001", prior_alphae_str, model_string_jags, fixed = TRUE) }
+               model_string_jags <- gsub("alpha_p1[j, 1] ~ dnorm(0, 0.001", prior_alphae_str, model_string_jags, fixed = TRUE) }
            } else if(d_list$n_patterns[1] == 3 & d_list$d1$d1_ec_mis == FALSE) {
              if(is.null(alpha0.prior) == FALSE & grepl("alpha_p1[1, 1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
                prior_mue <- alpha0.prior
                prior_mue_str <- paste("alpha_p1[1, 1] ~ dnorm(", prior_mue[1], ",", prior_mue[2])
-               model_string_jags <- gsub("alpha_p1[1, 1] ~ dnorm(0, 0.0000001", prior_mue_str, model_string_jags,fixed = TRUE) }
+               model_string_jags <- gsub("alpha_p1[1, 1] ~ dnorm(0, 0.001", prior_mue_str, model_string_jags,fixed = TRUE) }
              if(is.null(alpha0.prior) == FALSE & grepl("alpha_p1[1, 3] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
                prior_mue <- alpha0.prior
                prior_mue_str <- paste("alpha_p1[1, 3] ~ dnorm(", prior_mue[1], ",", prior_mue[2])
-               model_string_jags <- gsub("alpha_p1[1, 3] ~ dnorm(0, 0.0000001", prior_mue_str, model_string_jags,fixed = TRUE) }
+               model_string_jags <- gsub("alpha_p1[1, 3] ~ dnorm(0, 0.001", prior_mue_str, model_string_jags,fixed = TRUE) }
              if(is.null(alpha.prior) == FALSE & grepl("alpha_p1[j, 1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
                prior_alphae <- alpha.prior
                prior_alphae_str <- paste("alpha_p1[j, 1] ~ dnorm(", prior_alphae[1], ",", prior_alphae[2])
-               model_string_jags <- gsub("alpha_p1[j, 1] ~ dnorm(0, 0.0000001", prior_alphae_str, model_string_jags, fixed = TRUE) 
+               model_string_jags <- gsub("alpha_p1[j, 1] ~ dnorm(0, 0.001", prior_alphae_str, model_string_jags, fixed = TRUE) 
                prior_alphae_str <- paste("alpha_p1[j, 3] ~ dnorm(", prior_alphae[1], ",", prior_alphae[2])
-               model_string_jags <- gsub("alpha_p1[j, 3] ~ dnorm(0, 0.0000001", prior_alphae_str, model_string_jags, fixed = TRUE) }
+               model_string_jags <- gsub("alpha_p1[j, 3] ~ dnorm(0, 0.001", prior_alphae_str, model_string_jags, fixed = TRUE) }
            } else if(d_list$n_patterns[1] == 2 & d_list$d1$d1_c_obs == FALSE & d_list$d1$d1_e_obs == FALSE & restriction == "CC") {
              if(is.null(alpha0.prior) == FALSE & grepl("alpha_p1[1, 1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
                prior_mue <- alpha0.prior
                prior_mue_str <- paste("alpha_p1[1, 1] ~ dnorm(", prior_mue[1], ",", prior_mue[2])
-               model_string_jags <- gsub("alpha_p1[1, 1] ~ dnorm(0, 0.0000001", prior_mue_str, model_string_jags,fixed = TRUE) }
+               model_string_jags <- gsub("alpha_p1[1, 1] ~ dnorm(0, 0.001", prior_mue_str, model_string_jags,fixed = TRUE) }
              if(is.null(alpha.prior) == FALSE & grepl("alpha_p1[j, 1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
                prior_alphae <- alpha.prior
                prior_alphae_str <- paste("alpha_p1[j, 1] ~ dnorm(", prior_alphae[1], ",", prior_alphae[2])
-               model_string_jags <- gsub("alpha_p1[j, 1] ~ dnorm(0, 0.0000001", prior_alphae_str, model_string_jags, fixed = TRUE) }
+               model_string_jags <- gsub("alpha_p1[j, 1] ~ dnorm(0, 0.001", prior_alphae_str, model_string_jags, fixed = TRUE) }
            } else if(d_list$n_patterns[1] == 2 & d_list$d1$d1_c_obs == FALSE & d_list$d1$d1_ec_mis == FALSE & restriction == "CC") {
              if(is.null(alpha0.prior) == FALSE & grepl("alpha_p1[1, 1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
                prior_mue <- alpha0.prior
                prior_mue_str <- paste("alpha_p1[1, 1] ~ dnorm(", prior_mue[1], ",", prior_mue[2])
-               model_string_jags <- gsub("alpha_p1[1, 1] ~ dnorm(0, 0.0000001", prior_mue_str, model_string_jags,fixed = TRUE) }
+               model_string_jags <- gsub("alpha_p1[1, 1] ~ dnorm(0, 0.001", prior_mue_str, model_string_jags,fixed = TRUE) }
              if(is.null(alpha0.prior) == FALSE & grepl("alpha_p1[1, 2] <- ", model_string_jags, fixed = TRUE) == TRUE) {
                prior_mue <- alpha0.prior
                prior_mue_str <- paste("alpha_p1[1, 2] ~ dnorm(", prior_mue[1], ",", prior_mue[2], ")")
@@ -221,105 +221,105 @@ prior_pattern <- function(type, dist_e, dist_c, pe_fixed, pc_fixed, model_e_rand
              if(is.null(alpha.prior) == FALSE & grepl("alpha_p1[j, 1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
                prior_alphae <- alpha.prior
                prior_alphae_str <- paste("alpha_p1[j, 1] ~ dnorm(", prior_alphae[1], ",", prior_alphae[2])
-               model_string_jags <- gsub("alpha_p1[j, 1] ~ dnorm(0, 0.0000001", prior_alphae_str, model_string_jags, fixed = TRUE) 
+               model_string_jags <- gsub("alpha_p1[j, 1] ~ dnorm(0, 0.001", prior_alphae_str, model_string_jags, fixed = TRUE) 
                prior_alphae_str <- paste("alpha_p1[j, 2] ~ dnorm(", prior_alphae[1], ",", prior_alphae[2])
-               model_string_jags <- gsub("alpha_p1[j, 2] ~ dnorm(0, 0.0000001", prior_alphae_str, model_string_jags, fixed = TRUE) }
+               model_string_jags <- gsub("alpha_p1[j, 2] ~ dnorm(0, 0.001", prior_alphae_str, model_string_jags, fixed = TRUE) }
            } else if(d_list$n_patterns[1] == 2 & d_list$d1$d1_e_obs == FALSE & d_list$d1$d1_ec_mis == FALSE & restriction == "CC") {
              if(is.null(alpha0.prior) == FALSE & grepl("alpha_p1[1, 1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
                prior_mue <- alpha0.prior
                prior_mue_str <- paste("alpha_p1[1, 1] ~ dnorm(", prior_mue[1], ",", prior_mue[2])
-               model_string_jags <- gsub("alpha_p1[1, 1] ~ dnorm(0, 0.0000001", prior_mue_str, model_string_jags,fixed = TRUE) }
+               model_string_jags <- gsub("alpha_p1[1, 1] ~ dnorm(0, 0.001", prior_mue_str, model_string_jags,fixed = TRUE) }
              if(is.null(alpha.prior) == FALSE & grepl("alpha_p1[j, 1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
                prior_alphae <- alpha.prior
                prior_alphae_str <- paste("alpha_p1[j, 1] ~ dnorm(", prior_alphae[1], ",", prior_alphae[2])
-               model_string_jags <- gsub("alpha_p1[j, 1] ~ dnorm(0, 0.0000001", prior_alphae_str, model_string_jags, fixed = TRUE) }
+               model_string_jags <- gsub("alpha_p1[j, 1] ~ dnorm(0, 0.001", prior_alphae_str, model_string_jags, fixed = TRUE) }
            } else if(d_list$n_patterns[1] == 2 & d_list$d1$d1_ec_obs == FALSE & d_list$d1$d1_ec_mis == FALSE & restriction == "AC") {
              if(is.null(alpha0.prior) == FALSE & grepl("alpha_p1[1, 1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
                prior_mue <- alpha0.prior
                prior_mue_str <- paste("alpha_p1[1, 1] ~ dnorm(", prior_mue[1], ",", prior_mue[2])
-               model_string_jags <- gsub("alpha_p1[1, 1] ~ dnorm(0, 0.0000001", prior_mue_str, model_string_jags,fixed = TRUE) }
+               model_string_jags <- gsub("alpha_p1[1, 1] ~ dnorm(0, 0.001", prior_mue_str, model_string_jags,fixed = TRUE) }
              if(is.null(alpha.prior) == FALSE & grepl("alpha_p1[j, 1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
                prior_alphae <- alpha.prior
                prior_alphae_str <- paste("alpha_p1[j, 1] ~ dnorm(", prior_alphae[1], ",", prior_alphae[2])
-               model_string_jags <- gsub("alpha_p1[j, 1] ~ dnorm(0, 0.0000001", prior_alphae_str, model_string_jags, fixed = TRUE) }
+               model_string_jags <- gsub("alpha_p1[j, 1] ~ dnorm(0, 0.001", prior_alphae_str, model_string_jags, fixed = TRUE) }
            }
         if(d_list$n_patterns[2] == 4) {
           if(is.null(alpha0.prior) == FALSE & grepl("alpha_p2[1, 1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
             prior_mue <- alpha0.prior
             prior_mue_str <- paste("alpha_p2[1, 1] ~ dnorm(", prior_mue[1], ",", prior_mue[2])
-            model_string_jags <- gsub("alpha_p2[1, 1] ~ dnorm(0, 0.0000001", prior_mue_str, model_string_jags,fixed = TRUE) }
+            model_string_jags <- gsub("alpha_p2[1, 1] ~ dnorm(0, 0.001", prior_mue_str, model_string_jags,fixed = TRUE) }
           if(is.null(alpha0.prior) == FALSE & grepl("alpha_p2[1, 3] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
             prior_mue <- alpha0.prior
             prior_mue_str <- paste("alpha_p2[1, 3] ~ dnorm(", prior_mue[1], ",", prior_mue[2])
-            model_string_jags <- gsub("alpha_p2[1, 3] ~ dnorm(0, 0.0000001", prior_mue_str, model_string_jags,fixed = TRUE) }
+            model_string_jags <- gsub("alpha_p2[1, 3] ~ dnorm(0, 0.001", prior_mue_str, model_string_jags,fixed = TRUE) }
           if(is.null(alpha.prior) == FALSE & grepl("alpha_p2[j, 1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
             prior_alphae <- alpha.prior
             prior_alphae_str <- paste("alpha_p2[j, 1] ~ dnorm(", prior_alphae[1], ",", prior_alphae[2])
-            model_string_jags <- gsub("alpha_p2[j, 1] ~ dnorm(0, 0.0000001", prior_alphae_str, model_string_jags, fixed = TRUE) 
+            model_string_jags <- gsub("alpha_p2[j, 1] ~ dnorm(0, 0.001", prior_alphae_str, model_string_jags, fixed = TRUE) 
             prior_alphae_str <- paste("alpha_p2[j, 3] ~ dnorm(", prior_alphae[1], ",", prior_alphae[2])
-            model_string_jags <- gsub("alpha_p2[j, 3] ~ dnorm(0, 0.0000001", prior_alphae_str, model_string_jags, fixed = TRUE) }
+            model_string_jags <- gsub("alpha_p2[j, 3] ~ dnorm(0, 0.001", prior_alphae_str, model_string_jags, fixed = TRUE) }
         } else if(d_list$n_patterns[2] == 3 & d_list$d2$d2_c_obs == FALSE & restriction == "CC") {
           if(is.null(alpha0.prior) == FALSE & grepl("alpha_p2[1, 1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
             prior_mue <- alpha0.prior
             prior_mue_str <- paste("alpha_p2[1, 1] ~ dnorm(", prior_mue[1], ",", prior_mue[2])
-            model_string_jags <- gsub("alpha_p2[1, 1] ~ dnorm(0, 0.0000001", prior_mue_str, model_string_jags,fixed = TRUE) }
+            model_string_jags <- gsub("alpha_p2[1, 1] ~ dnorm(0, 0.001", prior_mue_str, model_string_jags,fixed = TRUE) }
           if(is.null(alpha0.prior) == FALSE & grepl("alpha_p2[1, 3] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
             prior_mue <- alpha0.prior
             prior_mue_str <- paste("alpha_p2[1, 3] ~ dnorm(", prior_mue[1], ",", prior_mue[2])
-            model_string_jags <- gsub("alpha_p2[1, 3] ~ dnorm(0, 0.0000001", prior_mue_str, model_string_jags,fixed = TRUE) } 
+            model_string_jags <- gsub("alpha_p2[1, 3] ~ dnorm(0, 0.001", prior_mue_str, model_string_jags,fixed = TRUE) } 
           if(is.null(alpha.prior) == FALSE & grepl("alpha_p2[j, 1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
             prior_alphae <- alpha.prior
             prior_alphae_str <- paste("alpha_p2[j, 1] ~ dnorm(", prior_alphae[1], ",", prior_alphae[2])
-            model_string_jags <- gsub("alpha_p2[j, 1] ~ dnorm(0, 0.0000001", prior_alphae_str, model_string_jags, fixed = TRUE) 
+            model_string_jags <- gsub("alpha_p2[j, 1] ~ dnorm(0, 0.001", prior_alphae_str, model_string_jags, fixed = TRUE) 
             prior_alphae_str <- paste("alpha_p2[j, 3] ~ dnorm(", prior_alphae[1], ",", prior_alphae[2])
-            model_string_jags <- gsub("alpha_p2[j, 3] ~ dnorm(0, 0.0000001", prior_alphae_str, model_string_jags, fixed = TRUE) }
+            model_string_jags <- gsub("alpha_p2[j, 3] ~ dnorm(0, 0.001", prior_alphae_str, model_string_jags, fixed = TRUE) }
         } else if(d_list$n_patterns[2] == 3 & d_list$d2$d2_ec_obs == FALSE & restriction == "AC") {
           if(is.null(alpha0.prior) == FALSE & grepl("alpha_p2[1, 3] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
             prior_mue <- alpha0.prior
             prior_mue_str <- paste("alpha_p2[1, 3] ~ dnorm(", prior_mue[1], ",", prior_mue[2])
-            model_string_jags <- gsub("alpha_p2[1, 3] ~ dnorm(0, 0.0000001", prior_mue_str, model_string_jags,fixed = TRUE) } 
+            model_string_jags <- gsub("alpha_p2[1, 3] ~ dnorm(0, 0.001", prior_mue_str, model_string_jags,fixed = TRUE) } 
           if(is.null(alpha.prior) == FALSE & grepl("alpha_p2[j, 3] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
             prior_alphae <- alpha.prior
             prior_alphae_str <- paste("alpha_p2[j, 3] ~ dnorm(", prior_alphae[1], ",", prior_alphae[2])
-            model_string_jags <- gsub("alpha_p2[j, 3] ~ dnorm(0, 0.0000001", prior_alphae_str, model_string_jags, fixed = TRUE) }
+            model_string_jags <- gsub("alpha_p2[j, 3] ~ dnorm(0, 0.001", prior_alphae_str, model_string_jags, fixed = TRUE) }
         } else if(d_list$n_patterns[2] == 3 & d_list$d2$d2_e_obs == FALSE & restriction == "CC") {
           if(is.null(alpha0.prior) == FALSE & grepl("alpha_p2[1, 1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
             prior_mue <- alpha0.prior
             prior_mue_str <- paste("alpha_p2[1, 1] ~ dnorm(", prior_mue[1], ",", prior_mue[2])
-            model_string_jags <- gsub("alpha_p2[1, 1] ~ dnorm(0, 0.0000001", prior_mue_str, model_string_jags,fixed = TRUE) }
+            model_string_jags <- gsub("alpha_p2[1, 1] ~ dnorm(0, 0.001", prior_mue_str, model_string_jags,fixed = TRUE) }
           if(is.null(alpha.prior) == FALSE & grepl("alpha_p2[j, 1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
             prior_alphae <- alpha.prior
             prior_alphae_str <- paste("alpha_p2[j, 1] ~ dnorm(", prior_alphae[1], ",", prior_alphae[2])
-            model_string_jags <- gsub("alpha_p2[j, 1] ~ dnorm(0, 0.0000001", prior_alphae_str, model_string_jags, fixed = TRUE) }
+            model_string_jags <- gsub("alpha_p2[j, 1] ~ dnorm(0, 0.001", prior_alphae_str, model_string_jags, fixed = TRUE) }
         } else if(d_list$n_patterns[2] == 3 & d_list$d2$d2_ec_mis == FALSE) {
           if(is.null(alpha0.prior) == FALSE & grepl("alpha_p2[1, 1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
             prior_mue <- alpha0.prior
             prior_mue_str <- paste("alpha_p2[1, 1] ~ dnorm(", prior_mue[1], ",", prior_mue[2])
-            model_string_jags <- gsub("alpha_p2[1, 1] ~ dnorm(0, 0.0000001", prior_mue_str, model_string_jags,fixed = TRUE) }
+            model_string_jags <- gsub("alpha_p2[1, 1] ~ dnorm(0, 0.001", prior_mue_str, model_string_jags,fixed = TRUE) }
           if(is.null(alpha0.prior) == FALSE & grepl("alpha_p2[1, 3] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
             prior_mue <- alpha0.prior
             prior_mue_str <- paste("alpha_p2[1, 3] ~ dnorm(", prior_mue[1], ",", prior_mue[2])
-            model_string_jags <- gsub("alpha_p2[1, 3] ~ dnorm(0, 0.0000001", prior_mue_str, model_string_jags,fixed = TRUE) }
+            model_string_jags <- gsub("alpha_p2[1, 3] ~ dnorm(0, 0.001", prior_mue_str, model_string_jags,fixed = TRUE) }
           if(is.null(alpha.prior) == FALSE & grepl("alpha_p2[j, 1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
             prior_alphae <- alpha.prior
             prior_alphae_str <- paste("alpha_p2[j, 1] ~ dnorm(", prior_alphae[1], ",", prior_alphae[2])
-            model_string_jags <- gsub("alpha_p2[j, 1] ~ dnorm(0, 0.0000001", prior_alphae_str, model_string_jags, fixed = TRUE) 
+            model_string_jags <- gsub("alpha_p2[j, 1] ~ dnorm(0, 0.001", prior_alphae_str, model_string_jags, fixed = TRUE) 
             prior_alphae_str <- paste("alpha_p2[j, 3] ~ dnorm(", prior_alphae[1], ",", prior_alphae[2])
-            model_string_jags <- gsub("alpha_p2[j, 3] ~ dnorm(0, 0.0000001", prior_alphae_str, model_string_jags, fixed = TRUE) }
+            model_string_jags <- gsub("alpha_p2[j, 3] ~ dnorm(0, 0.001", prior_alphae_str, model_string_jags, fixed = TRUE) }
         } else if(d_list$n_patterns[2] == 2 & d_list$d2$d2_c_obs == FALSE & d_list$d2$d2_e_obs == FALSE & restriction == "CC") {
           if(is.null(alpha0.prior) == FALSE & grepl("alpha_p2[1, 1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
             prior_mue <- alpha0.prior
             prior_mue_str <- paste("alpha_p2[1, 1] ~ dnorm(", prior_mue[1], ",", prior_mue[2])
-            model_string_jags <- gsub("alpha_p2[1, 1] ~ dnorm(0, 0.0000001", prior_mue_str, model_string_jags,fixed = TRUE) }
+            model_string_jags <- gsub("alpha_p2[1, 1] ~ dnorm(0, 0.001", prior_mue_str, model_string_jags,fixed = TRUE) }
           if(is.null(alpha.prior) == FALSE & grepl("alpha_p2[j, 1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
             prior_alphae <- alpha.prior
             prior_alphae_str <- paste("alpha_p2[j, 1] ~ dnorm(", prior_alphae[1], ",", prior_alphae[2])
-            model_string_jags <- gsub("alpha_p2[j, 1] ~ dnorm(0, 0.0000001", prior_alphae_str, model_string_jags, fixed = TRUE) }
+            model_string_jags <- gsub("alpha_p2[j, 1] ~ dnorm(0, 0.001", prior_alphae_str, model_string_jags, fixed = TRUE) }
         } else if(d_list$n_patterns[2] == 2 & d_list$d2$d2_c_obs == FALSE & d_list$d2$d2_ec_mis == FALSE & restriction == "CC") {
           if(is.null(alpha0.prior) == FALSE & grepl("alpha_p2[1, 1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
             prior_mue <- alpha0.prior
             prior_mue_str <- paste("alpha_p2[1, 1] ~ dnorm(", prior_mue[1], ",", prior_mue[2])
-            model_string_jags <- gsub("alpha_p2[1, 1] ~ dnorm(0, 0.0000001", prior_mue_str, model_string_jags,fixed = TRUE) }
+            model_string_jags <- gsub("alpha_p2[1, 1] ~ dnorm(0, 0.001", prior_mue_str, model_string_jags,fixed = TRUE) }
           if(is.null(alpha0.prior) == FALSE & grepl("alpha_p2[1, 2] <- ", model_string_jags, fixed = TRUE) == TRUE) {
             prior_mue <- alpha0.prior
             prior_mue_str <- paste("alpha_p2[1, 2] ~ dnorm(", prior_mue[1], ",", prior_mue[2], ")")
@@ -327,27 +327,27 @@ prior_pattern <- function(type, dist_e, dist_c, pe_fixed, pc_fixed, model_e_rand
           if(is.null(alpha.prior) == FALSE & grepl("alpha_p2[j, 1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
             prior_alphae <- alpha.prior
             prior_alphae_str <- paste("alpha_p2[j, 1] ~ dnorm(", prior_alphae[1], ",", prior_alphae[2])
-            model_string_jags <- gsub("alpha_p2[j, 1] ~ dnorm(0, 0.0000001", prior_alphae_str, model_string_jags, fixed = TRUE) 
+            model_string_jags <- gsub("alpha_p2[j, 1] ~ dnorm(0, 0.001", prior_alphae_str, model_string_jags, fixed = TRUE) 
             prior_alphae_str <- paste("alpha_p2[j, 2] ~ dnorm(", prior_alphae[1], ",", prior_alphae[2])
-            model_string_jags <- gsub("alpha_p2[j, 2] ~ dnorm(0, 0.0000001", prior_alphae_str, model_string_jags, fixed = TRUE) }
+            model_string_jags <- gsub("alpha_p2[j, 2] ~ dnorm(0, 0.001", prior_alphae_str, model_string_jags, fixed = TRUE) }
         } else if(d_list$n_patterns[2] == 2 & d_list$d2$d2_e_obs == FALSE & d_list$d2$d2_ec_mis == FALSE & restriction == "CC") {
           if(is.null(alpha0.prior) == FALSE & grepl("alpha_p2[1, 1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
             prior_mue <- alpha0.prior
             prior_mue_str <- paste("alpha_p2[1, 1] ~ dnorm(", prior_mue[1], ",", prior_mue[2])
-            model_string_jags <- gsub("alpha_p2[1, 1] ~ dnorm(0, 0.0000001", prior_mue_str, model_string_jags,fixed = TRUE) }
+            model_string_jags <- gsub("alpha_p2[1, 1] ~ dnorm(0, 0.001", prior_mue_str, model_string_jags,fixed = TRUE) }
           if(is.null(alpha.prior) == FALSE & grepl("alpha_p2[j, 1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
             prior_alphae <- alpha.prior
             prior_alphae_str <- paste("alpha_p2[j, 1] ~ dnorm(", prior_alphae[1], ",", prior_alphae[2])
-            model_string_jags <- gsub("alpha_p2[j, 1] ~ dnorm(0, 0.0000001", prior_alphae_str, model_string_jags, fixed = TRUE) }
+            model_string_jags <- gsub("alpha_p2[j, 1] ~ dnorm(0, 0.001", prior_alphae_str, model_string_jags, fixed = TRUE) }
         } else if(d_list$n_patterns[2] == 2 & d_list$d2$d2_ec_obs == FALSE & d_list$d2$d2_ec_mis == FALSE & restriction == "AC") {
           if(is.null(alpha0.prior) == FALSE & grepl("alpha_p2[1, 1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
             prior_mue <- alpha0.prior
             prior_mue_str <- paste("alpha_p2[1, 1] ~ dnorm(", prior_mue[1], ",", prior_mue[2])
-            model_string_jags <- gsub("alpha_p2[1, 1] ~ dnorm(0, 0.0000001", prior_mue_str, model_string_jags,fixed = TRUE) }
+            model_string_jags <- gsub("alpha_p2[1, 1] ~ dnorm(0, 0.001", prior_mue_str, model_string_jags,fixed = TRUE) }
           if(is.null(alpha.prior) == FALSE & grepl("alpha_p2[j, 1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
             prior_alphae <- alpha.prior
             prior_alphae_str <- paste("alpha_p2[j, 1] ~ dnorm(", prior_alphae[1], ",", prior_alphae[2])
-            model_string_jags <- gsub("alpha_p2[j, 1] ~ dnorm(0, 0.0000001", prior_alphae_str, model_string_jags, fixed = TRUE) }
+            model_string_jags <- gsub("alpha_p2[j, 1] ~ dnorm(0, 0.001", prior_alphae_str, model_string_jags, fixed = TRUE) }
         }
       }
     }
@@ -358,100 +358,100 @@ prior_pattern <- function(type, dist_e, dist_c, pe_fixed, pc_fixed, model_e_rand
       if(d_list$n_patterns[1] == 4) {
         if(grepl("beta_p1[1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
           prior_muc_str <- paste("beta_p1[1] ~ dnorm(", prior_muc[1], ",", prior_muc[2])
-          model_string_jags <- gsub("beta_p1[1] ~ dnorm(0, 0.0000001", prior_muc_str, model_string_jags,fixed = TRUE) }
+          model_string_jags <- gsub("beta_p1[1] ~ dnorm(0, 0.001", prior_muc_str, model_string_jags,fixed = TRUE) }
         if(grepl("beta_p1[2] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
           prior_muc_str <- paste("beta_p1[2] ~ dnorm(", prior_muc[1], ",", prior_muc[2])
-          model_string_jags <- gsub("beta_p1[2] ~ dnorm(0, 0.0000001", prior_muc_str, model_string_jags,fixed = TRUE) }
+          model_string_jags <- gsub("beta_p1[2] ~ dnorm(0, 0.001", prior_muc_str, model_string_jags,fixed = TRUE) }
       } else if(d_list$n_patterns[1] == 3 & d_list$d1$d1_c_obs == FALSE & restriction == "CC") {
         if(grepl("beta_p1[1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
           prior_muc_str <- paste("beta_p1[1] ~ dnorm(", prior_muc[1], ",", prior_muc[2])
-          model_string_jags <- gsub("beta_p1[1] ~ dnorm(0, 0.0000001", prior_muc_str, model_string_jags,fixed = TRUE) }
+          model_string_jags <- gsub("beta_p1[1] ~ dnorm(0, 0.001", prior_muc_str, model_string_jags,fixed = TRUE) }
       } else if(d_list$n_patterns[1] == 3 & d_list$d1$d1_ec_obs == FALSE & restriction == "AC") {
         if(grepl("beta_p1[2] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
           prior_muc_str <- paste("beta_p1[2] ~ dnorm(", prior_muc[1], ",", prior_muc[2])
-          model_string_jags <- gsub("beta_p1[2] ~ dnorm(0, 0.0000001", prior_muc_str, model_string_jags,fixed = TRUE) }
+          model_string_jags <- gsub("beta_p1[2] ~ dnorm(0, 0.001", prior_muc_str, model_string_jags,fixed = TRUE) }
       } else if(d_list$n_patterns[1] == 3 & d_list$d1$d1_e_obs == FALSE & restriction == "CC") {
         if(grepl("beta_p1[1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
           prior_muc_str <- paste("beta_p1[1] ~ dnorm(", prior_muc[1], ",", prior_muc[2])
-          model_string_jags <- gsub("beta_p1[1] ~ dnorm(0, 0.0000001", prior_muc_str, model_string_jags,fixed = TRUE) }
+          model_string_jags <- gsub("beta_p1[1] ~ dnorm(0, 0.001", prior_muc_str, model_string_jags,fixed = TRUE) }
         if(grepl("beta_p1[2] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
           prior_muc_str <- paste("beta_p1[2] ~ dnorm(", prior_muc[1], ",", prior_muc[2])
-          model_string_jags <- gsub("beta_p1[2] ~ dnorm(0, 0.0000001", prior_muc_str, model_string_jags,fixed = TRUE) }
+          model_string_jags <- gsub("beta_p1[2] ~ dnorm(0, 0.001", prior_muc_str, model_string_jags,fixed = TRUE) }
       } else if(d_list$n_patterns[1] == 3 & d_list$d1$d1_ec_mis == FALSE) {
         if(grepl("beta_p1[1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
           prior_muc_str <- paste("beta_p1[1] ~ dnorm(", prior_muc[1], ",", prior_muc[2])
-          model_string_jags <- gsub("beta_p1[1] ~ dnorm(0, 0.0000001", prior_muc_str, model_string_jags,fixed = TRUE) }
+          model_string_jags <- gsub("beta_p1[1] ~ dnorm(0, 0.001", prior_muc_str, model_string_jags,fixed = TRUE) }
         if(grepl("beta_p1[2] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
           prior_muc_str <- paste("beta_p1[2] ~ dnorm(", prior_muc[1], ",", prior_muc[2])
-          model_string_jags <- gsub("beta_p1[2] ~ dnorm(0, 0.0000001", prior_muc_str, model_string_jags,fixed = TRUE) } 
+          model_string_jags <- gsub("beta_p1[2] ~ dnorm(0, 0.001", prior_muc_str, model_string_jags,fixed = TRUE) } 
       } else if(d_list$n_patterns[1] == 2 & d_list$d1$d1_c_obs == FALSE & d_list$d1$d1_e_obs == FALSE & restriction == "CC") {
         if(grepl("beta_p1[1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
           prior_muc_str <- paste("beta_p1[1] ~ dnorm(", prior_muc[1], ",", prior_muc[2])
-          model_string_jags <- gsub("beta_p1[1] ~ dnorm(0, 0.0000001", prior_muc_str, model_string_jags,fixed = TRUE) }
+          model_string_jags <- gsub("beta_p1[1] ~ dnorm(0, 0.001", prior_muc_str, model_string_jags,fixed = TRUE) }
       } else if(d_list$n_patterns[1] == 2 & d_list$d1$d1_c_obs == FALSE & d_list$d1$d1_ec_mis == FALSE & restriction == "CC") {
         if(grepl("beta_p1[1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
           prior_muc_str <- paste("beta_p1[1] ~ dnorm(", prior_muc[1], ",", prior_muc[2])
-          model_string_jags <- gsub("beta_p1[1] ~ dnorm(0, 0.0000001", prior_muc_str, model_string_jags,fixed = TRUE) }
+          model_string_jags <- gsub("beta_p1[1] ~ dnorm(0, 0.001", prior_muc_str, model_string_jags,fixed = TRUE) }
       } else if(d_list$n_patterns[1] == 2 & d_list$d1$d1_e_obs == FALSE & d_list$d1$d1_ec_mis == FALSE & restriction == "CC") {
         if(grepl("beta_p1[1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
           prior_muc_str <- paste("beta_p1[1] ~ dnorm(", prior_muc[1], ",", prior_muc[2])
-          model_string_jags <- gsub("beta_p1[1] ~ dnorm(0, 0.0000001", prior_muc_str, model_string_jags,fixed = TRUE) }
+          model_string_jags <- gsub("beta_p1[1] ~ dnorm(0, 0.001", prior_muc_str, model_string_jags,fixed = TRUE) }
         if(grepl("beta_p1[2] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
           prior_muc_str <- paste("beta_p1[2] ~ dnorm(", prior_muc[1], ",", prior_muc[2])
-          model_string_jags <- gsub("beta_p1[2] ~ dnorm(0, 0.0000001", prior_muc_str, model_string_jags,fixed = TRUE) }
+          model_string_jags <- gsub("beta_p1[2] ~ dnorm(0, 0.001", prior_muc_str, model_string_jags,fixed = TRUE) }
       } else if(d_list$n_patterns[1] == 2 & d_list$d1$d1_ec_obs == FALSE & d_list$d1$d1_ec_mis == FALSE & restriction == "AC") {
         if(grepl("beta_p1[2] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
           prior_muc_str <- paste("beta_p1[2] ~ dnorm(", prior_muc[1], ",", prior_muc[2])
-          model_string_jags <- gsub("beta_p1[2] ~ dnorm(0, 0.0000001", prior_muc_str, model_string_jags,fixed = TRUE) }
+          model_string_jags <- gsub("beta_p1[2] ~ dnorm(0, 0.001", prior_muc_str, model_string_jags,fixed = TRUE) }
       }
       if(d_list$n_patterns[2] == 4) {
         if(grepl("beta_p2[1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
           prior_muc_str <- paste("beta_p2[1] ~ dnorm(", prior_muc[1], ",", prior_muc[2])
-          model_string_jags <- gsub("beta_p2[1] ~ dnorm(0, 0.0000001", prior_muc_str, model_string_jags,fixed = TRUE) }
+          model_string_jags <- gsub("beta_p2[1] ~ dnorm(0, 0.001", prior_muc_str, model_string_jags,fixed = TRUE) }
         if(grepl("beta_p2[2] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
           prior_muc_str <- paste("beta_p2[2] ~ dnorm(", prior_muc[1], ",", prior_muc[2])
-          model_string_jags <- gsub("beta_p2[2] ~ dnorm(0, 0.0000001", prior_muc_str, model_string_jags,fixed = TRUE) } 
+          model_string_jags <- gsub("beta_p2[2] ~ dnorm(0, 0.001", prior_muc_str, model_string_jags,fixed = TRUE) } 
       } else if(d_list$n_patterns[2] == 3 & d_list$d2$d2_c_obs == FALSE & restriction == "CC") {
         if(grepl("beta_p2[1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
           prior_muc_str <- paste("beta_p2[1] ~ dnorm(", prior_muc[1], ",", prior_muc[2])
-          model_string_jags <- gsub("beta_p2[1] ~ dnorm(0, 0.0000001", prior_muc_str, model_string_jags,fixed = TRUE) }
+          model_string_jags <- gsub("beta_p2[1] ~ dnorm(0, 0.001", prior_muc_str, model_string_jags,fixed = TRUE) }
       } else if(d_list$n_patterns[2] == 3 & d_list$d2$d2_ec_obs == FALSE & restriction == "AC") {
         if(grepl("beta_p2[2] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
           prior_muc_str <- paste("beta_p2[2] ~ dnorm(", prior_muc[1], ",", prior_muc[2])
-          model_string_jags <- gsub("beta_p2[2] ~ dnorm(0, 0.0000001", prior_muc_str, model_string_jags,fixed = TRUE) }
+          model_string_jags <- gsub("beta_p2[2] ~ dnorm(0, 0.001", prior_muc_str, model_string_jags,fixed = TRUE) }
       } else if(d_list$n_patterns[2] == 3 & d_list$d2$d2_e_obs == FALSE & restriction == "CC") {
         if(grepl("beta_p2[1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
           prior_muc_str <- paste("beta_p2[1] ~ dnorm(", prior_muc[1], ",", prior_muc[2])
-          model_string_jags <- gsub("beta_p2[1] ~ dnorm(0, 0.0000001", prior_muc_str, model_string_jags,fixed = TRUE) }
+          model_string_jags <- gsub("beta_p2[1] ~ dnorm(0, 0.001", prior_muc_str, model_string_jags,fixed = TRUE) }
         if(grepl("beta_p2[2] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
           prior_muc_str <- paste("beta_p2[2] ~ dnorm(", prior_muc[1], ",", prior_muc[2])
-          model_string_jags <- gsub("beta_p2[2] ~ dnorm(0, 0.0000001", prior_muc_str, model_string_jags,fixed = TRUE) }
+          model_string_jags <- gsub("beta_p2[2] ~ dnorm(0, 0.001", prior_muc_str, model_string_jags,fixed = TRUE) }
       } else if(d_list$n_patterns[2] == 3 & d_list$d2$d2_ec_mis == FALSE) {
         if(grepl("beta_p2[1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
           prior_muc_str <- paste("beta_p2[1] ~ dnorm(", prior_muc[1], ",", prior_muc[2])
-          model_string_jags <- gsub("beta_p2[1] ~ dnorm(0, 0.0000001", prior_muc_str, model_string_jags,fixed = TRUE) }
+          model_string_jags <- gsub("beta_p2[1] ~ dnorm(0, 0.001", prior_muc_str, model_string_jags,fixed = TRUE) }
         if(grepl("beta_p2[2] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
           prior_muc_str <- paste("beta_p2[2] ~ dnorm(", prior_muc[1], ",", prior_muc[2])
-          model_string_jags <- gsub("beta_p2[2] ~ dnorm(0, 0.0000001", prior_muc_str, model_string_jags,fixed = TRUE) } 
+          model_string_jags <- gsub("beta_p2[2] ~ dnorm(0, 0.001", prior_muc_str, model_string_jags,fixed = TRUE) } 
       } else if(d_list$n_patterns[2] == 2 & d_list$d2$d2_c_obs == FALSE & d_list$d2$d2_e_obs == FALSE & restriction == "CC") {
         if(grepl("beta_p2[1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
           prior_muc_str <- paste("beta_p2[1] ~ dnorm(", prior_muc[1], ",", prior_muc[2])
-          model_string_jags <- gsub("beta_p2[1] ~ dnorm(0, 0.0000001", prior_muc_str, model_string_jags,fixed = TRUE) }
+          model_string_jags <- gsub("beta_p2[1] ~ dnorm(0, 0.001", prior_muc_str, model_string_jags,fixed = TRUE) }
       } else if(d_list$n_patterns[2] == 2 & d_list$d2$d2_c_obs == FALSE & d_list$d2$d2_ec_mis == FALSE & restriction == "CC") {
         if(grepl("beta_p2[1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
           prior_muc_str <- paste("beta_p2[1] ~ dnorm(", prior_muc[1], ",", prior_muc[2])
-          model_string_jags <- gsub("beta_p2[1] ~ dnorm(0, 0.0000001", prior_muc_str, model_string_jags,fixed = TRUE) }
+          model_string_jags <- gsub("beta_p2[1] ~ dnorm(0, 0.001", prior_muc_str, model_string_jags,fixed = TRUE) }
       } else if(d_list$n_patterns[2] == 2 & d_list$d2$d2_e_obs == FALSE & d_list$d2$d2_ec_mis == FALSE & restriction == "CC") {
         if(grepl("beta_p2[1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
           prior_muc_str <- paste("beta_p2[1] ~ dnorm(", prior_muc[1], ",", prior_muc[2])
-          model_string_jags <- gsub("beta_p2[1] ~ dnorm(0, 0.0000001", prior_muc_str, model_string_jags,fixed = TRUE) }
+          model_string_jags <- gsub("beta_p2[1] ~ dnorm(0, 0.001", prior_muc_str, model_string_jags,fixed = TRUE) }
         if(grepl("beta_p2[2] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
           prior_muc_str <- paste("beta_p2[2] ~ dnorm(", prior_muc[1], ",", prior_muc[2])
-          model_string_jags <- gsub("beta_p2[2] ~ dnorm(0, 0.0000001", prior_muc_str, model_string_jags,fixed = TRUE) }
+          model_string_jags <- gsub("beta_p2[2] ~ dnorm(0, 0.001", prior_muc_str, model_string_jags,fixed = TRUE) }
       } else if(d_list$n_patterns[2] == 2 & d_list$d2$d2_ec_obs == FALSE & d_list$d2$d2_ec_mis == FALSE & restriction == "AC") {
         if(grepl("beta_p2[2] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
           prior_muc_str <- paste("beta_p2[2] ~ dnorm(", prior_muc[1], ",", prior_muc[2])
-          model_string_jags <- gsub("beta_p2[2] ~ dnorm(0, 0.0000001", prior_muc_str, model_string_jags,fixed = TRUE) }
+          model_string_jags <- gsub("beta_p2[2] ~ dnorm(0, 0.001", prior_muc_str, model_string_jags,fixed = TRUE) }
       }
     }
   } else if(pc_fixed > 1){
@@ -466,213 +466,213 @@ prior_pattern <- function(type, dist_e, dist_c, pe_fixed, pc_fixed, model_e_rand
         if(is.null(beta0.prior) == FALSE & grepl("beta_p1[1, 1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
           prior_muc <- beta0.prior
           prior_muc_str <- paste("beta_p1[1, 1] ~ dnorm(", prior_muc[1], ",", prior_muc[2])
-          model_string_jags <- gsub("beta_p1[1, 1] ~ dnorm(0, 0.0000001", prior_muc_str, model_string_jags,fixed = TRUE) }
+          model_string_jags <- gsub("beta_p1[1, 1] ~ dnorm(0, 0.001", prior_muc_str, model_string_jags,fixed = TRUE) }
         if(is.null(beta0.prior) == FALSE & grepl("beta_p1[1, 2] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
           prior_muc <- beta0.prior
           prior_muc_str <- paste("beta_p1[1, 2] ~ dnorm(", prior_muc[1], ",", prior_muc[2])
-          model_string_jags <- gsub("beta_p1[1, 2] ~ dnorm(0, 0.0000001", prior_muc_str, model_string_jags,fixed = TRUE) }
+          model_string_jags <- gsub("beta_p1[1, 2] ~ dnorm(0, 0.001", prior_muc_str, model_string_jags,fixed = TRUE) }
         if(is.null(beta.prior) == FALSE & grepl("beta_p1[j, 1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
           prior_betac <- beta.prior
           prior_betac_str <- paste("beta_p1[j, 1] ~ dnorm(", prior_betac[1], ",", prior_betac[2])
-          model_string_jags <- gsub("beta_p1[j, 1] ~ dnorm(0, 0.0000001", prior_betac_str, model_string_jags, fixed = TRUE) 
+          model_string_jags <- gsub("beta_p1[j, 1] ~ dnorm(0, 0.001", prior_betac_str, model_string_jags, fixed = TRUE) 
           prior_betac_str <- paste("beta_p1[j, 2] ~ dnorm(", prior_betac[1], ",", prior_betac[2])
-          model_string_jags <- gsub("beta_p1[j, 2] ~ dnorm(0, 0.0000001", prior_betac_str, model_string_jags, fixed = TRUE) }
+          model_string_jags <- gsub("beta_p1[j, 2] ~ dnorm(0, 0.001", prior_betac_str, model_string_jags, fixed = TRUE) }
       } else if(d_list$n_patterns[1] == 3 & d_list$d1$d1_c_obs == FALSE & restriction == "CC") {
         if(is.null(beta0.prior) == FALSE & grepl("beta_p1[1, 1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
           prior_muc <- beta0.prior
           prior_muc_str <- paste("beta_p1[1, 1] ~ dnorm(", prior_muc[1], ",", prior_muc[2])
-          model_string_jags <- gsub("beta_p1[1, 1] ~ dnorm(0, 0.0000001", prior_muc_str, model_string_jags,fixed = TRUE) }
+          model_string_jags <- gsub("beta_p1[1, 1] ~ dnorm(0, 0.001", prior_muc_str, model_string_jags,fixed = TRUE) }
         if(is.null(beta.prior) == FALSE & grepl("beta_p1[j, 1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
           prior_betac <- beta.prior
           prior_betac_str <- paste("beta_p1[j, 1] ~ dnorm(", prior_betac[1], ",", prior_betac[2])
-          model_string_jags <- gsub("beta_p1[j, 1] ~ dnorm(0, 0.0000001", prior_betac_str, model_string_jags, fixed = TRUE) }
+          model_string_jags <- gsub("beta_p1[j, 1] ~ dnorm(0, 0.001", prior_betac_str, model_string_jags, fixed = TRUE) }
       } else if(d_list$n_patterns[1] == 3 & d_list$d1$d1_ec_obs == FALSE & restriction == "AC") {
         if(is.null(beta0.prior) == FALSE & grepl("beta_p1[1, 2] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
           prior_muc <- beta0.prior
           prior_muc_str <- paste("beta_p1[1, 2] ~ dnorm(", prior_muc[1], ",", prior_muc[2])
-          model_string_jags <- gsub("beta_p1[1, 2] ~ dnorm(0, 0.0000001", prior_muc_str, model_string_jags,fixed = TRUE) }
+          model_string_jags <- gsub("beta_p1[1, 2] ~ dnorm(0, 0.001", prior_muc_str, model_string_jags,fixed = TRUE) }
         if(is.null(beta.prior) == FALSE & grepl("beta_p1[j, 2] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
           prior_betac <- beta.prior
           prior_betac_str <- paste("beta_p1[j, 2] ~ dnorm(", prior_betac[1], ",", prior_betac[2])
-          model_string_jags <- gsub("beta_p1[j, 2] ~ dnorm(0, 0.0000001", prior_betac_str, model_string_jags, fixed = TRUE) }
+          model_string_jags <- gsub("beta_p1[j, 2] ~ dnorm(0, 0.001", prior_betac_str, model_string_jags, fixed = TRUE) }
       } else if(d_list$n_patterns[1] == 3 & d_list$d1$d1_e_obs == FALSE & restriction == "CC") {
         if(is.null(beta0.prior) == FALSE & grepl("beta_p1[1, 1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
           prior_muc <- beta0.prior
           prior_muc_str <- paste("beta_p1[1, 1] ~ dnorm(", prior_muc[1], ",", prior_muc[2])
-          model_string_jags <- gsub("beta_p1[1, 1] ~ dnorm(0, 0.0000001", prior_muc_str, model_string_jags,fixed = TRUE) }
+          model_string_jags <- gsub("beta_p1[1, 1] ~ dnorm(0, 0.001", prior_muc_str, model_string_jags,fixed = TRUE) }
         if(is.null(beta0.prior) == FALSE & grepl("beta_p1[1, 2] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
           prior_muc <- beta0.prior
           prior_muc_str <- paste("beta_p1[1, 2] ~ dnorm(", prior_muc[1], ",", prior_muc[2])
-          model_string_jags <- gsub("beta_p1[1, 2] ~ dnorm(0, 0.0000001", prior_muc_str, model_string_jags,fixed = TRUE) }
+          model_string_jags <- gsub("beta_p1[1, 2] ~ dnorm(0, 0.001", prior_muc_str, model_string_jags,fixed = TRUE) }
         if(is.null(beta.prior) == FALSE & grepl("beta_p1[j, 1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
           prior_betac <- beta.prior
           prior_betac_str <- paste("beta_p1[j, 1] ~ dnorm(", prior_betac[1], ",", prior_betac[2])
-          model_string_jags <- gsub("beta_p1[j, 1] ~ dnorm(0, 0.0000001", prior_betac_str, model_string_jags, fixed = TRUE) 
+          model_string_jags <- gsub("beta_p1[j, 1] ~ dnorm(0, 0.001", prior_betac_str, model_string_jags, fixed = TRUE) 
           prior_betac_str <- paste("beta_p1[j, 2] ~ dnorm(", prior_betac[1], ",", prior_betac[2])
-          model_string_jags <- gsub("beta_p1[j, 2] ~ dnorm(0, 0.0000001", prior_betac_str, model_string_jags, fixed = TRUE) }
+          model_string_jags <- gsub("beta_p1[j, 2] ~ dnorm(0, 0.001", prior_betac_str, model_string_jags, fixed = TRUE) }
       } else if(d_list$n_patterns[1] == 3 & d_list$d1$d1_ec_mis == FALSE) {
         if(is.null(beta0.prior) == FALSE & grepl("beta_p1[1, 1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
           prior_muc <- beta0.prior
           prior_muc_str <- paste("beta_p1[1, 1] ~ dnorm(", prior_muc[1], ",", prior_muc[2])
-          model_string_jags <- gsub("beta_p1[1, 1] ~ dnorm(0, 0.0000001", prior_muc_str, model_string_jags,fixed = TRUE) }
+          model_string_jags <- gsub("beta_p1[1, 1] ~ dnorm(0, 0.001", prior_muc_str, model_string_jags,fixed = TRUE) }
         if(is.null(beta0.prior) == FALSE & grepl("beta_p1[1, 2] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
           prior_muc <- beta0.prior
           prior_muc_str <- paste("beta_p1[1, 2] ~ dnorm(", prior_muc[1], ",", prior_muc[2])
-          model_string_jags <- gsub("beta_p1[1, 2] ~ dnorm(0, 0.0000001", prior_muc_str, model_string_jags,fixed = TRUE) }
+          model_string_jags <- gsub("beta_p1[1, 2] ~ dnorm(0, 0.001", prior_muc_str, model_string_jags,fixed = TRUE) }
         if(is.null(beta.prior) == FALSE & grepl("beta_p1[j, 1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
           prior_betac <- beta.prior
           prior_betac_str <- paste("beta_p1[j, 1] ~ dnorm(", prior_betac[1], ",", prior_betac[2])
-          model_string_jags <- gsub("beta_p1[j, 1] ~ dnorm(0, 0.0000001", prior_betac_str, model_string_jags, fixed = TRUE) 
+          model_string_jags <- gsub("beta_p1[j, 1] ~ dnorm(0, 0.001", prior_betac_str, model_string_jags, fixed = TRUE) 
           prior_betac_str <- paste("beta_p1[j, 2] ~ dnorm(", prior_betac[1], ",", prior_betac[2])
-          model_string_jags <- gsub("beta_p1[j, 2] ~ dnorm(0, 0.0000001", prior_betac_str, model_string_jags, fixed = TRUE) }
+          model_string_jags <- gsub("beta_p1[j, 2] ~ dnorm(0, 0.001", prior_betac_str, model_string_jags, fixed = TRUE) }
       } else if(d_list$n_patterns[1] == 2 & d_list$d1$d1_c_obs == FALSE & d_list$d1$d1_e_obs == FALSE & restriction == "CC") {
         if(is.null(beta0.prior) == FALSE & grepl("beta_p1[1, 1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
           prior_muc <- beta0.prior
           prior_muc_str <- paste("beta_p1[1, 1] ~ dnorm(", prior_muc[1], ",", prior_muc[2])
-          model_string_jags <- gsub("beta_p1[1, 1] ~ dnorm(0, 0.0000001", prior_muc_str, model_string_jags,fixed = TRUE) }
+          model_string_jags <- gsub("beta_p1[1, 1] ~ dnorm(0, 0.001", prior_muc_str, model_string_jags,fixed = TRUE) }
         if(is.null(beta.prior) == FALSE & grepl("beta_p1[j, 1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
           prior_betac <- beta.prior
           prior_betac_str <- paste("beta_p1[j, 1] ~ dnorm(", prior_betac[1], ",", prior_betac[2])
-          model_string_jags <- gsub("beta_p1[j, 1] ~ dnorm(0, 0.0000001", prior_betac_str, model_string_jags, fixed = TRUE) }
+          model_string_jags <- gsub("beta_p1[j, 1] ~ dnorm(0, 0.001", prior_betac_str, model_string_jags, fixed = TRUE) }
       } else if(d_list$n_patterns[1] == 2 & d_list$d1$d1_c_obs == FALSE & d_list$d1$d1_ec_mis == FALSE & restriction == "CC") {
         if(is.null(beta0.prior) == FALSE & grepl("beta_p1[1, 1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
           prior_muc <- beta0.prior
           prior_muc_str <- paste("beta_p1[1, 1] ~ dnorm(", prior_muc[1], ",", prior_muc[2])
-          model_string_jags <- gsub("beta_p1[1, 1] ~ dnorm(0, 0.0000001", prior_muc_str, model_string_jags,fixed = TRUE) }
+          model_string_jags <- gsub("beta_p1[1, 1] ~ dnorm(0, 0.001", prior_muc_str, model_string_jags,fixed = TRUE) }
         if(is.null(beta.prior) == FALSE & grepl("beta_p1[j, 1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
           prior_betac <- beta.prior
           prior_betac_str <- paste("beta_p1[j, 1] ~ dnorm(", prior_betac[1], ",", prior_betac[2])
-          model_string_jags <- gsub("beta_p1[j, 1] ~ dnorm(0, 0.0000001", prior_betac_str, model_string_jags, fixed = TRUE) }
+          model_string_jags <- gsub("beta_p1[j, 1] ~ dnorm(0, 0.001", prior_betac_str, model_string_jags, fixed = TRUE) }
       } else if(d_list$n_patterns[1] == 2 & d_list$d1$d1_e_obs == FALSE & d_list$d1$d1_ec_mis == FALSE & restriction == "CC") {
         if(is.null(beta0.prior) == FALSE & grepl("beta_p1[1, 1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
           prior_muc <- beta0.prior
           prior_muc_str <- paste("beta_p1[1, 1] ~ dnorm(", prior_muc[1], ",", prior_muc[2])
-          model_string_jags <- gsub("beta_p1[1, 1] ~ dnorm(0, 0.0000001", prior_muc_str, model_string_jags,fixed = TRUE) }
+          model_string_jags <- gsub("beta_p1[1, 1] ~ dnorm(0, 0.001", prior_muc_str, model_string_jags,fixed = TRUE) }
         if(is.null(beta0.prior) == FALSE & grepl("beta_p1[1, 2] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
           prior_muc <- beta0.prior
           prior_muc_str <- paste("beta_p1[1, 2] ~ dnorm(", prior_muc[1], ",", prior_muc[2])
-          model_string_jags <- gsub("beta_p1[1, 2] ~ dnorm(0, 0.0000001", prior_muc_str, model_string_jags,fixed = TRUE) }
+          model_string_jags <- gsub("beta_p1[1, 2] ~ dnorm(0, 0.001", prior_muc_str, model_string_jags,fixed = TRUE) }
         if(is.null(beta.prior) == FALSE & grepl("beta_p1[j, 1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
           prior_betac <- beta.prior
           prior_betac_str <- paste("beta_p1[j, 1] ~ dnorm(", prior_betac[1], ",", prior_betac[2])
-          model_string_jags <- gsub("beta_p1[j, 1] ~ dnorm(0, 0.0000001", prior_betac_str, model_string_jags, fixed = TRUE) 
+          model_string_jags <- gsub("beta_p1[j, 1] ~ dnorm(0, 0.001", prior_betac_str, model_string_jags, fixed = TRUE) 
           prior_betac_str <- paste("beta_p1[j, 2] ~ dnorm(", prior_betac[1], ",", prior_betac[2])
-          model_string_jags <- gsub("beta_p1[j, 2] ~ dnorm(0, 0.0000001", prior_betac_str, model_string_jags, fixed = TRUE) }
+          model_string_jags <- gsub("beta_p1[j, 2] ~ dnorm(0, 0.001", prior_betac_str, model_string_jags, fixed = TRUE) }
       } else if(d_list$n_patterns[1] == 2 & d_list$d1$d1_ec_obs == FALSE & d_list$d1$d1_ec_mis == FALSE & restriction == "AC") {
         if(is.null(beta0.prior) == FALSE & grepl("beta_p1[1, 2] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
           prior_muc <- beta0.prior
           prior_muc_str <- paste("beta_p1[1, 2] ~ dnorm(", prior_muc[1], ",", prior_muc[2])
-          model_string_jags <- gsub("beta_p1[1, 2] ~ dnorm(0, 0.0000001", prior_muc_str, model_string_jags,fixed = TRUE) }
+          model_string_jags <- gsub("beta_p1[1, 2] ~ dnorm(0, 0.001", prior_muc_str, model_string_jags,fixed = TRUE) }
         if(is.null(beta.prior) == FALSE & grepl("beta_p1[j, 2] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
           prior_betac <- beta.prior
           prior_betac_str <- paste("beta_p1[j, 2] ~ dnorm(", prior_betac[1], ",", prior_betac[2])
-          model_string_jags <- gsub("beta_p1[j, 2] ~ dnorm(0, 0.0000001", prior_betac_str, model_string_jags, fixed = TRUE) }
+          model_string_jags <- gsub("beta_p1[j, 2] ~ dnorm(0, 0.001", prior_betac_str, model_string_jags, fixed = TRUE) }
       }
       if(d_list$n_patterns[2] == 4) {
         if(is.null(beta0.prior) == FALSE & grepl("beta_p2[1, 1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
           prior_muc <- beta0.prior
           prior_muc_str <- paste("beta_p2[1, 1] ~ dnorm(", prior_muc[1], ",", prior_muc[2])
-          model_string_jags <- gsub("beta_p2[1, 1] ~ dnorm(0, 0.0000001", prior_muc_str, model_string_jags,fixed = TRUE) }
+          model_string_jags <- gsub("beta_p2[1, 1] ~ dnorm(0, 0.001", prior_muc_str, model_string_jags,fixed = TRUE) }
         if(is.null(beta0.prior) == FALSE & grepl("beta_p2[1, 2] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
           prior_muc <- beta0.prior
           prior_muc_str <- paste("beta_p2[1, 2] ~ dnorm(", prior_muc[1], ",", prior_muc[2])
-          model_string_jags <- gsub("beta_p2[1, 2] ~ dnorm(0, 0.0000001", prior_muc_str, model_string_jags,fixed = TRUE) }
+          model_string_jags <- gsub("beta_p2[1, 2] ~ dnorm(0, 0.001", prior_muc_str, model_string_jags,fixed = TRUE) }
         if(is.null(beta.prior) == FALSE & grepl("beta_p2[j, 1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
           prior_betac <- beta.prior
           prior_betac_str <- paste("beta_p2[j, 1] ~ dnorm(", prior_betac[1], ",", prior_betac[2])
-          model_string_jags <- gsub("beta_p2[j, 1] ~ dnorm(0, 0.0000001", prior_betac_str, model_string_jags, fixed = TRUE) 
+          model_string_jags <- gsub("beta_p2[j, 1] ~ dnorm(0, 0.001", prior_betac_str, model_string_jags, fixed = TRUE) 
           prior_betac_str <- paste("beta_p2[j, 2] ~ dnorm(", prior_betac[1], ",", prior_betac[2])
-          model_string_jags <- gsub("beta_p2[j, 2] ~ dnorm(0, 0.0000001", prior_betac_str, model_string_jags, fixed = TRUE) }
+          model_string_jags <- gsub("beta_p2[j, 2] ~ dnorm(0, 0.001", prior_betac_str, model_string_jags, fixed = TRUE) }
       } else if(d_list$n_patterns[2] == 3 & d_list$d2$d2_c_obs == FALSE & restriction == "CC") {
         if(is.null(beta0.prior) == FALSE & grepl("beta_p2[1, 1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
           prior_muc <- beta0.prior
           prior_muc_str <- paste("beta_p2[1, 1] ~ dnorm(", prior_muc[1], ",", prior_muc[2])
-          model_string_jags <- gsub("beta_p2[1, 1] ~ dnorm(0, 0.0000001", prior_muc_str, model_string_jags,fixed = TRUE) }
+          model_string_jags <- gsub("beta_p2[1, 1] ~ dnorm(0, 0.001", prior_muc_str, model_string_jags,fixed = TRUE) }
         if(is.null(beta.prior) == FALSE & grepl("beta_p2[j, 1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
           prior_betac <- beta.prior
           prior_betac_str <- paste("beta_p2[j, 1] ~ dnorm(", prior_betac[1], ",", prior_betac[2])
-          model_string_jags <- gsub("beta_p2[j, 1] ~ dnorm(0, 0.0000001", prior_betac_str, model_string_jags, fixed = TRUE) }
+          model_string_jags <- gsub("beta_p2[j, 1] ~ dnorm(0, 0.001", prior_betac_str, model_string_jags, fixed = TRUE) }
       } else if(d_list$n_patterns[2] == 3 & d_list$d2$d2_ec_obs == FALSE & restriction == "AC") {
         if(is.null(beta0.prior) == FALSE & grepl("beta_p2[1, 2] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
           prior_muc <- beta0.prior
           prior_muc_str <- paste("beta_p2[1, 2] ~ dnorm(", prior_muc[1], ",", prior_muc[2])
-          model_string_jags <- gsub("beta_p2[1, 2] ~ dnorm(0, 0.0000001", prior_muc_str, model_string_jags,fixed = TRUE) }
+          model_string_jags <- gsub("beta_p2[1, 2] ~ dnorm(0, 0.001", prior_muc_str, model_string_jags,fixed = TRUE) }
         if(is.null(beta.prior) == FALSE & grepl("beta_p2[j, 2] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
           prior_betac <- beta.prior
           prior_betac_str <- paste("beta_p2[j, 2] ~ dnorm(", prior_betac[1], ",", prior_betac[2])
-          model_string_jags <- gsub("beta_p2[j, 2] ~ dnorm(0, 0.0000001", prior_betac_str, model_string_jags, fixed = TRUE) }
+          model_string_jags <- gsub("beta_p2[j, 2] ~ dnorm(0, 0.001", prior_betac_str, model_string_jags, fixed = TRUE) }
       } else if(d_list$n_patterns[2] == 3 & d_list$d2$d2_e_obs == FALSE & restriction == "CC") {
         if(is.null(beta0.prior) == FALSE & grepl("beta_p2[1, 1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
           prior_muc <- beta0.prior
           prior_muc_str <- paste("beta_p2[1, 1] ~ dnorm(", prior_muc[1], ",", prior_muc[2])
-          model_string_jags <- gsub("beta_p2[1, 1] ~ dnorm(0, 0.0000001", prior_muc_str, model_string_jags,fixed = TRUE) }
+          model_string_jags <- gsub("beta_p2[1, 1] ~ dnorm(0, 0.001", prior_muc_str, model_string_jags,fixed = TRUE) }
         if(is.null(beta0.prior) == FALSE & grepl("beta_p2[1, 2] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
           prior_muc <- beta0.prior
           prior_muc_str <- paste("beta_p2[1, 2] ~ dnorm(", prior_muc[1], ",", prior_muc[2])
-          model_string_jags <- gsub("beta_p2[1, 2] ~ dnorm(0, 0.0000001", prior_muc_str, model_string_jags,fixed = TRUE) }
+          model_string_jags <- gsub("beta_p2[1, 2] ~ dnorm(0, 0.001", prior_muc_str, model_string_jags,fixed = TRUE) }
         if(is.null(beta.prior) == FALSE & grepl("beta_p2[j, 1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
           prior_betac <- beta.prior
           prior_betac_str <- paste("beta_p2[j, 1] ~ dnorm(", prior_betac[1], ",", prior_betac[2])
-          model_string_jags <- gsub("beta_p2[j, 1] ~ dnorm(0, 0.0000001", prior_betac_str, model_string_jags, fixed = TRUE) 
+          model_string_jags <- gsub("beta_p2[j, 1] ~ dnorm(0, 0.001", prior_betac_str, model_string_jags, fixed = TRUE) 
           prior_betac_str <- paste("beta_p2[j, 2] ~ dnorm(", prior_betac[1], ",", prior_betac[2])
-          model_string_jags <- gsub("beta_p2[j, 2] ~ dnorm(0, 0.0000001", prior_betac_str, model_string_jags, fixed = TRUE) }
+          model_string_jags <- gsub("beta_p2[j, 2] ~ dnorm(0, 0.001", prior_betac_str, model_string_jags, fixed = TRUE) }
       } else if(d_list$n_patterns[2] == 3 & d_list$d2$d2_ec_mis == FALSE) {
         if(is.null(beta0.prior) == FALSE & grepl("beta_p2[1, 1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
           prior_muc <- beta0.prior
           prior_muc_str <- paste("beta_p2[1, 1] ~ dnorm(", prior_muc[1], ",", prior_muc[2])
-          model_string_jags <- gsub("beta_p2[1, 1] ~ dnorm(0, 0.0000001", prior_muc_str, model_string_jags,fixed = TRUE) }
+          model_string_jags <- gsub("beta_p2[1, 1] ~ dnorm(0, 0.001", prior_muc_str, model_string_jags,fixed = TRUE) }
         if(is.null(beta0.prior) == FALSE & grepl("beta_p2[1, 2] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
           prior_muc <- beta0.prior
           prior_muc_str <- paste("beta_p2[1, 2] ~ dnorm(", prior_muc[1], ",", prior_muc[2])
-          model_string_jags <- gsub("beta_p2[1, 2] ~ dnorm(0, 0.0000001", prior_muc_str, model_string_jags,fixed = TRUE) }
+          model_string_jags <- gsub("beta_p2[1, 2] ~ dnorm(0, 0.001", prior_muc_str, model_string_jags,fixed = TRUE) }
         if(is.null(beta.prior) == FALSE & grepl("beta_p2[j, 1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
           prior_betac <- beta.prior
           prior_betac_str <- paste("beta_p2[j, 1] ~ dnorm(", prior_betac[1], ",", prior_betac[2])
-          model_string_jags <- gsub("beta_p2[j, 1] ~ dnorm(0, 0.0000001", prior_betac_str, model_string_jags, fixed = TRUE) 
+          model_string_jags <- gsub("beta_p2[j, 1] ~ dnorm(0, 0.001", prior_betac_str, model_string_jags, fixed = TRUE) 
           prior_betac_str <- paste("beta_p2[j, 2] ~ dnorm(", prior_betac[1], ",", prior_betac[2])
-          model_string_jags <- gsub("beta_p2[j, 2] ~ dnorm(0, 0.0000001", prior_betac_str, model_string_jags, fixed = TRUE) }
+          model_string_jags <- gsub("beta_p2[j, 2] ~ dnorm(0, 0.001", prior_betac_str, model_string_jags, fixed = TRUE) }
       } else if(d_list$n_patterns[2] == 2 & d_list$d2$d2_c_obs == FALSE & d_list$d2$d2_e_obs == FALSE & restriction == "CC") {
         if(is.null(beta0.prior) == FALSE & grepl("beta_p2[1, 1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
           prior_muc <- beta0.prior
           prior_muc_str <- paste("beta_p2[1, 1] ~ dnorm(", prior_muc[1], ",", prior_muc[2])
-          model_string_jags <- gsub("beta_p2[1, 1] ~ dnorm(0, 0.0000001", prior_muc_str, model_string_jags,fixed = TRUE) }
+          model_string_jags <- gsub("beta_p2[1, 1] ~ dnorm(0, 0.001", prior_muc_str, model_string_jags,fixed = TRUE) }
         if(is.null(beta.prior) == FALSE & grepl("beta_p2[j, 1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
           prior_betac <- beta.prior
           prior_betac_str <- paste("beta_p2[j, 1] ~ dnorm(", prior_betac[1], ",", prior_betac[2])
-          model_string_jags <- gsub("beta_p2[j, 1] ~ dnorm(0, 0.0000001", prior_betac_str, model_string_jags, fixed = TRUE) }
+          model_string_jags <- gsub("beta_p2[j, 1] ~ dnorm(0, 0.001", prior_betac_str, model_string_jags, fixed = TRUE) }
       } else if(d_list$n_patterns[2] == 2 & d_list$d2$d2_c_obs == FALSE & d_list$d2$d2_ec_mis == FALSE & restriction == "CC") {
         if(is.null(beta0.prior) == FALSE & grepl("beta_p2[1, 1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
           prior_muc <- beta0.prior
           prior_muc_str <- paste("beta_p2[1, 1] ~ dnorm(", prior_muc[1], ",", prior_muc[2])
-          model_string_jags <- gsub("beta_p2[1, 1] ~ dnorm(0, 0.0000001", prior_muc_str, model_string_jags,fixed = TRUE) }
+          model_string_jags <- gsub("beta_p2[1, 1] ~ dnorm(0, 0.001", prior_muc_str, model_string_jags,fixed = TRUE) }
         if(is.null(beta.prior) == FALSE & grepl("beta_p2[j, 1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
           prior_betac <- beta.prior
           prior_betac_str <- paste("beta_p2[j, 1] ~ dnorm(", prior_betac[1], ",", prior_betac[2])
-          model_string_jags <- gsub("beta_p2[j, 1] ~ dnorm(0, 0.0000001", prior_betac_str, model_string_jags, fixed = TRUE) }
+          model_string_jags <- gsub("beta_p2[j, 1] ~ dnorm(0, 0.001", prior_betac_str, model_string_jags, fixed = TRUE) }
       } else if(d_list$n_patterns[2] == 2 & d_list$d2$d2_e_obs == FALSE & d_list$d2$d2_ec_mis == FALSE & restriction == "CC") {
         if(is.null(beta0.prior) == FALSE & grepl("beta_p2[1, 1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
           prior_muc <- beta0.prior
           prior_muc_str <- paste("beta_p2[1, 1] ~ dnorm(", prior_muc[1], ",", prior_muc[2])
-          model_string_jags <- gsub("beta_p2[1, 1] ~ dnorm(0, 0.0000001", prior_muc_str, model_string_jags,fixed = TRUE) }
+          model_string_jags <- gsub("beta_p2[1, 1] ~ dnorm(0, 0.001", prior_muc_str, model_string_jags,fixed = TRUE) }
         if(is.null(beta0.prior) == FALSE & grepl("beta_p2[1, 2] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
           prior_muc <- beta0.prior
           prior_muc_str <- paste("beta_p2[1, 2] ~ dnorm(", prior_muc[1], ",", prior_muc[2])
-          model_string_jags <- gsub("beta_p2[1, 2] ~ dnorm(0, 0.0000001", prior_muc_str, model_string_jags,fixed = TRUE) }
+          model_string_jags <- gsub("beta_p2[1, 2] ~ dnorm(0, 0.001", prior_muc_str, model_string_jags,fixed = TRUE) }
         if(is.null(beta.prior) == FALSE & grepl("beta_p2[j, 1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
           prior_betac <- beta.prior
           prior_betac_str <- paste("beta_p2[j, 1] ~ dnorm(", prior_betac[1], ",", prior_betac[2])
-          model_string_jags <- gsub("beta_p2[j, 1] ~ dnorm(0, 0.0000001", prior_betac_str, model_string_jags, fixed = TRUE) 
+          model_string_jags <- gsub("beta_p2[j, 1] ~ dnorm(0, 0.001", prior_betac_str, model_string_jags, fixed = TRUE) 
           prior_betac_str <- paste("beta_p2[j, 2] ~ dnorm(", prior_betac[1], ",", prior_betac[2])
-          model_string_jags <- gsub("beta_p2[j, 2] ~ dnorm(0, 0.0000001", prior_betac_str, model_string_jags, fixed = TRUE) }
+          model_string_jags <- gsub("beta_p2[j, 2] ~ dnorm(0, 0.001", prior_betac_str, model_string_jags, fixed = TRUE) }
       } else if(d_list$n_patterns[2] == 2 & d_list$d2$d2_ec_obs == FALSE & d_list$d2$d2_ec_mis == FALSE & restriction == "AC") {
         if(is.null(beta0.prior) == FALSE & grepl("beta_p2[1, 2] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
           prior_muc <- beta0.prior
           prior_muc_str <- paste("beta_p2[1, 2] ~ dnorm(", prior_muc[1], ",", prior_muc[2])
-          model_string_jags <- gsub("beta_p2[1, 2] ~ dnorm(0, 0.0000001", prior_muc_str, model_string_jags,fixed = TRUE) }
+          model_string_jags <- gsub("beta_p2[1, 2] ~ dnorm(0, 0.001", prior_muc_str, model_string_jags,fixed = TRUE) }
         if(is.null(beta.prior) == FALSE & grepl("beta_p2[j, 2] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
           prior_betac <- beta.prior
           prior_betac_str <- paste("beta_p2[j, 2] ~ dnorm(", prior_betac[1], ",", prior_betac[2])
-          model_string_jags <- gsub("beta_p2[j, 2] ~ dnorm(0, 0.0000001", prior_betac_str, model_string_jags, fixed = TRUE) }
+          model_string_jags <- gsub("beta_p2[j, 2] ~ dnorm(0, 0.001", prior_betac_str, model_string_jags, fixed = TRUE) }
       }
     }
   }
@@ -1511,10 +1511,10 @@ prior_pattern <- function(type, dist_e, dist_c, pe_fixed, pc_fixed, model_e_rand
         prior_beta_f <- beta_f.prior 
           if(grepl("beta_f_p1[1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
             prior_beta_f_str <- paste("beta_f_p1[1] ~ dnorm(", prior_beta_f[1], ",", prior_beta_f[2])
-            model_string_jags <- gsub("beta_f_p1[1] ~ dnorm(0, 0.0000001", prior_beta_f_str, model_string_jags,fixed = TRUE) }
+            model_string_jags <- gsub("beta_f_p1[1] ~ dnorm(0, 0.001", prior_beta_f_str, model_string_jags,fixed = TRUE) }
           if(grepl("beta_f_p2[1] ~ ", model_string_jags, fixed = TRUE) == TRUE) {
             prior_beta_f_str <- paste("beta_f_p2[1] ~ dnorm(", prior_beta_f[1], ",", prior_beta_f[2])
-            model_string_jags <- gsub("beta_f_p2[1] ~ dnorm(0, 0.0000001", prior_beta_f_str, model_string_jags,fixed = TRUE) }
+            model_string_jags <- gsub("beta_f_p2[1] ~ dnorm(0, 0.001", prior_beta_f_str, model_string_jags,fixed = TRUE) }
         }
     }
     if(length(model_e_random) != 0 & pe_random == 1) {
