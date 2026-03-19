@@ -7,56 +7,18 @@ Alternatives vary depending on the type of distribution assumed for the effect a
 type of missingness mechanism assumed and independence or joint modelling
 This function selects which type of model to execute.}
 \usage{
-write_pattern(
-  type,
-  dist_e,
-  dist_c,
-  pe_fixed,
-  pc_fixed,
-  ind_fixed,
-  pe_random,
-  pc_random,
-  ind_random,
-  model_e_random,
-  model_c_random,
-  d_list,
-  d1,
-  d2,
-  restriction
-)
+write_pattern(dist_e, dist_c, type, model_txt_info)
 }
 \arguments{
-\item{type}{Type of missingness mechanism assumed. Choices are Missing At Random (MAR), Missing Not At Random for the effects (MNAR_eff),
-Missing Not At Random for the costs (MNAR_cost), and Missing Not At Random for both (MNAR)}
-
 \item{dist_e}{Distribution assumed for the effects. Current available choices are: Normal ('norm'), Beta ('beta'), Gamma ('gamma'), Exponential ('exp'),
-Weibull ('weibull'), Logistic ('logis'), Poisson ('pois'), Negative Binomial ('nbinom') or Bernoulli ('bern')}
+Weibull ('weib'), Logistic ('logis'), Poisson ('pois'), Negative Binomial ('negbin') or Bernoulli ('bern')}
 
 \item{dist_c}{Distribution assumed for the costs. Current available choices are: Normal ('norm'), Gamma ('gamma') or LogNormal ('lnorm')}
 
-\item{pe_fixed}{Number of fixed effects for the effectiveness model}
+\item{type}{Type of missingness mechanism assumed. Choices are Missing At Random (MAR), Missing Not At Random for the effects (MNAR_eff),
+Missing Not At Random for the costs (MNAR_cost), and Missing Not At Random for both (MNAR)}
 
-\item{pc_fixed}{Number of fixed effects for the cost model}
-
-\item{ind_fixed}{Logical; if TRUE independence between effectiveness and costs is assumed, else correlation is accounted for}
-
-\item{pe_random}{Number of random effects for the effectiveness model}
-
-\item{pc_random}{Number of random effects for the cost model}
-
-\item{ind_random}{Logical; if TRUE independence at the level of the random effects between effectiveness and costs is assumed, else correlation is accounted for}
-
-\item{model_e_random}{Random effects formula for the effectiveness model}
-
-\item{model_c_random}{Random effects formula for the costs model}
-
-\item{d_list}{Number and type of patterns}
-
-\item{d1}{Pattern indicator in the control}
-
-\item{d2}{Pattern indicator in the intervention}
-
-\item{restriction}{type of identifying restriction to be imposed}
+\item{model_txt_info}{list containing model specification information used to write the txt file of the JAGS model.}
 }
 \description{
 An internal function to select which type of pattern mixture model to execute. 
@@ -65,8 +27,8 @@ type of missingness mechanism assumed and independence or joint modelling
 This function selects which type of model to execute.
 }
 \examples{
-# Internal function only
-# No examples
+#Internal function only
+#No examples
 #
 #
 }

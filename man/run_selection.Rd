@@ -4,24 +4,23 @@
 \alias{run_selection}
 \title{An internal function to execute a JAGS selection model and get posterior results}
 \usage{
-run_selection(type, dist_e, dist_c, inits, ppc)
+run_selection(data_model, type, dist_e, dist_c, model_info)
 }
 \arguments{
+\item{data_model}{list containing the data for the model to be passed to JAGS.}
+
 \item{type}{Type of missingness mechanism assumed. Choices are Missing At Random (MAR), Missing Not At Random for the effects (MNAR_eff),
 Missing Not At Random for the costs (MNAR_cost), and Missing Not At Random for both (MNAR).}
 
-\item{dist_e}{distribution assumed for the effects. Current available chocies are: Normal ('norm'), Beta ('beta'), Gamma ('gamma'), Exponential ('exp'),
-Weibull ('weibull'), Logistic ('logis'), Poisson ('pois'), Negative Binomial ('nbinom') or Bernoulli ('bern').}
+\item{dist_e}{distribution assumed for the effects. Current available choices are: Normal ('norm'), Beta ('beta'), Gamma ('gamma'), Exponential ('exp'),
+Weibull ('weib'), Logistic ('logis'), Poisson ('pois'), Negative Binomial ('negbin') or Bernoulli ('bern').}
 
-\item{dist_c}{Distribution assumed for the costs. Current available chocies are: Normal ('norm'), Gamma ('gamma') or LogNormal ('lnorm').}
+\item{dist_c}{Distribution assumed for the costs. Current available choices are: Normal ('norm'), Gamma ('gamma') or LogNormal ('lnorm').}
 
-\item{inits}{a list with elements equal to the number of chains selected; each element of the list is itself a list of starting values for the BUGS model, 
-or a function creating (possibly random) initial values. If inits is NULL, JAGS will generate initial values for parameters.}
-
-\item{ppc}{Logical. If \code{ppc} is \code{TRUE}, the estimates of the parameters that can be used to generate replications from the model are saved.}
+\item{model_info}{list containing model and MCMC information to be passed to JAGS.}
 }
 \description{
-This function fits a JAGS using the \code{\link[R2jags]{jags}} funciton and obtain posterior inferences.
+This function fits a JAGS using the \code{\link[R2jags]{jags}} function and obtain posterior inferences.
 }
 \examples{
 #Internal function only

@@ -2,51 +2,27 @@
 % Please edit documentation in R/prior_pattern.R
 \name{prior_pattern}
 \alias{prior_pattern}
-\title{An internal function to change the hyperprior parameters in the selection model provided by the user depending on the type of
+\title{An internal function to change the hyperprior parameters in the pattern mixture model provided by the user depending on the type of
 missingness mechanism and outcome distributions assumed}
 \usage{
-prior_pattern(
-  type,
-  dist_e,
-  dist_c,
-  pe_fixed,
-  pc_fixed,
-  model_e_random,
-  model_c_random,
-  pe_random,
-  pc_random,
-  d_list,
-  restriction
-)
+prior_pattern(type, dist_e, dist_c, model_txt_info, model_string_jags)
 }
 \arguments{
 \item{type}{Type of missingness mechanism assumed. Choices are Missing At Random (MAR), Missing Not At Random for the effects (MNAR_eff),
 Missing Not At Random for the costs (MNAR_cost), and Missing Not At Random for both (MNAR). For a complete list of all available hyper parameters 
 and types of models see the manual.}
 
-\item{dist_e}{distribution assumed for the effects. Current available chocies are: Normal ('norm'), Beta ('beta'), Gamma ('gamma'), Exponential ('exp'),
-Weibull ('weibull'), Logistic ('logis'), Poisson ('pois'), Negative Binomial ('nbinom') or Bernoulli ('bern')}
+\item{dist_e}{distribution assumed for the effects. Current available choices are: Normal ('norm'), Beta ('beta'), Gamma ('gamma'), Exponential ('exp'),
+Weibull ('weib'), Logistic ('logis'), Poisson ('pois'), Negative Binomial ('negbin') or Bernoulli ('bern')}
 
-\item{dist_c}{Distribution assumed for the costs. Current available chocies are: Normal ('norm'), Gamma ('gamma') or LogNormal ('lnorm')}
+\item{dist_c}{Distribution assumed for the costs. Current available choices are: Normal ('norm'), Gamma ('gamma') or LogNormal ('lnorm')}
 
-\item{pe_fixed}{Number of fixed effects for the effectiveness model}
+\item{model_txt_info}{list containing model specification information used to write the txt file of the JAGS model.}
 
-\item{pc_fixed}{Number of fixed effects for the cost model}
-
-\item{model_e_random}{Random effects formula for the effectiveness model}
-
-\item{model_c_random}{Random effects formula for the costs model}
-
-\item{pe_random}{Number of random effects for the effectiveness model}
-
-\item{pc_random}{Number of random effects for the cost model}
-
-\item{d_list}{a list of the number and types of patterns in the data}
-
-\item{restriction}{type of identifying restriction to be imposed}
+\item{model_string_jags}{text file of the model.}
 }
 \description{
-This function modifies default hyper prior parameter values in the type of selection model selected according 
+This function modifies default hyper prior parameter values in the type of pattern mixture model selected according 
 to the type of missingness mechanism and distributions for the outcomes assumed.
 }
 \examples{
@@ -55,7 +31,8 @@ to the type of missingness mechanism and distributions for the outcomes assumed.
 #
 #
 }
-\keyword{Selection}
+\keyword{Pattern}
 \keyword{distributions}
+\keyword{mixture}
 \keyword{models}
 \keyword{priors}

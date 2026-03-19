@@ -54,7 +54,7 @@ Baseline data are available for the utilities (no baseline costs collected), ins
   \item{age}{Age in years}
   \item{ethnicity}{binary: white (1) and other (0)}
   \item{employment}{binary: working (1) and other (0)}
-  \item{t}{Treatment arm indicator for the control (t=1) and the active intervention (t=2)}
+  \item{trt}{Treatment arm indicator for the control (t=1) and the active intervention (t=2)}
   \item{sex_inst.0}{baseline number of instances of unprotected sex}
   \item{sex_inst}{number of instances of unprotected sex at 12 months follow-up}
   \item{sti.0}{binary : baseline sti diagnosis (1) and no baseline sti diagnosis (0)}

@@ -17,20 +17,20 @@ hurdle(
   type,
   prob = c(0.025, 0.975),
   n.chains = 2,
-  n.iter = 20000,
+  n.iter = 10000,
   n.burnin = floor(n.iter/2),
   inits = NULL,
   n.thin = 1,
-  ppc = FALSE,
   save_model = FALSE,
   prior = "default",
+  center = FALSE,
   ...
 )
 }
 \arguments{
 \item{data}{A data frame in which to find the variables supplied in \code{model.eff}, \code{model.cost} (model formulas for effects and costs) 
 and \code{model.se}, \code{model.sc} (model formulas for the structural effect and cost models). Among these,
-effectiveness, cost and treatment indicator (only two arms) variables must always be provided and named 'e', 'c' and 't', respectively.}
+effectiveness, cost and treatment indicator (only two arms) variables must always be provided and named 'e', 'c' and 'trt', respectively.}
 
 \item{model.eff}{A formula expression in conventional \code{R} linear modelling syntax. The response must be a health economic
 effectiveness outcome ('e') whose name must correspond to that used in \code{data}. Any covariates in the model must be provided on the right-hand side of the formula. 
@@ -59,15 +59,15 @@ no structural value is chosen and a standard model for the effects is run.}
 \item{sc}{Structural value to be found in the cost variables defined in \code{data}. If set to \code{NULL}, 
 no structural value is chosen and a standard model for the costs is run.}
 
-\item{dist_e}{Distribution assumed for the effects. Current available chocies are: Normal ('norm'), Beta ('beta'), Gamma ('gamma'), Exponential ('exp'),
-Weibull ('weibull'), Logistic ('logis'), Poisson ('pois'), Negative Binomial ('nbinom') or Bernoulli ('bern').}
+\item{dist_e}{Distribution assumed for the effects. Current available choices are: Normal ('norm'), Beta ('beta'), Gamma ('gamma'), Exponential ('exp'),
+Weibull ('weib'), Logistic ('logis'), Poisson ('pois'), Negative Binomial ('negbin') or Bernoulli ('bern').}
 
-\item{dist_c}{Distribution assumed for the costs. Current available chocies are: Normal ('norm'), Gamma ('gamma') or LogNormal ('lnorm').}
+\item{dist_c}{Distribution assumed for the costs. Current available choices are: Normal ('norm'), Gamma ('gamma') or LogNormal ('lnorm').}
 
 \item{type}{Type of structural value mechanism assumed. Choices are Structural Completely At Random (SCAR),
 and Structural At Random (SAR).}
 
-\item{prob}{A numeric vector of probabilities within the range (0,1), representing the upper and lower
+\item{prob}{A numeric vector of probabilities within the range (0, 1), representing the upper and lower
 CI sample quantiles to be calculated and returned for the imputed values.}
 
 \item{n.chains}{Number of chains.}
@@ -82,35 +82,28 @@ will generate initial values for all the model parameters.}
 
 \item{n.thin}{Thinning interval.}
 
-\item{ppc}{Logical. If \code{ppc} is \code{TRUE}, the estimates of the parameters that can be used to generate replications from the model are saved.}
-
 \item{save_model}{Logical. If \code{save_model} is \code{TRUE} a \code{txt} file containing the model code is printed
 in the current working directory.}
 
-\item{prior}{A list containing the hyperprior values provided by the user. Each element of this list must be a vector of length two
-containing the user-provided hyperprior values and must be named with the name of the corresponding parameter. For example, the hyperprior
-values for the standard deviation parameter for the effects can be provided using the list \code{prior = list('sigma.prior.e' = c(0, 100))}. For more information about how 
-to provide prior hypervalues for different types of parameters and models see details. 
-If \code{prior} is set to 'default', the default values will be used.}
+\item{prior}{A list containing the hyperprior values provided by the user. Each element of this list must be a vector
+containing the user-provided prior distribution and parameter values and must be named with the name of the corresponding parameter. For example, the hyperprior
+values for the standard deviation parameter for the effects can be provided using the list \code{prior = list('sigma.prior.e' = c("unif", 0, 10))}. For more information about how 
+to provide prior hypervalues for different types of parameters and models see details. If \code{prior} is set to 'default', the default values will be used.}
 
-\item{...}{Additional arguments that can be provided by the user. Examples are \code{d_e} and \code{d_c}, which should correspond to two binary indicator vectors
-with length equal to the number of rows of \code{data}. By default these variables are constructed within the function based on the observed data
-but it is possible for the user to directly provide them as a means to explore some Structural Not At Random (SNAR) mechanism assumptions about one or both outcomes.
-Individuals whose corresponding indicator value is set to \code{1} or \code{0} will be respectively 
-associated with the structural or non-structural component in the model. Other optional arguments are \code{center = TRUE}, which centers all the covariates in the model or the additional arguments that can be provided 
-to the function \code{\link[BCEA]{bcea}} to summarise the health economic evaluation results.}
+\item{center}{Logical. If \code{center} is \code{TRUE}, all covariates in both the effect and cost models will be centred.}
+
+\item{...}{Additional arguments that can be provided by the user. Examples are the additional arguments that can be provided to the function \code{\link[BCEA]{bcea}} to summarise the health economic evaluation results.}
 }
 \value{
 An object of the class 'missingHE' containing the following elements
 \describe{
-  \item{data_set}{A list containing the original data set provided in \code{data} (see Arguments), the number of observed and missing individuals 
-  , the total number of individuals by treatment arm and the indicator vectors for the structural values}
+  \item{data_set}{A list containing the original data set provided in \code{data} (see Arguments). Additional information is also included about, among others, 
+  the number of observed and missing individuals, the total number of individuals by treatment arm and the indicator vectors for the structural values}
   \item{model_output}{A list containing the output of a \code{JAGS} model generated from the functions \code{\link[R2jags]{jags}}, and 
-  the posterior samples for the main parameters of the model and the imputed values}
+  the posterior samples for the main parameters of the model}
   \item{cea}{A list containing the output of the economic evaluation performed using the function \code{\link[BCEA]{bcea}}}
-  \item{type}{A character variable that indicate which type of structural value mechanism has been used to run the model, 
-  either \code{SCAR} or \code{SAR} (see details)}
-  \item{data_format}{A character variable that indicate which type of analysis was conducted, either using a \code{wide} or \code{long} dataset}
+  \item{type}{A character variable that indicate which type of structural value mechanism used to run the model, either \code{SCAR} or \code{SAR} (see details)}
+  \item{data_format}{A character variable that indicates which type of analysis was conducted, either using a \code{wide} or \code{long} dataset}
 }
 }
 \description{
@@ -127,42 +120,37 @@ is a mass distribution at the spike, while the second is a parametric model appl
 Usually, a logistic regression is used to estimate the probability of incurring a "structural" value (e.g. 0 for the costs, or 1 for the
 effects); this is then used to weigh the mean of the "non-structural" values estimated in the second component. 
 A simple example can be used to show how hurdle models are specified. 
-Consider a data set comprising a response variable \eqn{y} and a set of centered covariate \eqn{X_j}.Specifically, for each subject in the trial \eqn{i = 1, ..., n}
-we define an indicator variable \eqn{d_i} taking value \code{1} if the \eqn{i}-th individual is associated with a structural value and \code{0} otherwise.
+Consider a data set comprising a response variable \eqn{y} and a set of centered covariates \eqn{X_j}, for \eqn{i = j, ..., J}.Specifically, for each subject in the trial \eqn{i = 1, ..., n}
+we define an indicator variable \eqn{s_i} taking value \code{1} if the \eqn{i}-th individual is associated with a structural value and \code{0} otherwise.
 This is modelled as:
-\deqn{d_i ~ Bernoulli(\pi_i)}
-\deqn{logit(\pi_i) = \gamma_0 + \sum\gamma_j X_j}
+\deqn{s_i ~ Bernoulli(\pi_i)}
+\deqn{logit(\pi_i) = \sum\gamma_j X_j}
 where
 \itemize{
 \item \eqn{\pi_i} is the individual probability of a structural value in \eqn{y}.
-\item \eqn{\gamma_0} represents the marginal probability of a structural value in \eqn{y} on the logit scale.
-\item \eqn{\gamma_j} represents the impact on the probability of a structural value in \eqn{y} of the centered covariates \eqn{X_j}.
+\item \eqn{\gamma_j} represents the impact on the probability of a structural value in \eqn{y} of the covariate \eqn{X_j}.
 }
 When \eqn{\gamma_j = 0}, the model assumes a 'SCAR' mechanism, while when \eqn{\gamma_j != 0} the mechanism is 'SAR'.
-For the parameters indexing the structural value model, the default prior distributions assumed are the following:
+For the parameters indexing the structural value model, the default prior distributions assumed are:
 \itemize{
-\item \eqn{\gamma_0 ~ Logisitic(0, 1)}
 \item \eqn{\gamma_j ~ Normal(0, 0.01)}
 }
 When user-defined hyperprior values are supplied via the argument \code{prior} in the function \code{hurdle}, the elements of this list (see Arguments)
-must be vectors of length \code{2} containing the user-provided hyperprior values and must take specific names according to the parameters they are associated with. 
+must be vectors containing the user-provided distribution name and hyperprior values and must take specific names according to the parameters they are associated with. 
 Specifically, the names accepted by \strong{missingHE} are the following:
 \itemize{
-\item location parameters \eqn{\alpha_0, \beta_0}: "mean.prior.e"(effects) and/or "mean.prior.c"(costs)
 \item auxiliary parameters \eqn{\sigma}: "sigma.prior.e"(effects) and/or "sigma.prior.c"(costs)
 \item covariate parameters \eqn{\alpha_j, \beta_j}: "alpha.prior"(effects) and/or "beta.prior"(costs)
-\item marginal probability of structural values \eqn{\gamma_0}: "p.prior.e"(effects) and/or "p.prior.c"(costs)
 \item covariate parameters in the model of the structural values \eqn{\gamma_j} (if covariate data provided): "gamma.prior.e"(effects) and/or "gamma.prior.c"(costs)
 } 
-For simplicity, here we have assumed that the set of covariates \eqn{X_j} used in the models for the effects/costs and in the 
+For simplicity, here we assumed that the set of covariates \eqn{X_j} used in the models for the effects/costs and in the 
 model of the structural effect/cost values is the same. However, it is possible to specify different sets of covariates for each model
 using the arguments in the function \code{hurdle} (see Arguments).
 
 For each model, random effects can also be specified for each parameter by adding the term + (x | z) to each model formula, 
 where x is the fixed regression coefficient for which also the random effects are desired and z is the clustering variable across which 
 the random effects are specified (must be the name of a factor variable in the dataset). Multiple random effects can be specified using the 
-notation + (x1 + x2 | site) for each covariate that was included in the fixed effects formula. Random intercepts are included by default in the models
-if a random effects are specified but they can be removed by adding the term 0 within the random effects formula, e.g. + (0 + x | z).
+notation + (x1 + x2 | site) for each covariate that was included in the fixed effects formula.
 }
 \examples{
 # Quck example to run using subset of MenSS dataset
@@ -170,16 +158,16 @@ MenSS.subset <- MenSS[50:100, ]
 
 # Run the model using the hurdle function assuming a SCAR mechanism
 # Use only 100 iterations to run a quick check
-model.hurdle <- hurdle(data = MenSS.subset, model.eff = e ~ 1,model.cost = c ~ 1,
+model.hurdle <- hurdle(data = MenSS.subset, model.eff = e ~ trt, model.cost = c ~ trt,
    model.se = se ~ 1, model.sc = sc ~ 1, se = 1, sc = 0, dist_e = "norm", dist_c = "norm",
-   type = "SCAR", n.chains = 2, n.iter = 100,  ppc = FALSE)
+   type = "SCAR", n.chains = 2, n.iter = 100)
 
 # Print the results of the JAGS model
 print(model.hurdle)
 #
 
 # Use dic information criterion to assess model fit
-pic.dic <- pic(model.hurdle, criterion = "dic", module = "total")
+pic.dic <- pic(model.hurdle, criterion = "dic", cases = "cc")
 pic.dic
 #
 
@@ -189,7 +177,7 @@ coef(model.hurdle)
 
 \dontshow{
 # Use waic information criterion to assess model fit
-pic.waic <- pic(model.hurdle, criterion = "waic", module = "total")
+pic.waic <- pic(model.hurdle, criterion = "waic", cases = "cc")
 pic.waic
 }
 
@@ -208,22 +196,22 @@ summary(model.hurdle)
 
 \donttest{
 # Further examples which take longer to run
-model.hurdle <- hurdle(data = MenSS, model.eff = e ~ u.0,model.cost = c ~ e,
-   model.se = se ~ u.0, model.sc = sc ~ 1, se = 1, sc = 0, dist_e = "norm", dist_c = "norm",
-   type = "SAR", n.chains = 2, n.iter = 500,  ppc = FALSE)
+model.hurdle <- hurdle(data = MenSS, model.eff = e ~ trt, model.cost = c ~ trt + e,
+   model.se = se ~ age, model.sc = sc ~ age, se = 1, sc = 0, dist_e = "norm", dist_c = "norm",
+   type = "SAR", n.chains = 2, n.iter = 500)
 #
 # Print results for all imputed values
-print(model.hurdle, value.mis = TRUE)
+print(model.hurdle)
 
 # Use looic to assess model fit
-pic.looic<-pic(model.hurdle, criterion = "looic", module = "total")
+pic.looic <- pic(model.hurdle, criterion = "looic", cases = "cc")
 pic.looic
 
-# Show density plots for all parameters
-diag.hist <- diagnostic(model.hurdle, type = "denplot", param = "all")
+# Show density plots for mean costs parameters
+diag.den <- diagnostic(model.hurdle, type = "denplot", param = "mu.c")
 
 # Plots of imputations for all data
-p1 <- plot(model.hurdle, class = "scatter", outcome = "all")
+p1 <- plot(model.hurdle, class = "scatter", outcome = "both")
 
 # Summarise the CEA results
 summary(model.hurdle)

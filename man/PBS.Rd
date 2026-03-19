@@ -23,6 +23,7 @@ Baseline data are available for age, gender, ethnicity, living status, type of c
   \item{time}{time indicator}
   \item{e}{HRQoL utilities}
   \item{c}{costs (in pounds)}
+  \item{trt}{Treatment arm indicator for the control (t=1) and the active intervention (t=2)}
   \item{age}{age in years}
   \item{gender}{binary: male (1) and female (0)}
   \item{ethnicity}{binary: white (1) and other (0)}

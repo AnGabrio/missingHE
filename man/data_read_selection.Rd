@@ -10,13 +10,20 @@ data_read_selection(
   model.cost,
   model.me,
   model.mc,
+  cov_matrix,
   type,
-  center
+  center,
+  fixed_e,
+  fixed_c,
+  random_e,
+  random_c,
+  trt_lev,
+  trt_pos
 )
 }
 \arguments{
 \item{data}{A data frame in which to find variables supplied in \code{model.eff} and \code{model.cost}. Among these,
-effectiveness, cost and treatment indicator (only two arms) variables must always be provided and named 'e', 'c' and 't' respectively.}
+effectiveness, cost and treatment indicator variables must always be provided and named 'e', 'c' and 'trt' respectively.}
 
 \item{model.eff}{A formula expression in conventional \code{R} linear modelling syntax. The response must be a health economics
 effectiveness outcome ('e') whose name must correspond to that used in \code{data}, and 
@@ -39,9 +46,23 @@ term 'mc'(missing costs) and any covariates used to estimate the probability of 
 If there are no covariates, specify \code{1} on the right hand side. By default, covariates are placed on the "probability" parameter for the missing costs through a logistic-linear model.
 Random effects can also be specified for each model parameter.}
 
+\item{cov_matrix}{Data frame containing the covariate matrix of the model.}
+
 \item{type}{Type of missingness mechanism assumed. Choices are Missing At Random (MAR) and Missing Not At Random (MNAR).}
 
 \item{center}{Logical. If \code{center} is \code{TRUE} all the covariates in the model are centered.}
+
+\item{fixed_e}{Fixed effects variables to be included in the effects model}
+
+\item{fixed_c}{Fixed effects variables to be included in the costs model}
+
+\item{random_e}{Random effects variables to be included in the effects model}
+
+\item{random_c}{Random effects variables to be included in the costs model}
+
+\item{trt_lev}{Vector of names of each treatment factor level}
+
+\item{trt_pos}{Vector of name indices of each treatment factor level}
 }
 \description{
 This internal function imports the data and outputs only those variables that are needed to run the model
