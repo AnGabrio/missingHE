@@ -1,98 +1,118 @@
-## ----echo = FALSE, message = FALSE--------------------------------------------
+## ----echo = FALSE, message = FALSE------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 knitr::opts_chunk$set(prompt = TRUE, highlight = F, background = '#FFFFFF',
                       collapse = T, comment = "#>")
 library(missingHE)
-set.seed(1234)
+library(bookdown)
+library(ggplot2)
 
-## ----menss_data2, eval=TRUE, echo=TRUE, comment=NA,warning=FALSE,error=FALSE,message=FALSE----
-MenSS2 <- MenSS
-MenSS2$e <- MenSS$sex_inst
+options(width = 300)
+set.seed(1014)
 
-#first 10 entries of e
-head(MenSS2$e, n = 10)
+## ----seldist, echo=TRUE, eval=TRUE, message=FALSE, warning=FALSE, error=FALSE, results='hide'-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#rename trt levels
+MenSS$trt <- factor(MenSS$trt)
+levels(MenSS$trt) <- c("SoC", "MenSS")
+MenSS$e <- MenSS$e - 0.01 #ensure no ones QALYs occur
+MenSS$c <- MenSS$c + 0.01 #ensure no zero costs
 
-## ----hist_sex, eval=TRUE, echo=TRUE, comment=NA,warning=FALSE,error=FALSE,message=FALSE, fig.width=15,fig.height=9,out.width='65%',fig.align='center'----
-par(mfrow=c(1,2))
-hist(MenSS2$e[MenSS2$t==1], main = "N sex instances - Control")
-hist(MenSS2$e[MenSS2$t==2], main = "N sex instances - Intervention")
+#fit models with different distributions for outcomes
+#1=Normal-Normal
+sm1_nn <- selection(data = MenSS, dist_e = "norm", dist_c = "norm",
+                    model.eff = e ~ trt + u.0, model.cost = c ~ trt + e,
+                    model.me = me ~ 1, model.mc = mc ~ 1,
+                    type = "MAR", n.iter = 1000, ref = 2)
+#2=Normal-Gamma
+sm1_ng <- selection(data = MenSS, dist_e = "norm", dist_c = "gamma",
+                    model.eff = e ~ trt + u.0, model.cost = c ~ trt + e,
+                    model.me = me ~ 1, model.mc = mc ~ 1,
+                    type = "MAR", n.iter = 1000, ref = 2)
+#3=Beta-Gamma
+sm1_bg <- selection(data = MenSS, dist_e = "beta", dist_c = "gamma",
+                    model.eff = e ~ trt + u.0, model.cost = c ~ trt + e,
+                    model.me = me ~ 1, model.mc = mc ~ 1,
+                    type = "MAR", n.iter = 1000, ref = 2)
 
-## ----mv, eval=TRUE, echo=TRUE, comment=NA,warning=FALSE,error=FALSE,message=FALSE----
-#proportions of missing values in the control group
-sum(is.na(MenSS2$e[MenSS$t==1])) / length(MenSS2$e[MenSS$t==1])  
+## ----selpic, echo=TRUE, eval=TRUE, message=FALSE, warning=FALSE, error=FALSE------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#estimate looic for all models based on complete cases
+looic_m123 <- pic(x = list(sm1_nn, sm1_ng, sm1_bg),
+                  criterion = "looic", cases = "cc")
+#print criteria for each model
+looic_m123$pic
 
-#proportions of missing values in the intervention group
-sum(is.na(MenSS2$e[MenSS$t==2])) / length(MenSS2$e[MenSS$t==2])  
+## ----selpeff, echo=TRUE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# #print peff values
+# looic_m123$peff
 
-## ----costs_const, eval=TRUE, echo=TRUE, comment=NA,warning=FALSE,error=FALSE,message=FALSE----
- MenSS2$c <- MenSS2$c + 0.01
+## ----selppc, echo=TRUE, eval=TRUE, message=FALSE, warning=FALSE, error=FALSE------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#compare densities of observed vs replicated outcome data under each model
+ppc_dens_m1 <- ppc(x = sm1_nn, type = "dens_overlay", outcome = "both",
+                   ndisplay = 20, trt = "none")
+ppc_dens_m2 <- ppc(x = sm1_ng, type = "dens_overlay", outcome = "costs",
+                   ndisplay = 20, trt = "none")
+ppc_dens_m3 <- ppc(x = sm1_bg, type = "dens_overlay", outcome = "effects",
+                   ndisplay = 20, trt = "none")
 
-## ----selection1_no, eval=TRUE, echo=FALSE, include=FALSE, comment=NA,warning=FALSE,error=FALSE,message=FALSE----
-PG.sel=selection(data = MenSS2, model.eff = e ~ sex_inst.0, model.cost = c ~ 1, 
-  model.me = me ~ age + ethnicity + employment, 
-  model.mc = mc ~ age + ethnicity + employment, type = "MAR", 
-  n.iter = 1000, dist_e = "pois", dist_c = "gamma")
+## ----figplotppc1, echo=FALSE, eval=TRUE, tidy=TRUE, error=FALSE, warning=FALSE, dpi=300, fig.show='hold',fig.cap="Posterior densities of 20 replicated data under model 1 compared to the empirical density of the original data.", out.width='100%', fig.pos='h', out.extra=''---------------------------
+ppc_dens_m1
 
-## ----selection1, eval=FALSE, echo=TRUE, comment=NA,warning=FALSE,error=FALSE,message=FALSE----
-# PG.sel=selection(data = MenSS2, model.eff = e ~ sex_inst.0, model.cost = c ~ 1,
-#   model.me = me ~ age + ethnicity + employment,
-#   model.mc = mc ~ age + ethnicity + employment, type = "MAR",
-#   n.iter = 1000, dist_e = "pois", dist_c = "gamma")
+## ----figplotppc2, echo=FALSE, eval=TRUE, tidy=TRUE, error=FALSE, warning=FALSE, dpi=300, fig.show='hold',fig.cap="Posterior densities of 20 replicated data under model 2 compared to the empirical density of the original data.", out.width='100%', fig.pos='h', out.extra=''---------------------------
+ppc_dens_m2
 
-## ----plot_selection1, eval=TRUE, echo=TRUE, comment=NA,warning=FALSE,error=FALSE,message=FALSE, fig.width=15,fig.height=9,out.width='65%',fig.align='center'----
-plot(PG.sel, outcome = "effects")
+## ----figplotppc3, echo=FALSE, eval=TRUE, tidy=TRUE, error=FALSE, warning=FALSE, dpi=300, fig.show='hold',fig.cap="Posterior densities of 20 replicated data under model 3 compared to the empirical density of the original data.", out.width='100%', fig.pos='h', out.extra=''---------------------------
+ppc_dens_m3
 
-## ----coef_selection1, eval=TRUE, echo=TRUE, comment=NA,warning=FALSE,error=FALSE,message=FALSE----
-coef(PG.sel, prob = c(0.05, 0.95))
+## ----selmar, echo=TRUE, eval=TRUE, message=FALSE, warning=FALSE, error=FALSE, results='hide'--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#fit selection model 1 (Normal-Normal) under MAR conditional on u.0 and age
+sm1_nn_mar <- selection(data = MenSS, dist_e = "norm", dist_c = "norm",
+                    model.eff = e ~ trt + u.0, model.cost = c ~ trt + e,
+                    model.me = me ~ u.0 + age, model.mc = mc ~ u.0 + age,
+                    type = "MAR", n.iter = 1000, ref = 2)
 
-## ----summary_selection1, eval=TRUE, echo=TRUE, comment=NA,warning=FALSE,error=FALSE,message=FALSE----
-summary(PG.sel)
+## ----selprint, echo=TRUE, eval=TRUE, tidy=TRUE------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#print posterior summaries for fixed effects
+print(x = sm1_nn_mar, display = "fixed")
 
-## ----pattern1_no, eval=TRUE, echo=FALSE, include=FALSE, comment=NA,warning=FALSE,error=FALSE,message=FALSE----
-PG.pat=pattern(data = MenSS2, model.eff = e ~ sex_inst.0 + (1 | site), 
-               model.cost = c ~ 1 + (1 | site), type = "MAR", restriction = "AC", 
-               n.iter = 1000, Delta_e = 0, Delta_c = 0, dist_e = "pois", dist_c = "gamma")
+## ----selpe, echo=TRUE, eval=TRUE, message=FALSE, warning=FALSE, error=FALSE-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#store posterior samples of p_e and compute some custom summaries
+p_e <- sm1_nn_mar$model_output$model$BUGSoutput$sims.list$p_e
+summary(c(p_e))
 
-## ----pattern1, eval=FALSE, echo=TRUE, comment=NA,warning=FALSE,error=FALSE,message=FALSE----
-# PG.pat=pattern(data = MenSS2, model.eff = e ~ sex_inst.0 + (1 | site),
-#                model.cost = c ~ 1 + (1 | site), type = "MAR", restriction = "AC",
-#                n.iter = 1000, Delta_e = 0, Delta_c = 0, dist_e = "pois", dist_c = "gamma")
+## ----selcoef, echo=TRUE, eval=TRUE, message=FALSE, warning=FALSE, error=FALSE-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#print coefficient estimates from model.eff and model.cost
+coef(sm1_nn_mar, random = FALSE, digits = 2)
 
-## ----coef_pattern1, eval=TRUE, echo=TRUE, comment=NA,warning=FALSE,error=FALSE,message=FALSE----
-coef(PG.pat, random = TRUE)
+## ----selcov, echo=TRUE, eval=TRUE, message=FALSE, warning=FALSE, error=FALSE, results='hide'--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#fit selection model 1 (Normal-Normal) with covariates into both outcome and missingness models
+sm1_nn_cov <- selection(data = MenSS, dist_e = "norm", dist_c = "norm",
+                    model.eff = e ~ trt + u.0 + age, 
+                    model.cost = c ~ trt + age + employment + e,
+                    model.me = me ~ u.0 + age, model.mc = mc ~ age + employment,
+                    type = "MAR", n.iter = 1000, ref = 2)
 
-## ----prior_hurdle1, eval=TRUE, echo=TRUE, comment=NA,warning=FALSE,error=FALSE,message=FALSE----
-my.prior <- list(
-  "alpha0.prior" = c(0 , 0.0000001),
-  "alpha.prior" = c(0, 0.0000001),
-  "beta0.prior" = c(0, 0.0000001),
-  "gamma0.prior.c"= c(0, 1),
-  "gamma.prior.c" = c(0, 0.01),
-  "mu.b0.prior" = c(0, 0.001),
-  "mu.g0.prior.c"= c(0, 0.001),
-  "s.b0.prior" = c(0, 100),
-  "s.g0.prior.c"= c(0, 100),
-  "sigma.prior.c" = c(0, 10000)
-)
+## ----selcovre, echo=TRUE, eval=TRUE, message=FALSE, warning=FALSE, error=FALSE, results='hide'------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#fit selection model 1 (Normal-Normal) with covariates and random intercepts
+#into the model
+sm1_nn_cov_re <- selection(data = MenSS, dist_e = "norm", dist_c = "norm",
+                    model.eff = e ~ trt + u.0 + age + (1 | site), 
+                    model.cost = c ~ trt + age + employment + e + (1 | site),
+                    model.me = me ~ u.0 + age, model.mc = mc ~ age + employment,
+                    type = "MAR", n.iter = 1000, ref = 2)
 
-## ----hurdle1_no, eval=TRUE, echo=FALSE, include=FALSE, comment=NA,warning=FALSE,error=FALSE,message=FALSE----
-#remove added constant from costs
-#MenSS2$c <- MenSS2$c - 0.01
+## ----figplotdiag, echo=FALSE, eval=TRUE, tidy=TRUE, error=FALSE, warning=FALSE, dpi=300, fig.show='hold',fig.cap="Checking convergence using the diagnostic function for a family of model parameters estimated in missingHE, for example through inspection of the autocorrelation plots.", out.width='100%', fig.pos='h', out.extra=''----
+diagnostic(x = sm1_nn_cov, type = "acf", param = "alpha")
 
-PG.hur=hurdle(data = MenSS2, model.eff = e ~ sex_inst.0, model.cost = c ~ 1 + (1 | site),
-  model.se = se ~ 1, model.sc = sc ~ age + (1 | site), type = "SAR", se = 1, sc = 0,
-  n.iter = 1000, dist_e = "pois", dist_c = "gamma", prior = my.prior)
-
-## ----hurdle1, eval=FALSE, echo=TRUE, comment=NA,warning=FALSE,error=FALSE,message=FALSE----
-# #remove added constant from costs
-# #MenSS2$c <- MenSS2$c - 0.01
-# 
-# PG.hur=hurdle(data = MenSS2, model.eff = e ~ sex_inst.0, model.cost = c ~ 1 + (1 | site),
-#   model.se = se ~ 1, model.sc = sc ~ age + (1 | site), type = "SAR", se = NULL, sc = 0,
-#   n.iter = 1000, dist_e = "pois", dist_c = "gamma", prior = my.prior)
-
-## ----coef_hurdle1, eval=TRUE, echo=TRUE, comment=NA,warning=FALSE,error=FALSE,message=FALSE----
-coef(PG.hur, random = FALSE)
-
-## ----summary_hurdle1, eval=TRUE, echo=TRUE, comment=NA,warning=FALSE,error=FALSE,message=FALSE----
-coef(PG.hur, random = TRUE)
+## ----selprior, echo=TRUE, eval=TRUE, message=FALSE, warning=FALSE, error=FALSE, results='hide'------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#update priors on outcome regression coefficients and standard deviations
+myprior <- list("beta.prior" = c("norm", 0, 0.01), 
+                "beta_f.prior" = c("norm", 0, 0.001),
+                "alpha.prior" = c("norm", 0, 0.01),
+                "sigma.prior.e" = c("unif", 0, 5),
+                "sigma.prior.c" = c("unif", 0, 1000))
+#update model with new priors
+sm2_nn_cov <- selection(data = MenSS, dist_e = "norm", dist_c = "norm",
+                    model.eff = e ~ trt + u.0 + age, 
+                    model.cost = c ~ trt + age + employment + e,
+                    model.me = me ~ u.0 + age, model.mc = mc ~ age + employment,
+                    type = "MAR", n.iter = 1000, ref = 2,
+                    prior = myprior)
 

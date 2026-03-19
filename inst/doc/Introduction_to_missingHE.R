@@ -1,127 +1,143 @@
-## ----echo = FALSE, message = FALSE--------------------------------------------
+## ----echo = FALSE, message = FALSE------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 knitr::opts_chunk$set(prompt = TRUE, highlight = F, background = '#FFFFFF',
                       collapse = T, comment = "#>")
 library(missingHE)
+library(bookdown)
+library(ggplot2)
+
+options(width = 300)
 set.seed(1014)
 
-## ----menss--------------------------------------------------------------------
-str(MenSS)
+## ----menss, echo=FALSE, eval=TRUE, message=FALSE, warning=FALSE, error=FALSE------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+MenSS$u.0 <- round(MenSS$u.0, digits = 3)
+n <- nrow(MenSS)
+n1 <- nrow(MenSS[MenSS$trt=="1",])
+n2 <- nrow(MenSS[MenSS$trt=="2",])
+MenSS_outcomes <- MenSS[, c("sex_inst","sti","e","c","trt")]
+MenSS$trt <- factor(MenSS$trt)
+levels(MenSS$trt) <- c("SoC", "MenSS")
+MenSS_outcomes$trt <- factor(MenSS_outcomes$trt)
+levels(MenSS_outcomes$trt) <- c("SoC", "MenSS")
+MenSS_ec <- MenSS[,c("e","c","trt")]
+MenSS_ec_cc <- MenSS_ec[complete.cases(MenSS_ec),]
+n_ec_cc <- nrow(MenSS_ec_cc)
+n1_ec_cc <- nrow(MenSS_ec_cc[MenSS_ec_cc$trt=="1",])
+n2_ec_cc <- nrow(MenSS_ec_cc[MenSS_ec_cc$trt=="2",])
+n_e_ones <- nrow(MenSS_ec_cc[MenSS_ec_cc$e==1,])
+n1_e_ones <- nrow(MenSS_ec_cc[MenSS_ec_cc$e==1&MenSS_ec_cc$trt=="1",])
+n2_e_ones <- nrow(MenSS_ec_cc[MenSS_ec_cc$e==1&MenSS_ec_cc$trt=="2",])
+n_c_zeros <- nrow(MenSS_ec_cc[MenSS_ec_cc$c==0,])
+n1_c_zeros <- nrow(MenSS_ec_cc[MenSS_ec_cc$c==0&MenSS_ec_cc$trt=="1",])
+n2_c_zeros <- nrow(MenSS_ec_cc[MenSS_ec_cc$c==0&MenSS_ec_cc$trt=="2",])
 
-## ----hist, eval=TRUE, echo=TRUE, comment=NA,warning=FALSE,error=FALSE,message=FALSE, fig.width=15,fig.height=9,out.width='65%',fig.align='center'----
-par(mfrow=c(2,2))
-hist(MenSS$e[MenSS$t==1], main = "QALYs - Control")
-hist(MenSS$e[MenSS$t==2], main = "QALYs - Intervention")
-hist(MenSS$c[MenSS$t==1], main = "Costs - Control")
-hist(MenSS$c[MenSS$t==2], main = "Costs - Intervention")
+hist_e <- ggplot(MenSS_outcomes, aes(x=e, fill=trt)) + geom_histogram(color="black", binwidth = 0.05) + facet_wrap(~trt, labeller=label_parsed) + scale_fill_manual(values=c("grey","grey")) + scale_y_continuous(expand = expansion(mult = c(0, 0.05))) + theme(panel.grid.major = element_blank(), legend.key = element_rect(fill = "white"), panel.grid.minor = element_blank(), panel.background = element_blank(), legend.position="none",
+axis.line = element_line(colour = "black"), plot.title = element_text(hjust = 0.5))+ ylab("Frequency") + xlab("QALYs") + scale_x_continuous(breaks=seq(0.6,1,0.2))
+hist_c <- ggplot(MenSS_outcomes, aes(x=c, fill=trt)) + geom_histogram(color="black", binwidth = 100) + facet_wrap(~trt) + scale_fill_manual(values=c("grey","grey")) + scale_y_continuous(expand = expansion(mult = c(0, 0.05))) + theme(panel.grid.major = element_blank(), legend.key = element_rect(fill = "white"), panel.grid.minor = element_blank(), panel.background = element_blank(), legend.position="none",
+axis.line = element_line(colour = "black"), plot.title = element_text(hjust = 0.5))+ ylab("Frequency") + xlab("Tcosts") + scale_x_continuous(breaks=seq(0,1000,1000))
 
-## ----sv, eval=TRUE, echo=TRUE, comment=NA,warning=FALSE,error=FALSE,message=FALSE----
-#proportions of ones and zeros in the control group
-c(sum(MenSS$e[MenSS$t==1]==1, na.rm = TRUE) / length(MenSS$e[MenSS$t==1]),  
-sum(MenSS$c[MenSS$t==1]==0, na.rm = TRUE) / length(MenSS$e[MenSS$t==1]))
+## ----tbl1-hide, echo=TRUE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# rbind(head(MenSS), tail(MenSS))
 
-#proportions of ones and zeros in the intervention group
-c(sum(MenSS$e[MenSS$t==2]==1, na.rm = TRUE) / length(MenSS$e[MenSS$t==2]),  
-sum(MenSS$c[MenSS$t==2]==0, na.rm = TRUE) / length(MenSS$e[MenSS$t==2]))
+## ----tbl1, echo=FALSE, eval=TRUE, message=FALSE, warning=FALSE, error=FALSE-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+print(rbind(head(MenSS), tail(MenSS)), row.names = FALSE)
 
-## ----mv, eval=TRUE, echo=TRUE, comment=NA,warning=FALSE,error=FALSE,message=FALSE----
-#proportions of missing values in the control group
-c(sum(is.na(MenSS$e[MenSS$t==1])) / length(MenSS$e[MenSS$t==1]),  
-sum(is.na(MenSS$c[MenSS$t==1])) / length(MenSS$e[MenSS$t==1]))
+## ----fig1e, echo=FALSE, eval=TRUE, tidy=TRUE, error=FALSE, warning=FALSE, dpi=300, fig.show='hold',fig.cap="Histograms of the observed data distributions for the QALYs in the SoC and MenSS arm.", out.width='100%', fig.pos='h', out.extra=''-----------------------------------------------------------
+hist_e
 
-#proportions of missing values in the intervention group
-c(sum(is.na(MenSS$e[MenSS$t==2])) / length(MenSS$e[MenSS$t==2]),  
-sum(is.na(MenSS$c[MenSS$t==2])) / length(MenSS$e[MenSS$t==2]))
+## ----fig1c, echo=FALSE, eval=TRUE, tidy=TRUE, error=FALSE, warning=FALSE, dpi=300, fig.show='hold',fig.cap="Histograms of the observed data distributions for the Total costs in the SoC and MenSS arm.", out.width='100%', fig.pos='h', out.extra=''-----------------------------------------------------
+hist_c
 
-## ----selection1_no, eval=TRUE, echo=FALSE, include=FALSE, comment=NA,warning=FALSE,error=FALSE,message=FALSE----
-NN.sel=selection(data = MenSS, model.eff = e ~ u.0, model.cost = c ~ e, 
-  model.me = me ~ age + ethnicity + employment, 
-  model.mc = mc ~ age + ethnicity + employment, type = "MAR", 
-  n.iter = 1000, dist_e = "norm", dist_c = "norm", ppc = TRUE)
+## ----sel1, echo=FALSE, eval=TRUE, message=FALSE, warning=FALSE, error=FALSE, results='hide'---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+sm1_mar <- selection(data = MenSS, dist_e = "norm", dist_c = "norm",
+             model.eff = e ~ trt + u.0, model.cost = c ~ trt + e,
+             model.me = me ~ u.0, model.mc = mc ~ 1, 
+             type = "MAR", n.iter = 1000, ref = 2)
 
-## ----selection1, eval=FALSE, echo=TRUE, comment=NA,warning=FALSE,error=FALSE,message=FALSE----
-# NN.sel=selection(data = MenSS, model.eff = e ~ u.0, model.cost = c ~ e,
-#   model.me = me ~ age + ethnicity + employment,
-#   model.mc = mc ~ age + ethnicity + employment, type = "MAR",
-#   n.iter = 1000, dist_e = "norm", dist_c = "norm", ppc = TRUE)
+## ----pat1, echo=FALSE, eval=TRUE, message=FALSE, warning=FALSE, error=FALSE, results='hide'---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+pm1_mar <- pattern(data = MenSS, dist_e = "logis", dist_c = "norm", 
+                   model.eff = e ~ trt + u.0, model.cost = c ~ trt + e, 
+                   type = "MAR", restriction = "CC", 
+                   n.iter = 1000, ref = 2)
 
-## ----print_selection1, eval=TRUE, echo=TRUE, comment=NA,warning=FALSE,error=FALSE,message=FALSE----
-print(NN.sel, value.mis = FALSE, only.means = TRUE)
+## ----hur1, echo=FALSE, eval=TRUE, message=FALSE, warning=FALSE, error=FALSE, results='hide'---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+hm1_mar <- hurdle(data = MenSS, dist_e = "beta", dist_c = "gamma", 
+                  model.eff = e ~ trt + u.0, model.cost = c ~ trt + e, 
+                  model.se = se ~ 1, model.sc = sc ~ 1, 
+                  se = 1, sc = 0, type = "SCAR", 
+                  n.iter = 1000, ref = 2)
 
-## ----coef_selection1, eval=TRUE, echo=TRUE, comment=NA,warning=FALSE,error=FALSE,message=FALSE----
-coef(NN.sel, random = FALSE)
+## ----diag1, echo=TRUE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE, tidy=TRUE-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# diagnostic(x = sm1_mar, type = "traceplot", param = "sd.e")
 
-## ----summary_selection1, eval=TRUE, echo=TRUE, comment=NA,warning=FALSE,error=FALSE,message=FALSE----
-summary(NN.sel)
+## ----fig2, echo=FALSE, eval=TRUE, tidy=TRUE, error=FALSE, warning=FALSE, dpi=300, fig.show='hold',fig.cap="Checking convergence using the diagnostic function for a model fitted in missingHE, for example through inspection of the traceplots.", out.width='100%', fig.pos='h', out.extra=''------------
+diagnostic(x = sm1_mar, type = "traceplot", param = "sd.e")
 
-## ----BCEA_selection1, eval=TRUE, echo=TRUE, comment=NA,warning=FALSE,error=FALSE,message=FALSE, fig.width=15,fig.height=9,out.width='65%',fig.align='center'----
-par(mfrow=c(1,2))
-BCEA::ceplane.plot(NN.sel$cea)
-BCEA::ceac.plot(NN.sel$cea)
+## ----ppc1, echo=TRUE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE, tidy=TRUE--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# ppc(x = sm1_mar, type = "dens_overlay", outcome = "effects", ndisplay = 20)
 
-## ----pattern1_no, eval=TRUE, echo=FALSE, include=FALSE, comment=NA,warning=FALSE,error=FALSE,message=FALSE----
-NN.pat=pattern(data = MenSS, model.eff = e ~ u.0, model.cost = c ~ e, 
-  type = "MAR", restriction = "CC", n.iter = 1000, Delta_e = 0, Delta_c = 0, 
-  dist_e = "norm", dist_c = "norm", ppc = TRUE)
+## ----fig3, echo=FALSE, eval=TRUE, tidy=TRUE, error=FALSE, warning=FALSE, dpi=300, fig.show='hold',fig.cap="Posterior predictive graphical checks using the ppc function for a model fitted in missingHE, for example through inspection of the overlayed densities.", out.width='100%', fig.pos='h', out.extra=''----
+ppc(x = sm1_mar, type = "dens_overlay", outcome = "effects", ndisplay = 20)
 
-## ----pattern1, eval=FALSE, echo=TRUE, comment=NA,warning=FALSE,error=FALSE,message=FALSE----
-# NN.pat=pattern(data = MenSS, model.eff = e ~ u.0, model.cost = c ~ e,
-#   type = "MAR", restriction = "CC", n.iter = 1000, Delta_e = 0, Delta_c = 0,
-#   dist_e = "norm", dist_c = "norm", ppc = TRUE)
+## ----pic1, echo=TRUE, eval=TRUE, message=FALSE, warning=FALSE, error=FALSE, results='hide'----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+pic_sm1_mar <- pic(x = sm1_mar, criterion = "waic", cases = "cc")
 
-## ----coef_pattern1, eval=TRUE, echo=TRUE, comment=NA,warning=FALSE,error=FALSE,message=FALSE----
-coef(NN.pat, random = FALSE)
+## ----pic1show, echo=TRUE, eval=TRUE-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+pic_sm1_mar$waic
 
-## ----summary_pattern1, eval=TRUE, echo=TRUE, comment=NA,warning=FALSE,error=FALSE,message=FALSE----
-summary(NN.pat)
+## ----names, echo=TRUE, eval=FALSE-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# names(sm1_mar)
 
-## ----hurdle1_no, eval=TRUE, echo=FALSE, include=FALSE, comment=NA,warning=FALSE,error=FALSE,message=FALSE----
-NN.hur=hurdle(data = MenSS, model.eff = e ~ u.0, model.cost = c ~ e,
-  model.se = se ~ 1, model.sc = sc ~ age, type = "SAR", se = 1, sc = 0,
-  n.iter = 1000, dist_e = "norm", dist_c = "norm", ppc = TRUE)
+## ----namesshow, echo=FALSE, eval=TRUE, warning=FALSE, error=FALSE-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+names(sm1_mar)
 
-## ----hurdle1, eval=FALSE, echo=TRUE, comment=NA,warning=FALSE,error=FALSE,message=FALSE----
-# NN.hur=hurdle(data = MenSS, model.eff = e ~ u.0, model.cost = c ~ e,
-#   model.se = se ~ 1, model.sc = sc ~ age, type = "SAR", se = 1, sc = 0,
-#   n.iter = 1000, dist_e = "norm", dist_c = "norm", ppc = TRUE)
+## ----namesmodel, echo=TRUE, eval=FALSE, tidy=TRUE---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# names(sm1_mar$model_output$`model`)
 
-## ----coef_hurdle1, eval=TRUE, echo=TRUE, comment=NA,warning=FALSE,error=FALSE,message=FALSE----
-coef(NN.hur, random = FALSE)
+## ----namesmodelshow, echo=FALSE, eval=TRUE, tidy=TRUE---------------------------------------------
+options(width = 100)
+names(sm1_mar$model_output$`model`)
 
-## ----summary_hurdle1, eval=TRUE, echo=TRUE, comment=NA,warning=FALSE,error=FALSE,message=FALSE----
-summary(NN.hur)
+## ----print, echo=TRUE, eval=FALSE, tidy=TRUE------------------------------------------------------
+# print(sm1_mar)
 
-## ----diag_sel1, eval=TRUE, echo=TRUE, comment=NA,warning=FALSE,error=FALSE,message=FALSE, fig.width=15,fig.height=9,out.width='65%',fig.align='center'----
-diagnostic(NN.sel, type = "denplot", param = "mu.e", theme = NULL)
+## ----printshow, echo=FALSE, eval=TRUE, tidy=TRUE--------------------------------------------------
+print(sm1_mar)
 
-## ----diag_pat1, eval=TRUE, echo=TRUE, comment=NA,warning=FALSE,error=FALSE,message=FALSE, fig.width=15,fig.height=9,out.width='65%',fig.align='center'----
-diagnostic(NN.pat, type = "traceplot", param = "mu.c", theme = NULL)
+## ----coef, echo=TRUE, eval=FALSE, tidy=TRUE-------------------------------------------------------
+# coef(sm1_mar)
 
-## ----diag_hur1, eval=TRUE, echo=TRUE, comment=NA,warning=FALSE,error=FALSE,message=FALSE, fig.width=15,fig.height=9,out.width='65%',fig.align='center'----
-diagnostic(NN.hur, type = "acf", param = "p.c", theme = "base")
+## ----coefshow, echo=FALSE, eval=TRUE, tidy=TRUE---------------------------------------------------
+coef(sm1_mar)
 
-## ----plot_selection1, eval=TRUE, echo=TRUE, comment=NA,warning=FALSE,error=FALSE,message=FALSE, fig.width=15,fig.height=9,out.width='65%',fig.align='center'----
-plot(NN.sel, class = "scatter", outcome = "all")
+## ----plot1, echo=TRUE, eval=FALSE, tidy=TRUE, error=FALSE, warning=FALSE--------------------------
+# plot(sm1_mar, class = "scatter", outcome = "effects")
 
-## ----plot_pattern1, eval=TRUE, echo=TRUE, comment=NA,warning=FALSE,error=FALSE,message=FALSE, fig.width=15,fig.height=9,out.width='65%',fig.align='center'----
-plot(NN.pat, class = "histogram", outcome = "all")
+## ----figplot, echo=FALSE, eval=TRUE, tidy=TRUE, error=FALSE, warning=FALSE, dpi=300, fig.show='hold',fig.cap="Scatter plots of observed and imputed effectiveness data in the MenSS arm under normal distributions using a selection model.", out.width='100%', fig.pos='h', out.extra=''----
+plot(sm1_mar, class = "scatter", outcome = "effects", trt = "MenSS")
 
-## ----plot_hurdle1, eval=TRUE, echo=TRUE, comment=NA,warning=FALSE,error=FALSE,message=FALSE, fig.width=15,fig.height=9,out.width='65%',fig.align='center'----
-plot(NN.hur, class = "scatter", outcome = "costs_arm1")
+## ----summary, echo=TRUE, eval=FALSE, tidy=TRUE----------------------------------------------------
+# summary(sm1_mar)
 
-## ----ppc_selection1, eval=TRUE, echo=TRUE, comment=NA,warning=FALSE,error=FALSE,message=FALSE, fig.width=15,fig.height=9,out.width='65%',fig.align='center'----
-ppc(NN.sel, type = "histogram", outcome = "effects_arm1", ndisplay = 8)
+## ----summaryshow, echo=FALSE, eval=TRUE, tidy=TRUE------------------------------------------------
+diff_e_m1 <- round(mean(unlist(sm1_mar$cea$delta_e)), digits = 3)
+diff_c_m1 <- round(mean(unlist(sm1_mar$cea$delta_c)), digits = 3)
+icer_m1 <- round(sm1_mar$cea$ICER, digits = 3)
+summary(sm1_mar)
 
-## ----ppc_pattern1, eval=TRUE, echo=TRUE, comment=NA,warning=FALSE,error=FALSE,message=FALSE, fig.width=15,fig.height=9,out.width='65%',fig.align='center'----
-ppc(NN.pat, type = "dens", outcome = "effects_arm1", ndisplay = 8)
+## ----sumincr, echo=TRUE, eval=FALSE, tidy=TRUE----------------------------------------------------
+# summary(sm1_mar, incremental = TRUE)
 
-## ----ppc_hurdle1, eval=TRUE, echo=TRUE, comment=NA,warning=FALSE,error=FALSE,message=FALSE, fig.width=15,fig.height=9,out.width='65%',fig.align='center'----
-ppc(NN.hur, type = "dens_overlay", outcome = "all", ndisplay = 25)
+## ----bcea, echo=TRUE, eval=FALSE, tidy=TRUE-------------------------------------------------------
+# BCEA::ceplane.plot(sm1_mar$cea, graph = "ggplot2")
+# BCEA::ceac.plot(sm1_mar$cea, graph = "ggplot2")
 
-## ----pic_model1, eval=TRUE, echo=TRUE, comment=NA,warning=FALSE,error=FALSE,message=FALSE, fig.width=15,fig.height=9,out.width='65%',fig.align='center'----
-pic_sel <- pic(NN.sel, criterion = "waic", module = "both")
-pic_pat <- pic(NN.pat, criterion = "waic", module = "both")
-pic_hur <- pic(NN.hur, criterion = "waic", module = "both")
+## ----figplotcea1, echo=FALSE, eval=TRUE, tidy=FALSE, error=FALSE, warning=FALSE, dpi=300, fig.show='hold',fig.cap="Inspecting probabilistic sensitivity analysis using BCEA built-in functions, for example in terms of cost-effectiveness plane.",out.width='100%', fig.pos='h', out.extra=''----
+cep_sm1_mar <- BCEA::ceplane.plot(sm1_mar$cea, 
+            graph = "ggplot2") + ggplot2::ggtitle("")
+ceac_sm1_mar <- BCEA::ceac.plot(sm1_mar$cea, 
+            graph = "ggplot2") + ggplot2::ggtitle("")
+cep_sm1_mar
 
-#print results
-c(pic_sel$waic, pic_pat$waic, pic_hur$waic)
+## ----figplotcea2, echo=FALSE, eval=TRUE, tidy=FALSE, error=FALSE, warning=FALSE, dpi=300, fig.show='hold',fig.cap="Inspecting probabilistic sensitivity analysis using BCEA built-in functions, for example in terms of cost-effectiveness acceptability curve.",out.width='100%', fig.pos='h', out.extra=''----
+ceac_sm1_mar
 

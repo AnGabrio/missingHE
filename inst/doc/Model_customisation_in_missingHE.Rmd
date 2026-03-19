@@ -1,12 +1,13 @@
 ---
-title: "Model Customisation in missingHE"
+title: "Model and output customisation in missingHE"
 description: >
-  This tutorial shows few examples of how models in missingHE can be customised
-  in different ways according to the specific needs of the user when performing
-  trial-based CEA.
-output: rmarkdown::html_vignette
+  This tutorial shows few examples of how different types of models and their output can be
+  customised in missingHE based on the needs of the user when performing trial-based CEA.
+output: 
+    bookdown::html_document2:
+        base_format: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Model Customisation in missingHE}
+  %\VignetteIndexEntry{Model and output customisation in missingHE}
   %\VignetteEngine{knitr::rmarkdown}
   \usepackage[utf8]{inputenc}
 ---
@@ -15,198 +16,265 @@ vignette: >
 knitr::opts_chunk$set(prompt = TRUE, highlight = F, background = '#FFFFFF',
                       collapse = T, comment = "#>")
 library(missingHE)
-set.seed(1234)
+library(bookdown)
+library(ggplot2)
+
+options(width = 300)
+set.seed(1014)
 ```
 
-For each of the three types of models that can be fitted using `missingHE`, namely **selection**, **pattern mixture**, and **hurdle** models, the package provides a series of customisation options to allow a flexible specification of the models in terms of modelling assumptions and prior choices. These can be extremely useful for handling the typical features of trial-based CEA data, such as non-normality, clustering, and type of missingness mechanism. This tutorial shows how it is possible to customise different aspects of the models using the arguments of each type of function in the package. Throughout, we will use the built-in dataset called `MenSS` as a toy example, which is directly available when installing and loading `missingHE` in your `R` workspace. See the vignette called *Introduction to missingHE* for an introductory tutorial of each function in `missingHE` and a general presentation of the data from the `MenSS` dataset.
+Each model fitting function in `missingHE` provides a series of customisation options to allow a flexible specification of the missingness models in terms of modelling assumptions and output manipulation. Examples include: choice of outcome and prior probability distributions, model structure, missing data assumptions, type of diagnostic and model assessment measures, choice of numeric and graphical posterior summaries. This high level of flexibility aims at facilitating the tasks of the user related to the implementation of the health economic analysis, interpretation of key parameters as well as the need to assess model performance and conduct sensitivity analyses. 
 
-If you would like to have more information on the package, or would like to point out potential issues in the current version, feel free to contact the maintainer at <a.gabrio@maastrichtuniversity.nl>. Suggestions on how to improve the package are also very welcome.
+This tutorial illustrates how to customise the specification and output of the different types of models that can be fitted in `missingHE` using the different arguments available inside the functions of the package. For illustration purposes, the built-in data sets called `MenSS` and `PBS` will be used in this tutorial as toy examples, which are directly available when installing and loading `missingHE` in your `R` workspace. See [Introduction to missingHE](Introduction_to_missingHE.Rmd) and [Longitudinal models in missingHE](Longitudinal_models_in_missingHE.Rmd) for a overview about the different modelling approaches available in `missingHE`, practical examples on how to implement them using default argument choices and a general presentation of the two data sets. 
 
+If you would like to have more information on the package, or would like to point out potential issues in the current version, feel free to contact the maintainer at <a.gabrio@maastrichtuniversity.nl>. Suggestions on how to improve the package are also very welcome. A development version of the package is also available from the author's main GitHub repository at <https://github.com/AnGabrio/missingHE>.
 
-## Changing the distributional assumptions
+## Modelling assumptions {#sec-modass}
 
-A general concern when analysing trial-based CEA data is that, in many cases, both effectiveness and costs are characterised by highly skewed distributions, which may cause standard normality modelling assumptions to be difficult to justify, especially for small samples. `missingHE` allows to chose among a range of parametric distributions for modelling both outcome variables, which were selected based on the most common choices in standard practice and the literature.
+The majority of the customisation options about the assumptions and specification of the modelling approaches available in `missingHE` are common across the four main functions of the package, namely `selection` (selection models), `pattern` (pattern mixture models), `hurdle` (hurdle models) and `lmdm` (longitudinal missing data model). Among these, key options include: 
 
-In each model, the specific type of distributions for the effectiveness ($e$) and cost ($c$) outcome can be selected by setting the arguments `dist_e` and `dist_c` to specific character names. Available choices include: Normal (`"norm"`) and Beta (`"beta"`) distributions for $e$ and Normal (`"norm"`) and Gamma (`"gamma"`) for $c$. Distributions for modelling both discrete and binary effectiveness variables are also available, such as Poisson (`"pois"`) and Bernoulli (`bern`) distributions. The full list of available distributions for each type of outcome can be seen by using the `help` function on each function of the package.
+  - distributional assumptions about the outcome variables
+  - type of missingness mechanism 
+  - specification of the outcome model structure
+  - prior distributions
+  
+Other options are instead specific to the type of modelling approach selected and are therefore not applicable to all functions. Among these, key examples include: 
 
-In the `MenSS` dataset the default effectiveness variables are the QALYs. However, in general, other types of effectiveness measures may be of interest in the economic analysis (e.g. the primary outcome from a trial). In our dataset we have the number of instances of unprotected sex at $12$ months follow-up, denoted as `sex_inst`, which could be used in the CEA instead of QALYs. Thus, we create a second dataset called `MenSS2`, where we assign the name $e$ to the variable `sex_inst`, which allows `missingHE` to identify this variable as the main effectiveness variable for the analysis. This can be done by typing
+  - specification of the model for the missingness mechanism for each outcome (relevant only for `selection` and `lmdm`)
+  - type of identifying restrictions imposed (relevant only for `pattern`)
+  - specification of the model for the structural value mechanism and type of structural values for each outcome (relevant only for `hurdle`)
+  - specification of the time dependence structure (relevant only for `lmdm`)
 
-```{r menss_data2, eval=TRUE, echo=TRUE, comment=NA,warning=FALSE,error=FALSE,message=FALSE}
-MenSS2 <- MenSS
-MenSS2$e <- MenSS$sex_inst
+In the following, a general overview of the choices available in `missingHE` to specify these modelling assumptions using dedicated arguments from each main function of the package. An application of the methods to the two built-in data sets of the package will be used as a demonstrative example to illustrate the impact of these choices on the analysis results. 
 
-#first 10 entries of e
-head(MenSS2$e, n = 10)
+## Outcome distribution {#sec-dist}
+
+Choice of the distribution for the outcome variables is typically informed based on the characteristics of the observed data by checking whether possible inconsistencies between distributional assumptions and observed data occur. A common example is given by assuming both effectiveness and cost variables to be normally distributed, a typical assumption made in standard statistical analyses of continuous data. Indeed, provided a sufficient sample size is obtained from the study data, the CLT guarantees that the sampling distribution of the sample mean will be normal, regardless of the shape of the population distribution. In CEA, however, the context of the analysis poses some challenges which may violate this assumption: 1) sample sizes about health economic outcomes are often limited and further reduced by considerable proportions of missing values; 2) a combination of data features that violate normality are often present in the observed data (e.g. skewness); 3) interest is not in statistical inference but rather in uncertainty assessment and quantification. The occurrence of these elements lead analysts to consider alternative distributional forms for the modelling of cost-effectiveness outcomes, in an attempt to improve the fit and convey more robust results.
+
+`missingHE` allows the user to choose among a set of pre-defined parametric forms for the distributions assigned to the effectiveness and cost outcomes, which are shared across all model fitting functions in the package. The choice of the available distributions for the effetiveness and cost outcomes was informed based on the current methodological literature and may be conveyed to the desired package function by passing a specific character name to the arguments `dist_e` and `dist_c`. In particular, the set of distributions available (with associated character names) is:
+
+  - effectiveness: Normal (`"norm"`), Gamma (`"Gamma"`), Beta (`"Beta"`), Logistic (`"logis"`), Weibull (`"Weib"`), Poisson (`"Pois"`), Negative Binomial (`"Negbin"`), Bernoulli (`"Bern"`).
+  
+  - costs: Normal (`"norm"`), Gamma (`"Gamma"`), Lognormal (`"lnorm"`).
+
+Note that, while costs are usually expressed in monetary terms and can be modelled using continuous distributions, the level of measurement of effectiveness variables may differ according to the specific outcome which should be used to inform the choice of the relevant modelling distribution.
+
+To illustrate how alternative outcome distributions may be assumed to conduct the health economic assessment using `missingHE`, we use data from the built-in data set `MenSS` as a toy example. The data come from a pilot randomised trial on young males at risk of sexually transmitted infections (STIs) which, among its objectives, included the cost-effectiveness assessment of the *MenSS's Safer Sex* (MenSS) intervention compared to the *Standard of Care* (SoC). Key variables in `MenSS` include: Total costs and QALYs computed over the trial period (`c` and `e`); number of sexual intercourses (`"sex_inst"`) and whether an STI was diagnosed (`"sti"`) at follow-up; baseline values for all effectiveness variables and demographics, treatment (`"trt"`) and site (`"site"`) indicator.
+
+The following code is used to fit three selection models using the function `selection` to conduct the cost-effectiveness assessment under a *Missing At Random* (MAR) assumption. The models differ in terms of the distributional assumptions specified for the two health economic variables, namely QALYs (`e`) and Total costs (`c`):
+
+  - Model 1: Bivariate Normal for both `e` and `c`
+  - Model 2: Normal for `e` and Gamma for `c`
+  - Model 3: Beta for `e` and Gamma for `c`
+
+Prior to fitting the model, the data in `MenSS` are pre-processed by: replacing the default levels for the factor variable `trt` ($1$ and $2$) with the actual treatment names (`"SoC"` and `"MenSS"`); add/subtract to the cost/QALY data a small constant of $0.01$ to allow estimation of Gamma and Beta distributions, whose support does not include $0$ and $1$, respectively.
+
+```{r seldist, echo=TRUE, eval=TRUE, message=FALSE, warning=FALSE, error=FALSE, results='hide'}
+#rename trt levels
+MenSS$trt <- factor(MenSS$trt)
+levels(MenSS$trt) <- c("SoC", "MenSS")
+MenSS$e <- MenSS$e - 0.01 #ensure no ones QALYs occur
+MenSS$c <- MenSS$c + 0.01 #ensure no zero costs
+
+#fit models with different distributions for outcomes
+#1=Normal-Normal
+sm1_nn <- selection(data = MenSS, dist_e = "norm", dist_c = "norm",
+                    model.eff = e ~ trt + u.0, model.cost = c ~ trt + e,
+                    model.me = me ~ 1, model.mc = mc ~ 1,
+                    type = "MAR", n.iter = 1000, ref = 2)
+#2=Normal-Gamma
+sm1_ng <- selection(data = MenSS, dist_e = "norm", dist_c = "gamma",
+                    model.eff = e ~ trt + u.0, model.cost = c ~ trt + e,
+                    model.me = me ~ 1, model.mc = mc ~ 1,
+                    type = "MAR", n.iter = 1000, ref = 2)
+#3=Beta-Gamma
+sm1_bg <- selection(data = MenSS, dist_e = "beta", dist_c = "gamma",
+                    model.eff = e ~ trt + u.0, model.cost = c ~ trt + e,
+                    model.me = me ~ 1, model.mc = mc ~ 1,
+                    type = "MAR", n.iter = 1000, ref = 2)
 ```
 
-The new effectiveness outcome is now a discrete variable and therefore the use of discrete distribtuions is likely to be more appropriate for modelling purposes compared to standard normality assumptions. We can check the empirical histograms of $e$ by treatment group by typing
+Before looking at the model results, it is generally a good idea to assess the fit of the model to the observed data to inform the decision of which model results should be trusted more. Within the Bayesian framework, alternative approaches to model selection based on performance measures are available. `missingHE` allows the user to compute three main types of **predictive information criteria** (PIC), taken from common relative measures of Bayesian model fit, using the `pic` function. The available criteria include: *Deviance Information Criterion* (DIC); *Widely Applicable Information Criterion* (WAIC); *Leave-One-Out Information Criterion* (LOOIC). 
 
-```{r hist_sex, eval=TRUE, echo=TRUE, comment=NA,warning=FALSE,error=FALSE,message=FALSE, fig.width=15,fig.height=9,out.width='65%',fig.align='center'}
-par(mfrow=c(1,2))
-hist(MenSS2$e[MenSS2$t==1], main = "N sex instances - Control")
-hist(MenSS2$e[MenSS2$t==2], main = "N sex instances - Intervention")
+The following code shows how the results of any model fitted in `missingHE` may be passed to the argument `x` of `pic` to compute the desired criterion. In particular, we pass the three model result objects into `pic` as a list and select `"looic"` as value for `criterion` to indicate that we want the LOOIC criterion to be computed for all models, and we store the results into the new list object `looic_m123`. Next, we print out the computed criteria for each model by accessing the inner object  `looic_m123$pic`.
+
+```{r selpic, echo=TRUE, eval=TRUE, message=FALSE, warning=FALSE, error=FALSE}
+#estimate looic for all models based on complete cases
+looic_m123 <- pic(x = list(sm1_nn, sm1_ng, sm1_bg),
+                  criterion = "looic", cases = "cc")
+#print criteria for each model
+looic_m123$pic
 ```
 
-We can also see that the proportion of missing values in $e$ is considerably large in both treatment groups.
+The printed estimates for the criteria suggest a generally better fit for model 3 compared to model 2 and model 1, as indicated by lower LOOIC values. This in accordance with the expectation that distributions which allow to capture skewness, such as Gamma and Beta, tend to have a better fit to empirical data that show such features. Note that the criteria were generated by setting `cases` to `"cc"`, that is their calculation was only based on the complete cases. Alternative cases choices are: available effectiveness cases (`"ac_e"`), available cost cases (`"ac_c"`) and all cases (`"all"`). Although it is possible to compute the criteria based on imputed cases, it is generally recommended to assess the model fit only based on the observed cases (or after integrating out the missing values). Thus, care should be used when interpreting the PIC results directly computed based on some imputed data.
 
-```{r mv, eval=TRUE, echo=TRUE, comment=NA,warning=FALSE,error=FALSE,message=FALSE}
-#proportions of missing values in the control group
-sum(is.na(MenSS2$e[MenSS$t==1])) / length(MenSS2$e[MenSS$t==1])  
+Depending on the type of criteria chosen, `pic` provides additional output related to the computation of the quantity. For example, the object `looic_m123` is a list which stores several elements that were used in the computation of LOOIC (`pic`) for each model, such as estimates for the *effective number of parameters* (`peff`) as well as standard error estimates of `pic_se` and `peff_se`. These elements can be accessed and printed out in a similar way to what shown for the main LOOIC quantities. The following command can be used to access and print out `peff` estimates used in the calculation of LOOIC for each model.
 
-#proportions of missing values in the intervention group
-sum(is.na(MenSS2$e[MenSS$t==2])) / length(MenSS2$e[MenSS$t==2])  
+```{r selpeff, echo=TRUE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+#print peff values
+looic_m123$peff
 ```
 
-As an example, we fit a selection model assuming Poisson distributions to handle the discrete nature of $e$, and we choose Gamma distributions to capture the skewness in the costs. We note that, in case some of individuals have costs that are equal to zero (as in the `MenSS` dataset), standard parametric distributions with a positive support are not typically defined at $0$ (e.g. the Gamma distributions), making their implementation impossible. Thus, in these cases, it is necessary to use a trick to modify the boundary values before fitting the model. A common approach is to add a small constant to the cost variables. These can be done by typing  
+An alternative approach to assess the predictive ability of the model is to use the model parameters to generate replications of the data and compare them to the original data to assess the absolute predictive performance of a model with respect to the observed data. If the model is reasonable, the replications should look similar to the original data. To this purpose, `missingHE` allows the user to compute a series of graphical and/or numeric **posterior predictive checks** (PPC) using the function `ppc`. 
 
-```{r costs_const, eval=TRUE, echo=TRUE, comment=NA,warning=FALSE,error=FALSE,message=FALSE}
- MenSS2$c <- MenSS2$c + 0.01
+As an example, the following commands are used to generated posterior density plots for a total of $20$ replications of QALYs and/or Total costs under each model, which are compared to the empirical densities of the original outcome variables. The arguments inside `ppc` can be used to customise the resulting plot with respect to: 
+
+  - `type` indicates the type of plot. Choices include both most commonly used graphical (e.g. density, histogram, boxplot, etc.) and numeric (e.g. summary statistics, Bayesian posterior predictive p-value, etc.) outputs.
+  - `outcome` indicates the outcome, either effectiveness (`"effects"`), costs (`costs`), or both (`"both"`).
+  - `ndisplay` indicates the number of data replications to be generated to compute the desired plot/measure.
+  - `trt` indicates the treatment(s). Accepted values are: a numeric value or factor level denoting the ordered position or name of the arm of interest, a character name for all arms (`"all"`) or a character name for all data pulled across arms (`"none"`). 
+  
+```{r selppc, echo=TRUE, eval=TRUE, message=FALSE, warning=FALSE, error=FALSE}
+#compare densities of observed vs replicated outcome data under each model
+ppc_dens_m1 <- ppc(x = sm1_nn, type = "dens_overlay", outcome = "both",
+                   ndisplay = 20, trt = "none")
+ppc_dens_m2 <- ppc(x = sm1_ng, type = "dens_overlay", outcome = "costs",
+                   ndisplay = 20, trt = "none")
+ppc_dens_m3 <- ppc(x = sm1_bg, type = "dens_overlay", outcome = "effects",
+                   ndisplay = 20, trt = "none")
 ```
 
-We note that, although simple, this strategy has the potential drawback that results may be affected by the choice of the constant added and therefore sensitivity analysis to the value used is typically recommended. `missingHE` provides an alternative way to deal with this issue by means of fitting a two-part regression or *hurdle* model which does not require the use of any constant. For more information on hurdle models, type `help(hurdle)`.
-
-We are now ready to fit our selection model to the `MenSS2` dataset using the following command
-
-```{r selection1_no, eval=TRUE, echo=FALSE, include=FALSE, comment=NA,warning=FALSE,error=FALSE,message=FALSE}
-PG.sel=selection(data = MenSS2, model.eff = e ~ sex_inst.0, model.cost = c ~ 1, 
-  model.me = me ~ age + ethnicity + employment, 
-  model.mc = mc ~ age + ethnicity + employment, type = "MAR", 
-  n.iter = 1000, dist_e = "pois", dist_c = "gamma")
-```
-```{r selection1, eval=FALSE, echo=TRUE, comment=NA,warning=FALSE,error=FALSE,message=FALSE}
-PG.sel=selection(data = MenSS2, model.eff = e ~ sex_inst.0, model.cost = c ~ 1, 
-  model.me = me ~ age + ethnicity + employment, 
-  model.mc = mc ~ age + ethnicity + employment, type = "MAR", 
-  n.iter = 1000, dist_e = "pois", dist_c = "gamma")
+```{r figplotppc1, echo=FALSE, eval=TRUE, tidy=TRUE, error=FALSE, warning=FALSE, dpi=300, fig.show='hold',fig.cap="Posterior densities of 20 replicated data under model 1 compared to the empirical density of the original data.", out.width='100%', fig.pos='h', out.extra=''}
+ppc_dens_m1
 ```
 
-The arguments `dist_e = "pois"` and `dist_c = "gamma"` specify the distributions assumed for the outcome variables and, in the model of $e$, we also adjust for the baseline outcome values (`sex_inst.0`). According to the type of distributions chosen, `missingHE` automatically models the dependence between covariates and the mean outcome on a specific scale to reduce the chance of incurring into numerical problems due to the constraints of the distributions. For example, for both Poisson and Gamma distributions means are modelled on the log scale, while for Beta and Bernoulli distirbutions they are modelled on the logit scale. To see the modelling scale used by `missingHE` according to the type of distribution selected, use the `help` command on each function of the package. 
-
-The model assumes MAR conditional on `age`, `ethnicity` and `employment` as auxiliary variables for predicting missingness in both outcomes. We can look at how the model generate imputations for the outcomes by treatment group using the generic function `plot`. For example, we can look at how the missing $e$ are imputed by typing
-
-```{r plot_selection1, eval=TRUE, echo=TRUE, comment=NA,warning=FALSE,error=FALSE,message=FALSE, fig.width=15,fig.height=9,out.width='65%',fig.align='center'}
-plot(PG.sel, outcome = "effects")
+```{r figplotppc2, echo=FALSE, eval=TRUE, tidy=TRUE, error=FALSE, warning=FALSE, dpi=300, fig.show='hold',fig.cap="Posterior densities of 20 replicated data under model 2 compared to the empirical density of the original data.", out.width='100%', fig.pos='h', out.extra=''}
+ppc_dens_m2
 ```
 
-Summary results of our model from a statistical perspective can be inspected using the command `coef`, which extracts the estimates of the mean regression coefficients for $e$ and $c$ by treatment group. By default, the lower and upper bounds provide the $95\%$ credibile intervals for each estimate (based on the $0.025$ and $0.975$ quantiles of the posterior distribution). However, it is possible to modify these values using the argument `prob` to change the level of the intervals to match the one desired. For example, if we want $90\%$ intervals, we can type 
-
-```{r coef_selection1, eval=TRUE, echo=TRUE, comment=NA,warning=FALSE,error=FALSE,message=FALSE}
-coef(PG.sel, prob = c(0.05, 0.95))
+```{r figplotppc3, echo=FALSE, eval=TRUE, tidy=TRUE, error=FALSE, warning=FALSE, dpi=300, fig.show='hold',fig.cap="Posterior densities of 20 replicated data under model 3 compared to the empirical density of the original data.", out.width='100%', fig.pos='h', out.extra=''}
+ppc_dens_m3
 ```
 
-The entire posterior distribution for each parameter of the model can also be extracted from the output of the model by typing `PG.sel$model_output`, which returns a list object containing the posterior estimates for each model parameter. An overall summary of the economic analysis based on the model estimates can be obtained using the `summary` command
+Figure \@ref(fig:figplotppc1), Figure \@ref(fig:figplotppc2) and Figure \@ref(fig:figplotppc3) show how the predictive performance of the models changes considerably depending on the specific distributional assumptions made about the outcome variables. In particular, we see that under normality (model 1), replications for both effects and costs fail to capture the skewness observed in the empirical data distributions. Conversely, replications generated using Gamma (model 2) and Beta (model 3) distributions seem to better capture the features of the empirical cost and effectiveness data, respectively. 
 
-```{r summary_selection1, eval=TRUE, echo=TRUE, comment=NA,warning=FALSE,error=FALSE,message=FALSE}
-summary(PG.sel)
+## Missingness mechanism {#sec-mom}
+
+Choice of the missingness mechanism for the outcomes is typically very difficult to justify unless strong justifications can be provided for the exclusion of alternative options. According to Rubin's taxonomy, the types of mechanisms can be generally represented into two distinct groups: MAR and *Missing Not At Random* (MNAR), depending on whether the missingness probability is assumed to exclusively depend on observed quantities or not, respectively. Note that, in the literature, a third class called *Missing Completely At Random* (MCAR) is often identified which, however, can be also considered as a subclass of MAR where the missingness probability does not depend on any observed or unobserved variable (i.e. it is totally random). Depending on the modelling approach chosen, assumptions about the missingness mechanism can be encoded into the model in different ways. For example, selection models directly allow the specification of the missingness probability model, while pattern mixture models implicitly define the mechanism class based on the type of restrictions imposed to identify the outcome distributions in each pattern.
+
+`missingHE` allows the specification of either a MAR or MNAR assumption about the effectiveness and cost missingness mechanisms in each approach through the argument `type`. All the three selection models fitted to the `MenSS` data set were estimated under a MAR assumption, where the missingness outcomes' probabilities (`model.me` and `model.mc`) were assumed to not depend on any variable. Although this might be reasonable in some cases, it is generally more plausible that some observed variables provide some information that can help to improve estimation of the missingness probabilities. 
+
+The following code shows how estimation of selection models can be extended to include additional observed variables as predictors inside the missingness models to make the MAR assumptions more plausible. As an example, and for ease of presentation, we consider here only model 1 and include as possible predictors into `model.me` and `model.mc` the baseline utilities (`u.0`) and age (`age`) variables. 
+
+```{r selmar, echo=TRUE, eval=TRUE, message=FALSE, warning=FALSE, error=FALSE, results='hide'}
+#fit selection model 1 (Normal-Normal) under MAR conditional on u.0 and age
+sm1_nn_mar <- selection(data = MenSS, dist_e = "norm", dist_c = "norm",
+                    model.eff = e ~ trt + u.0, model.cost = c ~ trt + e,
+                    model.me = me ~ u.0 + age, model.mc = mc ~ u.0 + age,
+                    type = "MAR", n.iter = 1000, ref = 2)
 ```
 
-which shows summary statistics for the mean effectiveness and costs in each treatment group, for the mean differentials and the estimate of the ICER. 
+Posterior summaries for all model parameters may be inspected using the `print` function. The argument `display` may also be used to select the group of parameters for which the output should be printed out, with choices being: fixed effects (`"fixed"`), random effects (`"random"`), individual-specific parameter estimates (`"conditional"`), point-wise log-likelihood values (`"loglik"`), imputed values (`"mis"`). For example, estimates for the "fixed effects" parameters (default) from `sm1_nn_mar` may be displayed by typing
 
-## Including random effects terms
-
-For each type of model, `missingHE` allows the inclusion of random effects terms to handle clustered data. To be precise, the term *random effects* does not have much meaning within a Bayesian approach since all parameters are in fact random variables. However, this terminology is quite useful to explain the structure of the model. 
-
-We show how random effects can be added to the model of $e$ and $c$ within a pattern mixture model fitted to the `MenSS2` dataset using the function `pattern`. The clustering variable over which the random effects are specified is the factor variable `site`, representing the centres at which data were collected in the trial. Using the same distributional assumptions of the selection model, we fit the pattern mixture model by typing
-
-```{r pattern1_no, eval=TRUE, echo=FALSE, include=FALSE, comment=NA,warning=FALSE,error=FALSE,message=FALSE}
-PG.pat=pattern(data = MenSS2, model.eff = e ~ sex_inst.0 + (1 | site), 
-               model.cost = c ~ 1 + (1 | site), type = "MAR", restriction = "AC", 
-               n.iter = 1000, Delta_e = 0, Delta_c = 0, dist_e = "pois", dist_c = "gamma")
-```
-```{r pattern1, eval=FALSE, echo=TRUE, comment=NA,warning=FALSE,error=FALSE,message=FALSE}
-PG.pat=pattern(data = MenSS2, model.eff = e ~ sex_inst.0 + (1 | site), 
-               model.cost = c ~ 1 + (1 | site), type = "MAR", restriction = "AC", 
-               n.iter = 1000, Delta_e = 0, Delta_c = 0, dist_e = "pois", dist_c = "gamma")
+```{r selprint, echo=TRUE, eval=TRUE, tidy=TRUE}
+#print posterior summaries for fixed effects
+print(x = sm1_nn_mar, display = "fixed")
 ```
 
-The function fits a random intercept only model for $e$ and $c$, as indicated by the notation `(1 | site)`and `(1 | site)`. In both models, `site` is the clustering variable over which the random coefficients are estimated. `missingHE` allows the user to choose among different clustering variables for the model of $e$ and $c$ if these are available in the dataset. Random intercept and slope models can be specified using the notation `(1 + sex_inst.0 | site)`, where `sex_inst.0` is the name of a covariate which should be inlcuded as fixed effects in the corresponding outcome model. Finally, it is also possible to specify random slope only models using the notation `(0 + sex_inst.0 | site)`, where `0` indicates the removal of the random intercept. The same notation can be applied when using the `selection` and `hurdle` functions inside `missingHE`, with the addition that for these models random effects can also be specified for the missingness and structural value mechanisms. Use the `help` command to obtain more information on how random effects can be specified for each type of model. 
+The output generated by `print` shows for each parameter a selection of standard posterior summary measures obtained directly from `JAGS` including: mean, standard deviation, median, $2.5\%$ and $97.5\%$ percentiles as well as two MCMC diagnostic measures, the potential scale reduction factor (`Rhat`) and the number of effective sample size (`n.eff`). The names and number of parameters displayed reflect the structure of the outcome (`model.eff` and `model.cost`) and missingness (`model.me` and `model.mc`) models as specified in `sm1_nn_mar`. In particular:
 
-Coefficient estimates for the random effects can be extracted using the `coef` function and setting the argument `random = TRUE` (if set to `FALSE` then the fixed effects estimates are displayed).
+  - `alpha[1]`, `alpha[2]` and `alpha[3]` denote the regression coefficient in `model.eff` associated with the intercept, `trt` and `u.0`, respectively. 
+  - `beta[1]`, `beta[2]` and `beta_f` denote the regression coefficient in `model.cost` associated with the intercept, `trt` and `e`, respectively. 
+  - `gamma_c[1]`, `gamma_c[2]` and `gamma_c[3]` denote the regression coefficient in `model.mc` associated with the intercept, `u.0` and `age`, respectively. 
+  - `gamma_e[1]`, `gamma_e[2]` and `gamma_e[3]` denote the regression coefficient in `model.me` associated with the intercept, `u.0` and `age`, respectively. 
+  - `p_c` and `p_e` denote the average missingness probabilities from `model.mc` and `model.me`, respectively.   
+  - `s_c` (`tau_c`) and `s_e` (`tau_e`) denote the outcome standard deviation (precision) for `c` and `e`, respectively.   
+  - `tmu_c` and `tmu_e` denote the average means from `model.cost` and `model.eff`, respectively. 
 
-```{r coef_pattern1, eval=TRUE, echo=TRUE, comment=NA,warning=FALSE,error=FALSE,message=FALSE}
-coef(PG.pat, random = TRUE)
+Posterior distributions for each of these quantities may be extracted from the list object `sm1_nn_mar` by accessing the inner `JAGS` output `model`. For example, if different types of summaries or a visual inspection of the full posterior sample of a specific parameter is desired, e.g. `p_e`, we may access its posterior samples by typing
+
+```{r selpe, echo=TRUE, eval=TRUE, message=FALSE, warning=FALSE, error=FALSE}
+#store posterior samples of p_e and compute some custom summaries
+p_e <- sm1_nn_mar$model_output$model$BUGSoutput$sims.list$p_e
+summary(c(p_e))
 ```
 
-For both $e$ and $c$ models, summary statistics for the random coefficient estimates are displayed for each treatment group and each of the $3$ clusters in `site`. 
+The function `coef` allows to compute and display key posterior summaries for only the regression coefficients in `model.eff` and `model.cost`, following standard convention for reporting coefficient estimates for outcome regression models. The arguments `random` and `digits` may be used to indicate whether coefficient estimates of "random effects" (if present) in the outcome models should be displayed instead, and the number of digits to be displayed for all estimates. 
 
-## Changing the priors
-
-By default, all models in `missingHE` are fitted using vague prior distributions so that posterior results are essentially derived based on the information from the observed data alone. This ensures a rough approximation to results obtained under a frequentist approach based on the same type of models. 
-
-However, in some cases, it may be reasonable to use more informative priors to ensure a better stability of the posterior estimates by restricting the range over which estimates can be obtained. For example if, based on previous evidence or knowledge, the range over which a specific parameter is likely to vary is known, then priors can be specified so to give less weight to values outside that range when deriving the posterior estimates. However, unless the user is familiar with the choice of informative priors, it is generally recommended not to change the default priors of `missingHE` as the unintended use of informative priors may substantially drive posterior estimates and lead to incorrect results. 
-
-For each type of model in `missingHE`, priors can be modified using the argument `prior`, which allows to change the hyperprior values for each model parameter. The interpretation of the prior values change according to the type of parameter and model considered. For example, we can fit a hurdle model using `hurdle` to the `MenSS2` dataset using more informative priors on some parameters. 
-
-Prior values can be modified by first creating a list object which, for example, we call `my.prior`. Within this list, we create a number of elements (vectors of length two) which should be assigned specific names based on the type of parameters which priors we want to change.   
-
-```{r prior_hurdle1, eval=TRUE, echo=TRUE, comment=NA,warning=FALSE,error=FALSE,message=FALSE}
-my.prior <- list(
-  "alpha0.prior" = c(0 , 0.0000001),
-  "alpha.prior" = c(0, 0.0000001),
-  "beta0.prior" = c(0, 0.0000001),
-  "gamma0.prior.c"= c(0, 1),
-  "gamma.prior.c" = c(0, 0.01),
-  "mu.b0.prior" = c(0, 0.001),
-  "mu.g0.prior.c"= c(0, 0.001),
-  "s.b0.prior" = c(0, 100),
-  "s.g0.prior.c"= c(0, 100),
-  "sigma.prior.c" = c(0, 10000)
-)
+```{r selcoef, echo=TRUE, eval=TRUE, message=FALSE, warning=FALSE, error=FALSE}
+#print coefficient estimates from model.eff and model.cost
+coef(sm1_nn_mar, random = FALSE, digits = 2)
 ```
 
-The names above have the following interpretations in terms of the model parameters:
+The output produced is split into two parts: the first related to the coefficient estimates for the effectiveness model (`$effects`), and the second to the coefficient estimates for the costs model (`$costs`). For each coefficient, the name of the associated variable alongside posterior mean, standard deviation, lower and upper bounds of a $(1-\alpha)\%$ credibility interval (CI) are displayed. By default, boundary estimates for a $95\%$ interval are displayed, but the user can also specify custom low/high boundary estimates using the optional argument `prob`, i.e. `prob = (0.05, 0.95)` for a $90\%$ CI.
 
-* `"alpha0.prior"` is the intercept of the model of $e$. The first and second elements inside the vector for this parameter are the mean and precision (inverse of variance) that should be used for the normal prior given to this parameter by `missingHE`. 
+## Outcome model structure {#sec-oms}
 
-* `"alpha.prior"` are the regression coefficients (exclusing the intercept) of the model of $e$. The first and second elements inside the vector for this parameter are the mean and precision (inverse of variance) that should be used for the normal priors given to each coefficient by `missingHE`. 
+Assumptions about the modelling structure of the effectiveness and cost outcome models can be specified across all model fitting functions through the arguments `model.eff` and `model.cost`, respectively. The arguments require a formula object which mimics standard linear regression specification `e = trt + ` and `c = trt + `, where `e` and `c` and `trt` denote the outcome and treatment specific variable names accepted by `missingHE` which must always be included into the formulae. A generalised linear regression approach is used to specify the models at the location level of the outcomes, with default link functions automatically selected by `missingHE` according to the distributional assumptions specified in `dist_e` and `dist_c`, e.g. identity for Normal, logarithmic for Gamma and Weibull, and logit for Beta or Bernoulli. Any fully-observed variable in the data frame passed to `data` may be specified as additional covariates into the outcome models using a `+` sign. For example, the following code shows how to customise Model 1 (under MAR) to include different groups of covariates into the effectiveness and cost outcome and missingness models.
 
-* `"beta0.prior"` is the intercept of the model of $c$. The first and second elements inside the vector for this parameter are the mean and precision (inverse of variance) that should be used for the normal prior given to this parameter by `missingHE`. 
-
-* `"gamma0.prior.c"` is the intercept of the model of $sc$. The first and second elements inside the vector for this parameter are the mean and precision (inverse of variance) that should be used for the logistic prior given to this parameter by `missingHE`. 
-
-* `"gamma.prior.c"` are the regression coefficients (exclusing the intercept) of the model of $sc$. The first and second elements inside the vector for this parameter are the mean and precision (inverse of variance) that should be used for the normal priors given to each coefficient by `missingHE`. 
-
-* `"mu.b0.prior"` is the mean of the random intercept of the model of $c$. The first and second elements inside the vector for this parameter are the mean and precision (inverse of variance) that should be used for the normal prior given to this parameter by `missingHE`. 
-
-* `"s.b0.prior"` is the standard deviation of the random intercept of the model of $c$. The first and second elements inside the vector for this parameter are the lower and upper bounds that should be used for the uniform prior given to this parameter by `missingHE`. 
-
-* `"mu.g0.prior"` is the mean of the random intercept of the model of $sc$. The first and second elements inside the vector for this parameter are the mean and precision (inverse of variance) that should be used for the normal prior given to this parameter by `missingHE`. 
-
-* `"s.g0.prior"` is the standard deviation of the random intercept of the model of $sc$. The first and second elements inside the vector for this parameter are the lower and upper bounds that should be used for the uniform prior given to this parameter by `missingHE`. 
-
-* `"sigma.prior.c"` is the standard deviation of the model of $c$. The first and second elements inside the vector for this parameter are the lower and upper bounds that should be used for the uniform prior given to this parameter by `missingHE`. 
-
-The values shown above are the default values set in `missingHE` for each of these parameters. It is possible to change the priors by providing different values, for example by increasing the precision for some of the coefficient estimates or descreasing the upper bound for standard deviation parameters. Different names should be used to indicate for which parameter the prior should be modified, keeping in mind that the full list of names that can be used varies depending on the type of models and modelling assumptions specified. The full list of parameter names for each type of model can be assessed using the `help`command on each function of `missingHE`.
-
-We can now fit the hurdle model using our priors by typing 
-
-```{r hurdle1_no, eval=TRUE, echo=FALSE, include=FALSE, comment=NA,warning=FALSE,error=FALSE,message=FALSE}
-#remove added constant from costs
-#MenSS2$c <- MenSS2$c - 0.01
-
-PG.hur=hurdle(data = MenSS2, model.eff = e ~ sex_inst.0, model.cost = c ~ 1 + (1 | site),
-  model.se = se ~ 1, model.sc = sc ~ age + (1 | site), type = "SAR", se = 1, sc = 0,
-  n.iter = 1000, dist_e = "pois", dist_c = "gamma", prior = my.prior)
-```
-```{r hurdle1, eval=FALSE, echo=TRUE, comment=NA,warning=FALSE,error=FALSE,message=FALSE}
-#remove added constant from costs
-#MenSS2$c <- MenSS2$c - 0.01
-
-PG.hur=hurdle(data = MenSS2, model.eff = e ~ sex_inst.0, model.cost = c ~ 1 + (1 | site),
-  model.se = se ~ 1, model.sc = sc ~ age + (1 | site), type = "SAR", se = NULL, sc = 0,
-  n.iter = 1000, dist_e = "pois", dist_c = "gamma", prior = my.prior)
+```{r selcov, echo=TRUE, eval=TRUE, message=FALSE, warning=FALSE, error=FALSE, results='hide'}
+#fit selection model 1 (Normal-Normal) with covariates into both outcome and missingness models
+sm1_nn_cov <- selection(data = MenSS, dist_e = "norm", dist_c = "norm",
+                    model.eff = e ~ trt + u.0 + age, 
+                    model.cost = c ~ trt + age + employment + e,
+                    model.me = me ~ u.0 + age, model.mc = mc ~ age + employment,
+                    type = "MAR", n.iter = 1000, ref = 2)
 ```
 
-In this case, we do not require handling any structural value in $e$ and we pass this information to the function by setting `se = NULL`. Finally, we can inspect the statistical results from the model by typing
+If appropriate, `missingHE` allows the user to further to customise each model structure to account for possible clustering (e.g. based on different centres) through a formula notation inspired to the one used by the `lme4` package. More specifically, standard "random effects" parameters may be incorporated into each model by adding `+ (x | z)` to the usual "fixed effects" component of the model formula, where `x` denotes a linear specification for the random effects variable names to be added to the model (only if `x` already included as fixed effects) and `z` denotes the clustering variable name. For example, the following code shows how random intercepts (`1`) based on `site` may be included into both outcome selection models fitted to `MenSS`.
 
-```{r coef_hurdle1, eval=TRUE, echo=TRUE, comment=NA,warning=FALSE,error=FALSE,message=FALSE}
-coef(PG.hur, random = FALSE)
+```{r selcovre, echo=TRUE, eval=TRUE, message=FALSE, warning=FALSE, error=FALSE, results='hide'}
+#fit selection model 1 (Normal-Normal) with covariates and random intercepts
+#into the model
+sm1_nn_cov_re <- selection(data = MenSS, dist_e = "norm", dist_c = "norm",
+                    model.eff = e ~ trt + u.0 + age + (1 | site), 
+                    model.cost = c ~ trt + age + employment + e + (1 | site),
+                    model.me = me ~ u.0 + age, model.mc = mc ~ age + employment,
+                    type = "MAR", n.iter = 1000, ref = 2)
 ```
 
-and 
+As per usual, functions such as `print` and `coef` may be used to summarise posterior estimates for all relevant model parameters. When interest is in assessing MCMC convergence of a given model, the function `diagnostic` may be used to inspect graphical diagnostics for each family of model parameters. For example, the following code shows how autocorrelation plots for all regression coefficients in `model.eff` based on the formula stored in `sm1_nn_cov`.
 
-```{r summary_hurdle1, eval=TRUE, echo=TRUE, comment=NA,warning=FALSE,error=FALSE,message=FALSE}
-coef(PG.hur, random = TRUE)
+```{r figplotdiag, echo=FALSE, eval=TRUE, tidy=TRUE, error=FALSE, warning=FALSE, dpi=300, fig.show='hold',fig.cap="Checking convergence using the diagnostic function for a family of model parameters estimated in missingHE, for example through inspection of the autocorrelation plots.", out.width='100%', fig.pos='h', out.extra=''}
+diagnostic(x = sm1_nn_cov, type = "acf", param = "alpha")
 ```
 
+Graphs are displayed for each MCMC chain (default$=2$) and model parameters belonging to the specified family (`alpha`), while the argument `type` is used to select the specific type of diagnostic plot to be compute based on a set of available names accepted by `missingHE`. Several types of graphs are available in `missingHE`, among which, some of the most popular plots and associated names include: trace (`"traceplot"`), density (`"denplot"`), histogram (`"histogram`), autocorrelation (`"acf"`), and running means (`"running"`) plots. 
+
+The accepted names for the family of parameter, specified `param`, are related to the names assigned by `missingHE` to the model parameters in the `JAGS` text file, which can be displayed using the `print` function. Note that many parameter names are shared across all model fitting functions in `missingHE`. For example, the names `"alpha"` and `"beta"` are accepted by all functions and respectively denote all fixed effects regression coefficients in `model.eff` and `model.cost`, while `"random.alpha"` and `"random.beta"` denote the corresponding random effects parameters (if included). Similarly, `"mu_e"`, `"sd.e"`, `"mu_c"` and `"sd.c"` denote the effectiveness and cost outcome mean and standard deviation parameters. Some of family names are specific, or have a different interpretation, according to the modelling approach and function used. A quick summary of the most important family names unique to each approach in `missingHE` is the following:
+
+  - `selection`: `"gamma.e"`, `"gamma.c"`, `"delta.e"` and `"delta.c"` denote the logistic regression fixed effects coefficients and the MNAR parameters obtained from `model.me` and `model.mc`, respectively. Corresponding random effects parameters (if included) may also be indicated with the family names `"random.gamma.e"`, `"random.gamma.c"`, `"random.delta.e"` and `"random.gamma.c"`. Further, the average probabilities from both missingness models are denoted with `"p.e"` and `"p.c"`. 
+  
+  - `pattern`: `"delta.e"` and `"delta.c"` denote the sensitivity parameters included in each missingness pattern in combination with the type of identifying restrictions imposed, while `"p.p"` denotes the pattern-specific probabilities. Note that, unlike any other approach, most parameter estimates from pattern mixture models are estimated and disaplyed in `diagnostic` separately for each missingness pattern.
+  
+  - `hurdle`: `"gamma.e"` and `"gamma.c"` denote the logistic regression fixed effects coefficients obtained from `model.se` and `model.sc`, respectively. Corresponding random effects parameters (if included) may also be indicated with the family names `"random.gamma.e"` and `"random.gamma.c"`. Further, the average probabilities from both structural value models (if specified) are denoted with `"p.e"` and `"p.c"`. 
+  
+  - `lmdm`: `"gamma.e"`, `"gamma.c"`, `"delta.e"` and `"delta.c"` denote the multinomial regression fixed effects coefficients and MNAR parameters obtained from `model.me` and `model.mc`, respectively. Corresponding random effects parameters (if included) may also be indicated with the family names `"random.gamma.e"`, `"random.gamma.c"`, `"random.delta.e"` and `"random.gamma.c"`. Further, the average probabilities associated with all three types of missingness (i.e. completers, intermittent and dropout) are denoted with `"p.e"` and `"p.c"`. Note that, since `lmdm` fits longitudinal models, estimates for all parameters from `model.eff` and `model.cost` are estimated and displayed in `diagnostic` separately for each time point.
+
+ 
+## Prior distributions {#sec-prior}
+
+`missingHE` fits each modelling approach under weakly-informative prior distribution choices for all model parameters based on common practice and assuming a general lack of prior knowledge about the parameters. Examples include assuming Normal distributions centred at $0$ with generally low precision values (i.e. $1\times10^{6}$) for all regression coefficients, and Half-Cauchy distributions with a scale value of $2.5$. However, when desired and if prior information on some parameters is available, the user may overwrite `missingHE` defaul prior choices using the argument `prior` included in each modelling function. It is important that user-specific prior choices are passed to `prior` in a list form containing information about the desired parameters which need to be identified according to the type of model under consideration. For example, the following command may be used to update the priors about the effectiveness and cost regression coefficients and standard deviations when fitting a selection model using `selection`.
+
+```{r selprior, echo=TRUE, eval=TRUE, message=FALSE, warning=FALSE, error=FALSE, results='hide'}
+#update priors on outcome regression coefficients and standard deviations
+myprior <- list("beta.prior" = c("norm", 0, 0.01), 
+                "beta_f.prior" = c("norm", 0, 0.001),
+                "alpha.prior" = c("norm", 0, 0.01),
+                "sigma.prior.e" = c("unif", 0, 5),
+                "sigma.prior.c" = c("unif", 0, 1000))
+#update model with new priors
+sm2_nn_cov <- selection(data = MenSS, dist_e = "norm", dist_c = "norm",
+                    model.eff = e ~ trt + u.0 + age, 
+                    model.cost = c ~ trt + age + employment + e,
+                    model.me = me ~ u.0 + age, model.mc = mc ~ age + employment,
+                    type = "MAR", n.iter = 1000, ref = 2,
+                    prior = myprior)
+```
+
+The object `myprior` must be a list whose elements should take names accepted by `missingHE` denoting the specific parameters whose priors need to be overwritten. For example the character names `"beta.prior"`, `"beta_f.prior` and `"alpha.prior"` indicate that the default priors for all covariate coefficients in `model.cost`, the coefficient associated with `e` in `model.cost` and all covariate coefficients in `model.eff` need to be replaced. The content of these list elements are recognised by `missingHE` as providing the information necessary to write the updated priors for these parameters and must be provided in the form of vectors. The first element of each vector tells the name of the specific distribution assumed for the prior, while the successive elements inside each vector denote the canonical parameters indexing the chosen distribution. For example, for the first groups of parameters `"beta"`, `myprior` instructs `missingHE` to replace their default priors with Normal distributions centred at $0$ with a precision of $0.01$. Similarly, `myprior` instructs `missingHE` to specify Uniform priors on the standard deviations with differing ranges for the effectiveness and cost outcomes, through the information contained in the `"sigma.prior.e"` and `"sigma.prior.c"` elements. 
+
+Note that specific character names for the custom prior list elements as well as specific names for the prior distributions and the total number and possible values of the parameters indexing the priors must be used. `missingHE` allows the user to specify custom priors for parameters that are either shared across all types of model fitting functions, such as `"beta.prior"` and `"alpha.prior"` for regression coefficients in `model.eff` and `model.cost`, or specific to given functions, such as `"delta.prior.e"` and `"delta.prior.c"` for MNAR parameters in `model.me` and `model.mc`. The available distribution forms, their character names and parameterisation used by `missingHE` match those available from the `JAGS` manual (version 4.3.0). With regard to the prior list elements, some of the most important parameter names that are specific to certain modelling approaches, with associated parameter interpretation, are:
+
+  - `"alpha.prior"` and `"beta.prior"` denote all covariate-specific regression coefficients in the effectiveness and cost models, respectively. The corresponding random effects prior mean and standard deviation distributions (only if random effects are included) are denoted with `"mu.a.prior"`, `"s.a.prior"`, `"mu.b.prior"` and `"s.b.prior"`.
+  - `"beta_f.prior"` denote the regression coefficient in the cost model associated with `e` (if included), while `"mu.b_f.prior"` and `"s.b_f.prior"` denote the corresponding random effects prior mean and standard deviation distributions (only if random effects are included). 
+    - `"sigma.prior.e"` and `"sigma.prior.c"` denote the standard deviation in the effectiveness and cost models, respectively.
+  - `"gamma.prior.e"` and `"gamma.prior.c"` denote all covariate-specific logistic regression coefficients in the missingness (`selection`) or structural value (`hurdle`) effectiveness and cost models, respectively. The corresponding random effects prior mean and standard deviation distributions (only if random effects are included) are denoted with `"mu.g.prior.e"`, `"s.g.prior.e"`, `"mu.g.prior.c"` and `"s.g.prior.c"`.
+  - `"delta.prior.e"` and `"delta.prior.c"` denote the MNAR or sensitivity parameters in the missingness (`selection`) or unidentified distributions (`pattern`) for the effectiveness and cost models (if MNAR specified), respectively. The corresponding random effects prior mean and standard deviation distributions (only if random effects are included) are denoted with `"mu.d.prior.e"`, `"s.d.prior.e"`, `"mu.d.prior.c"` and `"s.d.prior.c"`.
+  - `"patterns.prior"` denote the pattern prior probability distributions (`pattern`).
+  - `"alpha_te.prior"`, `"alpha_tc.prior`, `"beta_te.prior"` and `"beta_tc.prior"` denote the AR1 regression coefficients capturing the time dependence between the outcomes (if AR1 specified) in the effectiveness and cost models (`lmdm`), respectively. The corresponding random effects prior mean and standard deviation distributions (only if random effects are included) are denoted with `"mu.a_te.prior"`, `"s.a_te.prior"`, `"mu.a_tc.prior"`, `"s.a_tc.prior"` and with `"mu.b_te.prior"`, `"s.b_te.prior"`, `"mu.b_tc.prior"`, `"s.b_tc.prior"`.
+
+## Conclusions {#sec-conc}
+
+Additional information about customisation options available for each functions in `missingHE` as well as summary information about each model specification, assumptions and parameter estimation may be accessed from the help file of each function by typing `help(function)`. 
 
