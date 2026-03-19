@@ -1,10 +1,13 @@
 ---
-title: "Longitudinal Models in missingHE"
+title: "Longitudinal models in missingHE"
 description: >
-  This tutorial shows some examples of how to specify, customise and fit a longitudinal missingness model in missingHE when performing trial-based CEA using longitudinal data.
-output: rmarkdown::html_vignette
+  This tutorial shows some examples of how to specify, customise and fit a longitudinal missingness
+  model in missingHE when performing trial-based CEA using longitudinal data.
+output: 
+    bookdown::html_document2:
+        base_format: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Longitudinal Models in missingHE}
+  %\VignetteIndexEntry{Longitudinal models in missingHE}
   %\VignetteEngine{knitr::rmarkdown}
   \usepackage[utf8]{inputenc}
 ---
@@ -13,201 +16,354 @@ vignette: >
 knitr::opts_chunk$set(prompt = TRUE, highlight = F, background = '#FFFFFF',
                       collapse = T, comment = "#>")
 library(missingHE)
+library(bookdown)
+library(ggplot2)
+
+options(width = 300)
 set.seed(1234)
 ```
 
-Although cross-sectional data represent the main source of evidence for conducting trial-based economic evaluations, analysts may also have access to more disaggregated level data, typically collected during the study at fixed time intervals for both the effectiveness and cost outcomes. When confronted with missingness, it is generally recommended to handle missing values at the most disaggregated data level since generation of aggregated variables using partially-observed variables will inevitably produce some loss of information. `missingHE` allows the user to fit a Bayesian model using partially-observed longitudinal health economic data, 
+The historical analysis framework for trial-based economic evaluations focusses on the modelling of individual-level effectiveness and cost variables $(e_i,c_i)$ collected at a given time or computed over some intervals, i.e. QALYs or Total costs. This because: 1) key quantities of interest, i.e. the mean parameters $(\mu_{e},\mu_{c})$ and related incremental quantities, can be easily derived from a bivariate model fitted to $(e_i,c_i)$; 2) when health economic outcomes are derived from longitudinal data $(e_{ij},c_{ij})$ collected at multiple occasions $j=1,\ldots,J$, the modelling of $(e_i,c_i)$ is considerably simplified compared to a multivariate model applied to $(e_{ij},c_{ij})$ .
 
-This tutorial shows how it to specify longitudinal models using the dedicated function `long_miss` in the package, while also showing the available customisation options to allow a flexible modelling specification. Throughout, we will use the built-in dataset called `PBS` as a toy example, which is directly available when installing and loading `missingHE` in your `R` workspace. See the vignette called *Introduction to missingHE* for an introductory tutorial of each function in `missingHE` and a general presentation of the data used in trial-based economics evaluations.
+However, when the longitudinal responses are subject to missingness, i.e. $e_{ij}=(e^{\text{obs}}_{ij},e^{\text{mis}}_{ij})$ and $c_{ij}=(e^{\text{obs}}_{ij},c^{\text{mis}}_{ij})$, a cross-sectional model is often inadequate since information from partially-observed responses will be ignored in the analysis. As a result, the specification of a joint model for $(e_{ij},c_{ij})$ provides an intuitive approach which, within a Bayesian framework, is a simple extension of the standard cross-sectional framework In addition, the model can be easily customised to: retrieve the estimates of interest while taking into account the evidence from any observed responses; conduct sensitivity analysis to alternative missingness assumptions.
 
-If you would like to have more information on the package, or would like to point out potential issues in the current version, feel free to contact the maintainer at <a.gabrio@maastrichtuniversity.nl>. Suggestions on how to improve the package are always very welcome.
+When partially-observed longitudinal data are available, `missingHE` allows the user to implement a joint longitudinal model through the dedicated function `lmdm`, which mimics the modelling strategy of a longitudinal selection model. The function requires the specification of a model for the effectiveness (`model.eff`) and cost (`model.cost`) variables as well as a conditional model (i.e. mechanism) for the missing effectiveness (`model.me`) and costs (`model.mc`). The main difference compared to standard selection models is that, rather than directly modelling the missingness indicators, `lmdm` specifies a model for the longitudinal missing data pattern indicators $\boldsymbol r_{ie}=(m_{ije},\ldots,m_{iJe})$ and $\boldsymbol r_{ic}=(m_{ijc},\ldots,m_{iJc})$, where $m_{ije}$ and $m_{ije}$ denote the binary missingness indicators for the responses at time $j$. As an example, consider a partially-observed effectiveness variable $e_{ij}$ and let $\boldsymbol r_{ie}$ denote the corresponding longitudinal missingness patterns indicator. Although $r_{ie}$ could theory be associated with different values depending on the specific pattern combinations based on the values of $m_{ije}$, a possible way to simplify the specification of the model is to reduce the number of modelled patterns by aggregating some of the observed patterns together. This is the strategy implemented by `missingHE` to facilitate the implementation of a longitudinal missingness approach based on a restricted number of aggregated patterns. In particular, `missingHE` specifies the model using three distinguished types of missingness patterns and assigns each of them with a specific indicator value: 1) $\boldsymbol r_{ie}=1$ for the complete cases, i.e. $m_{ije}=0$ for any $j$; 2) $\boldsymbol r_{i2}=2$ for intermittent missingness, i.e. $m_{ije}=1$ and $m_{ile}=0$ for at least some time $l>j$; 3) $\boldsymbol r_{ie}=3$ for dropout, i.e. $m_{ije}=1$ and $m_{ile}=0$ for only $l<j$.
 
+This tutorial shows how it to specify longitudinal models using the dedicated function `lmdm` in the package, while also showing the available customisation options to allow a flexible modelling specification. Throughout, we will use the built-in dataset called `PBS` as a toy example, which is directly available when installing and loading `missingHE` in your `R` workspace. See [Introduction to missingHE](Introduction_to_missingHE.Rmd) for an introductory tutorial of each type of missingness model in `missingHE`. 
 
-## Data: PBS
+If you would like to have more information on the package, or would like to point out potential issues in the current version, feel free to contact the maintainer at <a.gabrio@maastrichtuniversity.nl>. Suggestions on how to improve the package are also very welcome. A development version of the package is also available from the author's main GitHub repository at <https://github.com/AnGabrio/missingHE>.
 
-The *Positive Behavioural Support* (PBS) trial was a multicentre randomised controlled trial conducted on people suffering from intellectual disability and challenging behaviour. A total of $244$ individuals were enrolled in the trial, $136$ in the comparator group ($t=1$, treatment as usual) and $108$ in the reference group ($t=2$, treatment of care plus the PBS intervention). Clinical and health economic outcomes were collected via self-reported questionnaires at baseline, $6$ and $12$ months follow-ups. 
+# Modelling Framework {#sec-frame}
 
-* Health economic data included utility scores based on health-related quality of life (from EQ5D-3L) and costs based on resource use information (from CSRI). Health utility scores and costs at each time point in the trial were derived by converting individual's answers to the health and resource use questionnaire items and combining them with national tariffs and unit prices, respectively.
+Trial-based health economic disaggregated data usually consist in the longitudinal cost-effectiveness pair of variables $(e_{ijt},c_{ijt})$, collected on the $i$-th patient at time $j$ assigned to the $t$-th treatment in the study, for $i=1,\ldots,N$ patients, $j=1,\ldots,J$ time points and $t=1,\ldots,T$ treatment options. In many jurisdictions the recommended effectiveness variable $e_{ijt}$ is a *Health-Related Quality of Life* (HRQoL) measure, typically in the form of utility scores computed from the patients' answers to generic health-related quality of life questionnaires (e.g. EQ-5D) collected at given time intervals in the study. The cost variable $c_{ijt}$ denotes the sum of all relevant patient-level costs (e.g. direct/indirect medical costs, productivity losses, etc.), collected from the patients' answers to different types of healthcare-resource utilisation questionnaires or medical records at different times in the study.
 
-The dataset `PBS` includes the main variables of interest for the economic evaluation: the individual-level utilities and costs computed at each time point of the study. Additional baseline variables included are: id, time and treatment indicator, age, gender, ethnicity, living and marital status, type of carer and disability, and site. We can display a summary description of the variables in `PBS` by using the `str` command
+In `missingHE`, the observed variables $(e_{ijt},c_{ijt})$ are modelled using a joint bivariate probability distribution with density $p(e_{ijt},c_{ijt}\mid \boldsymbol \theta_{jt})$, as a function of a vector of relevant parameters $\boldsymbol \theta_{jt}$, and implemented using a series of conditional model factorisations. In particular, at $j>1$, the model can be represented as: 
 
-```{r menss}
-str(PBS)
-```
+\begin{equation}
+p(e_{ijt},c_{ijt} \mid \boldsymbol \theta_{jt}) \quad = \quad p(e_{ijt} \mid e_{ij-1t},c_{ij-1t}, \boldsymbol \theta_{ejt})p(c_{ijt} \mid c_{ij-1t}, e_{ij-1t}, e_{ijt},  \boldsymbol \theta_{cjt}),
+ (\#eq:biv)
+\end{equation}
 
-We can look at the empirical distributions of the data, for example the utility ($e$) and cost ($c$) variables, by time point to have a general idea about what type of data features are relevant for our analysis. Remember that, when using your own dataset, variables must be assigned specific names when using the functions from `missingHE`. For example, the treatment arm indicator should take value $1$ and $2$ for the control and intervention group, the time indicator should take integer values in increasing order from $1$ (baseline) up to the last follow-up point, while the effectiveness and cost variables should be assigned the names $e$ and $c$, respectively.
+where $p(e_{ijt} \mid e_{ij-1t},c_{ij-1t}, \boldsymbol \theta_{ejt})$ denotes the conditional effectiveness distribution at time $j$ given past responses ($e_{ij-1t},c_{ij-1t}$) and $p(c_{ijt} \mid c_{ij-1t}, e_{ij-1t}, e_{ijt},  \boldsymbol \theta_{cjt})$ the conditional cost distribution at $j$ given current ($e_{ijt}$) and past responses ($e_{ij-1t},c_{ij-1t}$), with $\theta_{ejt}$ and $\theta_{cjt}$ being the treatment- and time-specific set of parameters indexing the effectiveness and cost distributions, respectively. To simplify notation, we now drop the treatment index $t$ from model parameters.
 
-```{r hist, eval=TRUE, echo=TRUE, comment=NA,warning=FALSE,error=FALSE,message=FALSE, fig.width=15,fig.height=9,out.width='65%',fig.align='center'}
-par(mfrow=c(2,2))
-hist(PBS$e[PBS$time==2], main = "utilities - 6 months")
-hist(PBS$e[PBS$time==2], main = "utilities - 6 months")
-hist(PBS$c[PBS$time==3], main = "costs - 12 months")
-hist(PBS$c[PBS$time==3], main = "costs - 12 months")
-```
+Both outcome densities in Equation \@ref(eq:biv) are specified using some parametric forms for the probability distributions to describe the underlying uncertainty in the cost-effectiveness data. The set of model parameters can be generally represented as $\boldsymbol \theta_j=(\boldsymbol \phi_j(x),\boldsymbol \psi_j(x))$, where: $\boldsymbol \phi_j(x)=(\phi_{je}(x),\phi_{jc}(x))$ denotes the set of *location* parameters (e.g. mean) and $\boldsymbol \psi_j(x)=(\psi_{je}(x),\psi_{jc}(x))$ the set of *ancillary* parameters (e.g. variance) indexing the outcome distributions, both depending on some vector of potential baseline covariates $x$ (e.g. age, sex, etc...). While it is possible for both $\boldsymbol \phi_j$ and $\boldsymbol \psi_j$ to explicitly depend on $x$, the model specification is usually simplified assuming that these only affect the location parameters through a generalised linear formulation. For example, the location parameter of the effectiveness model can be specified as:
 
-We can immediately see that non-normality seems to be an issue for both utilities and, especially, costs at both follow-ups across treatment groups. Finally, the proportions of missing values is relatively small for both outcomes in each intervention group, especially for costs.
+\begin{equation} 
+g_e(\phi_{ije}) \quad = \quad \alpha_{j0} + \sum_{k=1}^K \alpha_{jk}x_{ik} + \alpha_{je} e_{ij-1} + \alpha_{jc} c_{ij-1} \,\,[+ \ldots],
+ (\#eq:glme)
+\end{equation} 
 
-```{r mv, eval=TRUE, echo=TRUE, comment=NA,warning=FALSE,error=FALSE,message=FALSE}
-#proportions of missing values in the control group at 6 months
-c(sum(is.na(PBS$e[PBS$time==2 & PBS$t==1])) / length(PBS$e[PBS$time==2 & PBS$t==1]),  
-sum(is.na(PBS$c[PBS$time==2 & PBS$t==1])) / length(PBS$c[PBS$time==2 & PBS$t==1]))
+and the location parameter of the cost model as:
 
-#proportions of missing values in the intervention group at 12 months
-c(sum(is.na(PBS$e[PBS$time==2 & PBS$t==2])) / length(PBS$e[PBS$time==2 & PBS$t==2]),  
-sum(is.na(PBS$c[PBS$time==2 & PBS$t==2])) / length(PBS$c[PBS$time==2 & PBS$t==2]))
-```
+\begin{equation} 
+g_c(\phi_{ijc}) \quad = \quad \beta_{j0} + \sum_{k=1}^K \beta_{jk}x_{ik} + \beta_{jf} e_{ij} + \beta_{je} e_{ij-1} + \beta_{jc} c_{ij-1} , \,\,[+ \ldots].
+ (\#eq:glmc)
+\end{equation} 
 
-## Longitudinal models
+where the regression coefficients $(\alpha_{je},\alpha_{jc})$ and $(\beta_{jf}, \beta_{je},\beta_{jc})$ are included to capture the possible time dependence between $c_{ij}$ and $e_{ij}$ at the location level. Note that `missingHE`, through the argument `time_dep` inside the `lmdm` function, allows the user to choose among three alternative specifications of Equation \@ref(eq:glme) and Equation \@ref(eq:glmc) based on different assumptions about the response time dependence: 1) `"none"` requires no time dependence by setting $\alpha_{je}=\alpha_{jc}=\beta_{je}=\beta_{jc}=\beta_{jf}=0$; 2) `"biv"` requires dependence only between outcomes at the same time by setting $\alpha_{je}=\alpha_{jc}=\beta_{je}=\beta_{jc}=0$;l 3) `"AR1"` requires an autoregressive of order one structure by not imposing any further restrictions on the regression parameters.
 
-`missingHE` currently implements a single type of longitudinal missingness model through the function `long_miss`, which mimics the modelling strategy of a selection model: it requires the specification of a model for the effectiveness (`model.eff`) and cost (`model.cost` variable as well as a conditional model for the missing effectiveness (`model.me`) and cost (`model.mc`) indicators. The main difference compared to a traditional selection approach is that, rather than directly modelling the missingness indicators, `long_miss` specifies a model for missing data pattern indicators for each outcome, which can take three possible values according to the specific type of observed pattern: $1 =$ complete cases (no missing outcome value at any time); $2 =$ intermittent missingness (missing values associated to people to miss some time); $3 =$ dropout (missing values associated to people dropping out at given time). 
+Covariates may be included into the model at different scales using the link functions $g_e(\cdot)$ and $g_c(\cdot)$, being either identity, logarithmic or logit, depending on the type of outcome and distribution specified. Note that `missingHE` expands any categorical covariates to a set of dummy variables. In addition, Equation \@ref(eq:glme) and Equation \@ref(eq:glmc) can be extended, as indicated by the term $[+ \ldots]$, to include additional terms into the model, e.g. clustering effects to account for the possible multilevel structure of the data. The objective of the statistical analysis is the estimation of population average time-specific effectiveness and cost parameters $\boldsymbol \mu=(\mu_{je},\mu_{jc})$ in each treatment group and to quantify the (posterior) uncertainty around them. Estimates of these parameters can be obtained from Equation \@ref(eq:glme) and Equation \@ref(eq:glmc) either from their respective regression parameters after mean centring all covariates or through repeatedly sampling from the predictive distribution of the outcomes using Monte Carlo integration. Finally, estimates of aggregated mean parameters computed over the entire study period are usually obtained through linear combination of the time-specific average estimates. For instance, in the case of QALYs, aggregated mean response estimates can be typically derived by applying an Area Under the Curve (AUC) approach: 
 
-The function allows a separate specification of the outcome and missingness model for the effectiveness and cost variable, including the selection of: distributional assumption via the arguments `dist_e` and `dist_c` (among a set of pre-defined choices); missingness mechanism assumption via the argument `type` (either MAR or MNAR); number and type of covariates to adjust for within the formula specified for the outcome and or missingness pattern model; type of temporal dependence assumed between the outcomes through the argument `time_dep` (either none or autoregressive of order one). Optional arguments that can also be specified include: `n.iter` (number of MCMC iterations); `inits` (initial values - by default randomly generated); `ppc` (whether or not results for posterior predictive checks should be stored - default is no); `save_model` (whether or not a .txt file of the `JAGS` code of the model should be printed in the current wd - deafult is no); `prior` (choice of prior values - default are weakly-informative). 
- 
-As an example, we fit a longitudinal missingness model assuming Normal distributions to handle $e$, and Gamma distributions to capture the skewness in the costs. We note that, in case some of individuals have costs that are equal to zero (as in the `PBS` dataset), standard parametric distributions with a positive support are not typically defined at $0$ (e.g. the Gamma distributions), making their implementation impossible. Thus, in these cases, it is necessary to use a trick to modify the boundary values before fitting the model. A common approach is to add a small constant to the cost variables. These can be done by typing  
+\begin{equation}
+\mu_e = \sum_{j=1}^J \mu_{je} \times w_{je},
+ (\#eq:mue)
+\end{equation}
 
-```{r costs_const, eval=TRUE, echo=TRUE, comment=NA,warning=FALSE,error=FALSE,message=FALSE}
-PBS$c <- PBS$c + 0.01
-```
+where $w_{je}=\frac{\gamma_j}{2}$ denotes the weight used in the AUC calculation, with $\gamma_j$ being the percentage of the time unit (often $1$ year) covered between the time interval $j-1$ and $j$. As an example, if responses were collected at equally-spaced time intervals, say every $6$ months, over a one-year study period, then $w_{je}=\frac{\gamma_j}{2}=\frac{6/12}{2}=0.25$ for any $j$. In the case of Total costs, aggregated mean response estimates can be typically derived as:  
 
-We note that, although simple, this strategy has the potential drawback that results may be affected by the choice of the constant added and therefore sensitivity analysis to the value used is typically recommended. 
+\begin{equation}
+\mu_c = \sum_{j=1}^J \mu_{jc} \times w_{jc},
+ (\#eq:muc)
+\end{equation}
 
-We are now ready to fit our longitudinal missingness model to the `PBS` dataset using the following command
+where setting $w_{jc}=1$ would correspond to a standard unweighted sum. Note that, after `missingHE` derives estimates for $(\mu_{je},\mu_{jc})$ from Equation \@ref(eq:glme) and Equation \@ref(eq:glmc), it automatically computes the aggregated estimates $(\mu_e,\mu_c)$ using the approaches described in Equation \@ref(eq:mue) and Equation \@ref(eq:muc) assuming default values of $w_{je}=0.5$ and $w_{jc}=1$ for all $j$. However, the function `lmdm` allows the user to modify these values through the optional arguments `w_e` and `w_c`, which can be provided either as single values (applied to each $j$) or as vectors of length $J$. This level of customisation allows the user to directly derive aggregated mean cost-effectiveness estimates and use them in the computation of all CEA-specific output when using `lmdm`.
 
-```{r long1_no, eval=TRUE, echo=FALSE, include=FALSE, comment=NA,warning=FALSE,error=FALSE,message=FALSE}
-NN.long=long_miss(data = PBS, model.eff = e ~ 1, model.cost = c ~ e, 
-    model.me = me ~ gender, model.mc = mc ~ gender, type = "MAR",
-    time_dep = "AR1", n.iter = 500, 
-    dist_e = "normal", dist_c = "normal", ppc = TRUE)
-```
-```{r long1, eval=FALSE, echo=TRUE, comment=NA,warning=FALSE,error=FALSE,message=FALSE}
-NN.long=long_miss(data = PBS, model.eff = e ~ 1, model.cost = c ~ e, 
-    model.me = me ~ gender, model.mc = mc ~ gender, type = "MAR",
-    time_dep = "AR1", n.iter = 500, 
-    dist_e = "normal", dist_c = "normal", ppc = TRUE)
-```
+Assuming that the location parameters are modelled using a linear predictor form as in Equation \@ref(eq:glme) and Equation \@ref(eq:glmc), priors on the corresponding sets of regression coefficients can be specified as $\boldsymbol \alpha_j=(\alpha_{j0},\ldots,\alpha_{jK},\alpha_{je},\alpha_{jc}) \overset{\text{iid}}{\sim} \text{Normal}(\mu_{j\alpha},\sigma_{j\alpha})$ and $\boldsymbol \beta=(\beta_{j0},\ldots,\beta_{jK},\beta_{jf},\beta_{je},\beta_{jc}) \overset{\text{iid}}{\sim} \text{Normal}(\mu_{j\beta},\sigma_{j\beta})$, where the notation $\mu_{j\cdot}$ and $\sigma_{j\cdot}$ denotes the time-specific prior mean and standard deviation, respectively. By default, `missingHE` assumes the "minimally informative" prior values of $\mu_{j\cdot}=0$ and $\sigma_{j\cdot}=1000$ for all regression coefficients. When genuine prior knowledge on specific parameters is available, it is possible to modify the default priors and elicit the corresponding information into the model. As for the ancillary parameters, the choice of the prior values depends on the form of the probability distribution selected according to the modelling choices available in `missingHE`.
 
-which fits a bivariate Normal model under an AR1 assumption about the time dependence between the outcomes, i.e. utilities and costs at time $j$ are allowed to depend on their values at $j-1$ and conditional on these they are assumed to be independent of their values at time $k<j-1$. According to the type of distributions chosen, `missingHE` automatically models the dependence between covariates/past values and the mean outcome at each time using a specific scale to reduce the chance of incurring into numerical problems due to the constraints of the distributions. For example, for both Poisson and Gamma distributions means are modelled on the log scale, while for Beta and Bernoulli distributions a logit scale is used. In both missingness pattern indicator models `gender` is included as auxiliary variable under a MAR assumption about both mechanisms.
+## Missingness Approach {#sec-miss}
 
-We can look at how the model generate imputations for the outcomes by treatment group using the generic function `plot`. For example, we can look at how the missing $e$ at time $3$ (12 months) are imputed by typing
+`missingHE` specifies the model for the aggregated missingness patterns ($\boldsymbol r_{ie}, \boldsymbol r_{ic}$) through a selection model approach, where the pattern-specific probabilities $(\pi^{r}_{ie},\pi^{r}_{ic})$ are estimated using a multinomial (log) regression, conditional on possibly fully-observed baseline covariates $X_i$ and partially-observed outcomes ($e_{ij},c_{ij}$). For example, the missingness effectiveness model is specified as 
 
-```{r plot_long1, eval=TRUE, echo=TRUE, comment=NA,warning=FALSE,error=FALSE,message=FALSE, fig.width=15,fig.height=9,out.width='65%',fig.align='center'}
-plot(NN.long, outcome = "effects", time_plot = 3)
-```
-
-Summary results of our model from a statistical perspective can be inspected using the command `coef`, which extracts estimates of the mean regression coefficients for $e$ and $c$ by treatment group and time point. By default, the lower and upper bounds provide the $95\%$ credible intervals for all coefficient estimates (based on the $0.025$ and $0.975$ quantiles of the posterior distribution). For example, we can inspect the coefficients in the utility and cost models at time $2$ (6 months) by typing 
-
-```{r coef_long1, eval=TRUE, echo=TRUE, comment=NA,warning=FALSE,error=FALSE,message=FALSE}
-coef(NN.long, time = 2)
-```
-
-Because a `"AR1"` time dependence was assumed, posterior summaries for the coefficients relating each outcome at the selected time $j=2$ to values at $j-1=1$ are also displayed. Similar outputs can be obtained for each time point by simply selecting the desired time using the function argument `time`. The entire posterior distribution for key parameters of the model can also be extracted from the output of the model by typing `NN.long$model_output`, which returns a list object containing the posterior estimates for the main model parameters, e.g. means and standard deviations. An overall summary of the economic analysis based on the mean effectiveness and total cost estimates can be obtained using the `summary` command
-
-```{r summary_long1, eval=TRUE, echo=TRUE, comment=NA,warning=FALSE,error=FALSE,message=FALSE}
-summary(NN.long)
-```
-
-which shows summary statistics for the mean effectiveness and costs in each treatment group, for the mean differentials and the estimate of the ICER. These estimates are retrieved by combining the posterior results from the longitudinal model for each type of outcome and time point of the analysis into estimates of aggregated health economic outcomes (e.g. QALYs and Total costs). I particular, the function `long_miss`, after deriving the posterior results from the model, uses the *Area Under the Curve* approach and total sum over the follow-up period for computing aggregated estimates based on the posterior mean results of the effectiveness and cost time specific mean estimates, respectively. The formulae used are:
-
-$$
 \begin{aligned}
-\mu_{e} &= \sum_{j=2}^J \frac{(\mu_{ej}-\mu_{ej-1})}{2}\times \delta_e \\
-\mu_{c} &= \sum_{j=2}^J \mu_{cj} \times \delta_c 
+\boldsymbol r_{ie} & \sim \text{Multinomial}(\pi_{ie}, 1), \\
+\pi^r_{ie} =& \frac{\iota^{r}_{ie}}{\sum_{l=1}^3 \iota^{l}_{ie}}, \\
+\log(\iota^{r}_{ie})&=\gamma^r_{j0e} + \sum_{k=1}^K \gamma^r_{jke} x_{ik} + \delta^r_{je} e_{ij} \,\,[+ \ldots], \\
+ (\#eq:lmdme)
 \end{aligned}
-$$
 
-where $\mu_{e}$ and $\mu_c$ denote the mean aggregated estimates (e.g. mean QALYs and Total costs), $\mu_{ej}$ and $\mu_{cj}$ denote the mean outcome estimates at time $j$ obtained from the model, while $\delta_e$ and $\delta_c$ are the weight factors used to combine the estimates over the time periods into cross-sectional quantities. By default, `missingHE` assumes a value of $0.5$ and $1$ for the weights used to respectively calculate the aggregated mean effectiveness and costs over the time period of the study. When desired, users can provide their own weights as additional argument named `qaly_delta` and `tcost_delta` that can be passed into the function `long_miss` when fitting the model.
+where the upperscript $r$ indicates the pattern category (1=completers, 2=intermittent, 3=dropout), $\boldsymbol r_{ie}$ is a vector with entries set to one if $m^r_{ije}=1$ and zero otherwise, $\boldsymbol \gamma^r_j = (\gamma^r_{j0e}, \ldots, \gamma^r_{jKe})$ is the set of time- and pattern-specific regression coefficients, while $\delta^r_{je}$ is the time- and pattern-specific MNAR parameters. Additional terms, e.g. clustering effects, may also be included in the model as indicated by the term $[+ \ldots]$. Note that an equivalent specification to Equation \@ref(eq:lmdme) for the missingness model of the longitudinal costs can be specified by `missingHE` through the function `lmdm`.
 
-## Assessing model convergence and fit to observed data
+According to Equation \@ref(eq:lmdme), it is clear to see that alternative assumptions about the missingness mechanism can be encoded into the model based on the type of variables included. In particular, we have: a **Missing Completely At Random** (MCAR) assumption when all regression coefficients, except $\gamma^r_{j0e}$, are zero; a **Missing At Random** (MAR) assumption when $\delta^r_{je}=0$ and one or more coefficients among $(\gamma^r_{j1e}, \ldots, \gamma^r_{jKe})$ is/are not zero; a **Missing Not At Random** (MNAR) when $\delta^r_{je} \neq 0$. Under MNAR, due to the missing values in $e_{ij}$, the model can only be identified by imposing some restrictions. These are implicitly defined from a combination of parametric assumptions about $p(e_{ij} \mid  e_{ij-1}, c_{ij-1}, \boldsymbol \theta_j)$ and dependence structure assumed for $p(\boldsymbol r_{ie} \mid e_{ij},\boldsymbol\eta_j)$. As a result, sensitivity analysis to assess the impact of alternative missingness assumptions on the inferences can be done by: varying the distributional assumption of $p(e_{ij} \mid  e_{ij-1}, c_{ij-1}, \boldsymbol \theta_j)$; varying the modelling structure in Equation \@ref(eq:lmdme); and, within a Bayesian setting, varying the prior distribution on $\delta^r_{je}$.
 
-Model assessment can be carried out using different functions in `missingHE`. Inspection of diagnostic measures and graphs can be achieved using the dedicated function `diagnostic`, which can produce different types of standard output (by setting the argument `type`) to detect possible issues in the MCMC convergence about desired model parameters (through the argument `param`). For example, the following command
+## The PBS trial {#sec-data}
 
-```{r diag_long1, eval=TRUE, echo=TRUE, comment=NA,warning=FALSE,error=FALSE,message=FALSE}
-diagnostic(NN.long, type = "traceplot", param = "mu.c")
+In the following, we use data from a real clinical study as a running example to illustrate how a longitundal missingness model for trial-based economic evaluations can be specified using the function `lmdm` from `missingHE`.  The PBS was a multicentre randomised controlled trial conducted on people suffering from intellectual disability and challenging behaviour. A total of $244$ individuals were enrolled in the trial, $136$ in the *Treatment As Usual* (TAU) and $108$ in the treatment of care plus the *Positive Behavioural Support* intervention (PBS). For all individuals, key health economic outcomes were collected via self-reported questionnaires (i.e. EQ-5D and CSRI) at baseline, $6$ and $12$ months follow-ups. 
+
+After loading the package `missingHE`, for example by typing `library(missingHE)`, the PBS dataset (`PBS`) is directly imported into the `R` workspace and can be inspected using the command
+
+```{r pbs, echo=FALSE, eval=TRUE, message=FALSE, warning=FALSE, error=FALSE}
+n_long <- nrow(PBS)
+n <- nrow(PBS[PBS$time == 1, ])
+n1 <- nrow(PBS[PBS$trt=="1" & PBS$time == 1,])
+n2 <- nrow(PBS[PBS$trt=="2" & PBS$time == 1,])
+PBS_outcomes <- PBS[,c("e","c","trt","time")]
+PBS_outcomes$time <- factor(PBS_outcomes$time)
+PBS_outcomes$trt <- factor(PBS_outcomes$trt)
+levels(PBS_outcomes$trt) <- c("TAU", "PBS")
+PBS_ec <- PBS[,c("id","e","c","trt","time")]
+PBS_ec_cc <- PBS_ec[complete.cases(PBS_ec),]
+PBS_ec_cc_unique <- PBS_ec_cc[unique(PBS_ec_cc$id),]
+n_ec_cc <- nrow(PBS_ec_cc_unique)
+n1_ec_cc <- nrow(PBS_ec_cc_unique[PBS_ec_cc_unique$trt==1,])
+n2_ec_cc <- nrow(PBS_ec_cc_unique[PBS_ec_cc_unique$trt==2,])
+n_long_ec_cc <- nrow(PBS_ec_cc)
+n1_long_ec_cc <- nrow(PBS_ec_cc[PBS_ec_cc$trt==1,])
+n2_long_ec_cc <- nrow(PBS_ec_cc[PBS_ec_cc$trt==2,])
+n1_ec_cc_t1 <- nrow(PBS_ec_cc[PBS_ec_cc$trt=="1" & PBS_ec_cc$time==1,])
+n2_ec_cc_t1 <- nrow(PBS_ec_cc[PBS_ec_cc$trt=="2" & PBS_ec_cc$time==1,])
+n1_ec_cc_t2 <- nrow(PBS_ec_cc[PBS_ec_cc$trt=="1" & PBS_ec_cc$time==2,])
+n2_ec_cc_t2 <- nrow(PBS_ec_cc[PBS_ec_cc$trt=="2" & PBS_ec_cc$time==2,])
+n1_ec_cc_t3 <- nrow(PBS_ec_cc[PBS_ec_cc$trt=="1" & PBS_ec_cc$time==3,])
+n2_ec_cc_t3 <- nrow(PBS_ec_cc[PBS_ec_cc$trt=="2" & PBS_ec_cc$time==3,])
+n_ec_cc_t1 <- n1_ec_cc_t1 + n2_ec_cc_t1
+n_ec_cc_t2 <- n1_ec_cc_t2 + n2_ec_cc_t2
+n_ec_cc_t3 <- n1_ec_cc_t3 + n2_ec_cc_t3
+
+hist_e <- ggplot(PBS_outcomes, aes(x=e, fill=trt)) + geom_histogram(color="black", binwidth = 0.05) + facet_wrap(~trt+time, labeller=label_parsed) + scale_fill_manual(values=c("grey","grey")) + scale_y_continuous(expand = expansion(mult = c(0, 0.05))) + theme(panel.grid.major = element_blank(), legend.key = element_rect(fill = "white"), panel.grid.minor = element_blank(), panel.background = element_blank(), legend.position="none",
+axis.line = element_line(colour = "black"), plot.title = element_text(hjust = 0.5))+ ylab("Frequency") + xlab("utilities") + scale_x_continuous(breaks=seq(-0.5,1,0.5))
+hist_c <- ggplot(PBS_outcomes, aes(x=c, fill=trt)) + geom_histogram(color="black", binwidth = 2000) + facet_wrap(~trt+time) + scale_fill_manual(values=c("grey","grey")) + scale_y_continuous(expand = expansion(mult = c(0, 0.05))) + theme(panel.grid.major = element_blank(), legend.key = element_rect(fill = "white"), panel.grid.minor = element_blank(), panel.background = element_blank(), legend.position="none",
+axis.line = element_line(colour = "black"), plot.title = element_text(hjust = 0.5))+ ylab("Frequency") + xlab("costs") + scale_x_continuous(breaks=seq(0,40000,40000))
 ```
 
-displays traceplots for the estimated mean cost parameters by treatment arm (1=control, 2=intervention) and time point (1=baseline, 2=six months, 3=twelve months). Numeric summaries may also be obtained by selecting a different type of diagnostic, among a set of pre-defined choices. For example, we can produce a graphical display of the *potential scale reduction factor* or *Rhat* statistic for the same parameters by typing    
-
-```{r diag_long2, eval=TRUE, echo=TRUE, comment=NA,warning=FALSE,error=FALSE,message=FALSE}
-diagnostic(NN.long, type = "Rhat", param = "mu.c")
+```{r tbl1-hide, echo=TRUE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+rbind(head(PBS), tail(PBS))
 ```
 
-Assessment of the model fit to the observed data can be carried out: in relative terms using Bayesian *predictive information criteria* (PIC), such as DIC, WAIC or LOOIC, through the dedicated function `pic`; in absolute terms using graphical *posterior predictive checks* (PPC), through the dedicated function `ppc`. Due to the additional computational time required in order to generate replications needed to perform PPCs, this option is only available when setting the optional argument `ppc = TRUE` within the main function `long_miss`. For example, inspection of posterior predictive replications for the utilities at time $j=3$ (12 months) is obtained by typing  
+to show the first and last few rows:
 
-```{r ppc_long, eval=TRUE, echo=TRUE, comment=NA,warning=FALSE,error=FALSE,message=FALSE}
-ppc(NN.long, type = "dens", outcome = "effects", time_plot = 3, ndisplay = 3)
+```{r tbl1, echo=FALSE, eval=TRUE, message=FALSE, warning=FALSE, error=FALSE}
+print(rbind(head(PBS), tail(PBS)), row.names = FALSE)
 ```
 
-where the arguments `ndisplay = 3`, `type = "dens"`, `type = "dens"`, and `type = "dens"` respectively instruct the function to compare the empirical estimates with a total of $3$ model-based density replications for the effectiveness outcome in both arms at 12 months.
+The dataset consists of $`r n`$ individuals grouped in two arms, where `trt`$=1$ indicates the TAU and `trt`$=2$ indicates the MenSS intervention, with `id` and `time` denoting the participant identification number and measurement occasion, respectively.
 
-## Model customisation
+Key health economic variables are `e` and `c`, which denote the HRQoL utility and cost longitudinal outcomes, respectively. All baseline variables are fully-observed, whereas all outcome variables are partially-observed in both treatment arms. There is a total of `r n_long_ec_cc` (`r round(n_long_ec_cc/n_long,2)*100`%) outcome observations, of which `r n1_long_ec_cc` in the TAU and `r n2_long_ec_cc` in the PBS arm, while the remaining `r n_long-n_long_ec_cc` observations are missing. Figure \@ref(fig:fig1e) and Figure \@ref(fig:fig1c) show the histograms of the observed distributions for the utility and cost variables in `PBS`, separately by treatment arm and time point.
 
-`missingHE` provides the user with a series of customisation options which allow to specify the longitudinal missingness model in a flexible way to tackle data-specific features. For example, skewness in the outcome distributions can be addressed through alternative distributional forms for the outcome variables, while clustering (e.g. at different centres) in the data through the inclusion of "random effects" terms. Different choices for the parameter priors with respect to the default values can also be provided alongside the specification of missing not at random (MNAR) assumptions about the outcome missingness mechanisms. 
-
-As an example, the following code shows how these aspects of the model can be modified by the user when fitting a model using `long_miss` to the PBS dataset. 
-
-```{r long2_no, eval=TRUE, echo=FALSE, include=FALSE, comment=NA,warning=FALSE,error=FALSE,message=FALSE}
-my.prior <- list(
-  "delta.prior.e" = c(0, 1),
-  "sigma.prior.c" = c(0, 20000)
-)
-PBS$site <- factor(PBS$site)
-
-LG.long=long_miss(data = PBS, model.eff = e ~ 1 + (1|site), model.cost = c ~ 1 + (1|site), 
-    model.me = me ~ e, model.mc = mc ~ 1, type = "MNAR",
-    time_dep = "none", n.iter = 500, prior = my.prior,
-    dist_e = "logistic", dist_c = "gamma", ppc = FALSE)
-```
-```{r long2, eval=FALSE, echo=TRUE, comment=NA,warning=FALSE,error=FALSE,message=FALSE}
-my.prior <- list(
-  "delta.prior.e" = c(0, 1),
-  "sigma.prior.c" = c(0, 20000)
-)
-PBS$site <- factor(PBS$site)
-
-LG.long=long_miss(data = PBS, model.eff = e ~ 1 + (1|site), model.cost = c ~ 1 + (1|site), 
-    model.me = me ~ e, model.mc = mc ~ 1, type = "MNAR",
-    time_dep = "none", n.iter = 500, prior = my.prior,
-    dist_e = "logistic", dist_c = "gamma", ppc = FALSE)
+```{r fig1e, echo=FALSE, eval=TRUE, tidy=TRUE, error=FALSE, warning=FALSE, dpi=300, fig.show='hold',fig.cap="Histograms of the observed data distributions for the utilities in the TAU and PBS arm by time point.", out.width='100%', fig.pos='h', out.extra=''}
+hist_e
 ```
 
-First, a list object called `my.prior` is created containing the names of the model parameters whose prior values should be changed and user-specific values are specified that will be used to overwrite the default values assumed by `missingHE`. In this case, we decided to modify prior values for the MNAR parameters $\delta_e \sim \text{Uniform}(0, 1)$ linking the missingness pattern probabilities to the partially-observed effect outcomes (denoted with the character name `"delta.prior.e"`), and the cost standard deviation parameters $\sigma_c\sim \text{Uniform}(0,20000)$ (denoted with the character name `"sigma.prior.c"`). Note that the interpretation of these values is tied to the specific prior distributional forms used by `missingHE` when fitting the model, which are dependent on the specific distributional choices made for the outcomes in `long_miss`. For example, when selecting `dist_c = "gamma"`, `missingHE` directly specifies uniform prior distributions on $\sigma_c$, whereas when `dist_c = "normal"` is set, `missingHE` specifies uniform prior distributions on $\log(\sigma_c$), therefore implying a different scale on which prior values should be interpreted. The full list of prior specifications and interpretation of prior values that can be modified by the user for each combination of distributional choices can be accessed by typing `help(long_miss)`.
-
-Second, when "random effects" are specified around a given variable observed in the dataset, said variable must be coded as a factor in `R` before passing to `long_miss`. Thus, we recoded the variable `site` into a factor variable, representing the different centre at which outcome data were collected in the study. 
-
-Third, we fit the longitudinal missingness model using the `long_miss` function while also customising the following aspects of the model:
-
-  * "Random intercept" terms are added to the effectiveness and cost model at the level of the site variable using the notation `+ (1|site)`. The round brackets denote the addition of some clustering terms, while the vertical bar symbol is used to separate the clustering variable (on the right side) from the coefficients for which said clustering effects are assumed (on the left side). In this case, only "random intercepts" are included in both outcome models but in theory also "random slopes" can be added for each additional regression coefficient included in the models. 
-  
-  * A MNAR assumption is specified for the effectiveness missingness model. This is achieved through the setting of `type = "MNAR"` and the addition of `e` to the left hand side of `model.me`, suggesting the dependence of the missingness pattern indicators $m_e$ on the outcome variable $e$. 
-  
-  * The user-specific prior values for the chosen parameters $\delta_e$ and $\sigma_c$ are passed to `long_miss` through the optional argument `prior = my.prior`, which asks `missingHE` to replace the default prior values for these parameters with those provided by the user within the object `my.prior`. Priors for all other model parameters are left to their default values.
-
-  * Logistic and Gamma distributions are specified for the effectiveness and cost variables through the arguments `dist_e = "logistic"` and `dist_c = "gamma"`, respectively.
-
-Once the model is fitted, coefficient estimates for the "random effects" at a given time can be extracted using the `coef` function and setting the argument `random = TRUE` (if set to `FALSE` then the fixed effects estimates are displayed instead).
-
-```{r coef_sl1, eval=TRUE, echo=TRUE, comment=NA,warning=FALSE,error=FALSE,message=FALSE}
-coef(LG.long, time = 3, random = TRUE)
+```{r fig1c, echo=FALSE, eval=TRUE, tidy=TRUE, error=FALSE, warning=FALSE, dpi=300, fig.show='hold',fig.cap="Histograms of the observed data distributions for the costs in the TAU and PBS arm by time point.", out.width='100%', fig.pos='h', out.extra=''}
+hist_c
 ```
 
-For both $e$ and $c$ models, summary statistics for each "random intercept" are separately displayed for the comparator (control) and reference (intervention) group at `time = 3` (12 months). All `missingHE` functions aimed at model or result assessment, such `diagnostic`, `pic`, `ppc`, `print` and `summary` can now be applied to the object `NN.long2` to generate the corresponding output. We remind the reader that when a MNAR mechanism is specified for either or both the outcomes, then standard measures of assessment of model fit, such as PICs and PPCs, are not useful in that they are based on observed data alone. However, since MNAR presupposes the inability of the observed data to fully explain missingness, then such assessment measures are likely to be misleading and should therefore not be trusted.
+## Model fitting {#sec-fitting}
 
-## Health economic results
+`missingHE` relies on `JAGS` through the dedicated function `lmdm` to implement the longitudinal missingness approach while providing a series of customisation options. In particular, key options include: choice of the probability distribution for the effectiveness and cost variables, choice of the regression model for each outcome, and type of missingness mechanism assumed.
 
-Finally, we can easily inspect summary health economic results derived from any model fitted in `missingHE` using the function `summary` by typing
+A set of pre-defined choices in terms of probability distributions, with built-in parameterisations, for the effectiveness (`e`) and/or cost (`c`) variables are available. The user may select a given distributional choice by passing the corresponding `missingHE` name to the arguments `dist_e` and `dist_c` of the desired function. The outcome model $p(e,c)$ requires a separate specification of the effectiveness and cost model formula using the notation:
 
-```{r summ_sl1, eval=TRUE, echo=TRUE, comment=NA,warning=FALSE,error=FALSE,message=FALSE}
-summary(NN.long)
+``` r
+model.eff <- e ~ trt + ...
+model.cost <- c ~ trt + ...
+```
+where `e`, `c` and `trt` indicate the effectiveness, cost and treatment variable names stored in the data set, while `...` is a suitable form for the combination of covariates to be used in each model. Dependence between the two models can be specified by adding the term `e` as an additional covariate in the cost model and by specifying the type of time dependence structure assumed for the model through the argument `time_dep`. Currently available choices for this argument are: 1) `"none"` for complete independence, which also requires `e` to not be included in `model.cost`; 2) `"biv` for bivariate dependence at each time, where dependence between $c_j$ and $e_j$ is only allowed at the same time $j$; 3) `"AR1` for order one autoregressive structure as specified in Equation \@ref(eq:glme) and Equation \@ref(eq:glmc). Note that the treatment indicator `trt` must be included into both regression formulae and should be coded as a factor variable in the data set, while the time indicator `time` should not be included in the formulae and should be coded as a numeric (integer) variable. The type of missingness assumption for each outcome is specified through the argument `type`, by setting `type = "MAR"` or `type = "MNAR"` to select between a MAR or MNAR mechanism, respectively. 
+
+As an example, a suitable call to `lmdm` is the following.
+
+``` r
+fit.model <- lmdm(data = data, model.eff = model.eff, 
+  model.cost = model.cost, dist_e = dist_e, dist_c = dist_c, 
+  type = type, time_dep = time_dep, ...)
 ```
 
-In addition, the user may also use external functions available from the `R` package `BCEA` to generate a more extensive and detailed output related to the health economic assessment based on the model estimates. In particular, the `BCEA` package provides a suit of functions dedicated at the generation and inspection of standard CEA output based on posterior estimates derived from a Bayesian model, such as cost-effectiveness planes (CEPs) and acceptability curves (CEACs). 
+where `data` is a dataframe containing the data, `model.eff` and `model.cost` are the formulae for the effectiveness and cost regression models, `dist_e`, `dist_c`, `type` and `time_dep` are character values indicating the chosen outcome distributions, type of missingness mechanism and time dependence, while `...` indicates additional optional arguments. In practice, unless there is a clear understanding of the implications of any change to the default model structure, the user is not required to modify the default values of these optional arguments. The only exception is related to: number of MCMC chains (`n.chains`), number of iterations (`n.iter`) and values of the parameters of the prior distributions (`prior`). As an example, consider the default priors for the linear predictor coefficients in the effectiveness and cost model, namely $\boldsymbol \beta_j \overset{\text{iid}}{\sim}\text{Normal}(\mu_{j\beta},\sigma_{j\beta})$ and $\boldsymbol \alpha_j \overset{\text{iid}}{\sim}\text{Normal}(\mu_{j\alpha},\sigma_{j\alpha})$. Suppose the user wants to select different prior mean and standard deviation values for these parameters. This can be done by typing
 
-For example, after loading the package in the current working space, e.g. by typing `library(BCEA)`, we can produce CEP and CEAC plots by typing
-
-```{r bcea_sl1, eval=TRUE, echo=TRUE, comment=NA,warning=FALSE,error=FALSE,message=FALSE}
-library(BCEA)
-ceplane.plot(NN.long$cea)
-ceac.plot(NN.long$cea)
+``` r
+myprior <- list("beta.prior" = c("norm", 0, 0.01), "alpha.prior" = c("norm", 0, 0.01))
 ```
 
-The specific output that is compatible with `BCEA` is stored into the list object named `cea`, which can be accessed inside the model object `NN.long` generated using the `long_miss` function. 
+which instructs `missingHE` to separately assign normal distributions to each regression coefficient in the models with prior mean of $0$ and precision (inverse of variance) of $0.01$. The list `myprior` can be then passed to the optional `prior` argument in the chosen model fitting function to implement the model using the updated priors.
+
+``` r
+fit.model <- lmdm(data = data, model.eff = model.eff, 
+  model.cost = model.cost, dist_e = dist_e, dist_c = dist_c, 
+  type = type, time_dep = time_dep, prior = myprior)
+```
+
+Note that the list and its elements containing the custom prior specification need to be named using the `missingHE` accepted terminology for parameter and distribution names. If the option `save_model` is set to `TRUE`, the `JAGS` model template is saved in the current working directory and can be used to further modify the model structure with a higher degree of flexibility. This, however, will require a new compilation of the model and, at present, the new model has to be run using dedicated commands, such as `rjags` from the `R2jags` package.
+
+## Fitting models under MAR {#lmdm-marmodel}
+
+To ease presentation, we consider the following common model specification: `e` and `c` are both normally distributed with no covariates included in their models; a MAR mechanism is assumed for both outcomes, and a bivariate structure is assumed for the time dependence. For demonstrative purposes and to ease presentation of results, in this tutorial we only consider models fitted under MAR. See [Fitting MNAR models in missingHE](Fitting_MNAR_models_in_missingHE.Rmd) for an overview about how informative missingness models can be fitted in `missingHE`. 
+
+The model is implemented using the function `lmdm` using the following command.
+
+```{r lmdm1, echo=TRUE, eval=TRUE, message=FALSE, warning=FALSE, error=FALSE, results='hide'}
+lmdm1_mar <- lmdm(data = PBS, dist_e = "norm", dist_c = "norm",
+             model.eff = e ~ trt, model.cost = c ~ trt + e,
+             model.me = me ~ 1, model.mc = mc ~ 1, time_dep = "biv",
+             type = "MAR", n.iter = 1000, ref = 2)
+```
+
+The arguments `model.me` and `model.mc` denote the missingness mechanism as in Equation \@ref(eq:lmdme) for both outcomes. Since no covariates are included in `model.me` and `model.mc`, the utility and cost mechanisms are assumed MAR (`type="MAR"`) conditional on the observed outcome values. The argument `ref = 2` is used to specify which study arm should be used as the reference group in the comparison, i.e. incremental results are reported here as `trt=2` (`"PBS"`) vs `trt=1` (`"TAU"`).
+
+## Model assessment {#lmdm-assmodel}
+
+Prior to inspecting the posterior results, it is important to assess model performance and convergence of the MCMC algorithm. `missingHE` provides three functions to compute and implement different types of popular Bayesian model assessment measures and plots, namely `diagnostic`, `ppc` and `pic`.
+
+### Convergence diagnostics {#lmdm-diag}
+
+The function `diagnostic` provides a range of standard diagnostic tools and plots for assessing convergence based on the posterior distribution of a Bayesian model fitted in `missingHE`. Consider the output of the model stored in the object `lmdm1_mar`; we may use the command
+
+```{r diag1, echo=TRUE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE, tidy=TRUE}
+diagnostic(x = lmdm1_mar, type = "denplot", param = "beta.f")
+```
+
+to produce “density plots” for the regression parameters associated with the effectiveness variable within the cost models. In this case, as displayed in Figure \@ref(fig:fig2), no major issues in convergence are identified for the parameters monitored at each time point.
+
+```{r fig2, echo=FALSE, eval=TRUE, tidy=TRUE, error=FALSE, warning=FALSE, dpi=300, fig.show='hold',fig.cap="Checking convergence using the diagnostic function for a model fitted in missingHE, for example through inspection of the density plots.", out.width='100%', fig.pos='h', out.extra=''}
+diagnostic(x = lmdm1_mar, type = "denplot", param = "beta.f")
+```
+
+With the exception of the argument `x`, which must be an object of class `"missingHE"`, all other arguments can be used to customise the output of the function. A full description of the choices for each argument, including the available types of diagnostic tools and families of parameters, is provided in the help file of the package. Note that the output produced by `diagnostic` is effectively a `ggplot2` object, and can therefore be manipulated by the user using functions from packages which allow to customise such objects.
+
+### Posterior predictive checks {#lmdm-ppc}
+
+The function `ppc` provides a range of graphical posterior predictive checks for assessing the fit of a Bayesian model implemented in `missingHE`. Consider the output of the model fitted in Section \@ref(lmdm-marmodel) and stored in the object `lmdm1_mar`; we may use the command
+
+```{r ppc1, echo=TRUE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE, results='hide'}
+ppc(x = lmdm1_mar, type = "histogram", outcome = "effects", 
+    ndisplay = 2, time.plot = 3, trt = "2")
+```
+
+to plot the densities of `ndisplay`$=5$ replications of the effectiveness data (light blue lines) with respect to the density of the observed data (dark blue line) in the PBS (`trt=2`) arm. The argument `time.plot` indicates for which times the comparison between observed and replicated data should be plotted, here the third time point is selected (default$=1$). Figure \@ref(fig:fig3) shows some discrepancies between the replicated and observed data histograms, likely due to the relatively poor fit of the current model (i.e. the normality assumption of `e`) to the observed data in both arms.
+
+```{r fig3, echo=FALSE, eval=TRUE, tidy=TRUE, error=FALSE, warning=FALSE, dpi=300, fig.show='hold',fig.cap="Posterior predictive graphical checks using the ppc function for a model fitted in missingHE, for example through inspection of histograms.", out.width='100%', fig.pos='h', out.extra=''}
+ppc(x = lmdm1_mar, type = "histogram", outcome = "effects", 
+    ndisplay = 2, time.plot = 3, trt = "2")
+```
+
+A full description of the choices for each argument in `ppc`, including the available types of posterior predictive checks, is provided in the package help file. Note that the arguments in `ppc` may also be used to generate graphs for any combination of treatment arms and time points available in the data set: for example, graphs corresponding to those shown in Figure \@ref(fig:fig3) for only the PBS arm at all time points may be requested by setting `trt=2` and `time.plot="all"`.
+
+### Predictive information criteria {#lmdm-pic}
+
+The function `pic` allows to assess the relative predictive accuracy of models fitted in `missingHE` by computing alternative Bayesian information criteria. As an example, consider again the model results stored in the object `lmdm1_mar`; we may use the command
+
+```{r pic1, echo=TRUE, eval=TRUE, message=FALSE, warning=FALSE, error=FALSE, results='hide'}
+pic_lmdm1_mar <- pic(x = lmdm1_mar, criterion = "looic", cases = "cc")
+```
+
+to return a named list containing a series of components used in the calculation of the selected information criterion. In this case, leave-one-out information criterion (LOOIC) was selected as specified in `criterion = "looic"` based only on the complete cases in the data set (`cases = "cc"`), and its value may be inspected by typing:
+
+```{r pic1show, echo=TRUE, eval=TRUE}
+pic_lmdm1_mar$looic
+```
+
+Note that all information criteria in `missingHE` can only be used as relative measures of fit to compare nested models, with lower values typically indicating better fit. In addition, predictive information criteria are ideally evaluated based on the observed data alone (or after integrating out missingness under MAR). As a result, computing these measures based on the complete cases provides a "safe" choice when comparing the fit of alternative models. `pic` allows alternative choices for the argument `cases`, whose appropriateness should be considered by the user based on the context at hand (e.g. amount and type of missing data). Current choices are: complete cases (`cc`), available cases for the effectiveness (`ac_e`), available cases for the costs (`"ac_c"`) or all cases (`all`).
+
+Finally, `pic` allows to compute information criteria for multiple `missingHE` objects by simply replacing the argument `x` with a list of models generated using the functions in the package. For example, suppose an additional longitudinal model was fitted using `lmdm` and its output stored in an object named `lmdm2_mar`, which additionally includes some covariates into the effectiveness and cost models. Then, the desired predictive information criteria may be computed for both models using `pic` by typing:
+
+```{r pic2, echo=TRUE, eval=FALSE, message=FALSE, error=FALSE, warning=FALSE, results='hide'}
+pic_compare_mar <- pic(x = list(lmdm1_mar, lmdm2_mar), 
+                       criterion = "looic", cases = "cc")
+```
+
+A full description of the different types of output associated and input choices is provided in the package help file.
+
+## Results inspection {#lmdm-inspres}
+
+### Summarise parameter estimates {#lmdm-insptab}
+
+Summary statistics computed based on posterior samples of these parameters, directly generated from `JAGS`, may be accessed using the `print` function by typing
+
+```{r print, echo=TRUE, eval=FALSE, tidy=TRUE}
+print(lmdm1_mar, display = "fixed")
+```
+
+which returns the following output
+
+```{r printshow, echo=FALSE, eval=TRUE, tidy=TRUE}
+print(lmdm1_mar, display = "fixed")
+```
+
+`missingHE` standardises the format of the output to report summary quantities related to key model parameters, by default the mean effectiveness and costs at each time point across treatment arms on their natural scale. Estimates of posterior mean (`mean`), standard deviation (`sd`) and $95\%$ credible interval boundaries (`2.5%` and `95.5%`) can be used to summarise the posterior distribution of the mean parameters. In addition, the MCMC diagnostics `Rhat` and `n.eff`, corresponding to the potential scale reduction factor and effective sample size numeric diagnostics, are provided and can be used to assess convergence for these parameters.
+
+Summary statistics for the regression coefficients on the scale defined by the linear predictor of the effectiveness and cost models $(\boldsymbol \alpha, \boldsymbol \beta)$, as defined in Section \@ref(sec-frame), may also be displayed using the `coef` function by typing
+
+```{r coef, echo=TRUE, eval=FALSE, tidy=TRUE}
+coef(lmdm1_mar)
+```
+
+which returns the following output
+
+```{r coefshow, echo=FALSE, eval=TRUE, tidy=TRUE}
+coef(lmdm1_mar)
+```
+
+The regression output is separately reported by outcome. For the above output, the following parameter estimates are reported at each time point in the model: the intercepts $\alpha_{j0}=$`(Intercept)` in the effectiveness model; the intercepts $\beta_{j0}=$`(Intercept)` and effectiveness coefficients $\beta_{jf}=$`e` in the cost model.
+
+For each regression parameter, estimates are summarised using posterior means (`mean`), standard deviations (`sd`) and credible interval boundaries (`lower` and `upper`), the latter being calculated assuming by default a credible level of $95\%$. 
+
+### Inspect imputed values {#lmdm-inspimp}
+
+The function `plot` allows to visually inspect how missing outcome data have been imputed from a model stored in an object of class `"missingHE"`, using `ggplot2` as the graphical engine. For example, the command
+
+```{r plot1, echo=TRUE, eval=FALSE, tidy=TRUE, error=FALSE, warning=FALSE}
+plot(lmdm1_mar, class = "boxplot", outcome = "costs", 
+     trt = "1", time.plot = 2)
+```
+
+displays boxplots of the observed (black dots and boxes) and imputed (red dots and boxes) effectiveness variables in the `"TAU"` (`trt=1`) arm at time $2$ based on the model results stored in `lmdm1_mar`, as shown in Figure \@ref(fig:figplot). Imputed values are represented in terms of posterior mean values, and their uncertainty by means of corresponding credible intervals. The arguments `class="boxplot"`, `outcome="costs"`, `trt="1"` and `time.plot=2` instruct `missingHE` to display boxplots for the cost outcome in the TAU arm at time $2$.
+
+```{r figplot, echo=FALSE, eval=TRUE, tidy=TRUE, error=FALSE, warning=FALSE, dpi=300, fig.show='hold',fig.cap="Boxplots of observed and imputed effectiveness data in the TAU arm at time 2 under normal distributions using a longitudinal model.", out.width='100%', fig.pos='h', out.extra=''}
+plot(lmdm1_mar, class = "boxplot", outcome = "costs", 
+     trt = "1", time.plot = 2)
+```
+
+Note that, similarly to `diagnostic`, all graphs produced via `plot` can be manipulated using `ggplot2` functions, e.g. to modify the graphics' aesthetics, text and disposition.
+
+### Summarise health economic results {#lmdm-sumher}
+
+Incremental cost-effectiveness results between the reference arm (`trt`$=2$) and each of the other study arms (`trt`$=1$) can be obtained by using the `summary` function and setting the argument `incremental` to `TRUE`.
+
+```{r summary, echo=TRUE, eval=FALSE, tidy=TRUE}
+summary(lmdm1_mar, incremental = TRUE)
+```
+
+Note that the health economic results displayed by `summary` are based on aggregated mean effectiveness and cost parameters ($\mu_{e},\mu_{c}$), which are implicitly derived from the model estimates at each time ($\mu_{je},\mu_{jc}$) using Equation \@ref(eq:mue) and Equation \@ref(eq:muc) and the weight quantities (`w_e` and `w_c`) specified in `lmdm`.   
+
+The incremental results produced by `summary` include:
+
+-   the mean incremental effectiveness and cost parameters ($\Delta_{e}=\mu_{e2}-\mu_{e1},\Delta_{c}=\mu_{c2}-\mu_{c1}$)
+
+-   the incremental net monetary benefit (INMB) ($\Delta_{e}\times k - \Delta_{c}$), calculated at the given $k$ value (willingness to pay threshold).
+
+-   the estimated mean of the *Incremental Cost-Effectiveness Ratio* (ICER), which quantifies the cost per incremental unit of effectiveness, computed based on posterior samples as $\text{ICER}=\frac{\Delta_{c}}{\Delta_{e}}$.
+
+The above output compares the cost-effectiveness of the two arms in the `MenSS` data set based on the results of the model stored in the object `lmdm1_mar`. For example, in this case, incremental results suggest that `"PBS"` is on average associated with higher QALYs and Total costs with respect to `"TAU"`, leading to a positive estimated ICER.
+
+### Probabilistic sensitivity analysis {#lmdm-psaBCEA}
+
+A series of built-in functions are also available from the package `BCEA` to visually display *Probabilistic Sensitivity Analysis* (PSA) results derived from a model fitted in `missingHE`. For example, the following commands may be used
+
+```{r bcea, echo=TRUE, eval=FALSE, tidy=TRUE}
+BCEA::ceplane.plot(lmdm1_mar$cea, graph = "ggplot2") 
+BCEA::ceac.plot(lmdm1_mar$cea, graph = "ggplot2") 
+```
+
+to generate Figure \@ref(fig:figplotcea1) and Figure \@ref(fig:figplotcea2), which combines cost-effectiveness plane and acceptability curve plots obtained from the PSA results stored in `lmdm1_mar$cea`.
+
+```{r figplotcea1, echo=FALSE, eval=TRUE, tidy=FALSE, error=FALSE, warning=FALSE, dpi=300, fig.show='hold',fig.cap="Inspecting probabilistic sensitivity analysis using BCEA built-in functions, for example in terms of cost-effectiveness plane.",out.width='100%', fig.pos='h', out.extra=''}
+cep_sm1_mar <- BCEA::ceplane.plot(lmdm1_mar$cea, 
+            graph = "ggplot2") + ggplot2::ggtitle("")
+ceac_sm1_mar <- BCEA::ceac.plot(lmdm1_mar$cea, 
+            graph = "ggplot2") + ggplot2::ggtitle("")
+cep_sm1_mar
+```
+
+```{r figplotcea2, echo=FALSE, eval=TRUE, tidy=FALSE, error=FALSE, warning=FALSE, dpi=300, fig.show='hold',fig.cap="Inspecting probabilistic sensitivity analysis using BCEA built-in functions, for example in terms of cost-effectiveness acceptability curve.",out.width='100%', fig.pos='h', out.extra=''}
+ceac_sm1_mar
+```
+
+In the cost-effectiveness plane, shown in Figure \@ref(fig:figplotcea1), all incremental estimates fall in the top-right quadrant (where `"PBS"` is more expensive and more effective than `"TAU"`) and only a few of them are associated with ICER estimates that are below $k=25,000$ (shaded area). In the cost-effectiveness acceptability curve, shown in Figure \@ref(fig:figplotcea2), a positive cost-effectiveness assessment of `"PBS"` vs `"TAU"` is shown for only willingness to pay threshold values $k$ above $40,000$.
