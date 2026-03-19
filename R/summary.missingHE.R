@@ -1,13 +1,16 @@
 #' Summary method for objects in the class \code{missingHE}
 #'
 #' Produces a table printout with some summary results of the health economic evaluation probabilistic model
-#' run using the function \code{\link{selection}}, \code{\link{pattern}}, \code{\link{hurdle}} or \code{\link{long_miss}}.
+#' run using the function \code{\link{selection}}, \code{\link{pattern}}, \code{\link{hurdle}} or \code{\link{lmdm}}.
 #' @param object A \code{missingHE} object containing the results of the Bayesian modelling and the economic evaluation
+#' @param incremental Logical. If \code{incremental} is \code{TRUE}, incremental CE results are printed.
+#' @param prob A numeric vector of probabilities within the range (0, 1), representing the upper and lower
+#'  CI quantiles to be calculated and returned for the posterior estimates.
+#' @param digits Integer indicating the number of decimal places to be used for rounding (default = 3).
 #' @param ... Additional arguments affecting the summary produced.
-#' @return Prints a table with some information on the health economic model based on the assumption
-#' selected for the missingness using the function \code{selection}, \code{pattern} or \code{hurdle}. 
+#' @return Prints tables with information on the CE results based on a model fitted using the function \code{selection}, \code{pattern} or \code{hurdle}. 
 #' Summary information on the main parameters of interests is provided.
-#' @seealso \code{\link{selection}} \code{\link{pattern}} \code{\link{hurdle}} \code{\link{long_miss}} \code{\link{diagnostic}} \code{\link{plot.missingHE}}
+#' @seealso \code{\link{selection}} \code{\link{pattern}} \code{\link{hurdle}} \code{\link{lmdm}} \code{\link{diagnostic}} \code{\link{plot.missingHE}}
 #' @author Andrea Gabrio
 #' @references 
 #' Baio, G.(2012). \emph{Bayesian Methods in Health Economcis}. CRC/Chapman Hall, London.
@@ -18,57 +21,85 @@
 #' #
 #' #
 
-summary.missingHE <- function(object, ...) {
+summary.missingHE <- function(object, incremental = FALSE, prob = c(0.025, 0.975),
+                              digits = 3, ...) {
   exArgs <- list(...)
   if(!inherits(object, "missingHE")) {
-    stop("Only objects of class 'missingHE' can be used")
+    stop("Only objects of class 'missingHE' can be used")}
+  if(!is.logical(incremental)) {
+    stop("Please provide 'incremental' as a logical value")}
+  if(!is.vector(prob) | length(prob) != 2 | !is.numeric(prob) | any(prob <= 0 | prob >= 1)) {
+    stop("Please provide a lower and an upper quantile for the posterior results")}
+  if(exists("ref", where = exArgs)) {
+    if(length(exArgs$ref) != 1 | !is.numeric(exArgs$ref)) { stop("Please provide a single numeric indicator for the reference treatment")}
+    if(exArgs$ref <= 0 | !exArgs$ref %% 1 == 0) { stop("Please provide a valid indicator value for the reference treatment")}
+    ref = exArgs$ref } else { ref = object$cea$ref}
+  if(exists("wtp", where = exArgs)) {
+    if(length(exArgs$wtp) != 1 | !is.numeric(exArgs$wtp)) { stop("Please provide a single numeric value for the acceptance threshold")}
+    if(exArgs$wtp <= 0 | !exArgs$wtp %% 1 == 0) { stop("Please provide a valid value for the acceptance threshold")}
+    wtp = exArgs$wtp } else { wtp = object$cea$Kmax}
+  n_trt <- length(object$data_set$data_raw$n)
+  trt_lev <- names(object$data_set$data_raw$n)
+  mu_e <- as.matrix(object$cea$e)
+  mu_c <- as.matrix(object$cea$c)
+  nmb <- mu_e * wtp - mu_c
+  colnames(mu_e) <- colnames(mu_c) <- colnames(nmb) <- trt_lev
+  delta_e <- as.matrix(mu_e[, ref] - mu_e[, -ref])
+  delta_c <- as.matrix(mu_c[, ref] - mu_c[, -ref])
+  inmb <- delta_e * wtp - delta_c
+  incr_lev <- paste(trt_lev[ref], "vs", trt_lev[-ref])
+  colnames(delta_e) <- colnames(delta_c) <- colnames(inmb) <- incr_lev
+  mean_mu_e <- round(apply(mu_e, 2, mean, na.rm = TRUE), digits = digits)
+  sd_mu_e <- round(apply(mu_e, 2, sd, na.rm = TRUE), digits = digits)
+  ql_mu_e <- round(apply(mu_e, 2, quantile, probs = prob[1], na.rm = TRUE), digits = digits)
+  qu_mu_e <- round(apply(mu_e, 2, quantile, probs = prob[2], na.rm = TRUE), digits = digits)
+  mean_mu_c <- round(apply(mu_c, 2, mean, na.rm = TRUE), digits = digits)
+  sd_mu_c <- round(apply(mu_c, 2, sd, na.rm = TRUE), digits = digits)
+  ql_mu_c <- round(apply(mu_c, 2, quantile, probs = prob[1], na.rm = TRUE), digits = digits)
+  qu_mu_c <- round(apply(mu_c, 2, quantile, probs = prob[2], na.rm = TRUE), digits = digits)
+  mean_nmb <- round(apply(nmb, 2, mean, na.rm = TRUE), digits = digits)
+  sd_nmb <- round(apply(nmb, 2, sd, na.rm = TRUE), digits = digits)
+  ql_nmb <- round(apply(nmb, 2, quantile, probs = prob[1], na.rm = TRUE), digits = digits)
+  qu_nmb <- round(apply(nmb, 2, quantile, probs = prob[2], na.rm = TRUE), digits = digits)
+  mean_delta_e <- round(apply(delta_e, 2, mean, na.rm = TRUE), digits = digits)
+  sd_delta_e <- round(apply(delta_e, 2, sd, na.rm = TRUE), digits = digits)
+  ql_delta_e <- round(apply(delta_e, 2, quantile, probs = prob[1], na.rm = TRUE), digits = digits)
+  qu_delta_e <- round(apply(delta_e, 2, quantile, probs = prob[2], na.rm = TRUE), digits = digits)
+  mean_delta_c <- round(apply(delta_c, 2, mean, na.rm = TRUE), digits = digits)
+  sd_delta_c <- round(apply(delta_c, 2, sd, na.rm = TRUE), digits = digits)
+  ql_delta_c <- round(apply(delta_c, 2, quantile, probs = prob[1], na.rm = TRUE), digits = digits)
+  qu_delta_c <- round(apply(delta_c, 2, quantile, probs = prob[2], na.rm = TRUE), digits = digits)
+  mean_inmb <- round(apply(inmb, 2, mean, na.rm = TRUE), digits = digits)
+  sd_inmb <- round(apply(inmb, 2, sd, na.rm = TRUE), digits = digits)
+  ql_inmb <- round(apply(inmb, 2, quantile, probs = prob[1], na.rm = TRUE), digits = digits)
+  qu_inmb <- round(apply(inmb, 2, quantile, probs = prob[2], na.rm = TRUE), digits = digits)
+  icer <- round(mean_delta_c / mean_delta_e, digits = digits)
+  tbl_abs_e <- t(rbind(mean_mu_e, sd_mu_e, ql_mu_e, qu_mu_e))
+  tbl_abs_c <- t(rbind(mean_mu_c, sd_mu_c, ql_mu_c, qu_mu_c))
+  tbl_abs_nmb <- t(rbind(mean_nmb, sd_nmb, ql_nmb, qu_nmb))
+  colnames(tbl_abs_e) <- colnames(tbl_abs_c) <- colnames(tbl_abs_nmb) <- c("Mean", "SD", "QL", "QU")
+  tbl_inc_e <- t(rbind(mean_delta_e, sd_delta_e, ql_delta_e, qu_delta_e))
+  tbl_inc_c <- t(rbind(mean_delta_c, sd_delta_c, ql_delta_c, qu_delta_c))
+  tbl_inc_nmb <- t(rbind(mean_inmb, sd_inmb, ql_inmb, qu_inmb, icer))
+  colnames(tbl_inc_e) <- colnames(tbl_inc_c) <- c("Mean", "SD", "QL", "QU")
+  colnames(tbl_inc_nmb) <- c("Mean", "SD", "QL", "QU", "ICER")
+  if(!incremental) {
+    tbl_res1 <- tbl_abs_e; tbl_res2 <- tbl_abs_c; tbl_res3 <- tbl_abs_nmb
+    text1 <- paste("\n \n Mean effects by intervention \n")
+    text2 <- paste("\n \n Mean costs by intervention \n")
+    text3 <- paste("\n \n Mean net monetary benefit by intervention and wtp =", wtp, "\n")
   }
-  mu_eff1 <- round(mean(object$cea$e[,1]), digits=3)
-  mu_eff2 <- round(mean(object$cea$e[,2]), digits = 3)
-  mu_cost1 <- round(mean(object$cea$c[,1]), digits = 3)
-  mu_cost2 <- round(mean(object$cea$c[,2]), digits = 3)
-  mu_delta_e <- round(mean(unlist(object$cea$delta_e)), digits = 3)
-  mu_delta_c <- round(mean(unlist(object$cea$delta_c)), digits = 3)
-  icer <- round(object$cea$ICER, digits = 3)
-  sd_mu_eff1 <- round(sd(object$cea$e[,1]), digits = 3)
-  sd_mu_eff2 <- round(sd(object$cea$e[,2]), digits = 3)
-  sd_mu_cost1 <- round(sd(object$cea$c[,1]), digits = 3)
-  sd_mu_cost2 <- round(sd(object$cea$c[,2]), digits = 3)
-  sd_delta_e <- round(sd(unlist(object$cea$delta_e)), digits = 3)
-  sd_delta_c <- round(sd(unlist(object$cea$delta_c)), digits = 3)
-  lower_mu_eff1 <- round(quantile(object$cea$e[,1], probs = 0.05), digits = 3)
-  lower_mu_eff2 <- round(quantile(object$cea$e[,2], probs = 0.05), digits = 3)
-  lower_mu_cost1 <- round(quantile(object$cea$c[,1], probs = 0.05), digits = 3)
-  lower_mu_cost2 <- round(quantile(object$cea$c[,2], probs = 0.05), digits = 3)
-  lower_mu_delta_e <- round(quantile(unlist(object$cea$delta_e), probs = 0.05), digits = 3)
-  lower_mu_delta_c <- round(quantile(unlist(object$cea$delta_c), probs = 0.05), digits = 3)
-  upper_mu_eff1 <- round(quantile(object$cea$e[,1], probs = 0.95), digits = 3)
-  upper_mu_eff2 <- round(quantile(object$cea$e[,2], probs = 0.95), digits = 3)
-  upper_mu_cost1 <- round(quantile(object$cea$c[,1], probs = 0.95), digits = 3)
-  upper_mu_cost2 <- round(quantile(object$cea$c[,2], probs = 0.95), digits = 3)
-  upper_mu_delta_e <- round(quantile(unlist(object$cea$delta_e), probs = 0.95), digits = 3)
-  upper_mu_delta_c <- round(quantile(unlist(object$cea$delta_c), probs = 0.95), digits = 3)
-  rownames_v <- c("mean effects (t = 1)", "mean costs (t = 1)", "mean effects (t = 2)", "mean costs (t = 2)",
-                "delta effects", "delta costs", "ICER")
-  colnames_v <- c("mean", "sd", "LB", "UB")
-  mean_v <- c(mu_eff1, mu_cost1, mu_eff2, mu_cost2, mu_delta_e, mu_delta_c, icer)
-  sd_v <- c(sd_mu_eff1, sd_mu_cost1, sd_mu_eff2, sd_mu_cost2, sd_delta_e, sd_delta_c, "")
-  lower_v <- c(lower_mu_eff1, lower_mu_cost1, lower_mu_eff2, lower_mu_cost2, lower_mu_delta_e, lower_mu_delta_c, "")
-  upper_v <- c(upper_mu_eff1, upper_mu_cost1, upper_mu_eff2, upper_mu_cost2, upper_mu_delta_e, upper_mu_delta_c, "")
-  cea_table <- cbind(mean_v, sd_v, lower_v, upper_v)
-  colnames(cea_table) <- colnames_v
-  rownames(cea_table) <- rownames_v
-  cea_table_df <- as.data.frame(cea_table)
-  table1 <- cea_table_df[1:2, ]
-  table2 <- cea_table_df[3:4, ]
-  table3 <- cea_table_df[5:7, ]
-  cea_table_list <- list(table1, table2, table3)
-  cat(paste("\n Cost-effectiveness analysis summary \n \n", "Comparator intervention:", object$cea$interventions[1], "\n","Reference intervention:", 
-            object$cea$interventions[2], "\n \n", "Parameter estimates under", object$type, "assumption"))
-  cat("\n \n Comparator intervention \n")
-  print(table1, quote = FALSE, digits = 3, justify = "center")
-  cat("\n Reference intervention \n")
-  print(table2, quote = FALSE, digits = 3, justify = "center")
-  cat("\n Incremental results \n")
-  print(table3, quote = FALSE, digits = 3, justify = "center")
+  if(incremental) {
+    tbl_res1 <- tbl_inc_e; tbl_res2 <- tbl_inc_c; tbl_res3 <- tbl_inc_nmb
+    text1 <- paste("\n \n Mean incremental effects \n")
+    text2 <- paste("\n \n Mean incremental costs \n")
+    text3 <- paste("\n \n Mean incremental net monetary benefit and wtp =", wtp, "\n")
+  }
+  cat(paste("\n Cost-effectiveness analysis summary \n \n", "CE parameter estimates under", object$type, "assumption"))
+  cat(text1)
+  print(tbl_res1, quote = FALSE, digits = digits, justify = "center")
+  cat(text2)
+  print(tbl_res2, quote = FALSE, digits = digits, justify = "center")
+  cat(text3)
+  print(tbl_res3, quote = FALSE, digits = digits, justify = "center")
  }

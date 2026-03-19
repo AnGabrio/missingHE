@@ -1,14 +1,15 @@
-#' Predictive information criteria for Bayesian models fitted in \code{JAGS} using the funciton \code{\link{selection}}, \code{\link{pattern}}, \code{\link{hurdle}} or \code{\link{long_miss}}
+#' Predictive information criteria for Bayesian models fitted in \code{JAGS} using the function \code{\link{selection}}, \code{\link{pattern}}, \code{\link{hurdle}} or \code{\link{lmdm}}
 #' 
 #' Efficient approximate leave-one-out cross validation (LOO), deviance information criterion (DIC) and widely applicable information criterion (WAIC) for Bayesian models, 
 #' calculated on the observed data.
 #' @keywords loo waic dic JAGS   
 #' @param x A \code{missingHE} object containing the results of a Bayesian model fitted in cost-effectiveness analysis using the function \code{\link{selection}}, \code{\link{pattern}}, 
-#' \code{\link{hurdle}} or \code{\link{long_miss}}.
+#' \code{\link{hurdle}} or \code{\link{lmdm}}.
 #' @param criterion type of information criteria to be produced. Available choices are \code{'dic'} for the Deviance Information Criterion, 
 #' \code{'waic'} for the Widely Applicable Information Criterion, and \code{'looic'} for the Leave-One-Out Information Criterion.
-#' @param module The modules with respect to which the information criteria should be computed. Available choices are \code{'total'} for the whole model, 
-#' \code{'e'} for the effectiveness variables only, \code{'c'} for the cost variables only, and \code{'both'} for both outcome variables.
+#' @param cases group of cases for which information criteria should be computed for: either \code{'all'} for all cases, \code{'cc'} for complete cases, 
+#' \code{'ac_e'} and \code{'ac_c'} for only the observed effect and cost cases, respectively.
+#' @param ... Additional parameters that can be provided to manage the output of \code{pic} when \code{'looic'} is selected. For more details see \strong{bayesplot}.  
 #' @return A named list containing different predictive information criteria results and quantities according to the value of \code{criterion}. In all cases, the measures are 
 #' computed on the observed data for the specific modules of the model selected in \code{module}.
 #' \describe{
@@ -17,18 +18,19 @@
 #'   \item{dic}{Deviance Information Criterion calculated with the formula used by \code{JAGS} (only if \code{criterion} is \code{'dic'})}. 
 #'   \item{d_hat}{Deviance evaluated at the posterior mean of the parameters and calculated with the formula used by \code{JAGS} (only if \code{criterion} is \code{'dic'})}
 #'   \item{elpd, elpd_se}{Expected log pointwise predictive density and standard error calculated on the observed data for the model nodes indicated in \code{module}
-#'    (only if \code{criterion} is \code{'waic'} or \code{'loo'}).}
-#'   \item{p, p_se}{Effective number of parameters and standard error calculated on the observed data for the model nodes indicated in \code{module}
-#'    (only if \code{criterion} is \code{'waic'} or \code{'loo'}).}
-#'   \item{looic, looic_se}{The leave-one-out information criterion and standard error calculated on the observed data for the model nodes indicated in \code{module}
-#'    (only if \code{criterion} is \code{'loo'}).}
-#'   \item{waic, waic_se}{The widely applicable information criterion and standard error calculated on the observed data for the model nodes indicated in \code{module}
+#'    (only if \code{criterion} is \code{'waic'} or \code{'looic'}).}
+#'   \item{p, p_se}{Effective number of parameters and standard error calculated on the cases indicated in \code{cases}.
+#'    (only if \code{criterion} is \code{'waic'} or \code{'looic'}).}
+#'   \item{looic, looic_se}{The leave-one-out information criterion and standard error calculated on the cases indicated in \code{cases}.
+#'    (only if \code{criterion} is \code{'looic'}).}
+#'   \item{waic, waic_se}{The widely applicable information criterion and standard error calculated on the cases indicated in \code{cases}.
 #'    (only if \code{criterion} is \code{'waic'}).}
-#'   \item{pointwise}{A matrix containing the pointwise contributions of each of the above measures calculated on the observed data for the model nodes indicated in \code{module}
-#'    (only if \code{criterion} is \code{'waic'} or \code{'loo'}).}
-#'   \item{pareto_k}{A vector containing the estimates of the shape parameter \eqn{k} for the generalised Pareto fit to the importance ratios for each leave-one-out distribution 
-#'    calculated on the observed data for the model nodes indicated in \code{module} (only if \code{criterion} is \code{'loo'}). 
-#'    See \code{\link[loo]{loo}} for details about interpreting \eqn{k}.}
+#'   \item{pointwise}{A matrix containing the pointwise contributions of each of the above measures calculated on the cases indicated in \code{cases}.
+#'    (only if \code{criterion} is \code{'waic'} or \code{'looic'}).}
+#'   \item{diagnostics}{A named list containing additional diagnostic measures (only if \code{criterion} is \code{'looic'}). 
+#'    See \code{\link[loo]{loo}} for details about interpreting the list elements.}
+#'   \item{psis_object}{A named list containing the matrix of (smoothed) log weights (only if \code{criterion} is \code{'looic'} with the optional argument \code{'save_psis'} is set to \code{TRUE}). 
+#'    See \code{\link[loo]{loo}} for details about interpreting the list elements.}'    
 #' }
 #' @seealso \code{\link[R2jags]{jags}}, \code{\link[loo]{loo}}, \code{\link[loo]{waic}}
 #' @author Andrea Gabrio
@@ -39,7 +41,7 @@
 #' LOOIC can be computationally expensive but can be easily approximated using importance weights that are smoothed by fitting a generalised Pareto distribution to the upper tail 
 #' of the distribution of the importance weights.
 #' WAIC is fully Bayesian and closely approximates Bayesian cross-validation. Unlike DIC, WAIC is invariant to parameterisation and also works for singular models. 
-#' In finite cases, WAIC and LOO give similar esitmates, but for influential observations WAIC underestimates the effect of leaving out one observation.
+#' In finite cases, WAIC and LOOIC give similar estimates, but for influential observations WAIC underestimates the effect of leaving out one observation.
 #' 
 #' @references  
 #' Plummer, M. \emph{JAGS: A program for analysis of Bayesian graphical models using Gibbs sampling.} (2003).
@@ -58,287 +60,268 @@
 #' @export
 #' @examples  
 #' # For examples see the function \code{\link{selection}}, \code{\link{pattern}}, 
-#' # \code{\link{hurdle}} or \code{\link{long_miss}}
+#' # \code{\link{hurdle}} or \code{\link{lmdm}}
 #' # 
 #' # 
 
-pic <- function(x, criterion = "dic", module = "total") {
+pic <- function(x, criterion = "dic", cases = "cc", ...) {
   if(!isTRUE(requireNamespace("loo", quietly = TRUE))) {
-    stop("You need to install the R package 'loo'. Please run in your R terminal:\n install.packages('loo')")
-  }
-  if(!inherits(x, "missingHE")) { 
-    stop("Only objects of class 'missingHE' can be used") 
-  }
-  if(x$model_output$`model summary`$BUGSoutput$n.chains == 1){
-    stop("information criteria cannot be computed if n.chain=1")
-  }
-  if(is.character(criterion) == FALSE | is.character(module) == FALSE) {
-    stop("criterion and module must be character names")
-  }
+    stop("You need to install the R package 'loo'. Please run in your R terminal:\n install.packages('loo')")}
+  if(!is.character(criterion)) {
+    stop("Criterion must be a character name")}
   criterion <- tolower(criterion)
-  module <- tolower(module)
   if(!criterion %in% c("dic", "waic", "looic")) {
-    stop("you must select a character name among those available. For details type 'help(pic)'")
+    stop("Please, select a character name for 'criterion' among those available. For details type 'help(pic)'")}
+  if(!cases %in% c("all", "cc", "ac_e", "ac_c")) {
+    stop("Please, select a character name for 'cases' among those available. For details type 'help(pic)'")}
+  if(!is.list(x)) { stop("Only an object or list of objects of class 'missingHE' can be used")}
+  if(!inherits(x, "missingHE")) {
+    if(!all(unlist(lapply(x, function(m) { inherits(m, "missingHE")})))) {
+      stop("Only a list of objects of class 'missingHE' can be used with same 'method' and 'data_format' argument values")}
+      if(length(unique(lapply(x, function(x) x$model_output$method))) != 1) {
+        stop("Only a list of objects of class 'missingHE' can be used with same 'method' and 'data_format' argument values")}
+    if(length(unique(lapply(x, function(x) x$data_format))) != 1) {
+      stop("Only a list of objects of class 'missingHE' can be used with same 'method' and 'data_format' argument values")}
   }
-  if(!module %in% c("total", "e", "c", "both")) {
-    stop("you must select a character name among those available. For details type 'help(pic)'")
-  }
-  if(x$data_format == "wide") {
-  m_e1 <- x$data_set$missing_effects$Control
-  loglik_e1 <- x$model_output$loglik$effects$control[, m_e1 == 0]
-  m_e2 <- x$data_set$missing_effects$Intervention
-  loglik_e2 <- x$model_output$loglik$effects$intervention[, m_e2 == 0]
-  m_c1 <- x$data_set$missing_costs$Control
-  loglik_c1 <- x$model_output$loglik$costs$control[, m_c1 == 0]
-  m_c2 <- x$data_set$missing_costs$Intervention
-  loglik_c2 <- x$model_output$loglik$costs$intervention[, m_c2 == 0]
-  if(x$model_output$type == "SELECTION" | x$model_output$type == "SELECTION_e" | 
-     x$model_output$type == "SELECTION_c" | x$model_output$type == "SELECTION_ec" ) {
-  loglik_me1 <- x$model_output$loglik$`missing indicators effects`$control
-  loglik_me2 <- x$model_output$loglik$`missing indicators effects`$intervention
-  loglik_mc1 <- x$model_output$loglik$`missing indicators costs`$control
-  loglik_mc2 <- x$model_output$loglik$`missing indicators costs`$intervention
-  if(criterion == "dic") {
-  loglik_e <- rowSums(cbind(loglik_e1, loglik_e2))
-  loglik_c <- rowSums(cbind(loglik_c1, loglik_c2))
-  loglik_me <- rowSums(cbind(loglik_me1, loglik_me2))
-  loglik_mc <- rowSums(cbind(loglik_mc1, loglik_mc2))
-  loglik_e_c <- rowSums(cbind(loglik_e, loglik_c))
-  loglik_total <- rowSums(cbind(loglik_e_c, loglik_me, loglik_mc))
-  } else if(criterion == "looic" | criterion == "waic"){
-    loglik_e <- cbind(loglik_e1, loglik_e2)
-    loglik_c <- cbind(loglik_c1, loglik_c2)
-    loglik_me <- cbind(loglik_me1, loglik_me2)
-    loglik_mc <- cbind(loglik_mc1, loglik_mc2)
-    loglik_e_c <- cbind(loglik_e, loglik_c)
-    loglik_total <- cbind(loglik_e_c, loglik_me, loglik_mc)
-   }
-  }
-  if(x$model_output$type == "PATTERN" | x$model_output$type == "PATTERN_e" | 
-     x$model_output$type == "PATTERN_c" | x$model_output$type == "PATTERN_ec" ) {
-  loglik_d1 <- x$model_output$loglik$`pattern indicators`$control
-  loglik_d2 <- x$model_output$loglik$`pattern indicators`$intervention
-  if(criterion == "dic") {
-    loglik_e <- rowSums(cbind(loglik_e1, loglik_e2))
-    loglik_c <- rowSums(cbind(loglik_c1, loglik_c2))
-    loglik_d <- rowSums(cbind(loglik_d1, loglik_d2))
-    loglik_e_c <- rowSums(cbind(loglik_e, loglik_c))
-    loglik_total <- rowSums(cbind(loglik_e_c, loglik_d))
-  } else if(criterion == "looic" | criterion == "waic"){
-    loglik_e <- cbind(loglik_e1, loglik_e2)
-    loglik_c <- cbind(loglik_c1, loglik_c2)
-    loglik_d <- cbind(loglik_d1, loglik_d2)
-    loglik_e_c <- cbind(loglik_e, loglik_c)
-    loglik_total <- cbind(loglik_e_c, loglik_d)
-   }
-  }
-  if(x$model_output$type == "HURDLE" | x$model_output$type == "HURDLE_e" | 
-     x$model_output$type == "HURDLE_c" | x$model_output$type == "HURDLE_ec") {
-    if(x$model_output$type == "HURDLE_ec" | x$model_output$type == "HURDLE_e") {
-    m_de1 <- ifelse(is.na(x$data_set$structural_effects$Control) == TRUE, 1, 0)
-    loglik_e1 <- x$model_output$loglik$effects$control[, m_e1 == 0]
-    loglik_de1 <- x$model_output$loglik$`structural indicators effects`$control[, m_e1 == 0]
-    m_de2 <- ifelse(is.na(x$data_set$structural_effects$Intervention) == TRUE, 1, 0)
-    loglik_e2 <- x$model_output$loglik$effects$intervention[, m_e2 == 0]
-    loglik_de2 <- x$model_output$loglik$`structural indicators effects`$intervention[, m_e2 == 0]
-    } 
-    if(x$model_output$type == "HURDLE_ec" | x$model_output$type == "HURDLE_c") {
-    m_dc1 <- ifelse(is.na(x$data_set$structural_costs$Control) == TRUE, 1, 0)
-    loglik_c1 <- x$model_output$loglik$costs$control[, m_c1 == 0]
-    loglik_dc1 <- x$model_output$loglik$`structural indicators costs`$control[, m_c1 == 0]
-    m_dc2 <- ifelse(is.na(x$data_set$structural_costs$Intervention) == TRUE, 1, 0)
-    loglik_c2 <- x$model_output$loglik$costs$intervention[, m_c2 == 0]
-    loglik_dc2 <- x$model_output$loglik$`structural indicators costs`$intervention[, m_c2 == 0]
-    }
-    if(criterion == "dic") {
-      loglik_e <- rowSums(cbind(loglik_e1, loglik_e2))
-      loglik_c <- rowSums(cbind(loglik_c1, loglik_c2))
-      loglik_e_c <- rowSums(cbind(loglik_e, loglik_c))
-      if(x$model_output$type == "HURDLE_ec") {
-        loglik_de <- rowSums(cbind(loglik_de1, loglik_de2))
-        loglik_dc <- rowSums(cbind(loglik_dc1, loglik_dc2))
-        loglik_total <- rowSums(cbind(loglik_e_c, loglik_de, loglik_dc))
-      } else if(x$model_output$type == "HURDLE_e") {
-        loglik_de <- rowSums(cbind(loglik_de1, loglik_de2))
-        loglik_total <- rowSums(cbind(loglik_e_c, loglik_de))
-      } else if(x$model_output$type == "HURDLE_c") {
-        loglik_dc <- rowSums(cbind(loglik_dc1, loglik_dc2))
-        loglik_total <- rowSums(cbind(loglik_e_c, loglik_dc))
+  exArgs <- list(...)
+  if(exists("r_eff", where = exArgs)) { r_eff = exArgs$r_eff } else { r_eff = 1}
+  if(exists("save_psis", where = exArgs)) { save_psis = exArgs$save_psis } else { save_psis = FALSE}
+  if(exists("cores", where = exArgs)) { cores = exArgs$cores } else { cores = getOption("mc.cores", 1)}
+  if(exists("is_method", where = exArgs)) { is_method = exArgs$is_method } else { is_method = c("psis", "tis", "sis")}
+  if(inherits(x, "missingHE")) {
+    if(x$model_output$model$BUGSoutput$n.chains == 1){
+      stop("Information criteria cannot be computed if 'n.chain' = 1")}
+    if(x$data_format == "wide") {
+      loglik_e_all <- x$model_output$loglik$effects
+      loglik_c_all <- x$model_output$loglik$costs
       }
-    } else if(criterion == "looic" | criterion == "waic"){
-      loglik_e <- cbind(loglik_e1, loglik_e2)
-      loglik_c <- cbind(loglik_c1, loglik_c2)
-      loglik_e_c <- cbind(loglik_e, loglik_c)
-      if(x$model_output$type == "HURDLE_ec") {
-        loglik_de <- cbind(loglik_de1, loglik_de2)
-        loglik_dc <- cbind(loglik_dc1, loglik_dc2)
-        loglik_total <- cbind(loglik_e_c, loglik_de, loglik_dc)
-      } else if(x$model_output$type == "HURDLE_e") {
-        loglik_de <- cbind(loglik_de1, loglik_de2)
-        loglik_total <- cbind(loglik_e_c, loglik_de)
-      } else if(x$model_output$type == "HURDLE_c") {
-        loglik_dc <- cbind(loglik_dc1, loglik_dc2)
-        loglik_total <- cbind(loglik_e_c, loglik_dc)
+    if(x$data_format == "long") {
+      loglik_e_all <- as.matrix(as.data.frame(x$model_output$loglik$effects))
+      loglik_c_all <- as.matrix(as.data.frame(x$model_output$loglik$costs))
       }
-    }
-  }
-  if(module == "total") { 
-    loglik <- loglik_total
-  } else if(module == "e") {
-    loglik <- loglik_e
-  } else if(module == "c") {
-    loglik <- loglik_c
-  } else if(module == "both") {
-    loglik <- loglik_e_c
-  }
-  if(criterion == "dic") {
-      d_bar <- mean(-2 * loglik)
-      pD <- var(-2* loglik) / 2
-      dic <- d_bar + pD
-      d_hat <- dic - 2 * pD 
-      ic <- list("d_bar" = d_bar, "pD" = pD, "dic" = dic, "d_hat" = d_hat)
-  }
-  if(criterion == "waic") {
-    waic_l <- suppressWarnings(loo::waic(loglik))
-    elpd <- waic_l$estimates[1, 1]
-    elpd_se <- waic_l$estimates[1, 2]
-    p <- waic_l$estimates[2, 1]
-    p_se <- waic_l$estimates[2, 2]
-    waic <- waic_l$estimates[3, 1]
-    waic_se <- waic_l$estimates[3, 2]
-    pointwise <- waic_l$pointwise
-    ic <- list("elpd" = elpd, "elpd_se" = elpd_se, "p" = p, "p_se" = p_se, 
-               "waic" = waic, "waic_se" = waic_se, "pointwise" = pointwise)
-  }
-  if(criterion == "looic") {
-    loo_l <- suppressWarnings(loo::loo(loglik))
-    elpd <- loo_l$estimates[1, 1]
-    elpd_se <- loo_l$estimates[1, 2]
-    p <- loo_l$estimates[2, 1]
-    p_se <- loo_l$estimates[2, 2]
-    looic <- loo_l$estimates[3, 1]
-    looic_se <- loo_l$estimates[3, 2]
-    pointwise <- loo_l$pointwise
-    pareto_k <- loo_l$pareto_k
-    ic <- list("elpd" = elpd, "elpd_se" = elpd_se, "p" = p, "p_se" = p_se, 
-               "looic" = looic, "looic_se" = looic_se, "pointwise" = pointwise, "pareto_k" = pareto_k)
-  }
- }
-  if(x$data_format == "long") {
-    m_e1 <- ifelse(is.na(x$data_set$effects$Control) == TRUE, 1, 0)
-    m_e2 <- ifelse(is.na(x$data_set$effects$Intervention) == TRUE, 1, 0)
-    m_c1 <- ifelse(is.na(x$data_set$costs$Control) == TRUE, 1, 0)
-    m_c2 <- ifelse(is.na(x$data_set$costs$Intervention) == TRUE, 1, 0)
-    loglik_e1 <- replicate(dim(m_e1)[2], list())
-    loglik_e2 <- replicate(dim(m_e2)[2], list())
-    loglik_c1 <- replicate(dim(m_c1)[2], list())
-    loglik_c2 <- replicate(dim(m_c2)[2], list())
-    for(time in 1:dim(m_e1)[2]) {
-      loglik_e1[[time]] <- x$model_output$loglik$effects$control[, m_e1[, time] == 0, time]
-      loglik_e2[[time]] <- x$model_output$loglik$effects$intervention[, m_e2[, time] == 0, time]
-      loglik_c1[[time]] <- x$model_output$loglik$costs$control[, m_c1[, time] == 0, time]
-      loglik_c2[[time]] <- x$model_output$loglik$costs$intervention[, m_c2[, time] == 0, time]
-    }
-    if(x$model_output$type == "LONG" | x$model_output$type == "LONG_e" | 
-       x$model_output$type == "LONG_c" | x$model_output$type == "LONG_ec" ) {
-      loglik_me1 <- replicate(dim(m_e1)[2], list())
-      loglik_me2 <- replicate(dim(m_e2)[2], list())
-      loglik_mc1 <- replicate(dim(m_c1)[2], list())
-      loglik_mc2 <- replicate(dim(m_c2)[2], list())
-      for(time in 1:dim(m_e1)[2]) {
-        loglik_me1[[time]] <- x$model_output$loglik$`missing indicators effects`$control[, , time]
-        loglik_me2[[time]] <- x$model_output$loglik$`missing indicators effects`$intervention[, , time]
-        loglik_mc1[[time]] <- x$model_output$loglik$`missing indicators costs`$control[, , time]
-        loglik_mc2[[time]] <- x$model_output$loglik$`missing indicators costs`$intervention[, , time]
+      loglik_ec_all <- loglik_e_all + loglik_c_all
+      m_e <- x$data_set$data_raw$me
+      m_c <- x$data_set$data_raw$mc
+      loglik_e_ac <- loglik_e_all[, m_e == 0]
+      loglik_c_ac <- loglik_c_all[, m_c == 0]
+      loglik_e_cc <- loglik_e_all[, m_e == 0 & m_c == 0]
+      loglik_c_cc <- loglik_c_all[, m_e == 0 & m_c == 0]
+      loglik_ec_cc <- loglik_e_cc + loglik_c_cc
+      if(x$model_output$method %in% c("SELECTION", "LMDM")) {
+        if(x$model_output$method == "SELECTION") {
+          loglik_me_all <- x$model_output$loglik$`missing indicators effects`
+          loglik_mc_all <- x$model_output$loglik$`missing indicators costs`
+        }
+        if(x$model_output$method == "LMDM") {
+          loglik_me_all <- as.matrix(as.data.frame(x$model_output$loglik$`missing indicators effects`))
+          loglik_mc_all <- as.matrix(as.data.frame(x$model_output$loglik$`missing indicators costs`))
+        }
+      loglik_me_ac <- loglik_me_all[, m_e == 0]
+      loglik_mc_ac <- loglik_mc_all[, m_c == 0]
+      loglik_me_cc <- loglik_me_all[, m_e == 0 & m_c == 0]
+      loglik_mc_cc <- loglik_mc_all[, m_e == 0 & m_c == 0]
+      if(cases == "all") { loglik_total <- loglik_ec_all + loglik_me_all + loglik_mc_all}
+      if(cases == "ac_e") { loglik_total <- loglik_e_ac + loglik_me_ac}
+      if(cases == "ac_c") { loglik_total <- loglik_c_ac + loglik_mc_ac}
+      if(cases == "cc") { loglik_total <- loglik_ec_cc + loglik_me_cc + loglik_mc_cc}
+      }
+      if(x$model_output$method == "HURDLE") {
+        if(!is.null(x$model_output$mean_nostr_effects)) {
+        loglik_se_all <- x$model_output$loglik$`structural indicators effects`
+        loglik_se_ac <- loglik_se_all[, m_e == 0]
+        loglik_se_cc <- loglik_se_all[, m_e == 0 & m_c == 0]
+        } else { loglik_se_all <- loglik_se_ac <- loglik_se_cc <- 0}
+        if(!is.null(x$model_output$mean_nostr_costs)) {
+          loglik_sc_all <- x$model_output$loglik$`structural indicators costs`
+          loglik_sc_ac <- loglik_sc_all[, m_c == 0]
+          loglik_sc_cc <- loglik_sc_all[, m_e == 0 & m_c == 0]
+        } else { loglik_sc_all <- loglik_sc_ac <- loglik_sc_cc <- 0}
+        if(cases == "all") { loglik_total <- loglik_ec_all + loglik_se_all + loglik_sc_all}
+        if(cases == "ac_e") { loglik_total <- loglik_e_ac + loglik_se_ac}
+        if(cases == "ac_c") { loglik_total <- loglik_c_ac + loglik_sc_ac}
+        if(cases == "cc") { loglik_total <- loglik_ec_cc + loglik_se_cc + loglik_sc_cc}
+      }
+      if(x$model_output$method == "PATTERN") {
+        loglik_d_all <- x$model_output$loglik$`pattern indicators`
+        loglik_d_e_ac <- loglik_d_all[, m_e == 0]
+        loglik_d_c_ac <- loglik_d_all[, m_c == 0]
+        loglik_d_cc <- loglik_d_all[, m_e == 0 & m_c == 0]
+        if(cases == "all") { loglik_total <- loglik_ec_all + loglik_d_all}
+        if(cases == "ac_e") { loglik_total <- loglik_e_ac + loglik_d_e_ac}
+        if(cases == "ac_c") { loglik_total <- loglik_c_ac + loglik_d_c_ac}
+        if(cases == "cc") { loglik_total <- loglik_ec_cc + loglik_d_cc}
       }
       if(criterion == "dic") {
-        loglik_e <- replicate(dim(m_e1)[2], list())
-        loglik_c <- replicate(dim(m_e1)[2], list())
-        loglik_me <- replicate(dim(m_e1)[2], list())
-        loglik_mc <- replicate(dim(m_e1)[2], list())
-        loglik_e_c <- replicate(dim(m_e1)[2], list())
-        loglik_total <- replicate(dim(m_e1)[2], list())
-        for(time in 1:dim(m_e1)[2]) {
-          loglik_e[[time]] <- c(rowSums(loglik_e1[[time]]), rowSums(loglik_e2[[time]]))
-          loglik_c[[time]] <- c(rowSums(loglik_c1[[time]]), rowSums(loglik_c2[[time]]))
-          loglik_me[[time]] <- c(rowSums(loglik_me1[[time]]), rowSums(loglik_me2[[time]]))
-          loglik_mc[[time]] <- c(rowSums(loglik_mc1[[time]]), rowSums(loglik_mc2[[time]]))
-          loglik_e_c[[time]] <- c(rowSums(loglik_e1[[time]]), rowSums(loglik_e2[[time]]), rowSums(loglik_c1[[time]]), rowSums(loglik_c2[[time]]))
-          loglik_total[[time]] <- c(rowSums(loglik_e1[[time]]), rowSums(loglik_e2[[time]]), rowSums(loglik_c1[[time]]), rowSums(loglik_c2[[time]]), 
-                                    rowSums(loglik_me1[[time]]), rowSums(loglik_me2[[time]]), loglik_mc1[[time]], rowSums(loglik_mc2[[time]]))
+        d_bar <- mean(-2 * rowSums(loglik_total))
+        pD <- var(-2* c(loglik_total)) / 2
+        dic <- d_bar + pD
+        d_hat <- dic - 2 * pD 
+        ic <- list("d_bar" = d_bar, "pD" = pD, "dic" = dic, "d_hat" = d_hat)
+      }
+      if(criterion == "waic") {
+        waic_l <- suppressWarnings(loo::waic(loglik_total))
+        elpd <- waic_l[[1]]["elpd_waic", "Estimate"]
+        elpd_se <- waic_l[[1]]["elpd_waic", "SE"]
+        p <- waic_l[[1]]["p_waic", "Estimate"]
+        p_se <- waic_l[[1]]["p_waic", "SE"]
+        waic <- waic_l[[1]]["waic", "Estimate"]
+        waic_se <- waic_l[[1]]["waic", "SE"]
+        pointwise <- waic_l[[2]]
+        ic <- list("elpd" = elpd, "elpd_se" = elpd_se, "p" = p, "p_se" = p_se, 
+                   "waic" = waic, "waic_se" = waic_se, "pointwise" = pointwise)
+      }
+      if(criterion == "looic") {
+        loo_l <- suppressWarnings(loo::loo(loglik_total, r_eff = r_eff, 
+                                           save_psis = save_psis, cores = cores, 
+                                           is_method = is_method))
+        elpd <- loo_l[[1]]["elpd_loo", "Estimate"]
+        elpd_se <- loo_l[[1]]["elpd_loo", "Estimate"]
+        p <- loo_l[[1]]["p_loo", "Estimate"]
+        p_se <- loo_l[[1]]["p_loo", "Estimate"]
+        looic <- loo_l[[1]]["looic", "Estimate"]
+        looic_se <- loo_l[[1]]["looic", "Estimate"]
+        pointwise <- loo_l[[2]]
+        diagnostics <- loo_l[[3]]
+        psis_object <- loo_l[[4]]
+        ic <- list("elpd" = elpd, "elpd_se" = elpd_se, "p" = p, "p_se" = p_se, 
+                   "looic" = looic, "looic_se" = looic_se, "pointwise" = pointwise, 
+                   "diagnostics" = diagnostics, "psis_object" = psis_object)
+      }
+  }
+  if(!inherits(x, "missingHE")) {
+    if(any(lapply(x, function(x) x$model_output$model$BUGSoutput$n.chains) == 1)){
+      stop("Information criteria cannot be computed if 'n.chain' = 1")}
+    if(all(lapply(x, function(x) x$data_format) %in% c("wide", "long"))) {
+        ic_list <- lapply(x, function(x, criterion, cases) {
+          if(x$data_format == "wide") {
+            loglik_e_all <- x$model_output$loglik$effects
+            loglik_c_all <- x$model_output$loglik$costs
+          }
+          if(x$data_format == "long") {
+            loglik_e_all <- as.matrix(as.data.frame(x$model_output$loglik$effects))
+            loglik_c_all <- as.matrix(as.data.frame(x$model_output$loglik$costs))
+          }
+          loglik_ec_all <- loglik_e_all + loglik_c_all
+          m_e <- x$data_set$data_raw$me
+          m_c <- x$data_set$data_raw$mc
+          loglik_e_ac <- loglik_e_all[, m_e == 0]
+          loglik_c_ac <- loglik_c_all[, m_c == 0]
+          loglik_e_cc <- loglik_e_all[, m_e == 0 & m_c == 0]
+          loglik_c_cc <- loglik_c_all[, m_e == 0 & m_c == 0]
+          loglik_ec_cc <- loglik_e_cc + loglik_c_cc
+          if(x$model_output$method %in% c("SELECTION", "LMDM")) {
+            if(x$model_output$method == "SELECTION") {
+              loglik_me_all <- x$model_output$loglik$`missing indicators effects`
+              loglik_mc_all <- x$model_output$loglik$`missing indicators costs`
+            }
+            if(x$model_output$method == "LMDM") {
+              loglik_me_all <- as.matrix(as.data.frame(x$model_output$loglik$`missing indicators effects`))
+              loglik_mc_all <- as.matrix(as.data.frame(x$model_output$loglik$`missing indicators costs`))
+            }
+          loglik_me_ac <- loglik_me_all[, m_e == 0]
+          loglik_mc_ac <- loglik_mc_all[, m_c == 0]
+          loglik_me_cc <- loglik_me_all[, m_e == 0 & m_c == 0]
+          loglik_mc_cc <- loglik_mc_all[, m_e == 0 & m_c == 0]
+          if(cases == "all") { loglik_total <- loglik_ec_all + loglik_me_all + loglik_mc_all}
+          if(cases == "ac_e") { loglik_total <- loglik_e_ac + loglik_me_ac}
+          if(cases == "ac_c") { loglik_total <- loglik_c_ac + loglik_mc_ac}
+          if(cases == "cc") { loglik_total <- loglik_ec_cc + loglik_me_cc + loglik_mc_cc}
+          }
+          if(x$model_output$method == "HURDLE") {
+            if(!is.null(x$model_output$mean_nostr_effects)) {
+              loglik_se_all <- x$model_output$loglik$`structural indicators effects`
+              loglik_se_ac <- loglik_se_all[, m_e == 0]
+              loglik_se_cc <- loglik_se_all[, m_e == 0 & m_c == 0]
+            } else { loglik_se_all <- loglik_se_ac <- loglik_se_cc <- 0}
+            if(!is.null(x$model_output$mean_nostr_costs)) {
+              loglik_sc_all <- x$model_output$loglik$`structural indicators costs`
+              loglik_sc_ac <- loglik_sc_all[, m_c == 0]
+              loglik_sc_cc <- loglik_sc_all[, m_e == 0 & m_c == 0]
+            } else { loglik_sc_all <- loglik_sc_ac <- loglik_sc_cc <- 0}
+            if(cases == "all") { loglik_total <- loglik_ec_all + loglik_se_all + loglik_sc_all}
+            if(cases == "ac_e") { loglik_total <- loglik_e_ac + loglik_se_ac}
+            if(cases == "ac_c") { loglik_total <- loglik_c_ac + loglik_sc_ac}
+            if(cases == "cc") { loglik_total <- loglik_ec_cc + loglik_se_cc + loglik_sc_cc}
+          }
+          if(x$model_output$method == "PATTERN") {
+            loglik_d_all <- x$model_output$loglik$`pattern indicators`
+            loglik_d_e_ac <- loglik_d_all[, m_e == 0]
+            loglik_d_c_ac <- loglik_d_all[, m_c == 0]
+            loglik_d_cc <- loglik_d_all[, m_e == 0 & m_c == 0]
+            if(cases == "all") { loglik_total <- loglik_ec_all + loglik_d_all}
+            if(cases == "ac_e") { loglik_total <- loglik_e_ac + loglik_d_e_ac}
+            if(cases == "ac_c") { loglik_total <- loglik_c_ac + loglik_d_c_ac}
+            if(cases == "cc") { loglik_total <- loglik_ec_cc + loglik_d_cc}
+          }
+          if(criterion == "dic") {
+            d_bar <- mean(-2 * rowSums(loglik_total))
+            pD <- var(-2* c(loglik_total)) / 2
+            dic <- d_bar + pD
+            d_hat <- dic - 2 * pD 
+            ic <- list("d_bar" = d_bar, "pD" = pD, "dic" = dic, "d_hat" = d_hat)
+          }
+          if(criterion == "waic") {
+            waic_l <- suppressWarnings(loo::waic(loglik_total))
+            elpd <- waic_l[[1]]["elpd_waic", "Estimate"]
+            elpd_se <- waic_l[[1]]["elpd_waic", "SE"]
+            p <- waic_l[[1]]["p_waic", "Estimate"]
+            p_se <- waic_l[[1]]["p_waic", "SE"]
+            waic <- waic_l[[1]]["waic", "Estimate"]
+            waic_se <- waic_l[[1]]["waic", "SE"]
+            pointwise <- waic_l[[2]]
+            ic <- list("elpd" = elpd, "elpd_se" = elpd_se, "p" = p, "p_se" = p_se, 
+                       "waic" = waic, "waic_se" = waic_se, "pointwise" = pointwise)
+          }
+          if(criterion == "looic") {
+            loo_l <- suppressWarnings(loo::loo(loglik_total, r_eff = r_eff, 
+                                               save_psis = save_psis, cores = cores, 
+                                               is_method = is_method))
+            elpd <- loo_l[[1]]["elpd_loo", "Estimate"]
+            elpd_se <- loo_l[[1]]["elpd_loo", "Estimate"]
+            p <- loo_l[[1]]["p_loo", "Estimate"]
+            p_se <- loo_l[[1]]["p_loo", "Estimate"]
+            looic <- loo_l[[1]]["looic", "Estimate"]
+            looic_se <- loo_l[[1]]["looic", "Estimate"]
+            pointwise <- loo_l[[2]]
+            diagnostics <- loo_l[[3]]
+            psis_object <- loo_l[[4]]
+            ic <- list("elpd" = elpd, "elpd_se" = elpd_se, "p" = p, "p_se" = p_se, 
+                       "looic" = looic, "looic_se" = looic_se, "pointwise" = pointwise, 
+                       "diagnostics" = diagnostics, "psis_object" = psis_object)
+          }
+        return(ic)
+      }, criterion = criterion, cases = cases)
+        if(criterion == "dic") {
+         pic_compare <-  unlist(lapply(ic_list, function(x) x$dic))
+         pic_se_compare <-  NULL
+         peff_compare <-  unlist(lapply(ic_list, function(x) x$pD))
+         peff_se_compare <-  NULL
+         names(pic_compare) <- paste("DIC model", seq(1:length(x)))
+         names(peff_compare) <- paste("peff model", seq(1:length(x)))
         }
-      } else if(criterion == "looic" | criterion == "waic"){
-        loglik_e <- replicate(dim(m_e1)[2], list())
-        loglik_c <- replicate(dim(m_e1)[2], list())
-        loglik_me <- replicate(dim(m_e1)[2], list())
-        loglik_mc <- replicate(dim(m_e1)[2], list())
-        loglik_e_c <- replicate(dim(m_e1)[2], list())
-        loglik_total <- replicate(dim(m_e1)[2], list())
-        for(time in 1:dim(m_e1)[2]) {
-          loglik_e[[time]] <- cbind(loglik_e1[[time]], loglik_e2[[time]])
-          loglik_c[[time]] <- cbind(loglik_c1[[time]], loglik_c2[[time]])
-          loglik_me[[time]] <- cbind(loglik_me1[[time]], loglik_me2[[time]])
-          loglik_mc[[time]] <- cbind(loglik_mc1[[time]], loglik_mc2[[time]])
-          loglik_e_c[[time]] <- cbind(loglik_e1[[time]], loglik_e2[[time]], loglik_c1[[time]], loglik_c2[[time]])
-          loglik_total[[time]] <- cbind(loglik_e1[[time]], loglik_e2[[time]], loglik_c1[[time]], loglik_c2[[time]],
-                                        loglik_me1[[time]], loglik_me2[[time]], loglik_mc1[[time]], loglik_mc2[[time]])
+        if(criterion == "waic") {
+          pic_compare <-  unlist(lapply(ic_list, function(x) x$waic))
+          pic_se_compare <-  unlist(lapply(ic_list, function(x) x$waic_se))
+          peff_compare <-  unlist(lapply(ic_list, function(x) x$p))
+          peff_se_compare <-  unlist(lapply(ic_list, function(x) x$p_se))
+          names(pic_compare) <- paste("WAIC model", seq(1:length(x)))
+          names(pic_se_compare) <- paste("SE(WAIC) model", seq(1:length(x)))
+          names(peff_compare) <- paste("peff model", seq(1:length(x)))
+          names(peff_se_compare) <- paste("SE(peff) model", seq(1:length(x)))
         }
-      }
+        if(criterion == "looic") {
+          pic_compare <-  unlist(lapply(ic_list, function(x) x$looic))
+          pic_se_compare <-  unlist(lapply(ic_list, function(x) x$looic_se))
+          peff_compare <-  unlist(lapply(ic_list, function(x) x$p))
+          peff_se_compare <-  unlist(lapply(ic_list, function(x) x$p_se))
+          names(pic_compare) <- paste("LOOIC model", seq(1:length(x)))
+          names(pic_se_compare) <- paste("SE(LOOIC) model", seq(1:length(x)))
+          names(peff_compare) <- paste("peff model", seq(1:length(x)))
+          names(peff_se_compare) <- paste("SE(peff) model", seq(1:length(x)))
+        }
     }
-    if(module == "total") { 
-      loglik <- loglik_total
-    } else if(module == "e") {
-      loglik <- loglik_e
-    } else if(module == "c") {
-      loglik <- loglik_c
-    } else if(module == "both") {
-      loglik <- loglik_e_c
-    }
-    if(criterion == "dic") {
-      d_bar <- pD <- rep(NA, dim(m_e1)[2])
-      for(time in 1:dim(m_e1)[2]) { 
-        d_bar[time] <- mean(-2 * loglik[[time]]) 
-        pD[time] <- var(-2* loglik[[time]]) / 2
-      }
-      dic <- d_bar + pD
-      d_hat <- dic - 2 * pD  
-      ic <- list("d_bar" = d_bar, "pD" = pD, "dic" = dic, "d_hat" = d_hat, "sum_dic" = sum(dic), "sum_pD" = sum(pD))
-    }
-    if(criterion == "waic") {
-      waic_l <- pointwise <- replicate(dim(m_e1)[2], list())
-      elpd <- elpd_se <- rep(NA, dim(m_e1)[2])
-      p <- p_se <- waic <- waic_se <- rep(NA, dim(m_e1)[2])
-      for(time in 1:dim(m_e1)[2]) { 
-        waic_l[[time]] <- suppressWarnings(loo::waic(loglik[[time]]))
-        elpd[time] <- waic_l[[time]]$estimates[1, 1]
-        elpd_se[time] <- waic_l[[time]]$estimates[1, 2]
-        p[time] <- waic_l[[time]]$estimates[2, 1]
-        p_se[time] <- waic_l[[time]]$estimates[2, 2]
-        waic[time] <- waic_l[[time]]$estimates[3, 1]
-        waic_se[time] <- waic_l[[time]]$estimates[3, 2]
-        pointwise[[time]] <- waic_l[[time]]$pointwise
-      }
-      ic <- list("elpd" = elpd, "elpd_se" = elpd_se, "p" = p, "p_se" = p_se, "waic" = waic, "waic_se" = waic_se, "pointwise" = pointwise, 
-                 "sum_waic" = sum(waic), "sum_pwaic" = sum(p))
-    }
-    if(criterion == "looic") {
-      loo_l <- pointwise <- pareto_k <- replicate(dim(m_e1)[2], list())
-      elpd <- elpd_se <- rep(NA, dim(m_e1)[2])
-      p <- p_se <- looic <- looic_se <- rep(NA, dim(m_e1)[2])
-      for(time in 1:dim(m_e1)[2]) { 
-        loo_l[[time]] <- suppressWarnings(loo::loo(loglik[[time]]))
-        elpd[time] <- loo_l[[time]]$estimates[1, 1]
-        elpd_se[time] <- loo_l[[time]]$estimates[1, 2]
-        p[time] <- loo_l[[time]]$estimates[2, 1]
-        p_se[time] <- loo_l[[time]]$estimates[2, 2]
-        looic[time] <- loo_l[[time]]$estimates[3, 1]
-        looic_se[time] <- loo_l[[time]]$estimates[3, 2]
-        pointwise[[time]] <- loo_l[[time]]$pointwise
-        pareto_k[[time]] <- loo_l[[time]]$pointwise
-      }
-      ic <- list("elpd" = elpd, "elpd_se" = elpd_se, "p" = p, "p_se" = p_se, "looic" = looic, "looic_se" = looic_se, "pointwise" = pointwise, "pareto_k" = pareto_k, 
-                 "sum_looic" = sum(looic), "sum_plooic" = sum(p))
-    }
+    ic <- list("pic" = pic_compare, "pic_se" = pic_se_compare, 
+               "peff" = peff_compare, "peff_se" = peff_se_compare, "ic_res" = ic_list)
   }
   return(ic)
 }

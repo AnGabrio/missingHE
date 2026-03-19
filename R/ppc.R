@@ -1,30 +1,26 @@
-#' Posterior predictive checks for assessing the fit to the observed data of Bayesian models implemented in \code{JAGS} using the function \code{\link{selection}}, \code{\link{pattern}} or \code{\link{hurdle}}
+#' Posterior predictive checks for assessing the fit to the observed data of Bayesian models implemented in \code{JAGS} using the function \code{\link{selection}}, \code{\link{pattern}}, \code{\link{hurdle}} or \code{\link{lmdm}}
 #'
 #' The focus is restricted to full Bayesian models in cost-effectiveness analyses based on the function \code{\link{selection}}, \code{\link{pattern}},
-#' \code{\link{hurdle}} or \code{\link{long_miss}} with the fit to the observed data being assessed through graphical checks based on the posterior replications generated from the model. 
+#' \code{\link{hurdle}} or \code{\link{lmdm}} with the fit to the observed data being assessed through graphical checks based on the posterior replications generated from the model. 
 #' Examples include the comparison of histograms, density plots, intervals, test statistics, evaluated using both the observed and replicated data.
 #' Different types of posterior predictive checks are implemented to assess model fit using functions contained in the package \strong{bayesplot}. 
 #' Graphics and plots are managed using functions contained in the package \strong{ggplot2} and \strong{ggthemes}.
 #' @keywords posterior predictive checks MCMC replications 
 #' @param x An object of class "missingHE" containing the posterior results of a full Bayesian model implemented using the function \code{\link{selection}}, 
-#' \code{\link{pattern}}, \code{\link{hurdle}} or \code{\link{long_miss}}.
-#' @param type Type of posterior predictive check to be plotted for assessing model fit. Available choices include: 'histogram', 'boxplot', 
-#' 'freqpoly', 'dens', 'dens_overlay' and ecdf_overlay', which compare the empirical and repicated distributions of the data; 'stat' and 'stat_2d', which compare
-#' the value of some statistics evaluated on the observed data with the replicated values for those statistics from the posterior predictions; 'error_hist', 
-#' 'error_scatter', 'error_scatter_avg' and 'error_binned', which display the predictive errors of the model; 'intervals' and 'ribbon', which compare medians and
-#' central interval estimates of the replications with the observed data overlaid; 'scatter' and 'scatter_avg', which display scatterplots of the observed and replicated data.   
-#' @param outcome The outcome variables that should be displayed. Use the names 'effects_arm1' and effects_arm2' for the effectiveness in the control and intervention arm; 
-#' use costs_arm1' or 'costs_arm2' for the costs; use "effects" or "costs" for the respective outcome in both arms; use "all" for all outcomes.
-#' @param ndisplay Number of posterior replications to be displayed in the plots.
-#' @param time_plot Time point for which posterior predictive checks should be displayed (only for long models).  
+#' \code{\link{pattern}}, \code{\link{hurdle}} or \code{\link{lmdm}}.
+#' @param type Type of posterior predictive check among some pre-defined types, mostly taken from the package \strong{bayesplot}. For a full list of available options see details.
+#' @param outcome The outcome variables that should be displayed. Options are: 'both' (default) for both effects and costs; 'effects' or 'costs' for the effects
+#' or costs separately.
+#' @param ndisplay Number of posterior replications to be used to generate the plots.
+#' @param trt treatment group for which plots should be displayed. Choices include: 'all' (default) for all groups; 'none' for results across all groups; any 
+#' character or numeric value denoting the treatment group name or index associated with the treatment variable in the original data set.
 #' @param theme Type of ggplot theme among some pre-defined themes, mostly taken from the package \strong{ggthemes}. For a full list of available themes see details.
 #' @param scheme_set Type of scheme sets among some pre-defined schemes, mostly taken from the package \strong{bayesplot}. For a full list of available themes see details.
-#' @param legend Position of the legend: available choices are: "top", "left", "right", "bottom" and "none".
 #' @param ... Additional parameters that can be provided to manage the output of \code{ppc}. For more details see \strong{bayesplot}.  
 #' @return A \code{ggplot} object containing the plots specified in the argument \code{type}.
-#' @seealso \code{\link{selection}} \code{\link{pattern}} \code{\link{hurdle}} \code{\link{long_miss}} \code{\link{diagnostic}}
+#' @seealso \code{\link{selection}} \code{\link{pattern}} \code{\link{hurdle}} \code{\link{lmdm}} \code{\link{diagnostic}}
 #' @details The function produces different types of graphical posterior predictive checks using the estimates from a Bayesian cost-effectiveness model implemented
-#' with the function \code{\link{selection}}, \code{\link{pattern}} or \code{\link{hurdle}}. The purpose of these checks is to visually compare the distribution (or some relevant quantity)
+#' with the function \code{\link{selection}}, \code{\link{pattern}}, \code{\link{hurdle}} or \code{\link{lmdm}}. The purpose of these checks is to visually compare the distribution (or some relevant quantity)
 #' of the observed data with respect to that from the replicated data for both effectiveness and cost outcomes in each treatment arm. Since predictive checks are meaningful 
 #' only with respect to the observed data, only the observed outcome values are used to assess the fit of the model.
 #' The arguments \code{theme} and \code{scheme_set} allow to customise the graphical aspect of the plots generated by \code{ppc} and allow to choose among a set of possible 
@@ -34,1231 +30,2171 @@
 #' Gelman, A. Carlin, JB., Stern, HS. Rubin, DB.(2003). \emph{Bayesian Data Analysis, 2nd edition}, CRC Press.
 #' @import ggplot2 ggpubr
 #' @importFrom stats rnorm rbeta rgamma rlnorm rweibull rnbinom rbinom rpois rlogis rexp complete.cases
-#' @importFrom bayesplot color_scheme_set ppc_hist ppc_boxplot ppc_freqpoly ppc_dens ppc_dens_overlay ppc_ecdf_overlay ppc_stat color_scheme_get bayesplot_theme_get ppc_stat_2d ppc_error_hist ppc_error_scatter ppc_error_scatter_avg ppc_error_binned ppc_intervals ppc_ribbon ppc_scatter ppc_scatter_avg legend_none
+#' @importFrom bayesplot color_scheme_set ppc_hist ppc_boxplot ppc_freqpoly ppc_dens ppc_dens_overlay ppc_ecdf_overlay ppc_pit_ecdf ppc_stat color_scheme_get bayesplot_theme_get ppc_stat_2d ppc_error_hist ppc_error_scatter ppc_error_scatter_avg ppc_error_binned ppc_intervals ppc_ribbon ppc_scatter ppc_scatter_avg legend_none ppc_loo_pit_ecdf ppc_loo_pit_overlay
+#' @importFrom graphics text
 #' @export 
 #' @examples
 #' # For examples see the function \code{\link{selection}}, \code{\link{pattern}}, 
-#' # \code{\link{hurdle}} or \code{\link{long_miss}}
+#' # \code{\link{hurdle}} or \code{\link{lmdm}}
 #' #
 
-ppc <- function(x, type = "histogram", outcome = "all", ndisplay = 15, time_plot = NULL, theme = NULL, scheme_set = NULL, legend = "top", ...) {
-  if(!isTRUE(requireNamespace("ggplot2")) | !isTRUE(requireNamespace("ggthemes")) | !isTRUE(requireNamespace("bayesplot")) | !isTRUE(requireNamespace("ggpubr"))) {
-    stop("You need to install the R packages 'ggplot2' and 'bayesplot'. Please run in your R terminal:\n install.packages('ggplot2', 'ggthemes', 'bayesplot', 'ggpubr')")
+ppc <- function(x, type = "histogram", outcome = "both", ndisplay = 15, 
+                trt = "all", theme = NULL, scheme_set = NULL, ...) {
+  if(!inherits(x, "missingHE")) { stop("Only objects of class 'missingHE' can be used")}
+  if(!isTRUE(requireNamespace("ggplot2")) | !isTRUE(requireNamespace("bayesplot")) | !isTRUE(requireNamespace("ggpubr"))) {
+    stop("You need to install the R packages 'ggplot2', 'bayesplot' and 'ggpubr'. 
+         Please run in your R terminal:\n install.packages('ggplot2', 'bayesplot', 'ggpubr')")
   }
-  if(x$model_output$ppc == FALSE) {
-    stop("No posterior estimates that can be used to generate replications are detected. Try running the function 'selection', 'pattern' or 'hurdle' and set the argument ppc = TRUE")
-  }
-  if(is.null(theme) == TRUE) {theme = "default" }
-  if(!theme %in% c("default", "base", "calc", "economist", "excel", "few", "538", "gdocs", "hc", "par", "pander", "solarized", "stata", "tufte", "wsj")) {
-    stop("You must provide a valid theme type among those available")
-  }
-  if(is.null(scheme_set) == TRUE) {scheme_set = "blue" }
-  if(!scheme_set %in% c("blue", "brightblue", "gray", "darkgray", "green", "pink", "purple", "red", "teal", "yellow", "viridis", "viridisA", "viridisB", "viridisC",
-                        "viridisE", "mix-x-y")) {
-    stop("You must provide a valid scheme sets among those available")
-  }
+  if(is.null(theme)) { theme = "classic"}
+  if(!theme %in% c("classic", "base", "calc", "economist", "excel", "few", "538", "gdocs", 
+                   "hc", "par", "pander", "solarized", "stata", "tufte", "wsj")) {
+    stop("Please provide a valid theme type among those available. Type ''help(ggthemes)'' for more details.")}
+  if(is.null(scheme_set)) { scheme_set = "blue"}
+  if(!scheme_set %in% c("blue", "brightblue", "gray", "darkgray", "green", "pink", "purple", "red", "teal", "yellow", 
+                        "viridis", "viridisA", "viridisB", "viridisC", "viridisE", "mix-x-y")) {
+    stop("Please provide a valid scheme set among those available.")}
   if(!type %in% c("histogram", "boxplot", "freqpoly", "dens", "dens_overlay", "ecdf_overlay", "stat", "stat_2d", "error_hist", 
-                  "error_scatter", "error_scatter_avg", "error_binned", "intervals", "ribbon", "scatter", "scatter_avg")) {
-    stop("You must provide a plot type among those available")
-  }
-  if(!outcome %in% c("effects_arm1", "costs_arm1", "effects_arm2", "costs_arm2", "effects", "costs", "all")) {
-    stop("You must provide a plot outcome among those available")
-  }
-  if(!legend %in% c("top", "right", "left", "bottom", "none")) {
-    stop("Please provide a valid name for 'legend' to indicate the position of the legend")
-  }
+                  "error_scatter", "error_scatter_avg", "error_binned", "intervals", "ribbon", "scatter", "scatter_avg", 
+                  "pit_ecdf", "loo_pit_ecdf", "loo_pit_overlay")) {
+    stop("Please provide a plot type among those available.")}
+  if(!outcome %in% c("both", "effects", "costs")) {
+    stop("Please provide an outcome name among those available.")}
   exArgs <- list(...)
-  if(!inherits(x, "missingHE")) {
-    stop("Only objects of class 'missingHE' can be used")
-  }
-  if(exists("corr", where = exArgs)) {corr = exArgs$corr} else {corr = NULL }
-  if(!is.null(corr) & outcome != "all" | !is.null(corr) & !is.function(corr)) {
-    stop("The argument 'corr' must be a function and is available only if 'all' outcomes selected ")
-  }
-  if(exists("stat", where = exArgs)) {stat = exArgs$stat} else {stat = NULL }
-  if(exists("bpp", where = exArgs)) {bpp = exArgs$bpp} else {bpp = FALSE }
-  if(bpp == TRUE & type == "stat_2d") { stop("Bayesian p-values not available for 'stat_2d' type")}
+  if(exists("legend.position", where = exArgs)) { legend.pos = exArgs$legend.position } else { legend.pos = "top"}
+  if(exists("hjust", where = exArgs)) { hjust = exArgs$hjust } else { hjust = -0.5}
+  if(exists("vjust", where = exArgs)) { vjust = exArgs$vjust } else { vjust = 0.3}
+  if(exists("digits", where = exArgs)) { digits = exArgs$digits } else { digits = 7}
+  if(exists("corr", where = exArgs)) { corr = exArgs$corr} else { corr = NULL}
+  values <- NULL
+  if(!is.null(corr) & outcome != "both" | !is.null(corr) & !is.function(corr)) {
+    stop("The argument 'corr' must be a function and is available only when outcome is set to 'both'.")}
+  if(exists("stat", where = exArgs)) { stat = exArgs$stat} else { stat = NULL}
+  if(exists("bpp", where = exArgs)) { bpp = exArgs$bpp} else { bpp = FALSE}
+  if(bpp & type == "stat_2d") { stop("Bayesian p-values are not available for 'stat_2d' type.")}
   if(type == "stat" & is.null(corr)) {
-  if(is.null(stat) == TRUE | length(stat) !=1 | !is.function(stat)) {
-    stop("Please use the argument 'stat' to provide a single function for computing statistics on replications")
-   } 
+  if(is.null(stat) | length(stat) !=1 | !is.function(stat)) {
+    stop("Please use the argument 'stat' to provide a single function for computing statistics.")} 
   }
-  if(type == "stat_2d" & is.null(stat) == TRUE | type == "stat_2d" & length(stat) !=2 | type == "stat_2d" & any(sapply(stat, is.function)) == FALSE) {
-    stop("Please use the argument 'stat' to provide a vector of two functions for computing statistics on replications")
-  }
+  if(type == "stat_2d" & is.null(stat) | type == "stat_2d" & length(stat) !=2 | type == "stat_2d" & !any(sapply(stat, is.function))) {
+    stop("Please use the argument 'stat' to provide a vector of two functions for computing statistics.")}
+  n_sim <- x$model_output$model$n.iter
+  n_trt <- length(x$data_set$data_raw$trt_index)
+  trt_lev <- names(x$data_set$data_raw$trt_index)
+  if(is.numeric(trt)) {
+    if(length(trt) == 1 & !any(trt %in% c(1:n_trt))) {
+      stop("Please provide a trt value among those available.")
+    } else if(length(trt) > 1 & !any(trt %in% c(2:n_trt))){
+      stop("Please provide a trt value among those available.")}
+  } else if(is.character(trt)) {
+    if(length(trt) == 1 & !any(trt %in% c("all", trt_lev, "none"))) {
+      stop("Please provide a trt name among those available.")
+    } else if(length(trt) > 1 & !length(trt) %in% c(2:n_trt)){
+      stop("Please provide a trt name among those available.")}
+  } else { stop("Please provide a trt name or value among those available.")}
+  if(!is.numeric(ndisplay) |  ndisplay < 1 | ndisplay > n_sim) {
+    stop("Number of replications to display is not valid.")}
+  if(exists("time.plot", where = exArgs)) { time.plot = exArgs$time.plot } else { time.plot = 1}
+  if(x$data_format == "long") {
+    n_time <- max(x$data_set$data_raw$time_long, na.rm = TRUE)
+  } else { n_time <- 1}
+  if(is.numeric(time.plot)) {
+    if(length(time.plot) == 1 & !any(time.plot %in% c(1:n_time))) {
+      stop("Please provide a time.plot value among those available.")
+    } else if(length(time.plot) > 1 & !any(time.plot %in% c(2:n_time))){
+      stop("Please provide a time.plot value among those available.")}
+  } else if(is.character(time.plot)) {
+    if(length(time.plot) == 1 & !any(time.plot %in% c("all", 1:n_time))) {
+      stop("Please provide a time.plot name among those available.")
+    } else if(length(time.plot) > 1 & !length(time.plot) %in% c(2:n_time)){
+      stop("Please provide a time.plot name among those available.")}
+  } else { stop("Please provide a time.plot name or value among those available.")}
   if(x$data_format == "wide") {
-    if(is.numeric(ndisplay) == FALSE |  ndisplay < 1 | ndisplay > dim(x$model_output$`model summary`$BUGSoutput$sims.list$mu_e1)[1]) {
-      stop("number of replications to display is not valid")
-    }
-  index_mis_e1 <- which(is.na(x$data_set$effects$Control))
-  index_mis_e2 <- which(is.na(x$data_set$effects$Intervention))
-  index_mis_c1 <- which(is.na(x$data_set$costs$Control))
-  index_mis_c2 <- which(is.na(x$data_set$costs$Intervention))
-  if(length(index_mis_e1) == 0 | length(index_mis_e2) == 0) {
-    stop("Missing values not found for the effects in both arms")
-  } 
-  if(length(index_mis_c1) == 0 | length(index_mis_c2) == 0) {
-    stop("Missing values not found for the costs in both arms")
-  } 
-  e1_obs <- as.numeric(x$data_set$effects$Control[-index_mis_e1])
-  e2_obs <- as.numeric(x$data_set$effects$Intervention[-index_mis_e2])
-  c1_obs <- as.numeric(x$data_set$costs$Control[-index_mis_c1])
-  c2_obs <- as.numeric(x$data_set$costs$Intervention[-index_mis_c2])
-  n1_e <- length(e1_obs)
-  n1_c <- length(c1_obs)
-  n2_e <- length(e2_obs)
-  n2_c <- length(c2_obs)
-  e1_rep <- matrix(NA, nrow = x$model_output$`model summary`$BUGSoutput$n.iter, n1_e)
-  c1_rep <- matrix(NA, nrow = x$model_output$`model summary`$BUGSoutput$n.iter, n1_c)
-  e2_rep <- matrix(NA, nrow = x$model_output$`model summary`$BUGSoutput$n.iter, n2_e)
-  c2_rep <- matrix(NA, nrow = x$model_output$`model summary`$BUGSoutput$n.iter, n2_c)
-   if(x$model_output$dist_e == "norm") {
-   mu_e1 <- x$model_output$`model summary`$BUGSoutput$sims.list$mu_e1[, -index_mis_e1]
-   mu_e2 <- x$model_output$`model summary`$BUGSoutput$sims.list$mu_e2[, -index_mis_e2]
-   if(is.null(dim(mu_e1)) == TRUE | is.null(dim(mu_e2)) == TRUE){
-     stop("Not possible to plot posterior predictive checks with a single observed effect value in one arm.")
-   }
-    if(grepl("SELECTION", x$model_output$type) == TRUE){
-     sigma_e1 <- 1 / sqrt(x$model_output$`model summary`$BUGSoutput$sims.list$tau_e[, 1])
-     sigma_e2 <- 1 / sqrt(x$model_output$`model summary`$BUGSoutput$sims.list$tau_e[, 2])
-     for(i in 1 : nrow(e1_rep)){ e1_rep[i, ] <- rnorm(n1_e, mean = mu_e1[i, ], sd = sigma_e1 [i]) } 
-     for(i in 1 : nrow(e2_rep)){ e2_rep[i, ] <- rnorm(n2_e, mean = mu_e2[i, ], sd = sigma_e2 [i]) }
-    } else if(grepl("PATTERN", x$model_output$type) == TRUE) {
-     sigma_e1 <- 1 / sqrt(x$model_output$`model summary`$BUGSoutput$sims.list$tau_e_p1)
-     sigma_e2 <- 1 / sqrt(x$model_output$`model summary`$BUGSoutput$sims.list$tau_e_p2)
-     for(i in 1 : nrow(e1_rep)){ e1_rep[i, ] <- rnorm(n1_e, mean = mu_e1[i, ], sd = sigma_e1 [i, ]) }
-     for(i in 1 : nrow(e2_rep)){ e2_rep[i, ] <- rnorm(n2_e, mean = mu_e2[i, ], sd = sigma_e2 [i, ]) }
-    } else if(grepl("HURDLE", x$model_output$type) == TRUE) {
-     sigma_e1 <- 1 / sqrt(x$model_output$`model summary`$BUGSoutput$sims.list$tau_e1)
-     sigma_e2 <- 1 / sqrt(x$model_output$`model summary`$BUGSoutput$sims.list$tau_e2)
-     for(i in 1 : nrow(e1_rep)){ e1_rep[i, ] <- rnorm(n1_e, mean = mu_e1[i, ], sd = sigma_e1 [i, ]) }
-     for(i in 1 : nrow(e2_rep)){ e2_rep[i, ] <- rnorm(n2_e, mean = mu_e2[i, ], sd = sigma_e2 [i, ]) }
-    }
-   } else if(x$model_output$dist_e == "logis") {
-     mu_e1 <- x$model_output$`model summary`$BUGSoutput$sims.list$mu_e1[, -index_mis_e1]
-     mu_e2 <- x$model_output$`model summary`$BUGSoutput$sims.list$mu_e2[, -index_mis_e2]
-     if(is.null(dim(mu_e1)) == TRUE | is.null(dim(mu_e2)) == TRUE){
-       stop("Not possible to plot posterior predictive checks with a single observed effect value in one arm.")
+    me_type <- ifelse(x$data_set$data_raw$me == 1, "missing", "observed")
+    mc_type <- ifelse(x$data_set$data_raw$mc == 1, "missing", "observed")  
+    e_obs <- x$data_set$data_raw$e[me_type == "observed"]
+    c_obs <- x$data_set$data_raw$c[mc_type == "observed"]
+    trt_obs_e <- x$data_set$data_raw$data$trt[me_type == "observed"]
+    trt_obs_c <- x$data_set$data_raw$data$trt[mc_type == "observed"]
+    n_all <- sum(x$data_set$data_raw$n)
+    n_trt_obs_e <- x$data_set$data_raw$n_obs_e
+    n_trt_obs_c <- x$data_set$data_raw$n_obs_c
+    n_obs_e <- sum(n_trt_obs_e)
+    n_obs_c <- sum(n_trt_obs_c)
+    e_rep <- matrix(NA, nrow = n_sim, n_obs_e)
+    c_rep <- matrix(NA, nrow = n_sim, n_obs_c)
+    e_obs_trt <- lapply(x$data_set$data_raw$efft, function(x) x[!is.na(x)])
+    c_obs_trt <- lapply(x$data_set$data_raw$costt, function(x) x[!is.na(x)])
+    e_rep_trt <- lapply(x$data_set$data_raw$m_efft, function(x) matrix(NA, nrow = n_sim, ncol = length(x[x == 0])))
+    c_rep_trt <- lapply(x$data_set$data_raw$m_costt, function(x) matrix(NA, nrow = n_sim, ncol = length(x[x == 0])))
+    if(x$model_output$method == "SELECTION") {
+      cmu_e <- x$model_output$model$BUGSoutput$sims.list$cmu_e[, me_type == "observed"]
+      s_e <- x$model_output$model$BUGSoutput$sims.list$s_e
+     if(x$model_output$dist_c == "lnorm") {
+      clmu_c <- x$model_output$model$BUGSoutput$sims.list$clmu_c[, mc_type == "observed"]
+      ltau_c <- x$model_output$model$BUGSoutput$sims.list$ltau_c
+     } else {
+      cmu_c <- x$model_output$model$BUGSoutput$sims.list$cmu_c[, mc_type == "observed"]
+      s_c <- x$model_output$model$BUGSoutput$sims.list$s_c
      }
-      if(grepl("SELECTION", x$model_output$type) == TRUE){
-       scale_e1 <- 1 / x$model_output$`model summary`$BUGSoutput$sims.list$tau_e[, 1]
-       scale_e2 <- 1 / x$model_output$`model summary`$BUGSoutput$sims.list$tau_e[, 2]
-       for(i in 1 : nrow(e1_rep)){ e1_rep[i, ] <- rlogis(n1_e, location = mu_e1[i, ], scale = scale_e1 [i]) } 
-       for(i in 1 : nrow(e2_rep)){ e2_rep[i, ] <- rlogis(n2_e, location = mu_e2[i, ], scale = scale_e2 [i]) }
-      } else if(grepl("PATTERN", x$model_output$type) == TRUE) {
-       scale_e1 <- 1 / x$model_output$`model summary`$BUGSoutput$sims.list$tau_e_p1
-       scale_e2 <- 1 / x$model_output$`model summary`$BUGSoutput$sims.list$tau_e_p2
-       for(i in 1 : nrow(e1_rep)){ e1_rep[i, ] <- rlogis(n1_e, location = mu_e1[i, ], scale = scale_e1 [i, ]) }
-       for(i in 1 : nrow(e2_rep)){ e2_rep[i, ] <- rlogis(n2_e, location = mu_e2[i, ], scale = scale_e2 [i, ]) }
-      } else if(grepl("HURDLE", x$model_output$type) == TRUE) {
-       scale_e1 <- 1 / x$model_output$`model summary`$BUGSoutput$sims.list$tau_e1
-       scale_e2 <- 1 / x$model_output$`model summary`$BUGSoutput$sims.list$tau_e2
-       for(i in 1 : nrow(e1_rep)){ e1_rep[i, ] <- rlogis(n1_e, location = mu_e1[i, ], scale = scale_e1 [i, ]) }
-       for(i in 1 : nrow(e2_rep)){ e2_rep[i, ] <- rlogis(n2_e, location = mu_e2[i, ], scale = scale_e2 [i, ]) }
+     if(x$model_output$dist_e == "norm") {
+       for(i in 1:n_sim){ 
+         e_rep[i, ] <- rnorm(n_obs_e, mean = cmu_e[i, ], sd = s_e[i])
+         for(trt_i in trt_lev){ e_rep_trt[[trt_i]][i, ] <- rnorm(n_trt_obs_e[trt_i], mean = cmu_e[i, trt_obs_e == trt_i], sd = s_e[i])}
+        } 
+     }
+     if(x$model_output$dist_e == "logis") {
+       for(i in 1:n_sim){ e_rep[i, ] <- rlogis(n_obs_e, location = cmu_e[i, ], scale =  s_e[i])
+       for(trt_i in trt_lev){ e_rep_trt[[trt_i]][i, ] <- rlogis(n_trt_obs_e[trt_i], location = cmu_e[i, trt_obs_e == trt_i], scale = s_e[i])}
+       } 
+     }
+     if(x$model_output$dist_e == "negbin") {
+       tau_e <- x$model_output$model$BUGSoutput$sims.list$tau_e
+       for(i in 1:n_sim){ e_rep[i, ] <- rnbinom(n_obs_e, prob = tau_e[i] / (tau_e[i] + cmu_e[i, ]), size =  tau_e[i])
+       for(trt_i in trt_lev){ e_rep_trt[[trt_i]][i, ] <- rnbinom(n_trt_obs_e[trt_i], prob = tau_e[i] / (tau_e[i] + cmu_e[i, trt_obs_e == trt_i]), size =  tau_e[i])}
+       } 
+     }
+     if(x$model_output$dist_e == "exp") {
+       for(i in 1:n_sim){ e_rep[i, ] <- rexp(n_obs_e, rate = 1 / cmu_e[i, ])
+       for(trt_i in trt_lev){ e_rep_trt[[trt_i]][i, ] <- rexp(n_trt_obs_e[trt_i], rate = 1 / cmu_e[i, trt_obs_e == trt_i])}
+       } 
+     }
+     if(x$model_output$dist_e == "bern") {
+       for(i in 1:n_sim){ e_rep[i, ] <- rbinom(n_obs_e, size = 1, prob = cmu_e[i, ])
+       for(trt_i in trt_lev){ e_rep_trt[[trt_i]][i, ] <- rbinom(n_trt_obs_e[trt_i], size = 1, prob = cmu_e[i, trt_obs_e == trt_i])}
+       } 
+     }
+     if(x$model_output$dist_e == "pois") {
+       for(i in 1:n_sim){ e_rep[i, ] <- rpois(n_obs_e, lambda = cmu_e[i, ])
+       for(trt_i in trt_lev){ e_rep_trt[[trt_i]][i, ] <- rpois(n_trt_obs_e[trt_i], lambda = cmu_e[i, trt_obs_e == trt_i])}
+       } 
+     }
+     if(x$model_output$dist_e == "gamma") {
+       ctau_e <- x$model_output$model$BUGSoutput$sims.list$ctau_e[, me_type == "observed"]
+       for(i in 1:n_sim){ e_rep[i, ] <- rgamma(n_obs_e, shape = cmu_e[i, ] * ctau_e[i, ], rate =  ctau_e[i, ])
+       for(trt_i in trt_lev){ e_rep_trt[[trt_i]][i, ] <- rgamma(n_trt_obs_e[trt_i], shape = cmu_e[i, trt_obs_e == trt_i] * ctau_e[i, trt_obs_e == trt_i], rate =  ctau_e[i, trt_obs_e == trt_i])}
+       } 
+     }
+     if(x$model_output$dist_e == "weib") {
+       ctau_e <- x$model_output$model$BUGSoutput$sims.list$ctau_e[, me_type == "observed"]
+       for(i in 1:n_sim){ e_rep[i, ] <- rweibull(n_obs_e, shape = ctau_e[i, ], scale = cmu_e[i, ] / exp(lgamma(1 + 1 / ctau_e[i, ])))
+       for(trt_i in trt_lev){ e_rep_trt[[trt_i]][i, ] <- rweibull(n_trt_obs_e[trt_i], shape = ctau_e[i, trt_obs_e == trt_i], scale = cmu_e[i, trt_obs_e == trt_i] / exp(lgamma(1 + 1 / ctau_e[i, trt_obs_e == trt_i])))}
+       } 
+     }
+     if(x$model_output$dist_e == "beta") {
+       ctau_e <- x$model_output$model$BUGSoutput$sims.list$ctau_e[, me_type == "observed"]
+       for(i in 1:n_sim){ e_rep[i, ] <- rbeta(n_obs_e, shape1 = cmu_e[i, ] * ctau_e[i, ], shape2 =  (1 - cmu_e[i, ]) * ctau_e[i, ])
+       for(trt_i in trt_lev){ e_rep_trt[[trt_i]][i, ] <- rbeta(n_trt_obs_e[trt_i], shape1 = cmu_e[i, trt_obs_e == trt_i] * ctau_e[i, trt_obs_e == trt_i], shape2 =  (1 - cmu_e[i, trt_obs_e == trt_i]) * ctau_e[i, trt_obs_e == trt_i])}
+       } 
+     }
+     if(x$model_output$dist_c == "norm") {
+       for(i in 1:n_sim){ c_rep[i, ] <- rnorm(n_obs_c, mean = cmu_c[i, ], sd = s_c[i])
+       for(trt_i in trt_lev){ c_rep_trt[[trt_i]][i, ] <- rnorm(n_trt_obs_c[trt_i], mean = cmu_c[i, trt_obs_c == trt_i], sd = s_c[i])}
+       } 
+     }
+     if(x$model_output$dist_c == "gamma") {
+       ctau_c <- x$model_output$model$BUGSoutput$sims.list$ctau_c[, mc_type == "observed"]
+       for(i in 1:n_sim){ c_rep[i, ] <- rgamma(n_obs_c, shape = cmu_c[i, ] * ctau_c[i, ], rate =  ctau_c[i, ])
+       for(trt_i in trt_lev){ c_rep_trt[[trt_i]][i, ] <- rgamma(n_trt_obs_c[trt_i], shape = cmu_c[i, trt_obs_c == trt_i] * ctau_c[i, trt_obs_c == trt_i], rate =  ctau_c[i, trt_obs_c == trt_i])}
+       } 
+     } 
+     if(x$model_output$dist_c == "lnorm") {
+       for(i in 1:n_sim){ c_rep[i, ] <- rlnorm(n_obs_c, meanlog = clmu_c[i, ], sdlog = 1 / sqrt(ltau_c[i]))
+       for(trt_i in trt_lev){ c_rep_trt[[trt_i]][i, ] <- rlnorm(n_trt_obs_c[trt_i], meanlog = clmu_c[i, trt_obs_c == trt_i], sdlog = 1 / sqrt(ltau_c[i]))}
+       } 
+     }
+    }
+    if(x$model_output$method == "HURDLE") {
+      cmu_e <- round(x$model_output$model$BUGSoutput$sims.list$cmu_e[, me_type == "observed"], digits = digits)
+      s_e <- x$model_output$model$BUGSoutput$sims.list$s_e
+      if(x$model_output$dist_c == "lnorm") {
+        clmu_c <- x$model_output$model$BUGSoutput$sims.list$clmu_c[, mc_type == "observed"]
+        ltau_c <- x$model_output$model$BUGSoutput$sims.list$ltau_c
+      } else {
+        cmu_c <- round(x$model_output$model$BUGSoutput$sims.list$cmu_c[, mc_type == "observed"], digits = digits)
+        s_c <- x$model_output$model$BUGSoutput$sims.list$s_c
       }
-   } else if(x$model_output$dist_e == "nbinom") {
-     mu_e1 <- x$model_output$`model summary`$BUGSoutput$sims.list$mu_e1[, -index_mis_e1]
-     mu_e2 <- x$model_output$`model summary`$BUGSoutput$sims.list$mu_e2[, -index_mis_e2]
-     if(is.null(dim(mu_e1)) == TRUE | is.null(dim(mu_e2)) == TRUE){
-       stop("Not possible to plot posterior predictive checks with a single observed effect value in one arm.")
-     }
-     if(grepl("SELECTION", x$model_output$type) == TRUE){
-       prob_e1 <- x$model_output$`model summary`$BUGSoutput$sims.list$tau_e[, 1] / (x$model_output$`model summary`$BUGSoutput$sims.list$tau_e[, 1] + x$model_output$`model summary`$BUGSoutput$sims.list$mu_e1[, -index_mis_e1])
-       prob_e2 <- x$model_output$`model summary`$BUGSoutput$sims.list$tau_e[, 2] / (x$model_output$`model summary`$BUGSoutput$sims.list$tau_e[, 2] + x$model_output$`model summary`$BUGSoutput$sims.list$mu_e2[, -index_mis_e2])
-       size_e1 <- x$model_output$`model summary`$BUGSoutput$sims.list$tau_e[, 1]
-       size_e2 <- x$model_output$`model summary`$BUGSoutput$sims.list$tau_e[, 2]
-       for(i in 1 : nrow(e1_rep)){ e1_rep[i, ] <- rnbinom(n1_e, prob = prob_e1[i, ], size = size_e1 [i]) } 
-       for(i in 1 : nrow(e2_rep)){ e2_rep[i, ] <- rnbinom(n2_e, prob = prob_e2[i, ], size = size_e2 [i]) }
-     } else if(grepl("PATTERN", x$model_output$type) == TRUE) {
-       prob_e1 <- array(NA, dim = c(nrow(e1_rep), dim(mu_e1)[2], dim(x$model_output$`model summary`$BUGSoutput$sims.list$tau_e_p1)[2]))
-        for(j in 1 : dim(x$model_output$`model summary`$BUGSoutput$sims.list$tau_e_p1)[2]) {
-          prob_e1[, , j] <- x$model_output$`model summary`$BUGSoutput$sims.list$tau_e_p1[, j] / (x$model_output$`model summary`$BUGSoutput$sims.list$tau_e_p1[, j] + x$model_output$`model summary`$BUGSoutput$sims.list$mu_e1[, -index_mis_e1])
+      if(!is.null(x$model_output$mean_nostr_effects)) { 
+        str_e <- x$model_output$se
+        if(x$model_output$dist_e %in% c("gamma", "weib", "exp", "pois", "negbin")) {
+          str_e <- round(exp(str_e), digits = digits)
+          } 
+        if(x$model_output$dist_e %in% c("beta")) {
+          str_e <- round(exp(str_e) / (1 + exp(str_e)), digits = digits)}
+        } else { str_e <- NULL}
+      if(!is.null(x$model_output$mean_nostr_costs)) { 
+        str_c <- x$model_output$sc
+        if(x$model_output$dist_c %in% c("gamma", "lnorm")) {
+          str_c <- round(exp(str_c), digits = digits)}
+      } else { str_c <- NULL}
+      if(!is.null(str_e)) {
+        s_eff <- x$data_set$data_raw$se
+        s_eff[is.na(s_eff)] <- -999999
+        se_type <- ifelse(s_eff == 1, "structural", s_eff)  
+        se_type <- ifelse(s_eff == 0, "non-structural", se_type)  
+        e_obs_ns <- x$data_set$data_raw$e[se_type == "non-structural"]
+        e_obs_s <- x$data_set$data_raw$e[se_type == "structural"]
+        trt_obs_ns_e <- x$data_set$data_raw$data$trt[se_type == "non-structural"]
+        trt_obs_s_e <- x$data_set$data_raw$data$trt[se_type == "structural"]
+        n_trt_obs_ns_e <- x$data_set$data_raw$n_ns_eff
+        n_trt_obs_s_e <- x$data_set$data_raw$n_s_eff
+        n_obs_ns_e <- sum(n_trt_obs_ns_e)
+        n_obs_s_e <- sum(n_trt_obs_s_e)
+        e_ns_rep <- e_ns_rep <- matrix(NA, nrow = n_sim, n_obs_ns_e)
+        e_s_rep <- e_s_rep <- matrix(NA, nrow = n_sim, n_obs_s_e)
+        e_obs_ns_trt <- lapply(x$data_set$data_raw$s_efft, function(x) x[!is.na(x) & x == 0])        
+        e_obs_s_trt <- lapply(x$data_set$data_raw$s_efft, function(x) x[!is.na(x) & x == 1])        
+        e_rep_ns_trt <- lapply(x$data_set$data_raw$s_efft, function(x) matrix(NA, nrow = n_sim, ncol = length(x[ !is.na(x) & x == 0])))
+        e_rep_s_trt <- lapply(x$data_set$data_raw$s_efft, function(x) matrix(NA, nrow = n_sim, ncol = length(x[ !is.na(x) & x == 1])))
+      }
+      if(!is.null(str_c)) {
+        s_cost <- x$data_set$data_raw$sc
+        s_cost[is.na(s_cost)] <- -999999
+        sc_type <- ifelse(s_cost == 1, "structural", s_cost)  
+        sc_type <- ifelse(s_cost == 0, "non-structural", sc_type)  
+        c_obs_ns <- x$data_set$data_raw$c[sc_type == "non-structural"]
+        c_obs_s <- x$data_set$data_raw$c[sc_type == "structural"]
+        trt_obs_ns_c <- x$data_set$data_raw$data$trt[sc_type == "non-structural"]
+        trt_obs_s_c <- x$data_set$data_raw$data$trt[sc_type == "structural"]
+        n_trt_obs_ns_c <- x$data_set$data_raw$n_ns_cost
+        n_trt_obs_s_c <- x$data_set$data_raw$n_s_cost
+        n_obs_ns_c <- sum(n_trt_obs_ns_c)
+        n_obs_s_c <- sum(n_trt_obs_s_c)
+        c_ns_rep <- c_ns_rep <- matrix(NA, nrow = n_sim, n_obs_ns_c)
+        c_s_rep <- c_s_rep <- matrix(NA, nrow = n_sim, n_obs_s_c)
+        c_obs_ns_trt <- lapply(x$data_set$data_raw$s_costt, function(x) x[!is.na(x) & x == 0])        
+        c_obs_s_trt <- lapply(x$data_set$data_raw$s_costt, function(x) x[!is.na(x) & x == 1])        
+        c_rep_ns_trt <- lapply(x$data_set$data_raw$s_costt, function(x) matrix(NA, nrow = n_sim, ncol = length(x[ !is.na(x) & x == 0])))
+        c_rep_s_trt <- lapply(x$data_set$data_raw$s_costt, function(x) matrix(NA, nrow = n_sim, ncol = length(x[ !is.na(x) & x == 1])))
+      }
+      if(is.null(str_e)) {
+        if(x$model_output$dist_e == "norm") {
+          for(i in 1:n_sim){ e_rep[i, ] <- rnorm(n_obs_e, mean = cmu_e[i, ], sd = s_e[i])
+            for(trt_i in trt_lev){ e_rep_trt[[trt_i]][i, ] <- rnorm(n_trt_obs_e[trt_i], mean = cmu_e[i, trt_obs_e == trt_i], sd = s_e[i])}
+          } 
         }
-       prob_e2 <- array(NA, dim = c(nrow(e2_rep), dim(mu_e2)[2], dim(x$model_output$`model summary`$BUGSoutput$sims.list$tau_e_p2)[2]))
-       for(j in 1 : dim(x$model_output$`model summary`$BUGSoutput$sims.list$tau_e_p2)[2]) {
-         prob_e2[, , j] <- x$model_output$`model summary`$BUGSoutput$sims.list$tau_e_p2[, j] / (x$model_output$`model summary`$BUGSoutput$sims.list$tau_e_p2[, j] + x$model_output$`model summary`$BUGSoutput$sims.list$mu_e2[, -index_mis_e2])
-       }
-       size_e1 <- x$model_output$`model summary`$BUGSoutput$sims.list$tau_e_p1
-       size_e2 <- x$model_output$`model summary`$BUGSoutput$sims.list$tau_e_p2
-       for(i in 1 : nrow(e1_rep)){ e1_rep[i, ] <- rnbinom(n1_e, prob = prob_e1[i, , ], size = size_e1 [i, ]) } 
-       for(i in 1 : nrow(e2_rep)){ e2_rep[i, ] <- rnbinom(n2_e, prob = prob_e2[i, , ], size = size_e2 [i, ]) }
-     } else if(grepl("HURDLE", x$model_output$type) == TRUE) {
-       if(x$model_output$type %in% c("HURDLE_e", "HURDLE_ec")){
-         prob_e1 <- array(NA, dim = c(nrow(e1_rep), dim(mu_e1)[2], dim(x$model_output$`model summary`$BUGSoutput$sims.list$tau_e1)[2]))
-         for(j in 1 : dim(x$model_output$`model summary`$BUGSoutput$sims.list$tau_e1)[2]) {
-           prob_e1[, , j] <- x$model_output$`model summary`$BUGSoutput$sims.list$tau_e1[, j] / (x$model_output$`model summary`$BUGSoutput$sims.list$tau_e1[, j] + x$model_output$`model summary`$BUGSoutput$sims.list$mu_e1[, -index_mis_e1])
-         }
-         prob_e2 <- array(NA, dim = c(nrow(e2_rep), dim(mu_e2)[2], dim(x$model_output$`model summary`$BUGSoutput$sims.list$tau_e2)[2]))
-         for(j in 1 : dim(x$model_output$`model summary`$BUGSoutput$sims.list$tau_e2)[2]) {
-           prob_e2[, , j] <- x$model_output$`model summary`$BUGSoutput$sims.list$tau_e2[, j] / (x$model_output$`model summary`$BUGSoutput$sims.list$tau_e2[, j] + x$model_output$`model summary`$BUGSoutput$sims.list$mu_e2[, -index_mis_e2])
-         }
-         size_e1 <- x$model_output$`model summary`$BUGSoutput$sims.list$tau_e1
-         size_e2 <- x$model_output$`model summary`$BUGSoutput$sims.list$tau_e2
-         for(i in 1 : nrow(e1_rep)){ e1_rep[i, ] <- rnbinom(n1_e, prob = prob_e1[i, , ], size = size_e1 [i, ]) } 
-         for(i in 1 : nrow(e2_rep)){ e2_rep[i, ] <- rnbinom(n2_e, prob = prob_e2[i, , ], size = size_e2 [i, ]) }
-       } else if(x$model_output$type %in% c("HURDLE_c")){
-       prob_e1 <- as.vector(x$model_output$`model summary`$BUGSoutput$sims.list$tau_e1) / (as.vector(x$model_output$`model summary`$BUGSoutput$sims.list$tau_e1) + x$model_output$`model summary`$BUGSoutput$sims.list$mu_e1[, -index_mis_e1])
-       prob_e2 <- as.vector(x$model_output$`model summary`$BUGSoutput$sims.list$tau_e2) / (as.vector(x$model_output$`model summary`$BUGSoutput$sims.list$tau_e2) + x$model_output$`model summary`$BUGSoutput$sims.list$mu_e2[, -index_mis_e2])
-       size_e1 <- as.vector(x$model_output$`model summary`$BUGSoutput$sims.list$tau_e1)
-       size_e2 <- as.vector(x$model_output$`model summary`$BUGSoutput$sims.list$tau_e2)
-       for(i in 1 : nrow(e1_rep)){ e1_rep[i, ] <- rnbinom(n1_e, prob = prob_e1[i, ], size = size_e1 [i]) } 
-       for(i in 1 : nrow(e2_rep)){ e2_rep[i, ] <- rnbinom(n2_e, prob = prob_e2[i, ], size = size_e2 [i]) }
-       }
-     }
-   } else if(x$model_output$dist_e == "exp") {
-     mu_e1 <- x$model_output$`model summary`$BUGSoutput$sims.list$mu_e1[, -index_mis_e1]
-     mu_e2 <- x$model_output$`model summary`$BUGSoutput$sims.list$mu_e2[, -index_mis_e2]
-     if(is.null(dim(mu_e1)) == TRUE | is.null(dim(mu_e2)) == TRUE){
-       stop("Not possible to plot posterior predictive checks with a single observed effect value in one arm.")
-     }
-     rate_e1 <- 1 / mu_e1
-     rate_e2 <- 1 / mu_e2
-     for(i in 1 : nrow(e1_rep)){ e1_rep[i, ] <- rexp(n1_e, rate  = rate_e1[i, ]) }
-     for(i in 1 : nrow(e2_rep)){ e2_rep[i, ] <- rexp(n2_e, rate  = rate_e2[i, ]) }
-   } else if(x$model_output$dist_e == "bern" | x$model_output$dist_e == "pois") {
-     mu_e1 <- x$model_output$`model summary`$BUGSoutput$sims.list$mu_e1[, -index_mis_e1]
-     mu_e2 <- x$model_output$`model summary`$BUGSoutput$sims.list$mu_e2[, -index_mis_e2]
-      if(is.null(dim(mu_e1)) == TRUE | is.null(dim(mu_e2)) == TRUE){
-       stop("Not possible to plot posterior predictive checks with a single observed effect value in one arm.")
-     }
-      if(x$model_output$dist_e == "bern"){
-       for(i in 1 : nrow(e1_rep)){ e1_rep[i, ] <- rbinom(n1_e, size = 1, prob = mu_e1[i, ]) }
-       for(i in 1 : nrow(e2_rep)){ e2_rep[i, ] <- rbinom(n2_e, size = 1, prob = mu_e2[i, ]) }
-     }
-      if(x$model_output$dist_e == "pois"){
-       for(i in 1 : nrow(e1_rep)){ e1_rep[i, ] <- rpois(n1_e, lambda = mu_e1[i, ]) }
-       for(i in 1 : nrow(e2_rep)){ e2_rep[i, ] <- rpois(n2_e, lambda = mu_e2[i, ]) }
-     }
-   } else if(x$model_output$dist_e == "gamma") {
-     shape_e1 <- x$model_output$`model summary`$BUGSoutput$sims.list$mu_e1[, -index_mis_e1] * x$model_output$`model summary`$BUGSoutput$sims.list$tau_e1[, -index_mis_e1]
-     rate_e1 <-  x$model_output$`model summary`$BUGSoutput$sims.list$tau_e1[, -index_mis_e1]
-     shape_e2 <- x$model_output$`model summary`$BUGSoutput$sims.list$mu_e2[, -index_mis_e2] * x$model_output$`model summary`$BUGSoutput$sims.list$tau_e2[, -index_mis_e2]
-     rate_e2 <-  x$model_output$`model summary`$BUGSoutput$sims.list$tau_e2[, -index_mis_e2]
-     if(is.null(dim(shape_e1)) == TRUE | is.null(dim(shape_e2)) == TRUE){
-       stop("Not possible to plot posterior predictive checks with a single observed effect value in one arm.")
-     }
-     for(i in 1 : nrow(e1_rep)){ e1_rep[i, ] <- rgamma(n1_e, shape = shape_e1[i, ], rate = rate_e1 [i, ]) }
-     for(i in 1 : nrow(e2_rep)){ e2_rep[i, ] <- rgamma(n2_e, shape = shape_e2[i, ], rate = rate_e2 [i, ]) }
-   } else if(x$model_output$dist_e == "weibull") {
-     shape_e1 <- x$model_output$`model summary`$BUGSoutput$sims.list$tau_e1[, -index_mis_e1]
-     shape_e2 <- x$model_output$`model summary`$BUGSoutput$sims.list$tau_e2[, -index_mis_e2]
-     scale_e1 <- x$model_output$`model summary`$BUGSoutput$sims.list$mu_e1[, -index_mis_e1] / exp(lgamma(1 + 1 / x$model_output$`model summary`$BUGSoutput$sims.list$tau_e1[, -index_mis_e1]))
-     scale_e2 <- x$model_output$`model summary`$BUGSoutput$sims.list$mu_e2[, -index_mis_e2] / exp(lgamma(1 + 1 / x$model_output$`model summary`$BUGSoutput$sims.list$tau_e2[, -index_mis_e2]))
-     if(is.null(dim(shape_e1)) == TRUE | is.null(dim(shape_e2)) == TRUE){
-       stop("Not possible to plot posterior predictive checks with a single observed effect value in one arm.")
-     }
-     for(i in 1 : nrow(e1_rep)){ e1_rep[i, ] <- rweibull(n1_c, shape = shape_e1[i, ], scale = scale_e1 [i, ]) }
-     for(i in 1 : nrow(e2_rep)){ e2_rep[i, ] <- rweibull(n2_c, shape = shape_e2[i, ], scale = scale_e2 [i, ]) }
-   } else if(x$model_output$dist_e == "beta") {
-    shape1_e1 <- x$model_output$`model summary`$BUGSoutput$sims.list$mu_e1[, -index_mis_e1] * x$model_output$`model summary`$BUGSoutput$sims.list$tau_e1[, -index_mis_e1]
-    shape2_e1 <- (1 - x$model_output$`model summary`$BUGSoutput$sims.list$mu_e1[, -index_mis_e1]) * x$model_output$`model summary`$BUGSoutput$sims.list$tau_e1[, -index_mis_e1]
-    shape1_e2 <- x$model_output$`model summary`$BUGSoutput$sims.list$mu_e2[, -index_mis_e2] * x$model_output$`model summary`$BUGSoutput$sims.list$tau_e2[, -index_mis_e2]
-    shape2_e2 <- (1 - x$model_output$`model summary`$BUGSoutput$sims.list$mu_e2[, -index_mis_e2]) * x$model_output$`model summary`$BUGSoutput$sims.list$tau_e2[, -index_mis_e2]
-    if(is.null(dim(shape1_e1)) == TRUE | is.null(dim(shape1_e2)) == TRUE){
-      stop("Not possible to plot posterior predictive checks with a single observed effect value in one arm.")
+        if(x$model_output$dist_e == "logis") {
+          for(i in 1:n_sim){ e_rep[i, ] <- rlogis(n_obs_e, location = cmu_e[i, ], scale =  s_e[i])
+          for(trt_i in trt_lev){ e_rep_trt[[trt_i]][i, ] <- rlogis(n_trt_obs_e[trt_i], location = cmu_e[i, trt_obs_e == trt_i], scale = s_e[i])}
+          } 
+        }
+        if(x$model_output$dist_e == "negbin") {
+          tau_e <- x$model_output$model$BUGSoutput$sims.list$tau_e
+          for(i in 1:n_sim){ e_rep[i, ] <- rnbinom(n_obs_e, prob = tau_e[i] / (tau_e[i] + cmu_e[i, ]), size =  tau_e[i])
+          for(trt_i in trt_lev){ e_rep_trt[[trt_i]][i, ] <- rnbinom(n_trt_obs_e[trt_i], prob = tau_e[i] / (tau_e[i] + cmu_e[i, trt_obs_e == trt_i]), size =  tau_e[i])}
+          } 
+        }
+        if(x$model_output$dist_e == "exp") {
+          for(i in 1:n_sim){ e_rep[i, ] <- rexp(n_obs_e, rate = 1 / cmu_e[i, ])
+          for(trt_i in trt_lev){ e_rep_trt[[trt_i]][i, ] <- rexp(n_trt_obs_e[trt_i], rate = 1 / cmu_e[i, trt_obs_e == trt_i])}
+          } 
+        }
+        if(x$model_output$dist_e == "bern") {
+          for(i in 1:n_sim){ e_rep[i, ] <- rbinom(n_obs_e, size = 1, prob = cmu_e[i, ])
+          for(trt_i in trt_lev){ e_rep_trt[[trt_i]][i, ] <- rbinom(n_trt_obs_e[trt_i], size = 1, prob = cmu_e[i, trt_obs_e == trt_i])}
+          } 
+        }
+        if(x$model_output$dist_e == "pois") {
+          for(i in 1:n_sim){ e_rep[i, ] <- rpois(n_obs_e, lambda = cmu_e[i, ])
+          for(trt_i in trt_lev){ e_rep_trt[[trt_i]][i, ] <- rpois(n_trt_obs_e[trt_i], lambda = cmu_e[i, trt_obs_e == trt_i])}
+          } 
+        }
+        if(x$model_output$dist_e == "gamma") {
+          ctau_e <- x$model_output$model$BUGSoutput$sims.list$ctau_e[, me_type == "observed"]
+          for(i in 1:n_sim){ e_rep[i, ] <- rgamma(n_obs_e, shape = cmu_e[i, ] * ctau_e[i, ], rate =  ctau_e[i, ])
+          for(trt_i in trt_lev){ e_rep_trt[[trt_i]][i, ] <- rgamma(n_trt_obs_e[trt_i], shape = cmu_e[i, trt_obs_e == trt_i] * ctau_e[i, trt_obs_e == trt_i], rate =  ctau_e[i, trt_obs_e == trt_i])}
+          } 
+        }
+        if(x$model_output$dist_e == "weib") {
+          ctau_e <- x$model_output$model$BUGSoutput$sims.list$ctau_e[, me_type == "observed"]
+          for(i in 1:n_sim){ e_rep[i, ] <- rweibull(n_obs_e, shape = ctau_e[i, ], scale = cmu_e[i, ] / exp(lgamma(1 + 1 / ctau_e[i, ])))
+          for(trt_i in trt_lev){ e_rep_trt[[trt_i]][i, ] <- rweibull(n_trt_obs_e[trt_i], shape = ctau_e[i, trt_obs_e == trt_i], scale = cmu_e[i, trt_obs_e == trt_i] / exp(lgamma(1 + 1 / ctau_e[i, trt_obs_e == trt_i])))}
+          } 
+        }
+        if(x$model_output$dist_e == "beta") {
+          ctau_e <- x$model_output$model$BUGSoutput$sims.list$ctau_e[, me_type == "observed"]
+          for(i in 1:n_sim){ e_rep[i, ] <- rbeta(n_obs_e, shape1 = cmu_e[i, ] * ctau_e[i, ], shape2 =  (1 - cmu_e[i, ]) * ctau_e[i, ])
+          for(trt_i in trt_lev){ e_rep_trt[[trt_i]][i, ] <- rbeta(n_trt_obs_e[trt_i], shape1 = cmu_e[i, trt_obs_e == trt_i] * ctau_e[i, trt_obs_e == trt_i], shape2 =  (1 - cmu_e[i, trt_obs_e == trt_i]) * ctau_e[i, trt_obs_e == trt_i])}
+          } 
+        }        
+      }
+      if(is.null(str_c)) {
+        if(x$model_output$dist_c == "norm") {
+          for(i in 1:n_sim){ c_rep[i, ] <- rnorm(n_obs_c, mean = cmu_c[i, ], sd = s_c[i])
+          for(trt_i in trt_lev){ c_rep_trt[[trt_i]][i, ] <- rnorm(n_trt_obs_c[trt_i], mean = cmu_c[i, trt_obs_c == trt_i], sd = s_c[i])}
+          } 
+        }
+        if(x$model_output$dist_c == "gamma") {
+          ctau_c <- x$model_output$model$BUGSoutput$sims.list$ctau_c[, mc_type == "observed"]
+          for(i in 1:n_sim){ c_rep[i, ] <- rgamma(n_obs_c, shape = cmu_c[i, ] * ctau_c[i, ], rate =  ctau_c[i, ])
+          for(trt_i in trt_lev){ c_rep_trt[[trt_i]][i, ] <- rgamma(n_trt_obs_c[trt_i], shape = cmu_c[i, trt_obs_c == trt_i] * ctau_c[i, trt_obs_c == trt_i], rate =  ctau_c[i, trt_obs_c == trt_i])}
+          } 
+        } 
+        if(x$model_output$dist_c == "lnorm") {
+          for(i in 1:n_sim){ c_rep[i, ] <- rlnorm(n_obs_c, meanlog = clmu_c[i, ], sdlog = 1 / sqrt(ltau_c[i]))
+          for(trt_i in trt_lev){ c_rep_trt[[trt_i]][i, ] <- rlnorm(n_trt_obs_c[trt_i], meanlog = clmu_c[i, trt_obs_c == trt_i], sdlog = 1 / sqrt(ltau_c[i]))}
+          } 
+        }      
+      }
+      if(!is.null(str_e)) {
+        if(x$model_output$dist_e == "norm") {
+          for(i in 1:n_sim){ 
+            e_ns_rep[i, ] <- rnorm(n_obs_ns_e, mean = cmu_e[i, ][cmu_e[i, ] != str_e], sd = s_e[i, 1])
+            e_s_rep[i, ] <- rnorm(n_obs_s_e, mean = cmu_e[i, ][cmu_e[i, ] == str_e], sd = s_e[i, 2])
+            for(trt_i in trt_lev){ 
+              e_rep_ns_trt[[trt_i]][i, ] <- rnorm(n_trt_obs_ns_e[trt_i], mean = cmu_e[i, trt_obs_ns_e == trt_i][cmu_e[i, trt_obs_ns_e == trt_i] != str_e], sd = s_e[i, 1])
+              e_rep_s_trt[[trt_i]][i, ] <- rnorm(n_trt_obs_s_e[trt_i], mean = cmu_e[i, trt_obs_s_e == trt_i][cmu_e[i, trt_obs_s_e == trt_i] != str_e], sd = s_e[i, 2])
+            }
+          } 
+        }
+        if(x$model_output$dist_e == "logis") {
+          for(i in 1:n_sim){ 
+            e_ns_rep[i, ] <- rlogis(n_obs_ns_e, location = cmu_e[i, ][cmu_e[i, ] != str_e], scale =  s_e[i, 1])
+            e_s_rep[i, ] <- rlogis(n_obs_s_e, location = cmu_e[i, ][cmu_e[i, ] == str_e], scale =  s_e[i, 2])
+          for(trt_i in trt_lev){ 
+            e_rep_ns_trt[[trt_i]][i, ] <- rlogis(n_trt_obs_ns_e[trt_i], location = cmu_e[i, trt_obs_ns_e == trt_i][cmu_e[i, trt_obs_ns_e == trt_i] != str_e], scale = s_e[i, 1])
+            e_rep_s_trt[[trt_i]][i, ] <- rlogis(n_trt_obs_s_e[trt_i], location = cmu_e[i, trt_obs_s_e == trt_i][cmu_e[i, trt_obs_s_e == trt_i] == str_e], scale = s_e[i, 2])
+            }
+          } 
+        }
+        if(x$model_output$dist_e == "negbin") {
+          tau_e <- x$model_output$model$BUGSoutput$sims.list$tau_e
+          for(i in 1:n_sim){ 
+            e_ns_rep[i, ] <- rnbinom(n_obs_ns_e, prob = tau_e[i, 1] / (tau_e[i, 1] + cmu_e[i, ][cmu_e[i, ] != str_e]), size =  tau_e[i, 1])
+            e_s_rep[i, ] <- rnbinom(n_obs_s_e, prob = tau_e[i, 2] / (tau_e[i, 2] + cmu_e[i, ][cmu_e[i, ] == str_e]), size =  tau_e[i, 2])
+          for(trt_i in trt_lev){ 
+            e_rep_ns_trt[[trt_i]][i, ] <- rnbinom(n_trt_obs_ns_e[trt_i], prob = tau_e[i, 1] / (tau_e[i, 1] + cmu_e[i, trt_obs_ns_e == trt_i][cmu_e[i, trt_obs_ns_e == trt_i] != str_e]), size =  tau_e[i, 1])
+            e_rep_s_trt[[trt_i]][i, ] <- rnbinom(n_trt_obs_s_e[trt_i], prob = tau_e[i, 2] / (tau_e[i, 2] + cmu_e[i, trt_obs_s_e == trt_i][cmu_e[i, trt_obs_s_e == trt_i] == str_e]), size =  tau_e[i, 2])
+            }
+          } 
+        }
+        if(x$model_output$dist_e == "exp") {
+          for(i in 1:n_sim){ 
+            e_ns_rep[i, ] <- rexp(n_obs_ns_e, rate = 1 / cmu_e[i, ][cmu_e[i, ] != str_e])
+            e_s_rep[i, ] <- rexp(n_obs_s_e, rate = 1 / cmu_e[i, ][cmu_e[i, ] == str_e])
+          for(trt_i in trt_lev){ 
+            e_rep_ns_trt[[trt_i]][i, ] <- rexp(n_trt_obs_ns_e[trt_i], rate = 1 / cmu_e[i, trt_obs_ns_e == trt_i][cmu_e[i, trt_obs_ns_e == trt_i] != str_e])
+            e_rep_s_trt[[trt_i]][i, ] <- rexp(n_trt_obs_s_e[trt_i], rate = 1 / cmu_e[i, trt_obs_s_e == trt_i][cmu_e[i, trt_obs_s_e == trt_i] == str_e])
+            }
+          } 
+        }
+        if(x$model_output$dist_e == "bern") {
+          for(i in 1:n_sim){ 
+            e_ns_rep[i, ] <- rbinom(n_obs_ns_e, size = 1, prob = cmu_e[i, ][cmu_e[i, ] != str_e])
+            e_s_rep[i, ] <- rbinom(n_obs_s_e, size = 1, prob = cmu_e[i, ][cmu_e[i, ] == str_e])
+          for(trt_i in trt_lev){ 
+            e_rep_ns_trt[[trt_i]][i, ] <- rbinom(n_trt_obs_ns_e[trt_i], size = 1, prob = cmu_e[i, trt_obs_ns_e == trt_i][cmu_e[i, trt_obs_ns_e == trt_i] != str_e])
+            e_rep_s_trt[[trt_i]][i, ] <- rbinom(n_trt_obs_s_e[trt_i], size = 1, prob = cmu_e[i, trt_obs_s_e == trt_i][cmu_e[i, trt_obs_s_e == trt_i] == str_e])
+            }
+          } 
+        }
+        if(x$model_output$dist_e == "pois") {
+          for(i in 1:n_sim){ 
+            e_ns_rep[i, ] <- rpois(n_obs_ns_e, lambda = cmu_e[i, ][cmu_e[i, ] != str_e])
+            e_s_rep[i, ] <- rpois(n_obs_s_e, lambda = cmu_e[i, ][cmu_e[i, ] == str_e])
+          for(trt_i in trt_lev){ 
+            e_rep_ns_trt[[trt_i]][i, ] <- rpois(n_trt_obs_ns_e[trt_i], lambda = cmu_e[i, trt_obs_ns_e == trt_i][cmu_e[i, trt_obs_ns_e == trt_i] != str_e])
+            e_rep_s_trt[[trt_i]][i, ] <- rpois(n_trt_obs_s_e[trt_i], lambda = cmu_e[i, trt_obs_s_e == trt_i][cmu_e[i, trt_obs_s_e == trt_i] == str_e])
+            }
+          } 
+        }
+        if(x$model_output$dist_e == "gamma") {
+          ctau_e <- x$model_output$model$BUGSoutput$sims.list$ctau_e[, me_type == "observed"]
+          for(i in 1:n_sim){ 
+            e_ns_rep[i, ] <- rgamma(n_obs_ns_e, shape = cmu_e[i, ][cmu_e[i, ] != str_e] * ctau_e[i, ][cmu_e[i, ] != str_e], rate =  ctau_e[i, ][cmu_e[i, ] != str_e])
+            e_s_rep[i, ] <- rgamma(n_obs_s_e, shape = cmu_e[i, ][cmu_e[i, ] == str_e] * ctau_e[i, ][cmu_e[i, ] == str_e], rate =  ctau_e[i, ][cmu_e[i, ] == str_e])
+            for(trt_i in trt_lev){ 
+              e_rep_ns_trt[[trt_i]][i, ] <- rgamma(n_trt_obs_ns_e[trt_i], shape = cmu_e[i, trt_obs_ns_e == trt_i][cmu_e[i, trt_obs_ns_e == trt_i] != str_e] * ctau_e[i, trt_obs_ns_e == trt_i][cmu_e[i, trt_obs_ns_e == trt_i] != str_e], 
+                                                   rate =  ctau_e[i, trt_obs_ns_e == trt_i][cmu_e[i, trt_obs_ns_e == trt_i] != str_e])
+              e_rep_s_trt[[trt_i]][i, ] <- rgamma(n_trt_obs_s_e[trt_i], shape = cmu_e[i, trt_obs_s_e == trt_i][cmu_e[i, trt_obs_s_e == trt_i] == str_e] * ctau_e[i, trt_obs_s_e == trt_i][cmu_e[i, trt_obs_s_e == trt_i] == str_e], 
+                                                  rate =  ctau_e[i, trt_obs_s_e == trt_i][cmu_e[i, trt_obs_s_e == trt_i] == str_e])            
+            }
+          } 
+        }
+        if(x$model_output$dist_e == "weib") {
+          ctau_e <- x$model_output$model$BUGSoutput$sims.list$ctau_e[, me_type == "observed"]
+          for(i in 1:n_sim){ 
+            e_ns_rep[i, ] <- rweibull(n_obs_ns_e, shape = ctau_e[i, ][cmu_e[i, ] != str_e], scale = cmu_e[i, ][cmu_e[i, ] != str_e] / exp(lgamma(1 + 1 / ctau_e[i, ][cmu_e[i, ] != str_e])))
+            e_s_rep[i, ] <- rweibull(n_obs_s_e, shape = ctau_e[i, ][cmu_e[i, ] == str_e], scale = cmu_e[i, ][cmu_e[i, ] == str_e] / exp(lgamma(1 + 1 / ctau_e[i, ][cmu_e[i, ] == str_e])))
+          for(trt_i in trt_lev){ 
+            e_rep_ns_trt[[trt_i]][i, ] <- rweibull(n_trt_obs_ns_e[trt_i], shape = ctau_e[i, trt_obs_ns_e == trt_i][cmu_e[i, trt_obs_ns_e == trt_i] != str_e], 
+                                                   scale = cmu_e[i, trt_obs_ns_e == trt_i][cmu_e[i, trt_obs_ns_e == trt_i] != str_e] / exp(lgamma(1 + 1 / ctau_e[i, trt_obs_ns_e == trt_i][cmu_e[i, trt_obs_ns_e == trt_i] != str_e])))
+            e_rep_s_trt[[trt_i]][i, ] <- rweibull(n_trt_obs_s_e[trt_i], shape = ctau_e[i, trt_obs_s_e == trt_i][cmu_e[i, trt_obs_s_e == trt_i] == str_e], 
+                                                   scale = cmu_e[i, trt_obs_s_e == trt_i][cmu_e[i, trt_obs_s_e == trt_i] == str_e] / exp(lgamma(1 + 1 / ctau_e[i, trt_obs_s_e == trt_i][cmu_e[i, trt_obs_s_e == trt_i] == str_e])))            
+            }
+          } 
+        }
+        if(x$model_output$dist_e == "beta") {
+          ctau_e <- x$model_output$model$BUGSoutput$sims.list$ctau_e[, me_type == "observed"]
+          for(i in 1:n_sim){ 
+            e_ns_rep[i, ] <- rbeta(n_obs_ns_e, shape1 = cmu_e[i, ][cmu_e[i, ] != str_e] * ctau_e[i, ][cmu_e[i, ] != str_e], shape2 =  (1 - cmu_e[i, ][cmu_e[i, ] != str_e]) * ctau_e[i, ][cmu_e[i, ] != str_e])
+            e_s_rep[i, ] <- rbeta(n_obs_s_e, shape1 = cmu_e[i, ][cmu_e[i, ] == str_e] * ctau_e[i, ][cmu_e[i, ] == str_e], shape2 =  (1 - cmu_e[i, ][cmu_e[i, ] == str_e]) * ctau_e[i, ][cmu_e[i, ] == str_e])
+            for(trt_i in trt_lev){ 
+              e_rep_ns_trt[[trt_i]][i, ] <- rbeta(n_trt_obs_ns_e[trt_i], shape1 = cmu_e[i, trt_obs_ns_e == trt_i][cmu_e[i, trt_obs_ns_e == trt_i] != str_e] * ctau_e[i, trt_obs_ns_e == trt_i][cmu_e[i, trt_obs_ns_e == trt_i] != str_e], 
+                                                  shape2 =  (1 - cmu_e[i, trt_obs_ns_e == trt_i][cmu_e[i, trt_obs_ns_e == trt_i] != str_e]) * ctau_e[i, trt_obs_ns_e == trt_i][cmu_e[i, trt_obs_ns_e == trt_i] != str_e])
+              e_rep_s_trt[[trt_i]][i, ] <- rbeta(n_trt_obs_s_e[trt_i], shape1 = cmu_e[i, trt_obs_ns_e == trt_i][cmu_e[i, trt_obs_ns_e == trt_i] == str_e] * ctau_e[i, trt_obs_ns_e == trt_i][cmu_e[i, trt_obs_ns_e == trt_i] == str_e], 
+                                                 shape2 =  (1 - cmu_e[i, trt_obs_ns_e == trt_i][cmu_e[i, trt_obs_ns_e == trt_i] == str_e]) * ctau_e[i, trt_obs_ns_e == trt_i][cmu_e[i, trt_obs_ns_e == trt_i] == str_e])            
+            }
+          }          
+        }
+        e_rep <- cbind(e_ns_rep, e_s_rep)
+        e_rep_trt <- mapply(cbind, e_rep_ns_trt, e_rep_s_trt)      
+      }
+      if(!is.null(str_c)) {
+        if(x$model_output$dist_c == "norm") {
+          for(i in 1:n_sim){ 
+            c_ns_rep[i, ] <- rnorm(n_obs_ns_c, mean = cmu_c[i, ][cmu_c[i, ] != str_c], sd = s_c[i, 1])
+            c_s_rep[i, ] <- rnorm(n_obs_s_c, mean = cmu_c[i, ][cmu_c[i, ] == str_c], sd = s_c[i, 2])
+          for(trt_i in trt_lev){ 
+            c_rep_ns_trt[[trt_i]][i, ] <- rnorm(n_trt_obs_ns_c[trt_i], mean = cmu_c[i, trt_obs_ns_c == trt_i][cmu_c[i, trt_obs_ns_c == trt_i] != str_c], sd = s_c[i, 1])
+            c_rep_s_trt[[trt_i]][i, ] <- rnorm(n_trt_obs_s_c[trt_i], mean = cmu_c[i, trt_obs_s_c == trt_i][cmu_c[i, trt_obs_s_c == trt_i] != str_c], sd = s_c[i, 2])
+            }
+          } 
+        }
+        if(x$model_output$dist_c == "gamma") {
+          ctau_c <- x$model_output$model$BUGSoutput$sims.list$ctau_c[, mc_type == "observed"]
+          for(i in 1:n_sim){ 
+            c_ns_rep[i, ] <- rgamma(n_obs_ns_c, shape = cmu_c[i, ][cmu_c[i, ] != str_c] * ctau_c[i, ][cmu_c[i, ] != str_c], rate =  ctau_c[i, ][cmu_c[i, ] != str_c])
+            c_s_rep[i, ] <- rgamma(n_obs_s_c, shape = cmu_c[i, ][cmu_c[i, ] == str_c] * ctau_c[i, ][cmu_c[i, ] == str_c], rate =  ctau_c[i, ][cmu_c[i, ] == str_c])
+          for(trt_i in trt_lev){ 
+            c_rep_ns_trt[[trt_i]][i, ] <- rgamma(n_trt_obs_ns_c[trt_i], shape = cmu_c[i, trt_obs_ns_c == trt_i][cmu_c[i, trt_obs_ns_c == trt_i] != str_c] * ctau_c[i, trt_obs_ns_c == trt_i][cmu_c[i, trt_obs_ns_c == trt_i] != str_c], 
+                                                 rate =  ctau_c[i, trt_obs_ns_c == trt_i][cmu_c[i, trt_obs_ns_c == trt_i] != str_c])
+            c_rep_s_trt[[trt_i]][i, ] <- rgamma(n_trt_obs_s_c[trt_i], shape = cmu_c[i, trt_obs_s_c == trt_i][cmu_c[i, trt_obs_s_c == trt_i] == str_c] * ctau_c[i, trt_obs_s_c == trt_i][cmu_c[i, trt_obs_s_c == trt_i] == str_c], 
+                                                 rate =  ctau_c[i, trt_obs_s_c == trt_i][cmu_c[i, trt_obs_s_c == trt_i] == str_c])            
+            }
+          } 
+        }        
+        if(x$model_output$dist_c == "lnorm") {
+          for(i in 1:n_sim){ 
+            c_ns_rep[i, ] <- rlnorm(n_obs_ns_c, meanlog = clmu_c[i, ][clmu_c[i, ] != str_c], sdlog = 1 / sqrt(ltau_c[i, 1]))
+            c_s_rep[i, ] <- rlnorm(n_obs_s_c, meanlog = clmu_c[i, ][clmu_c[i, ] == str_c], sdlog = 1 / sqrt(ltau_c[i, 2]))
+          for(trt_i in trt_lev){ 
+            c_rep_ns_trt[[trt_i]][i, ] <- rlnorm(n_trt_obs_ns_c[trt_i], meanlog = clmu_c[i, trt_obs_ns_c == trt_i][clmu_c[i, trt_obs_ns_c == trt_i] != str_c], sdlog = 1 / sqrt(ltau_c[i, 1]))
+            c_rep_s_trt[[trt_i]][i, ] <- rlnorm(n_trt_obs_s_c[trt_i], meanlog = clmu_c[i, trt_obs_s_c == trt_i][clmu_c[i, trt_obs_s_c == trt_i] == str_c], sdlog = 1 / sqrt(ltau_c[i, 2]))
+          }
+          } 
+        }        
+        c_rep <- cbind(c_ns_rep, c_s_rep)
+        c_rep_trt <- mapply(cbind, c_rep_ns_trt, c_rep_s_trt) 
+      }
     }
-    for(i in 1 : nrow(e1_rep)){ e1_rep[i, ] <- rbeta(n1_e, shape1 = shape1_e1[i, ], shape2 = shape2_e1 [i, ]) }
-    for(i in 1 : nrow(e2_rep)){ e2_rep[i, ] <- rbeta(n2_e, shape1 = shape1_e2[i, ], shape2 = shape2_e2 [i, ]) }
+    if(x$model_output$method == "PATTERN") {
+      d_mod <- x$model_output$d_mod
+      d_mod_e_obs <- d_mod[me_type == "observed"]
+      d_mod_c_obs <- d_mod[mc_type == "observed"]
+      d_e_obs <- x$data_set$data_raw$d[me_type == "observed"]
+      d_c_obs <- x$data_set$data_raw$d[mc_type == "observed"]
+      pat_obs_e_val <- unique(d_mod_e_obs)
+      pat_obs_c_val <- unique(d_mod_c_obs)
+      n_pat_e_obs <- length(unique(d_mod_e_obs))
+      n_pat_c_obs <- length(unique(d_mod_c_obs))
+      if(1 %in% x$data_set$data_raw$d) {
+        e_rep_pat1_trt <- c_rep_pat1_trt <- lapply(x$data_set$data_raw$dt, function(x) matrix(NA, nrow = n_sim, ncol = length(x[x == 1])))  
+      } else { e_rep_pat1_trt <- c_rep_pat1_trt <- NULL}
+      if(2 %in% x$data_set$data_raw$d) {
+        c_rep_pat2_trt <- lapply(x$data_set$data_raw$dt, function(x) matrix(NA, nrow = n_sim, ncol = length(x[x == 2])))         
+      } else { c_rep_pat2_trt <- NULL}      
+      if(3 %in% x$data_set$data_raw$d) {
+        e_rep_pat3_trt <- lapply(x$data_set$data_raw$dt, function(x) matrix(NA, nrow = n_sim, ncol = length(x[x == 3])))        
+      } else { e_rep_pat3_trt <- NULL} 
+      par_e_pat3_ind <- 3; par_c_pat2_ind <- 2
+      if(all(unique(x$data_set$data_raw$d) %in% c(3, 4)) & length(unique(x$data_set$data_raw$d)) == 2) { par_e_pat3_ind <- 1}
+      if(all(unique(x$data_set$data_raw$d) %in% c(1, 3)) & length(unique(x$data_set$data_raw$d)) == 2) { par_e_pat3_ind <- 2}
+      if(all(unique(x$data_set$data_raw$d) %in% c(2, 3)) & length(unique(x$data_set$data_raw$d)) == 2) { par_e_pat3_ind <- 2}
+      if(all(unique(x$data_set$data_raw$d) %in% c(1, 3, 4)) & length(unique(x$data_set$data_raw$d)) == 3) { par_e_pat3_ind <- 2}
+      if(all(unique(x$data_set$data_raw$d) %in% c(2, 4)) & length(unique(x$data_set$data_raw$d)) == 2) { par_e_pat2_ind <- 1}
+      if(all(unique(x$data_set$data_raw$d) %in% c(2, 3)) & length(unique(x$data_set$data_raw$d)) == 2) { par_e_pat2_ind <- 1}
+      if(all(unique(x$data_set$data_raw$d) %in% c(2, 3, 4)) & length(unique(x$data_set$data_raw$d)) == 3) { par_e_pat2_ind <- 1}      
+      d_mod_e_obs_target <- d_mod_e_obs; d_mod_c_obs_target <- d_mod_c_obs
+      if(length(unique(d_mod_e_obs)) == 1) { 
+        d_mod_e_obs_target[d_mod_e_obs == unique(d_mod_e_obs)[1]] <- 1}
+      if(length(unique(d_mod_e_obs)) == 2) { 
+        d_mod_e_obs_target[d_mod_e_obs == unique(d_mod_e_obs)[1]] <- 1
+        d_mod_e_obs_target[d_mod_e_obs == unique(d_mod_e_obs)[2]] <- 2}
+      if(length(unique(d_mod_c_obs)) == 1) { 
+        d_mod_c_obs_target[d_mod_c_obs == unique(d_mod_c_obs)[1]] <- 1}
+      if(length(unique(d_mod_e_obs)) == 2) { 
+        d_mod_c_obs_target[d_mod_c_obs == unique(d_mod_c_obs)[1]] <- 1
+        d_mod_c_obs_target[d_mod_c_obs == unique(d_mod_c_obs)[2]] <- 2}
+      p_obs_e_index <- lapply(1:n_pat_e_obs, function(target) which(d_mod_e_obs_target == target))
+      p_obs_c_index <- lapply(1:n_pat_c_obs, function(target) which(d_mod_c_obs_target == target))
+      e_rep_pat <- lapply(p_obs_e_index, function(x) matrix(NA, nrow = n_sim, ncol = length(x)))
+      c_rep_pat <- lapply(p_obs_c_index, function(x) matrix(NA, nrow = n_sim, ncol = length(x)))
+      cmu_e <- x$model_output$model$BUGSoutput$sims.list$cmu_e[, me_type == "observed"]
+      s_e <- as.matrix(x$model_output$model$BUGSoutput$sims.list$s_e_p[, pat_obs_e_val])
+      if(x$model_output$dist_c == "lnorm") {
+        clmu_c <- x$model_output$model$BUGSoutput$sims.list$clmu_c[, mc_type == "observed"]
+        ltau_c <- as.matrix(x$model_output$model$BUGSoutput$sims.list$ltau_c_p[, pat_obs_c_val])
+      } else {
+        cmu_c <- x$model_output$model$BUGSoutput$sims.list$cmu_c[, mc_type == "observed"]
+        s_c <- as.matrix(x$model_output$model$BUGSoutput$sims.list$s_c_p[, pat_obs_c_val])
+      }
+      if(x$model_output$dist_e == "norm") {
+        for(i in 1:n_sim){
+          for(p in 1:n_pat_e_obs){ e_rep_pat[[p]][i, ] <- rnorm(dim(e_rep_pat[[p]])[2], mean = cmu_e[i, unlist(p_obs_e_index[p])], sd = s_e[i, p])}
+          for(trt_i in trt_lev){ 
+            if(!is.null(e_rep_pat1_trt)) { e_rep_pat1_trt[[trt_i]][i, ] <- rnorm(dim(e_rep_pat1_trt[[trt_i]])[2], mean = cmu_e[i, trt_obs_e == trt_i & d_mod_e_obs == 1], sd = s_e[i, 1])}
+            if(!is.null(e_rep_pat3_trt)) { e_rep_pat3_trt[[trt_i]][i, ] <- rnorm(dim(e_rep_pat3_trt[[trt_i]])[2], mean = cmu_e[i, trt_obs_e == trt_i & d_mod_e_obs == par_e_pat3_ind], sd = s_e[i, par_e_pat3_ind])}
+          }          
+        } 
+      }
+      if(x$model_output$dist_e == "logis") {
+        for(i in 1:n_sim){ 
+          for(p in 1:n_pat_e_obs){ e_rep_pat[[p]][i, ] <- rlogis(dim(e_rep_pat[[p]])[2], location = cmu_e[i, unlist(p_obs_e_index[p])], scale =  s_e[i, p])}
+          for(trt_i in trt_lev){ 
+            if(!is.null(e_rep_pat1_trt)) { e_rep_pat1_trt[[trt_i]][i, ] <- rlogis(dim(e_rep_pat1_trt[[trt_i]])[2], location = cmu_e[i, trt_obs_e == trt_i & d_mod_e_obs == 1], scale = s_e[i, 1])}
+            if(!is.null(e_rep_pat3_trt)) { e_rep_pat3_trt[[trt_i]][i, ] <- rlogis(dim(e_rep_pat3_trt[[trt_i]])[2], location = cmu_e[i, trt_obs_e == trt_i & d_mod_e_obs == par_e_pat3_ind], scale = s_e[i, par_e_pat3_ind])}
+          }
+        } 
+      }
+      if(x$model_output$dist_e == "negbin") {
+        tau_e <- as.matrix(x$model_output$model$BUGSoutput$sims.list$tau_e_p[, pat_obs_e_val])
+        for(i in 1:n_sim){ 
+          for(p in 1:n_pat_e_obs){ e_rep_pat[[p]][i, ] <- rnbinom(dim(e_rep_pat[[p]])[2], prob = tau_e[i, p] / (tau_e[i, p] + cmu_e[i, unlist(p_obs_e_index[p])]), size =  tau_e[i, p])}
+          for(trt_i in trt_lev){ 
+            if(!is.null(e_rep_pat1_trt)) { e_rep_pat1_trt[[trt_i]][i, ] <- rnbinom(dim(e_rep_pat1_trt[[trt_i]])[2], prob = tau_e[i, 1] / (tau_e[i, 1] + cmu_e[i, trt_obs_e == trt_i & d_mod_e_obs == 1]), size = tau_e[i, 1])}
+            if(!is.null(e_rep_pat3_trt)) { e_rep_pat3_trt[[trt_i]][i, ] <- rnbinom(dim(e_rep_pat3_trt[[trt_i]])[2], prob = tau_e[i, par_e_pat3_ind] / (tau_e[i, par_e_pat3_ind] + cmu_e[i, trt_obs_e == trt_i & d_mod_e_obs == par_e_pat3_ind]), size = tau_e[i, par_e_pat3_ind])}
+          }       
+        }
+      }
+      if(x$model_output$dist_e == "exp") {
+        for(i in 1:n_sim){ 
+          for(p in 1:n_pat_e_obs){ e_rep_pat[[p]][i, ] <- rexp(dim(e_rep_pat[[p]])[2], rate = 1 / cmu_e[i, unlist(p_obs_e_index[p])])}
+          for(trt_i in trt_lev){ 
+            if(!is.null(e_rep_pat1_trt)) { e_rep_pat1_trt[[trt_i]][i, ] <- rexp(dim(e_rep_pat1_trt[[trt_i]])[2], rate = 1 / cmu_e[i, trt_obs_e == trt_i & d_mod_e_obs == 1])}
+            if(!is.null(e_rep_pat3_trt)) { e_rep_pat3_trt[[trt_i]][i, ] <- rexp(dim(e_rep_pat3_trt[[trt_i]])[2], rate = 1 / cmu_e[i, trt_obs_e == trt_i & d_mod_e_obs == par_e_pat3_ind])}
+          } 
+        } 
+      }
+      if(x$model_output$dist_e == "bern") {
+        for(i in 1:n_sim){ 
+          for(p in 1:n_pat_e_obs){ e_rep_pat[[p]][i, ] <- rbinom(dim(e_rep_pat[[p]])[2], size = 1,  prob = cmu_e[i, unlist(p_obs_e_index[p])])}
+          for(trt_i in trt_lev){ 
+            if(!is.null(e_rep_pat1_trt)) { e_rep_pat1_trt[[trt_i]][i, ] <- rbinom(dim(e_rep_pat1_trt[[trt_i]])[2], size = 1, prob = cmu_e[i, trt_obs_e == trt_i & d_mod_e_obs == 1])}
+            if(!is.null(e_rep_pat3_trt)) { e_rep_pat3_trt[[trt_i]][i, ] <- rbinom(dim(e_rep_pat3_trt[[trt_i]])[2], size = 1, prob = cmu_e[i, trt_obs_e == trt_i & d_mod_e_obs == par_e_pat3_ind])}
+          }          
+        } 
+      }
+      if(x$model_output$dist_e == "pois") {
+        for(i in 1:n_sim){ 
+          for(p in 1:n_pat_e_obs){ e_rep_pat[[p]][i, ] <- rpois(dim(e_rep_pat[[p]])[2], lambda = cmu_e[i, unlist(p_obs_e_index[p])])}
+          for(trt_i in trt_lev){ 
+            if(!is.null(e_rep_pat1_trt)) { e_rep_pat1_trt[[trt_i]][i, ] <- rpois(dim(e_rep_pat1_trt[[trt_i]])[2], lambda = cmu_e[i, trt_obs_e == trt_i & d_mod_e_obs == 1])}
+            if(!is.null(e_rep_pat3_trt)) { e_rep_pat3_trt[[trt_i]][i, ] <- rpois(dim(e_rep_pat3_trt[[trt_i]])[2], lambda = cmu_e[i, trt_obs_e == trt_i & d_mod_e_obs == par_e_pat3_ind])}
+          }           
+        } 
+      }
+      if(x$model_output$dist_e == "gamma") {
+        ctau_e <- x$model_output$model$BUGSoutput$sims.list$ctau_e[, me_type == "observed"]
+        for(i in 1:n_sim){ 
+          for(p in 1:n_pat_e_obs){ e_rep_pat[[p]][i, ] <- rgamma(dim(e_rep_pat[[p]])[2], shape = cmu_e[i, unlist(p_obs_e_index[p])] * ctau_e[i, unlist(p_obs_e_index[p])], rate = ctau_e[i, unlist(p_obs_e_index[p])])}
+          for(trt_i in trt_lev){ 
+            if(!is.null(e_rep_pat1_trt)) { e_rep_pat1_trt[[trt_i]][i, ] <- rgamma(dim(e_rep_pat1_trt[[trt_i]])[2], shape = cmu_e[i, trt_obs_e == trt_i & d_mod_e_obs == 1] * ctau_e[i, trt_obs_e == trt_i & d_mod_e_obs == 1], rate = ctau_e[i, trt_obs_e == trt_i & d_mod_e_obs == 1])}
+            if(!is.null(e_rep_pat3_trt)) { e_rep_pat3_trt[[trt_i]][i, ] <- rgamma(dim(e_rep_pat3_trt[[trt_i]])[2], shape = cmu_e[i, trt_obs_e == trt_i & d_mod_e_obs == par_e_pat3_ind] * ctau_e[i, trt_obs_e == trt_i & d_mod_e_obs == par_e_pat3_ind], rate = ctau_e[i, trt_obs_e == trt_i & d_mod_e_obs == par_e_pat3_ind])}
+          }          
+        } 
+      }
+      if(x$model_output$dist_e == "weib") {
+        ctau_e <- x$model_output$model$BUGSoutput$sims.list$ctau_e[, me_type == "observed"]
+        for(i in 1:n_sim){ 
+          for(p in 1:n_pat_e_obs){ e_rep_pat[[p]][i, ] <- rweibull(dim(e_rep_pat[[p]])[2], shape = ctau_e[i, unlist(p_obs_e_index[p])], scale = cmu_e[i, unlist(p_obs_e_index[p])] / exp(lgamma(1 + 1 / ctau_e[i, unlist(p_obs_e_index[p])])))}
+          for(trt_i in trt_lev){ 
+            if(!is.null(e_rep_pat1_trt)) { e_rep_pat1_trt[[trt_i]][i, ] <- rweibull(dim(e_rep_pat1_trt[[trt_i]])[2], shape = ctau_e[i, trt_obs_e == trt_i & d_mod_e_obs == 1], scale = cmu_e[i, trt_obs_e == trt_i & d_mod_e_obs == 1] / exp(lgamma(1 + 1 / ctau_e[i, trt_obs_e == trt_i & d_mod_e_obs == par_e_pat3_ind])))}
+            if(!is.null(e_rep_pat3_trt)) { e_rep_pat3_trt[[trt_i]][i, ] <- rweibull(dim(e_rep_pat3_trt[[trt_i]])[2], shape = ctau_e[i, trt_obs_e == trt_i & d_mod_e_obs == par_e_pat3_ind], scale = cmu_e[i, trt_obs_e == trt_i & d_mod_e_obs == par_e_pat3_ind] / exp(lgamma(1 + 1 / ctau_e[i, trt_obs_e == trt_i & d_mod_e_obs == par_e_pat3_ind])))}
+          }          
+        } 
+      }
+      if(x$model_output$dist_e == "beta") {
+        ctau_e <- x$model_output$model$BUGSoutput$sims.list$ctau_e[, me_type == "observed"]
+        for(i in 1:n_sim){ 
+          for(p in 1:n_pat_e_obs){ e_rep_pat[[p]][i, ] <- rbeta(dim(e_rep_pat[[p]])[2], shape1 = cmu_e[i, unlist(p_obs_e_index[p])] * ctau_e[i, unlist(p_obs_e_index[p])], shape2 = (1 - cmu_e[i, unlist(p_obs_e_index[p])]) * ctau_e[i, unlist(p_obs_e_index[p])])}
+          for(trt_i in trt_lev){ 
+            if(!is.null(e_rep_pat1_trt)) { e_rep_pat1_trt[[trt_i]][i, ] <- rbeta(dim(e_rep_pat1_trt[[trt_i]])[2], shape1 = cmu_e[i, trt_obs_e == trt_i & d_mod_e_obs == 1] * ctau_e[i, trt_obs_e == trt_i & d_mod_e_obs == 1], shape2 = (1 - cmu_e[i, trt_obs_e == trt_i & d_mod_e_obs == 1]) * ctau_e[i, trt_obs_e == trt_i & d_mod_e_obs == 1])}
+            if(!is.null(e_rep_pat3_trt)) { e_rep_pat3_trt[[trt_i]][i, ] <- rbeta(dim(e_rep_pat3_trt[[trt_i]])[2], shape1 = cmu_e[i, trt_obs_e == trt_i & d_mod_e_obs == par_e_pat3_ind] * ctau_e[i, trt_obs_e == trt_i & d_mod_e_obs == par_e_pat3_ind], shape2 = (1 - cmu_e[i, trt_obs_e == trt_i & d_mod_e_obs == par_e_pat3_ind]) * ctau_e[i, trt_obs_e == trt_i & d_mod_e_obs == par_e_pat3_ind])}
+          }           
+        } 
+      }
+      if(x$model_output$dist_c == "norm") {
+        for(i in 1:n_sim){
+          for(p in 1:n_pat_c_obs){ c_rep_pat[[p]][i, ] <- rnorm(dim(c_rep_pat[[p]])[2], mean = cmu_c[i, unlist(p_obs_c_index[p])], sd = s_c[i, p])}
+          for(trt_i in trt_lev){ 
+            if(!is.null(c_rep_pat1_trt)) { c_rep_pat1_trt[[trt_i]][i, ] <- rnorm(dim(c_rep_pat1_trt[[trt_i]])[2], mean = cmu_c[i, trt_obs_c == trt_i & d_mod_c_obs == 1], sd = s_c[i, 1])}
+            if(!is.null(c_rep_pat2_trt)) { c_rep_pat2_trt[[trt_i]][i, ] <- rnorm(dim(c_rep_pat2_trt[[trt_i]])[2], mean = cmu_c[i, trt_obs_c == trt_i & d_mod_c_obs == par_c_pat2_ind], sd = s_c[i, par_c_pat2_ind])}
+          }          
+        } 
+      }      
+      if(x$model_output$dist_c == "gamma") {
+        ctau_c <- x$model_output$model$BUGSoutput$sims.list$ctau_c[, mc_type == "observed"]
+        for(i in 1:n_sim){ 
+          for(p in 1:n_pat_c_obs){ c_rep_pat[[p]][i, ] <- rgamma(dim(c_rep_pat[[p]])[2], shape = cmu_c[i, unlist(p_obs_c_index[p])] * ctau_c[i, unlist(p_obs_c_index[p])], rate = ctau_c[i, unlist(p_obs_c_index[p])])}
+          for(trt_i in trt_lev){ 
+            if(!is.null(c_rep_pat1_trt)) { c_rep_pat1_trt[[trt_i]][i, ] <- rgamma(dim(c_rep_pat1_trt[[trt_i]])[2], shape = cmu_c[i, trt_obs_c == trt_i & d_mod_c_obs == 1] * ctau_c[i, trt_obs_c == trt_i & d_mod_c_obs == 1], rate = ctau_c[i, trt_obs_c == trt_i & d_mod_c_obs == 1])}
+            if(!is.null(c_rep_pat2_trt)) { c_rep_pat2_trt[[trt_i]][i, ] <- rgamma(dim(c_rep_pat2_trt[[trt_i]])[2], shape = cmu_c[i, trt_obs_c == trt_i & d_mod_c_obs == par_c_pat2_ind] * ctau_c[i, trt_obs_c == trt_i & d_mod_c_obs == par_c_pat2_ind], rate = ctau_c[i, trt_obs_c == trt_i & d_mod_c_obs == par_c_pat2_ind])}
+          }          
+        } 
+      }      
+      if(x$model_output$dist_c == "lnorm") {
+        for(i in 1:n_sim){ 
+          for(p in 1:n_pat_c_obs){ c_rep_pat[[p]][i, ] <- rlnorm(dim(c_rep_pat[[p]])[2], meanlog = clmu_c[i, unlist(p_obs_c_index[p])], sdlog = 1 / sqrt(ltau_c[i, p]))}
+          for(trt_i in trt_lev){ 
+            if(!is.null(c_rep_pat1_trt)) { c_rep_pat1_trt[[trt_i]][i, ] <- rlnorm(dim(c_rep_pat1_trt[[trt_i]])[2], meanlog = clmu_c[i, trt_obs_c == trt_i & d_mod_c_obs == 1], sdlog = 1 / sqrt(ltau_c[i, 1]))}
+            if(!is.null(c_rep_pat2_trt)) { c_rep_pat2_trt[[trt_i]][i, ] <- rlnorm(dim(c_rep_pat2_trt[[trt_i]])[2], meanlog = clmu_c[i, trt_obs_c == trt_i & d_mod_c_obs == par_c_pat2_ind], sdlog = 1 / sqrt(ltau_c[i, par_c_pat2_ind]))}
+          }           
+        } 
+      }
+      e_rep <- do.call(cbind, e_rep_pat)
+      c_rep <- do.call(cbind, c_rep_pat)
+      if(!is.null(e_rep_pat1_trt) & !is.null(e_rep_pat3_trt)) { e_rep_trt <- mapply(cbind, e_rep_pat1_trt, e_rep_pat3_trt)}
+      if(!is.null(e_rep_pat1_trt) & is.null(e_rep_pat3_trt)) { e_rep_trt <- e_rep_pat1_trt}
+      if(is.null(e_rep_pat1_trt) & !is.null(e_rep_pat3_trt)) { e_rep_trt <- e_rep_pat3_trt}
+      if(!is.null(c_rep_pat1_trt) & !is.null(c_rep_pat2_trt)) { c_rep_trt <- mapply(cbind, c_rep_pat1_trt, c_rep_pat2_trt)}
+      if(!is.null(c_rep_pat1_trt) & is.null(c_rep_pat2_trt)) { c_rep_trt <- c_rep_pat1_trt}
+      if(is.null(c_rep_pat1_trt) & !is.null(c_rep_pat2_trt)) { c_rep_trt <- c_rep_pat2_trt}
+    }
   }
-  if(x$model_output$dist_c == "norm") {
-    mu_c1 <- x$model_output$`model summary`$BUGSoutput$sims.list$mu_c1[, -index_mis_c1]
-    mu_c2 <- x$model_output$`model summary`$BUGSoutput$sims.list$mu_c2[, -index_mis_c2]
-    if(is.null(dim(mu_c1)) == TRUE | is.null(dim(mu_c2)) == TRUE){
-      stop("Not possible to plot posterior predictive checks with a single observed cost value in one arm.")
+  if(x$data_format == "long") {
+  me_type <- ifelse(x$data_set$data_raw$me_long == 1, "missing", "observed")
+  mc_type <- ifelse(x$data_set$data_raw$mc_long == 1, "missing", "observed")  
+  e_obs <- x$data_set$data_raw$e_long[me_type == "observed"]
+  c_obs <- x$data_set$data_raw$c_long[mc_type == "observed"]
+  trt_obs_e <- x$data_set$data_raw$data_long$trt[me_type == "observed"]
+  trt_obs_c <- x$data_set$data_raw$data_long$trt[mc_type == "observed"]
+  time_obs_e <- x$data_set$data_raw$time_long[me_type == "observed"]
+  time_obs_c <- x$data_set$data_raw$time_long[mc_type == "observed"]
+  time_trt_obs_e <- x$data_set$data_raw$data_long$time_trt[me_type == "observed"]
+  time_trt_obs_c <- x$data_set$data_raw$data_long$time_trt[mc_type == "observed"]
+  n_all <- sum(x$data_set$data_raw$n_long)
+  time_trt_lev <- unique(x$data_set$data_raw$data_long$time_trt)
+  time_trt_index_time <- rep(1:n_time, each = n_trt)
+  names(time_trt_index_time) <- time_trt_lev
+  n_trt_obs_e <- x$data_set$data_raw$n_obs_e
+  n_trt_obs_c <- x$data_set$data_raw$n_obs_c
+  n_time_obs_e <- x$data_set$data_raw$n_obs_time_e
+  n_time_obs_c <- x$data_set$data_raw$n_obs_time_c
+  n_time_trt_obs_e <- x$data_set$data_raw$n_obs_time_trt_e
+  n_time_trt_obs_c <- x$data_set$data_raw$n_obs_time_trt_c
+  n_obs_e <- sum(n_trt_obs_e)
+  n_obs_c <- sum(n_trt_obs_c)
+  n_obs_e_time <- sum(n_time_obs_e)
+  n_obs_c_time <- sum(n_time_obs_c)
+  n_obs_e_time_trt <- sum(n_time_trt_obs_e)
+  n_obs_c_time_trt <- sum(n_time_trt_obs_c)
+  e_obs_trt <- lapply(x$data_set$data_raw$efft, function(x) x[!is.na(x)])
+  c_obs_trt <- lapply(x$data_set$data_raw$costt, function(x) x[!is.na(x)])
+  e_obs_time <- lapply(x$data_set$data_raw$eff_time_list, function(x) x[!is.na(x)])
+  c_obs_time <- lapply(x$data_set$data_raw$cost_time_list, function(x) x[!is.na(x)])
+  e_obs_time_trt <- lapply(x$data_set$data_raw$eff_time_trt_list, function(x) x[!is.na(x)])
+  c_obs_time_trt <- lapply(x$data_set$data_raw$cost_time_trt_list, function(x) x[!is.na(x)])
+  e_rep_trt <- lapply(x$data_set$data_raw$m_efft, function(x) matrix(NA, nrow = n_sim, ncol = length(x[x == 0])))
+  c_rep_trt <- lapply(x$data_set$data_raw$m_costt, function(x) matrix(NA, nrow = n_sim, ncol = length(x[x == 0])))
+  e_rep_time <- lapply(x$data_set$data_raw$eff_time_list, function(x) matrix(NA, nrow = n_sim, ncol = length(x[!is.na(x)])))
+  c_rep_time <- lapply(x$data_set$data_raw$cost_time_list, function(x) matrix(NA, nrow = n_sim, ncol = length(x[!is.na(x)])))
+  e_rep_time_trt <- lapply(x$data_set$data_raw$eff_time_trt_list, function(x) matrix(NA, nrow = n_sim, ncol = length(x[!is.na(x)])))
+  c_rep_time_trt <- lapply(x$data_set$data_raw$cost_time_trt_list, function(x) matrix(NA, nrow = n_sim, ncol = length(x[!is.na(x)])))
+  if(x$model_output$method == "LMDM") {
+    cmu_e <- as.matrix(as.data.frame(x$model_output$model$BUGSoutput$sims.list$cmu_e))[, me_type == "observed"]
+    s_e <- x$model_output$model$BUGSoutput$sims.list$s_e
+    if(x$model_output$dist_c == "lnorm") {
+      clmu_c <- as.matrix(as.data.frame(x$model_output$model$BUGSoutput$sims.list$clmu_c))[, mc_type == "observed"]
+      ltau_c <- x$model_output$model$BUGSoutput$sims.list$ltau_c
+    } else {
+      cmu_c <- as.matrix(as.data.frame(x$model_output$model$BUGSoutput$sims.list$cmu_c))[, mc_type == "observed"]
+      s_c <- x$model_output$model$BUGSoutput$sims.list$s_c
     }
-    if(grepl("SELECTION", x$model_output$type) == TRUE){
-      sigma_c1 <- 1 / sqrt(x$model_output$`model summary`$BUGSoutput$sims.list$tau_c[, 1])
-      sigma_c2 <- 1 / sqrt(x$model_output$`model summary`$BUGSoutput$sims.list$tau_c[, 2])
-      for(i in 1 : nrow(c1_rep)){ c1_rep[i, ] <- rnorm(n1_c, mean = mu_c1[i, ], sd = sigma_c1 [i]) }
-      for(i in 1 : nrow(c2_rep)){ c2_rep[i, ] <- rnorm(n2_c, mean = mu_c2[i, ], sd = sigma_c2 [i]) }
-    } else if(grepl("PATTERN", x$model_output$type) == TRUE) {
-      sigma_c1 <- 1 / sqrt(x$model_output$`model summary`$BUGSoutput$sims.list$tau_c_p1)
-      sigma_c2 <- 1 / sqrt(x$model_output$`model summary`$BUGSoutput$sims.list$tau_c_p2)
-      for(i in 1 : nrow(c1_rep)){ c1_rep[i, ] <- rnorm(n1_c, mean = mu_c1[i, ], sd = sigma_c1 [i, ]) }
-      for(i in 1 : nrow(c2_rep)){ c2_rep[i, ] <- rnorm(n2_c, mean = mu_c2[i, ], sd = sigma_c2 [i, ]) }
-    } else if(grepl("HURDLE", x$model_output$type) == TRUE) {
-      sigma_c1 <- 1 / sqrt(x$model_output$`model summary`$BUGSoutput$sims.list$tau_c1)
-      sigma_c2 <- 1 / sqrt(x$model_output$`model summary`$BUGSoutput$sims.list$tau_c2)
-      for(i in 1 : nrow(c1_rep)){ c1_rep[i, ] <- rnorm(n1_c, mean = mu_c1[i, ], sd = sigma_c1 [i, ]) }
-      for(i in 1 : nrow(c2_rep)){ c2_rep[i, ] <- rnorm(n2_c, mean = mu_c2[i, ], sd = sigma_c2 [i, ]) }
+    if(x$model_output$dist_e == "norm") {
+      for(i in 1:n_sim){ 
+        for(time_i in 1:n_time){ e_rep_time[[time_i]][i, ] <- rnorm(n_time_obs_e[time_i], mean = cmu_e[i, time_obs_e == time_i], sd = s_e[i, time_i])}
+        for(time_trt_i in time_trt_lev){ e_rep_time_trt[[time_trt_i]][i, ] <- rnorm(n_time_trt_obs_e[time_trt_i], mean = cmu_e[i, time_trt_obs_e == time_trt_i], sd = s_e[i, time_trt_index_time[time_trt_i]])}
+      } 
     }
-  } else if(x$model_output$dist_c == "gamma") {
-    shape_c1 <- x$model_output$`model summary`$BUGSoutput$sims.list$mu_c1[, -index_mis_c1] * x$model_output$`model summary`$BUGSoutput$sims.list$tau_c1[, -index_mis_c1]
-    rate_c1 <-  x$model_output$`model summary`$BUGSoutput$sims.list$tau_c1[, -index_mis_c1]
-    shape_c2 <- x$model_output$`model summary`$BUGSoutput$sims.list$mu_c2[, -index_mis_c2] * x$model_output$`model summary`$BUGSoutput$sims.list$tau_c2[, -index_mis_c2]
-    rate_c2 <-  x$model_output$`model summary`$BUGSoutput$sims.list$tau_c2[, -index_mis_c2]
-    if(is.null(dim(shape_c1)) == TRUE | is.null(dim(shape_c2)) == TRUE){
-      stop("Not possible to plot posterior predictive checks with a single observed cost value in one arm.")
+    if(x$model_output$dist_e == "logis") {
+      for(i in 1:n_sim){ 
+        for(time_i in 1:n_time){ e_rep_time[[time_i]][i, ] <- rlogis(n_time_obs_e[time_i], location = cmu_e[i, time_obs_e == time_i], scale = s_e[i, time_i])}
+        for(time_trt_i in time_trt_lev){ e_rep_time_trt[[time_trt_i]][i, ] <- rlogis(n_time_trt_obs_e[time_trt_i], location = cmu_e[i, time_trt_obs_e == time_trt_i], scale = s_e[i, time_trt_index_time[time_trt_i]])}
+      } 
     }
-    for(i in 1 : nrow(c1_rep)){ c1_rep[i, ] <- rgamma(n1_c, shape = shape_c1[i, ], rate = rate_c1 [i, ]) }
-    for(i in 1 : nrow(c2_rep)){ c2_rep[i, ] <- rgamma(n2_c, shape = shape_c2[i, ], rate = rate_c2 [i, ]) }
-  } else if(x$model_output$dist_c == "lnorm") {
-    mu_c1 <- x$model_output$`model summary`$BUGSoutput$sims.list$lmu_c1[, -index_mis_c1]
-    mu_c2 <- x$model_output$`model summary`$BUGSoutput$sims.list$lmu_c2[, -index_mis_c2]
-    if(is.null(dim(mu_c1)) == TRUE | is.null(dim(mu_c2)) == TRUE){
-      stop("Not possible to plot posterior predictive checks with a single observed cost value in one arm.")
+    if(x$model_output$dist_e == "negbin") {
+      tau_e <- x$model_output$model$BUGSoutput$sims.list$tau_e
+      for(i in 1:n_sim){ 
+        for(time_i in 1:n_time){ e_rep_time[[time_i]][i, ] <- rnbinom(n_time_obs_e[time_i], prob = tau_e[i, time_i] / (tau_e[i, time_i] + cmu_e[i, time_obs_e == time_i]), size = tau_e[i, time_i])}
+        for(time_trt_i in time_trt_lev){ e_rep_time_trt[[time_trt_i]][i, ] <- rnbinom(n_time_trt_obs_e[time_trt_i], prob = tau_e[i, time_trt_index_time[time_trt_i]] / (tau_e[i, time_trt_index_time[time_trt_i]] + cmu_e[i, time_trt_obs_e == time_trt_i]), size =  tau_e[i, time_trt_index_time[time_trt_i]])}
+      } 
     }
-    if(grepl("SELECTION", x$model_output$type) == TRUE){
-      sigma_c1 <- 1 / sqrt(x$model_output$`model summary`$BUGSoutput$sims.list$ltau_c[, 1])
-      sigma_c2 <- 1 / sqrt(x$model_output$`model summary`$BUGSoutput$sims.list$ltau_c[, 2])
-      for(i in 1 : nrow(c1_rep)){ c1_rep[i, ] <- rlnorm(n1_c, meanlog = mu_c1[i, ], sdlog = sigma_c1 [i]) }
-      for(i in 1 : nrow(c2_rep)){ c2_rep[i, ] <- rlnorm(n2_c, meanlog = mu_c2[i, ], sdlog = sigma_c2 [i]) }
-    } else if(grepl("PATTERN", x$model_output$type) == TRUE) {
-      sigma_c1 <- 1 / sqrt(x$model_output$`model summary`$BUGSoutput$sims.list$ltau_c_p1)
-      sigma_c2 <- 1 / sqrt(x$model_output$`model summary`$BUGSoutput$sims.list$ltau_c_p2)
-      for(i in 1 : nrow(c1_rep)){ c1_rep[i, ] <- rlnorm(n1_c, meanlog = mu_c1[i, ], sdlog = sigma_c1 [i]) }
-      for(i in 1 : nrow(c2_rep)){ c2_rep[i, ] <- rlnorm(n2_c, meanlog = mu_c2[i, ], sdlog = sigma_c2 [i]) }
-    } else if(grepl("HURDLE", x$model_output$type) == TRUE) {
-      sigma_c1 <- 1 / sqrt(x$model_output$`model summary`$BUGSoutput$sims.list$ltau_c1)
-      sigma_c2 <- 1 / sqrt(x$model_output$`model summary`$BUGSoutput$sims.list$ltau_c2)
-      for(i in 1 : nrow(c1_rep)){ c1_rep[i, ] <- rlnorm(n1_c, meanlog = mu_c1[i, ], sdlog = sigma_c1 [i]) }
-      for(i in 1 : nrow(c2_rep)){ c2_rep[i, ] <- rlnorm(n2_c, meanlog = mu_c2[i, ], sdlog = sigma_c2 [i]) }
+    if(x$model_output$dist_e == "exp") {
+      for(i in 1:n_sim){ 
+        for(time_i in 1:n_time){ e_rep_time[[time_i]][i, ] <- rexp(n_time_obs_e[time_i], rate = 1 / cmu_e[i, time_obs_e == time_i])}
+        for(time_trt_i in time_trt_lev){ e_rep_time_trt[[time_trt_i]][i, ] <- rexp(n_time_trt_obs_e[time_trt_i], rate = 1 / cmu_e[i, time_trt_obs_e == time_trt_i])}
+      } 
+    }
+    if(x$model_output$dist_e == "bern") {
+      for(i in 1:n_sim){ 
+        for(time_i in 1:n_time){ e_rep_time[[time_i]][i, ] <- rbinom(n_time_obs_e[time_i], size = 1, prob = cmu_e[i, time_obs_e == time_i])}
+        for(time_trt_i in time_trt_lev){ e_rep_time_trt[[time_trt_i]][i, ] <- rbinom(n_time_trt_obs_e[time_trt_i], size = 1, prob = cmu_e[i, time_trt_obs_e == time_trt_i])}
+      } 
+    }
+    if(x$model_output$dist_e == "pois") {
+      for(i in 1:n_sim){ 
+        for(time_i in 1:n_time){ e_rep_time[[time_i]][i, ] <- rpois(n_time_obs_e[time_i], lambda = cmu_e[i, time_obs_e == time_i])}
+        for(time_trt_i in time_trt_lev){ e_rep_time_trt[[time_trt_i]][i, ] <- rpois(n_time_trt_obs_e[time_trt_i], lambda = cmu_e[i, time_trt_obs_e == time_trt_i])}
+      } 
+    }
+    if(x$model_output$dist_e == "gamma") {
+      ctau_e <- as.matrix(as.data.frame(x$model_output$model$BUGSoutput$sims.list$ctau_e))[, me_type == "observed"]
+      for(i in 1:n_sim){ 
+        for(time_i in 1:n_time){ e_rep_time[[time_i]][i, ] <- rgamma(n_time_obs_e[time_i], shape = cmu_e[i, time_obs_e == time_i], rate = ctau_e[i, time_obs_e == time_i])}
+        for(time_trt_i in time_trt_lev){ e_rep_time_trt[[time_trt_i]][i, ] <- rgamma(n_time_trt_obs_e[time_trt_i], shape = cmu_e[i, time_trt_obs_e == time_trt_i] * ctau_e[i, time_trt_obs_e == time_trt_i], rate =  ctau_e[i, time_trt_obs_e == time_trt_i])}
+      } 
+    }
+    if(x$model_output$dist_e == "weib") {
+      ctau_e <- as.matrix(as.data.frame(x$model_output$model$BUGSoutput$sims.list$ctau_e))[, me_type == "observed"]
+      for(i in 1:n_sim){ 
+        for(time_i in 1:n_time){ e_rep_time[[time_i]][i, ] <- rweibull(n_time_obs_e[time_i], shape = ctau_e[i, time_obs_e == time_i], scale = cmu_e[i, time_obs_e == time_i] / exp(lgamma(1 + 1 / ctau_e[i, time_obs_e == time_i])))}
+        for(time_trt_i in time_trt_lev){ e_rep_time_trt[[time_trt_i]][i, ] <- rweibull(n_time_trt_obs_e[time_trt_i], shape = ctau_e[i, time_trt_obs_e == time_trt_i], scale = cmu_e[i, time_trt_obs_e == time_trt_i] / exp(lgamma(1 + 1 / ctau_e[i, time_trt_obs_e == time_trt_i])))}
+      } 
+    }
+    if(x$model_output$dist_e == "beta") {
+      ctau_e <- as.matrix(as.data.frame(x$model_output$model$BUGSoutput$sims.list$ctau_e))[, me_type == "observed"]
+      for(i in 1:n_sim){ 
+        for(time_i in 1:n_time){ e_rep_time[[time_i]][i, ] <- rbeta(n_time_obs_e[time_i], shape1 = cmu_e[i, time_obs_e == time_i] * ctau_e[i, time_obs_e == time_i], shape2 = (1 - cmu_e[i, time_obs_e == time_i]) * ctau_e[i, time_obs_e == time_i])}
+        for(time_trt_i in time_trt_lev){ e_rep_time_trt[[time_trt_i]][i, ] <- rbeta(n_time_trt_obs_e[time_trt_i], shape1 = cmu_e[i, time_trt_obs_e == time_trt_i] * ctau_e[i, time_trt_obs_e == time_trt_i], shape2 =  (1 - cmu_e[i, time_trt_obs_e == time_trt_i]) * ctau_e[i, time_trt_obs_e == time_trt_i])}
+      } 
+    }
+    if(x$model_output$dist_c == "norm") {
+      for(i in 1:n_sim){ 
+        for(time_i in 1:n_time){ c_rep_time[[time_i]][i, ] <- rnorm(n_time_obs_c[time_i], mean = cmu_c[i, time_obs_c == time_i], sd = s_c[i, time_i])}
+        for(time_trt_i in time_trt_lev){ c_rep_time_trt[[time_trt_i]][i, ] <- rnorm(n_time_trt_obs_c[time_trt_i], mean = cmu_c[i, time_trt_obs_c == time_trt_i], sd = s_c[i, time_trt_index_time[time_trt_i]])}
+      } 
+    }
+    if(x$model_output$dist_c == "gamma") {
+      ctau_c <- as.matrix(as.data.frame(x$model_output$model$BUGSoutput$sims.list$ctau_c))[, mc_type == "observed"]
+      for(i in 1:n_sim){ 
+        for(time_i in 1:n_time){ c_rep_time[[time_i]][i, ] <- rgamma(n_time_obs_c[time_i], shape = cmu_c[i, time_obs_c == time_i], rate =  ctau_c[i, time_obs_c == time_i])}
+        for(time_trt_i in time_trt_lev){ c_rep_time_trt[[time_trt_i]][i, ] <- rgamma(n_time_trt_obs_c[time_trt_i], shape = cmu_c[i, time_trt_obs_c == time_trt_i] * ctau_c[i, time_trt_obs_c == time_trt_i], rate =  ctau_c[i, time_trt_obs_c == time_trt_i])}
+      } 
+    } 
+    if(x$model_output$dist_c == "lnorm") {
+      for(i in 1:n_sim){ 
+        for(time_i in 1:n_time){ c_rep_time[[time_i]][i, ] <- rlnorm(n_time_obs_c[time_i], meanlog = clmu_c[i, time_obs_c == time_i], sdlog = 1 / sqrt(ltau_c[i, time_i]))}
+        for(time_trt_i in time_trt_lev){ c_rep_time_trt[[time_trt_i]][i, ] <- rlnorm(n_time_trt_obs_c[time_trt_i], meanlog = clmu_c[i, time_trt_obs_c == time_trt_i], sdlog = 1 / sqrt(ltau_c[i, time_trt_index_time[time_trt_i]]))}
+      } 
     }
   }
-  color_scheme_set(scheme = scheme_set) 
+  }
+  if(length(trt) == 1) {
+    if(trt == "none") { 
+      list.trt_name <- "none"}
+    if(trt == "all") { 
+      list.trt_name <- trt_lev}
+    if(!trt %in% c("all", "none") & is.character(trt)) { 
+      list.trt_name <- trt}
+  } 
+  if(length(trt) > 1 & is.character(trt)) { 
+    list.trt_name <- trt}
+  if(is.numeric(trt)) { 
+    list.trt_name <- trt_lev[trt]
+  }
+  if(length(time.plot) == 1) {
+    if(time.plot == "all") { 
+      list.time_name <- as.character(1:n_time)}
+    if(!time.plot %in% c("all") & is.character(time.plot)) { 
+      list.time_name <- time.plot}
+  }
+  if(length(time.plot) > 1 & is.character(time.plot)) { 
+    list.time_name <- time.plot}
+  if(is.numeric(time.plot)) { 
+    list.time_name <- as.character(1:n_time)[time.plot]}
+  color_scheme_set(scheme = scheme_set)    
+  gplot_e <- gplot_c <- gplot_e_trt <- gplot_c_trt <- list()
+  gplot_e_time <- gplot_c_time <- gplot_e_time_trt <- gplot_c_time_trt <- list()
   if(type == "histogram") {
-    if(exists("binwidth_e", where = exArgs)) {binwidth_e = exArgs$binwidth_e} else {binwidth_e = 1 / 30 }
-    if(exists("binwidth_c", where = exArgs)) {binwidth_c = exArgs$binwidth_c} else {binwidth_c = 30 }
-    if(exists("breaks", where = exArgs)) {breaks = exArgs$breaks} else {breaks = NULL }
-    if(exists("freq", where = exArgs)) {freq = exArgs$freq} else {freq = TRUE }
-    ppc_plot_e1 <- ppc_hist(y = e1_obs, yrep = e1_rep[1 : ndisplay, ], binwidth = binwidth_e, breaks = breaks, freq = freq)
-    ppc_plot_e2 <- ppc_hist(y = e2_obs, yrep = e2_rep[1 : ndisplay, ], binwidth = binwidth_e, breaks = breaks, freq = freq)
-    ppc_plot_c1 <- ppc_hist(y = c1_obs, yrep = c1_rep[1 : ndisplay, ], binwidth = binwidth_c, breaks = breaks, freq = freq)
-    ppc_plot_c2 <- ppc_hist(y = c2_obs, yrep = c2_rep[1 : ndisplay, ], binwidth = binwidth_c, breaks = breaks, freq = freq)
-  } else if(type == "boxplot") {
-    if(exists("notch", where = exArgs)) {notch = exArgs$notch} else {notch = FALSE }
-    if(exists("size", where = exArgs)) {size = exArgs$size} else {size = 0.5 }
-    if(exists("alpha", where = exArgs)) {alpha = exArgs$alpha} else {alpha = 1 }
-    ppc_plot_e1 <- ppc_boxplot(y = e1_obs, yrep = e1_rep[1 : ndisplay, ], notch = notch, size = size, alpha = alpha)
-    ppc_plot_e2 <- ppc_boxplot(y = e2_obs, yrep = e2_rep[1 : ndisplay, ], notch = notch, size = size, alpha = alpha)
-    ppc_plot_c1 <- ppc_boxplot(y = c1_obs, yrep = c1_rep[1 : ndisplay, ], notch = notch, size = size, alpha = alpha)
-    ppc_plot_c2 <- ppc_boxplot(y = c2_obs, yrep = c2_rep[1 : ndisplay, ], notch = notch, size = size, alpha = alpha)
-  } else if(type == "freqpoly") {
-    if(exists("binwidth_e", where = exArgs)) {binwidth_e = exArgs$binwidth_e} else {binwidth_e = 1 / 30 }
-    if(exists("binwidth_c", where = exArgs)) {binwidth_c = exArgs$binwidth_c} else {binwidth_c = 30 }
-    if(exists("freq", where = exArgs)) {freq = exArgs$freq} else {freq = TRUE }
-    if(exists("size", where = exArgs)) {size = exArgs$size} else {size = 0.25 }
-    if(exists("alpha", where = exArgs)) {alpha = exArgs$alpha} else {alpha = 1 }
-    ppc_plot_e1 <- ppc_freqpoly(y = e1_obs, yrep = e1_rep[1 : ndisplay, ], binwidth = binwidth_e, freq = freq, size = size, alpha = alpha)
-    ppc_plot_e2 <- ppc_freqpoly(y = e2_obs, yrep = e2_rep[1 : ndisplay, ], binwidth = binwidth_e, freq = freq, size = size, alpha = alpha)
-    ppc_plot_c1 <- ppc_freqpoly(y = c1_obs, yrep = c1_rep[1 : ndisplay, ], binwidth = binwidth_c, freq = freq, size = size, alpha = alpha)
-    ppc_plot_c2 <- ppc_freqpoly(y = c2_obs, yrep = c2_rep[1 : ndisplay, ], binwidth = binwidth_c, freq = freq, size = size, alpha = alpha)
-  } else if(type == "dens") {
-    if(exists("trim", where = exArgs)) {trim = exArgs$trim} else {trim = FALSE }
-    if(exists("size", where = exArgs)) {size = exArgs$size} else {size = 0.5 }
-    if(exists("alpha", where = exArgs)) {alpha = exArgs$alpha} else {alpha = 1 }
-    ppc_plot_e1 <- ppc_dens(y = e1_obs, yrep = e1_rep[1 : ndisplay, ], size = size, alpha = alpha, trim = FALSE)
-    ppc_plot_e2 <- ppc_dens(y = e2_obs, yrep = e2_rep[1 : ndisplay, ], size = size, alpha = alpha, trim = FALSE)
-    ppc_plot_c1 <- ppc_dens(y = c1_obs, yrep = c1_rep[1 : ndisplay, ], size = size, alpha = alpha, trim = FALSE)
-    ppc_plot_c2 <- ppc_dens(y = c2_obs, yrep = c2_rep[1 : ndisplay, ], size = size, alpha = alpha, trim = FALSE)
-  } else if(type == "dens_overlay") {
-    if(exists("adjust", where = exArgs)) {adjust = exArgs$adjust} else {adjust = 1 }
-    if(exists("bw", where = exArgs)) {bw = exArgs$bw} else {bw = "nrd0" }
-    if(exists("trim", where = exArgs)) {trim = exArgs$trim} else {trim = FALSE }
-    if(exists("size", where = exArgs)) {size = exArgs$size} else {size = 0.25 }
-    if(exists("alpha", where = exArgs)) {alpha = exArgs$alpha} else {alpha = 0.7 }
-    if(exists("kernel", where = exArgs)) {kernel = exArgs$kernel} else {kernel = "gaussian" }
-    if(exists("n_dens", where = exArgs)) {n_dens = exArgs$n_dens} else {n_dens = 1024 }
-    ppc_plot_e1 <- ppc_dens_overlay(y = e1_obs, yrep = e1_rep[1 : ndisplay, ], size = size, alpha = alpha, trim = FALSE, bw = bw, adjust = adjust, kernel = kernel, n_dens = n_dens)
-    ppc_plot_e2 <- ppc_dens_overlay(y = e2_obs, yrep = e2_rep[1 : ndisplay, ], size = size, alpha = alpha, trim = FALSE, bw = bw, adjust = adjust, kernel = kernel, n_dens = n_dens)
-    ppc_plot_c1 <- ppc_dens_overlay(y = c1_obs, yrep = c1_rep[1 : ndisplay, ], size = size, alpha = alpha, trim = FALSE, bw = bw, adjust = adjust, kernel = kernel, n_dens = n_dens)
-    ppc_plot_c2 <- ppc_dens_overlay(y = c2_obs, yrep = c2_rep[1 : ndisplay, ], size = size, alpha = alpha, trim = FALSE, bw = bw, adjust = adjust, kernel = kernel, n_dens = n_dens)
-  } else if(type == "ecdf_overlay") {
-    if(exists("size", where = exArgs)) {size = exArgs$size} else {size = 0.25 }
-    if(exists("alpha", where = exArgs)) {alpha = exArgs$alpha} else {alpha = 0.7 }
-    if(exists("pad", where = exArgs)) {pad = exArgs$pad} else {pad = TRUE }
-    if(exists("discrete", where = exArgs)) {discrete = exArgs$discrete} else {discrete = FALSE }
-    ppc_plot_e1 <- ppc_ecdf_overlay(y = e1_obs, yrep = e1_rep[1 : ndisplay, ], size = size, alpha = alpha, discrete = discrete, pad = pad)
-    ppc_plot_e2 <- ppc_ecdf_overlay(y = e2_obs, yrep = e2_rep[1 : ndisplay, ], size = size, alpha = alpha, discrete = discrete, pad = pad)
-    ppc_plot_c1 <- ppc_ecdf_overlay(y = c1_obs, yrep = c1_rep[1 : ndisplay, ], size = size, alpha = alpha, discrete = discrete, pad = pad)
-    ppc_plot_c2 <- ppc_ecdf_overlay(y = c2_obs, yrep = c2_rep[1 : ndisplay, ], size = size, alpha = alpha, discrete = discrete, pad = pad)
-  } else if(type == "stat" & is.null(corr) == TRUE) {
-    if(bpp == FALSE){
-    if(exists("binwidth_e", where = exArgs)) {binwidth_e = exArgs$binwidth_e} else {binwidth_e = 1 / 30 }
-    if(exists("binwidth_c", where = exArgs)) {binwidth_c = exArgs$binwidth_c} else {binwidth_c = 30 }
-    if(exists("freq", where = exArgs)) {freq = exArgs$freq} else {freq = TRUE }
-    if(exists("breaks", where = exArgs)) {breaks = exArgs$breaks} else {breaks = NULL }
-    ppc_plot_e1 <- ppc_stat(y = e1_obs, yrep = e1_rep[1 : ndisplay, ], stat = stat, binwidth = binwidth_e, breaks = breaks, freq = freq)
-    ppc_plot_e2 <- ppc_stat(y = e2_obs, yrep = e2_rep[1 : ndisplay, ], stat = stat, binwidth = binwidth_e, breaks = breaks, freq = freq)
-    ppc_plot_c1 <- ppc_stat(y = c1_obs, yrep = c1_rep[1 : ndisplay, ], stat = stat, binwidth = binwidth_c, breaks = breaks, freq = freq)
-    ppc_plot_c2 <- ppc_stat(y = c2_obs, yrep = c2_rep[1 : ndisplay, ], stat = stat, binwidth = binwidth_c, breaks = breaks, freq = freq)
+    if(exists("bins", where = exArgs)) { bins = exArgs$bins} else { bins = 30}
+    if(exists("breaks", where = exArgs)) { breaks = exArgs$breaks} else { breaks = NULL}
+    if(exists("freq", where = exArgs)) { freq = exArgs$freq} else { freq = TRUE}
+    if(x$data_format == "wide") {
+    gplot_e <- ppc_hist(y = e_obs, yrep = e_rep[1 : ndisplay, ], bins = bins, breaks = breaks, freq = freq)
+    gplot_c <- ppc_hist(y = c_obs, yrep = c_rep[1 : ndisplay, ], bins = bins, breaks = breaks, freq = freq)
+    for(trt_i in trt_lev) {
+      gplot_e_trt[[trt_i]] <- ppc_hist(y = e_obs_trt[[trt_i]], yrep = e_rep_trt[[trt_i]][1 : ndisplay, ], bins = bins, breaks = breaks, freq = freq)
+      gplot_c_trt[[trt_i]] <- ppc_hist(y = c_obs_trt[[trt_i]], yrep = c_rep_trt[[trt_i]][1 : ndisplay, ], bins = bins, breaks = breaks, freq = freq)
     }
-    if(bpp == TRUE){
-    if(exists("trim", where = exArgs)) {trim = exArgs$trim} else {trim = FALSE }
-    if(exists("size", where = exArgs)) {size = exArgs$size} else {size = 0.5 }
-    if(exists("alpha", where = exArgs)) {alpha = exArgs$alpha} else {alpha = 1 }    
-      stat_e1 <- stat(e1_obs)
-      stat_c1 <- stat(c1_obs)
-      values_e1 <- apply(e1_rep[1 : ndisplay, ], 1, stat)
-      values_c1 <- apply(c1_rep[1 : ndisplay, ], 1, stat)
-      df1<-data.frame(values_e1, values_c1)
-      stat_e2 <- stat(e2_obs)
-      stat_c2 <- stat(c2_obs)
-      values_e2 <- apply(e2_rep[1 : ndisplay, ], 1, stat)
-      values_c2 <- apply(c2_rep[1 : ndisplay, ], 1, stat)
-      df2 <- data.frame(values_e2, values_c2)
-      pval_e1 <- sum(values_e1 > stat_e1) / length(values_e1)
-      pval_c1 <- sum(values_c1 > stat_c1) / length(values_c1)
-      pval_e2 <- sum(values_e2 > stat_e2) / length(values_e2)
-      pval_c2 <- sum(values_c2 > stat_c2) / length(values_c2)
+    }
+    if(x$data_format == "long") {
+      for(time_i in 1:n_time) {
+        gplot_e_time[[time_i]] <- ppc_hist(y = e_obs_time[[time_i]], yrep = e_rep_time[[time_i]][1 : ndisplay, ], bins = bins, breaks = breaks, freq = freq)
+        gplot_c_time[[time_i]] <- ppc_hist(y = c_obs_time[[time_i]], yrep = c_rep_time[[time_i]][1 : ndisplay, ], bins = bins, breaks = breaks, freq = freq)
+      }
+      for(time_trt_i in time_trt_lev) {
+        gplot_e_time_trt[[time_trt_i]] <- ppc_hist(y = e_obs_time_trt[[time_trt_i]], yrep = e_rep_time_trt[[time_trt_i]][1 : ndisplay, ], bins = bins, breaks = breaks, freq = freq)
+        gplot_c_time_trt[[time_trt_i]] <- ppc_hist(y = c_obs_time_trt[[time_trt_i]], yrep = c_rep_time_trt[[time_trt_i]][1 : ndisplay, ], bins = bins, breaks = breaks, freq = freq)
+      }
+    }
+  }
+  if(type == "boxplot") {
+    if(exists("notch", where = exArgs)) { notch = exArgs$notch} else { notch = FALSE}
+    if(exists("size", where = exArgs)) { size = exArgs$size} else { size = 0.5}
+    if(exists("alpha", where = exArgs)) { alpha = exArgs$alpha} else { alpha = 1}
+    if(x$data_format == "wide") {
+    gplot_e <- ppc_boxplot(y = e_obs, yrep = e_rep[1 : ndisplay, ], notch = notch, size = size, alpha = alpha)
+    gplot_c <- ppc_boxplot(y = c_obs, yrep = c_rep[1 : ndisplay, ], notch = notch, size = size, alpha = alpha)
+    for(trt_i in trt_lev) {
+      gplot_e_trt[[trt_i]] <- ppc_boxplot(y = e_obs_trt[[trt_i]], yrep = e_rep_trt[[trt_i]][1 : ndisplay, ], notch = notch, size = size, alpha = alpha)
+      gplot_c_trt[[trt_i]] <- ppc_boxplot(y = c_obs_trt[[trt_i]], yrep = c_rep_trt[[trt_i]][1 : ndisplay, ], notch = notch, size = size, alpha = alpha)
+    }
+    }
+    if(x$data_format == "long") {
+      for(time_i in 1:n_time) {
+        gplot_e_time[[time_i]] <- ppc_boxplot(y = e_obs_time[[time_i]], yrep = e_rep_time[[time_i]][1 : ndisplay, ], notch = notch, size = size, alpha = alpha)
+        gplot_c_time[[time_i]] <- ppc_boxplot(y = c_obs_time[[time_i]], yrep = c_rep_time[[time_i]][1 : ndisplay, ], notch = notch, size = size, alpha = alpha)
+      }
+      for(time_trt_i in time_trt_lev) {
+        gplot_e_time_trt[[time_trt_i]] <- ppc_boxplot(y = e_obs_time_trt[[time_trt_i]], yrep = e_rep_time_trt[[time_trt_i]][1 : ndisplay, ], notch = notch, size = size, alpha = alpha)
+        gplot_e_time_trt[[time_trt_i]] <- ppc_boxplot(y = c_obs_time_trt[[time_trt_i]], yrep = c_rep_time_trt[[time_trt_i]][1 : ndisplay, ], notch = notch, size = size, alpha = alpha)
+      }
+    }
+  }
+  if(type == "freqpoly") {
+    if(exists("bins", where = exArgs)) { bins = exArgs$bins} else { bins = 30}
+    if(exists("freq", where = exArgs)) { freq = exArgs$freq} else { freq = TRUE}
+    if(exists("size", where = exArgs)) { size = exArgs$size} else { size = 0.25}
+    if(exists("alpha", where = exArgs)) { alpha = exArgs$alpha} else { alpha = 1}
+    if(x$data_format == "wide") {
+    gplot_e <- ppc_freqpoly(y = e_obs, yrep = e_rep[1 : ndisplay, ], bins = bins, freq = freq, size = size, alpha = alpha)
+    gplot_c <- ppc_freqpoly(y = c_obs, yrep = c_rep[1 : ndisplay, ], bins = bins, freq = freq, size = size, alpha = alpha)
+    for(trt_i in trt_lev) {
+      gplot_e_trt[[trt_i]] <- ppc_freqpoly(y = e_obs_trt[[trt_i]], yrep = e_rep_trt[[trt_i]][1 : ndisplay, ], bins = bins, freq = freq, size = size, alpha = alpha)
+      gplot_c_trt[[trt_i]] <- ppc_freqpoly(y = c_obs_trt[[trt_i]], yrep = c_rep_trt[[trt_i]][1 : ndisplay, ], bins = bins, freq = freq, size = size, alpha = alpha)
+    }
+    }
+    if(x$data_format == "long") {
+      for(time_i in 1:n_time) {
+        gplot_e_time[[time_i]] <- ppc_freqpoly(y = e_obs_time[[time_i]], yrep = e_rep_time[[time_i]][1 : ndisplay, ], bins = bins, freq = freq, size = size, alpha = alpha)
+        gplot_c_time[[time_i]] <- ppc_freqpoly(y = c_obs_time[[time_i]], yrep = c_rep_time[[time_i]][1 : ndisplay, ], bins = bins, freq = freq, size = size, alpha = alpha)
+      }
+      for(time_trt_i in time_trt_lev) {
+        gplot_e_time_trt[[time_trt_i]] <- ppc_freqpoly(y = e_obs_time_trt[[time_trt_i]], yrep = e_rep_time_trt[[time_trt_i]][1 : ndisplay, ], bins = bins, freq = freq, size = size, alpha = alpha)
+        gplot_e_time_trt[[time_trt_i]] <- ppc_freqpoly(y = c_obs_time_trt[[time_trt_i]], yrep = c_rep_time_trt[[time_trt_i]][1 : ndisplay, ], bins = bins, freq = freq, size = size, alpha = alpha)
+      }
+    }
+  }
+  if(type == "dens") {
+    if(exists("trim", where = exArgs)) { trim = exArgs$trim} else { trim = FALSE}
+    if(exists("size", where = exArgs)) { size = exArgs$size} else { size = 0.5}
+    if(exists("alpha", where = exArgs)) { alpha = exArgs$alpha} else { alpha = 1}
+    if(x$data_format == "wide") {
+    gplot_e <- ppc_dens(y = e_obs, yrep = e_rep[1 : ndisplay, ], size = size, alpha = alpha, trim = trim)
+    gplot_c <- ppc_dens(y = c_obs, yrep = c_rep[1 : ndisplay, ], size = size, alpha = alpha, trim = trim)
+    for(trt_i in trt_lev) {
+      gplot_e_trt[[trt_i]] <- ppc_dens(y = e_obs_trt[[trt_i]], yrep = e_rep_trt[[trt_i]][1 : ndisplay, ], size = size, alpha = alpha, trim = trim)
+      gplot_c_trt[[trt_i]] <- ppc_dens(y = c_obs_trt[[trt_i]], yrep = c_rep_trt[[trt_i]][1 : ndisplay, ], size = size, alpha = alpha, trim = trim)
+    }
+    }
+    if(x$data_format == "long") {
+      for(time_i in 1:n_time) {
+        gplot_e_time[[time_i]] <- ppc_dens(y = e_obs_time[[time_i]], yrep = e_rep_time[[time_i]][1 : ndisplay, ], size = size, alpha = alpha, trim = trim)
+        gplot_c_time[[time_i]] <- ppc_dens(y = c_obs_time[[time_i]], yrep = c_rep_time[[time_i]][1 : ndisplay, ], size = size, alpha = alpha, trim = trim)
+      }
+      for(time_trt_i in time_trt_lev) {
+        gplot_e_time_trt[[time_trt_i]] <- ppc_dens(y = e_obs_time_trt[[time_trt_i]], yrep = e_rep_time_trt[[time_trt_i]][1 : ndisplay, ], size = size, alpha = alpha, trim = trim)
+        gplot_c_time_trt[[time_trt_i]] <- ppc_dens(y = c_obs_time_trt[[time_trt_i]], yrep = c_rep_time_trt[[time_trt_i]][1 : ndisplay, ], size = size, alpha = alpha, trim = trim)
+      }
+    }
+ }
+  if(type == "dens_overlay") {
+    if(exists("adjust", where = exArgs)) { adjust = exArgs$adjust} else { adjust = 1}
+    if(exists("bw", where = exArgs)) { bw = exArgs$bw} else { bw = "nrd0"}
+    if(exists("trim", where = exArgs)) { trim = exArgs$trim} else { trim = FALSE}
+    if(exists("size", where = exArgs)) { size = exArgs$size} else { size = 0.25}
+    if(exists("alpha", where = exArgs)) { alpha = exArgs$alpha} else { alpha = 0.7}
+    if(exists("kernel", where = exArgs)) { kernel = exArgs$kernel} else { kernel = "gaussian"}
+    if(exists("n_dens", where = exArgs)) { n_dens = exArgs$n_dens} else { n_dens = 1024}
+    if(x$data_format == "wide") {
+    gplot_e <- ppc_dens_overlay(y = e_obs, yrep = e_rep[1 : ndisplay, ], size = size, alpha = alpha, trim = trim, bw = bw, adjust = adjust, kernel = kernel, n_dens = n_dens)
+    gplot_c <- ppc_dens_overlay(y = c_obs, yrep = c_rep[1 : ndisplay, ], size = size, alpha = alpha, trim = trim, bw = bw, adjust = adjust, kernel = kernel, n_dens = n_dens)
+    for(trt_i in trt_lev) {
+      gplot_e_trt[[trt_i]] <- ppc_dens_overlay(y = e_obs_trt[[trt_i]], yrep = e_rep_trt[[trt_i]][1 : ndisplay, ], size = size, alpha = alpha, trim = trim, bw = bw, adjust = adjust, kernel = kernel, n_dens = n_dens)
+      gplot_c_trt[[trt_i]] <- ppc_dens_overlay(y = c_obs_trt[[trt_i]], yrep = c_rep_trt[[trt_i]][1 : ndisplay, ], size = size, alpha = alpha, trim = trim, bw = bw, adjust = adjust, kernel = kernel, n_dens = n_dens)
+    }
+    }
+    if(x$data_format == "long") {
+      for(time_i in 1:n_time) {
+        gplot_e_time[[time_i]] <- ppc_dens_overlay(y = e_obs_time[[time_i]], yrep = e_rep_time[[time_i]][1 : ndisplay, ], size = size, alpha = alpha, trim = trim, bw = bw, adjust = adjust, kernel = kernel, n_dens = n_dens)
+        gplot_c_time[[time_i]] <- ppc_dens_overlay(y = c_obs_time[[time_i]], yrep = c_rep_time[[time_i]][1 : ndisplay, ], size = size, alpha = alpha, trim = trim, bw = bw, adjust = adjust, kernel = kernel, n_dens = n_dens)
+      }
+      for(time_trt_i in time_trt_lev) {
+        gplot_e_time_trt[[time_trt_i]] <- ppc_dens_overlay(y = e_obs_time_trt[[time_trt_i]], yrep = e_rep_time_trt[[time_trt_i]][1 : ndisplay, ], size = size, alpha = alpha, trim = trim, bw = bw, adjust = adjust, kernel = kernel, n_dens = n_dens)
+        gplot_c_time_trt[[time_trt_i]] <- ppc_dens_overlay(y = c_obs_time_trt[[time_trt_i]], yrep = c_rep_time_trt[[time_trt_i]][1 : ndisplay, ], size = size, alpha = alpha, trim = trim, bw = bw, adjust = adjust, kernel = kernel, n_dens = n_dens)
+      }
+    }
+  }
+  if(type == "ecdf_overlay") {
+    if(exists("size", where = exArgs)) { size = exArgs$size} else { size = 0.25}
+    if(exists("alpha", where = exArgs)) { alpha = exArgs$alpha} else { alpha = 0.7}
+    if(exists("pad", where = exArgs)) { pad = exArgs$pad} else { pad = TRUE}
+    if(exists("discrete", where = exArgs)) { discrete = exArgs$discrete} else { discrete = FALSE}
+    if(x$data_format == "wide") {
+    gplot_e <- ppc_ecdf_overlay(y = e_obs, yrep = e_rep[1 : ndisplay, ], size = size, alpha = alpha, discrete = discrete, pad = pad)
+    gplot_c <- ppc_ecdf_overlay(y = c_obs, yrep = c_rep[1 : ndisplay, ], size = size, alpha = alpha, discrete = discrete, pad = pad)
+    for(trt_i in trt_lev) {
+      gplot_e_trt[[trt_i]] <- ppc_ecdf_overlay(y = e_obs_trt[[trt_i]], yrep = e_rep_trt[[trt_i]][1 : ndisplay, ], size = size, alpha = alpha, discrete = discrete, pad = pad)
+      gplot_c_trt[[trt_i]] <- ppc_ecdf_overlay(y = c_obs_trt[[trt_i]], yrep = c_rep_trt[[trt_i]][1 : ndisplay, ], size = size, alpha = alpha, discrete = discrete, pad = pad)
+    }
+    }
+    if(x$data_format == "long") {
+      for(time_i in 1:n_time) {
+        gplot_e_time[[time_i]] <- ppc_ecdf_overlay(y = e_obs_time[[time_i]], yrep = e_rep_time[[time_i]][1 : ndisplay, ], size = size, alpha = alpha, discrete = discrete, pad = pad)
+        gplot_c_time[[time_i]] <- ppc_ecdf_overlay(y = c_obs_time[[time_i]], yrep = c_rep_time[[time_i]][1 : ndisplay, ], size = size, alpha = alpha, discrete = discrete, pad = pad)
+      }
+      for(time_trt_i in time_trt_lev) {
+        gplot_e_time_trt[[time_trt_i]] <- ppc_ecdf_overlay(y = e_obs_time_trt[[time_trt_i]], yrep = e_rep_time_trt[[time_trt_i]][1 : ndisplay, ], size = size, alpha = alpha, discrete = discrete, pad = pad)
+        gplot_c_time_trt[[time_trt_i]] <- ppc_ecdf_overlay(y = c_obs_time_trt[[time_trt_i]], yrep = c_rep_time_trt[[time_trt_i]][1 : ndisplay, ], size = size, alpha = alpha, discrete = discrete, pad = pad)
+      } 
+    }
+  }
+  if(type == "stat_2d") {
+    if(exists("size", where = exArgs)) { size = exArgs$size} else { size = 2.5}
+    if(exists("alpha", where = exArgs)) { alpha = exArgs$alpha} else { alpha = 0.7}
+    if(exists("stat", where = exArgs)) { stat = exArgs$stat} else { stat = c("mean", "sd")}
+    if(x$data_format == "wide") {
+    gplot_e <- ppc_stat_2d(y = e_obs, yrep = e_rep[1 : ndisplay, ], stat = stat, size = size, alpha = alpha)
+    gplot_c <- ppc_stat_2d(y = c_obs, yrep = c_rep[1 : ndisplay, ], stat = stat, size = size, alpha = alpha)
+    for(trt_i in trt_lev) {
+      gplot_e_trt[[trt_i]] <- ppc_stat_2d(y = e_obs_trt[[trt_i]], yrep = e_rep_trt[[trt_i]][1 : ndisplay, ], stat = stat, size = size, alpha = alpha)
+      gplot_c_trt[[trt_i]] <- ppc_stat_2d(y = c_obs_trt[[trt_i]], yrep = c_rep_trt[[trt_i]][1 : ndisplay, ], stat = stat, size = size, alpha = alpha)
+    }
+    }
+    if(x$data_format == "long") {
+      for(time_i in 1:n_time) {
+        gplot_e_time[[time_i]] <- ppc_stat_2d(y = e_obs_time[[time_i]], yrep = e_rep_time[[time_i]][1 : ndisplay, ], stat = stat, size = size, alpha = alpha)
+        gplot_c_time[[time_i]] <- ppc_stat_2d(y = c_obs_time[[time_i]], yrep = c_rep_time[[time_i]][1 : ndisplay, ], stat = stat, size = size, alpha = alpha)
+      }
+      for(time_trt_i in time_trt_lev) {
+        gplot_e_time_trt[[time_trt_i]] <- ppc_stat_2d(y = e_obs_time_trt[[time_trt_i]], yrep = e_rep_time_trt[[time_trt_i]][1 : ndisplay, ], stat = stat, size = size, alpha = alpha)
+        gplot_c_time_trt[[time_trt_i]] <- ppc_stat_2d(y = c_obs_time_trt[[time_trt_i]], yrep = c_rep_time_trt[[time_trt_i]][1 : ndisplay, ], stat = stat, size = size, alpha = alpha)
+      }
+    }
+  }
+  if(type == "error_hist") {
+    if(exists("bins", where = exArgs)) { bins = exArgs$bins} else { bins = 30}
+    if(exists("freq", where = exArgs)) { freq = exArgs$freq} else { freq = TRUE}
+    if(exists("breaks", where = exArgs)) { breaks = exArgs$breaks} else { breaks = NULL}
+    if(x$data_format == "wide") {
+    gplot_e <- ppc_error_hist(y = e_obs, yrep = e_rep[1 : ndisplay, ], bins = bins, breaks = breaks, freq = freq)
+    gplot_c <- ppc_error_hist(y = c_obs, yrep = c_rep[1 : ndisplay, ], bins = bins, breaks = breaks, freq = freq)
+    for(trt_i in trt_lev) {
+      gplot_e_trt[[trt_i]] <- ppc_error_hist(y = e_obs_trt[[trt_i]], yrep = e_rep_trt[[trt_i]][1 : ndisplay, ], bins = bins, breaks = breaks, freq = freq)
+      gplot_c_trt[[trt_i]] <- ppc_error_hist(y = c_obs_trt[[trt_i]], yrep = c_rep_trt[[trt_i]][1 : ndisplay, ], bins = bins, breaks = breaks, freq = freq)
+    }
+    }
+    if(x$data_format == "long") {
+      for(time_i in 1:n_time) {
+        gplot_e_time[[time_i]] <- ppc_error_hist(y = e_obs_time[[time_i]], yrep = e_rep_time[[time_i]][1 : ndisplay, ], bins = bins, breaks = breaks, freq = freq)
+        gplot_c_time[[time_i]] <- ppc_error_hist(y = c_obs_time[[time_i]], yrep = c_rep_time[[time_i]][1 : ndisplay, ], bins = bins, breaks = breaks, freq = freq)
+      }
+      for(time_trt_i in time_trt_lev) {
+        gplot_e_time_trt[[time_trt_i]] <- ppc_error_hist(y = e_obs_time_trt[[time_trt_i]], yrep = e_rep_time_trt[[time_trt_i]][1 : ndisplay, ], bins = bins, breaks = breaks, freq = freq)
+        gplot_c_time_trt[[time_trt_i]] <- ppc_error_hist(y = c_obs_time_trt[[time_trt_i]], yrep = c_rep_time_trt[[time_trt_i]][1 : ndisplay, ], bins = bins, breaks = breaks, freq = freq)
+      }
+    }
+  }
+  if(type == "error_scatter") {
+    if(exists("size", where = exArgs)) { size = exArgs$size} else { size = 2.5}
+    if(exists("alpha", where = exArgs)) { alpha = exArgs$alpha} else { alpha = 0.8}
+    if(x$data_format == "wide") {
+    gplot_e <- ppc_error_scatter(y = e_obs, yrep = e_rep[1 : ndisplay, ], size = size, alpha = alpha)
+    gplot_c <- ppc_error_scatter(y = c_obs, yrep = c_rep[1 : ndisplay, ], size = size, alpha = alpha)
+    for(trt_i in trt_lev) {
+      gplot_e_trt[[trt_i]] <- ppc_error_scatter(y = e_obs_trt[[trt_i]], yrep = e_rep_trt[[trt_i]][1 : ndisplay, ], size = size, alpha = alpha)
+      gplot_c_trt[[trt_i]] <- ppc_error_scatter(y = c_obs_trt[[trt_i]], yrep = c_rep_trt[[trt_i]][1 : ndisplay, ], size = size, alpha = alpha)
+    }
+    }
+    if(x$data_format == "long") {
+      for(time_i in 1:n_time) {
+        gplot_e_time[[time_i]] <- ppc_error_scatter(y = e_obs_time[[time_i]], yrep = e_rep_time[[time_i]][1 : ndisplay, ], size = size, alpha = alpha)
+        gplot_c_time[[time_i]] <- ppc_error_scatter(y = c_obs_time[[time_i]], yrep = c_rep_time[[time_i]][1 : ndisplay, ], size = size, alpha = alpha)
+      }
+      for(time_trt_i in time_trt_lev) {
+        gplot_e_time_trt[[time_trt_i]] <- ppc_error_scatter(y = e_obs_time_trt[[time_trt_i]], yrep = e_rep_time_trt[[time_trt_i]][1 : ndisplay, ], size = size, alpha = alpha)
+        gplot_c_time_trt[[time_trt_i]] <- ppc_error_scatter(y = c_obs_time_trt[[time_trt_i]], yrep = c_rep_time_trt[[time_trt_i]][1 : ndisplay, ], size = size, alpha = alpha)
+      }
+    }
+  }
+  if(type == "error_scatter_avg") {
+    if(exists("size", where = exArgs)) { size = exArgs$size} else { size = 2.5}
+    if(exists("alpha", where = exArgs)) { alpha = exArgs$alpha} else { alpha = 0.8}
+    if(x$data_format == "wide") {
+    gplot_e <- ppc_error_scatter_avg(y = e_obs, yrep = e_rep[1 : ndisplay, ], size = size, alpha = alpha)
+    gplot_c <- ppc_error_scatter_avg(y = c_obs, yrep = c_rep[1 : ndisplay, ], size = size, alpha = alpha)
+    for(trt_i in trt_lev) {
+      gplot_e_trt[[trt_i]] <- ppc_error_scatter_avg(y = e_obs_trt[[trt_i]], yrep = e_rep_trt[[trt_i]][1 : ndisplay, ], size = size, alpha = alpha)
+      gplot_c_trt[[trt_i]] <- ppc_error_scatter_avg(y = c_obs_trt[[trt_i]], yrep = c_rep_trt[[trt_i]][1 : ndisplay, ], size = size, alpha = alpha)
+    }
+    }
+    if(x$data_format == "long") {
+      for(time_i in 1:n_time) {
+        gplot_e_time[[time_i]] <- ppc_error_scatter_avg(y = e_obs_time[[time_i]], yrep = e_rep_time[[time_i]][1 : ndisplay, ], size = size, alpha = alpha)
+        gplot_c_time[[time_i]] <- ppc_error_scatter_avg(y = c_obs_time[[time_i]], yrep = c_rep_time[[time_i]][1 : ndisplay, ], size = size, alpha = alpha)
+      }
+      for(time_trt_i in time_trt_lev) {
+        gplot_e_time_trt[[time_trt_i]] <- ppc_error_scatter_avg(y = e_obs_time_trt[[time_trt_i]], yrep = e_rep_time_trt[[time_trt_i]][1 : ndisplay, ], size = size, alpha = alpha)
+        gplot_c_time_trt[[time_trt_i]] <- ppc_error_scatter_avg(y = c_obs_time_trt[[time_trt_i]], yrep = c_rep_time_trt[[time_trt_i]][1 : ndisplay, ], size = size, alpha = alpha)
+      }
+    }
+  }
+  if(type == "error_binned") {
+    if(exists("bins", where = exArgs)) { bins = exArgs$bins} else { bins = NULL}
+    if(exists("size", where = exArgs)) { size = exArgs$size} else { size = 1}
+    if(exists("alpha", where = exArgs)) { alpha = exArgs$alpha} else { alpha = 0.25}
+    if(x$data_format == "wide") {
+    gplot_e <- ppc_error_binned(y = e_obs, yrep = e_rep[1 : ndisplay, ], bins = bins, size = size, alpha = alpha)
+    gplot_c <- ppc_error_binned(y = c_obs, yrep = c_rep[1 : ndisplay, ], bins = bins, size = size, alpha = alpha)
+    for(trt_i in trt_lev) {
+      gplot_e_trt[[trt_i]] <- ppc_error_binned(y = e_obs_trt[[trt_i]], yrep = e_rep_trt[[trt_i]][1 : ndisplay, ], bins = bins, size = size, alpha = alpha)
+      gplot_c_trt[[trt_i]] <- ppc_error_binned(y = c_obs_trt[[trt_i]], yrep = c_rep_trt[[trt_i]][1 : ndisplay, ], bins = bins, size = size, alpha = alpha)
+    }
+    }
+    if(x$data_format == "long") {
+      for(time_i in 1:n_time) {
+        gplot_e_time[[time_i]] <- ppc_error_binned(y = e_obs_time[[time_i]], yrep = e_rep_time[[time_i]][1 : ndisplay, ], bins = bins, size = size, alpha = alpha)
+        gplot_c_time[[time_i]] <- ppc_error_binned(y = c_obs_time[[time_i]], yrep = c_rep_time[[time_i]][1 : ndisplay, ], bins = bins, size = size, alpha = alpha)
+      }
+      for(time_trt_i in time_trt_lev) {
+        gplot_e_time_trt[[time_trt_i]] <- ppc_error_binned(y = e_obs_time_trt[[time_trt_i]], yrep = e_rep_time_trt[[time_trt_i]][1 : ndisplay, ], bins = bins, size = size, alpha = alpha)
+        gplot_c_time_trt[[time_trt_i]] <- ppc_error_binned(y = c_obs_time_trt[[time_trt_i]], yrep = c_rep_time_trt[[time_trt_i]][1 : ndisplay, ], bins = bins, size = size, alpha = alpha)
+      }
+    }
+  }
+  if(type == "intervals") {
+    if(exists("prob", where = exArgs)) { prob = exArgs$prob} else { prob = 0.5}
+    if(exists("prob_outer", where = exArgs)) { prob_outer = exArgs$prob_outer} else { prob_outer = 0.9}
+    if(exists("size", where = exArgs)) { size = exArgs$size} else { size = 1}
+    if(exists("fatten", where = exArgs)) {fatten = exArgs$fatten} else { fatten = 3}
+    if(x$data_format == "wide") {
+    gplot_e <- ppc_intervals(y = e_obs, yrep = e_rep[1 : ndisplay, ], prob = prob, prob_outer = prob_outer, size = size, fatten = fatten)
+    gplot_c <- ppc_intervals(y = c_obs, yrep = c_rep[1 : ndisplay, ], prob = prob, prob_outer = prob_outer, size = size, fatten = fatten)
+    for(trt_i in trt_lev) {
+      gplot_e_trt[[trt_i]] <- ppc_intervals(y = e_obs_trt[[trt_i]], yrep = e_rep_trt[[trt_i]][1 : ndisplay, ], prob = prob, prob_outer = prob_outer, size = size, fatten = fatten)
+      gplot_c_trt[[trt_i]] <- ppc_intervals(y = c_obs_trt[[trt_i]], yrep = c_rep_trt[[trt_i]][1 : ndisplay, ], prob = prob, prob_outer = prob_outer, size = size, fatten = fatten)
+    }
+    }
+    if(x$data_format == "long") {
+      for(time_i in 1:n_time) {
+        gplot_e_time[[time_i]] <- ppc_intervals(y = e_obs_time[[time_i]], yrep = e_rep_time[[time_i]][1 : ndisplay, ], prob = prob, prob_outer = prob_outer, size = size, fatten = fatten)
+        gplot_c_time[[time_i]] <- ppc_intervals(y = c_obs_time[[time_i]], yrep = c_rep_time[[time_i]][1 : ndisplay, ], prob = prob, prob_outer = prob_outer, size = size, fatten = fatten)
+      }
+      for(time_trt_i in time_trt_lev) {
+        gplot_e_time_trt[[time_trt_i]] <- ppc_intervals(y = e_obs_time_trt[[time_trt_i]], yrep = e_rep_time_trt[[time_trt_i]][1 : ndisplay, ], prob = prob, prob_outer = prob_outer, size = size, fatten = fatten)
+        gplot_c_time_trt[[time_trt_i]] <- ppc_intervals(y = c_obs_time_trt[[time_trt_i]], yrep = c_rep_time_trt[[time_trt_i]][1 : ndisplay, ], prob = prob, prob_outer = prob_outer, size = size, fatten = fatten)
+      }
+    }
+  }
+  if(type == "ribbon") {
+    if(exists("prob", where = exArgs)) { prob = exArgs$prob} else { prob = 0.5}
+    if(exists("prob_outer", where = exArgs)) { prob_outer = exArgs$prob_outer} else { prob_outer = 0.9}
+    if(exists("size", where = exArgs)) { size = exArgs$size} else { size = 0.25}
+    if(exists("alpha", where = exArgs)) { alpha = exArgs$alpha} else { alpha = 0.33}
+    if(x$data_format == "wide") {
+    gplot_e <- ppc_ribbon(y = e_obs, yrep = e_rep[1 : ndisplay, ], prob = prob, prob_outer = prob_outer, alpha = alpha, size = size)
+    gplot_c <- ppc_ribbon(y = c_obs, yrep = c_rep[1 : ndisplay, ], prob = prob, prob_outer = prob_outer, alpha = alpha, size = size)
+    for(trt_i in trt_lev) {
+      gplot_e_trt[[trt_i]] <- ppc_ribbon(y = e_obs_trt[[trt_i]], yrep = e_rep_trt[[trt_i]][1 : ndisplay, ], prob = prob, prob_outer = prob_outer, alpha = alpha, size = size)
+      gplot_c_trt[[trt_i]] <- ppc_ribbon(y = c_obs_trt[[trt_i]], yrep = c_rep_trt[[trt_i]][1 : ndisplay, ], prob = prob, prob_outer = prob_outer, alpha = alpha, size = size)
+    }
+    }
+    if(x$data_format == "long") {
+      for(time_i in 1:n_time) {
+        gplot_e_time[[time_i]] <- ppc_ribbon(y = e_obs_time[[time_i]], yrep = e_rep_time[[time_i]][1 : ndisplay, ], prob = prob, prob_outer = prob_outer, alpha = alpha, size = size)
+        gplot_c_time[[time_i]] <- ppc_ribbon(y = c_obs_time[[time_i]], yrep = c_rep_time[[time_i]][1 : ndisplay, ], prob = prob, prob_outer = prob_outer, alpha = alpha, size = size)
+      }
+      for(time_trt_i in time_trt_lev) {
+        gplot_e_time_trt[[time_trt_i]] <- ppc_ribbon(y = e_obs_time_trt[[time_trt_i]], yrep = e_rep_time_trt[[time_trt_i]][1 : ndisplay, ], prob = prob, prob_outer = prob_outer, alpha = alpha, size = size)
+        gplot_c_time_trt[[time_trt_i]] <- ppc_ribbon(y = c_obs_time_trt[[time_trt_i]], yrep = c_rep_time_trt[[time_trt_i]][1 : ndisplay, ], prob = prob, prob_outer = prob_outer, alpha = alpha, size = size)
+      }
+    }
+  }
+  if(type == "scatter") {
+    if(exists("size", where = exArgs)) { size = exArgs$size} else { size = 2.5}
+    if(exists("alpha", where = exArgs)) { alpha = exArgs$alpha} else { alpha = 0.8}
+    if(x$data_format == "wide") {
+    gplot_e <- ppc_scatter(y = e_obs, yrep = e_rep[1 : ndisplay, ], alpha = alpha, size = size)
+    gplot_c <- ppc_scatter(y = c_obs, yrep = c_rep[1 : ndisplay, ], alpha = alpha, size = size)
+    for(trt_i in trt_lev) {
+      gplot_e_trt[[trt_i]] <- ppc_scatter(y = e_obs_trt[[trt_i]], yrep = e_rep_trt[[trt_i]][1 : ndisplay, ], alpha = alpha, size = size)
+      gplot_c_trt[[trt_i]] <- ppc_scatter(y = c_obs_trt[[trt_i]], yrep = c_rep_trt[[trt_i]][1 : ndisplay, ], alpha = alpha, size = size)
+    }
+    }
+    if(x$data_format == "long") {
+      for(time_i in 1:n_time) {
+        gplot_e_time[[time_i]] <- ppc_scatter(y = e_obs_time[[time_i]], yrep = e_rep_time[[time_i]][1 : ndisplay, ], alpha = alpha, size = size)
+        gplot_c_time[[time_i]] <- ppc_scatter(y = c_obs_time[[time_i]], yrep = c_rep_time[[time_i]][1 : ndisplay, ], alpha = alpha, size = size)
+      }
+      for(time_trt_i in time_trt_lev) {
+        gplot_e_time_trt[[time_trt_i]] <- ppc_scatter(y = e_obs_time_trt[[time_trt_i]], yrep = e_rep_time_trt[[time_trt_i]][1 : ndisplay, ], alpha = alpha, size = size)
+        gplot_c_time_trt[[time_trt_i]] <- ppc_scatter(y = c_obs_time_trt[[time_trt_i]], yrep = c_rep_time_trt[[time_trt_i]][1 : ndisplay, ], alpha = alpha, size = size)
+      }
+    }
+  }
+  if(type == "scatter_avg") {
+    if(exists("size", where = exArgs)) { size = exArgs$size} else { size = 2.5}
+    if(exists("alpha", where = exArgs)) { alpha = exArgs$alpha} else { alpha = 0.8}
+    if(x$data_format == "wide") {
+    gplot_e <- ppc_scatter_avg(y = e_obs, yrep = e_rep[1 : ndisplay, ], alpha = alpha, size = size)
+    gplot_c <- ppc_scatter_avg(y = c_obs, yrep = c_rep[1 : ndisplay, ], alpha = alpha, size = size)
+    for(trt_i in trt_lev) {
+      gplot_e_trt[[trt_i]] <- ppc_scatter_avg(y = e_obs_trt[[trt_i]], yrep = e_rep_trt[[trt_i]][1 : ndisplay, ], alpha = alpha, size = size)
+      gplot_c_trt[[trt_i]] <- ppc_scatter_avg(y = c_obs_trt[[trt_i]], yrep = c_rep_trt[[trt_i]][1 : ndisplay, ], alpha = alpha, size = size)
+    }
+    }
+    if(x$data_format == "long") {
+      for(time_i in 1:n_time) {
+        gplot_e_time[[time_i]] <- ppc_scatter_avg(y = e_obs_time[[time_i]], yrep = e_rep_time[[time_i]][1 : ndisplay, ], alpha = alpha, size = size)
+        gplot_c_time[[time_i]] <- ppc_scatter_avg(y = c_obs_time[[time_i]], yrep = c_rep_time[[time_i]][1 : ndisplay, ], alpha = alpha, size = size)
+      }
+      for(time_trt_i in time_trt_lev) {
+        gplot_e_time_trt[[time_trt_i]] <- ppc_scatter_avg(y = e_obs_time_trt[[time_trt_i]], yrep = e_rep_time_trt[[time_trt_i]][1 : ndisplay, ], alpha = alpha, size = size)
+        gplot_c_time_trt[[time_trt_i]] <- ppc_scatter_avg(y = c_obs_time_trt[[time_trt_i]], yrep = c_rep_time_trt[[time_trt_i]][1 : ndisplay, ], alpha = alpha, size = size)
+      }
+    }
+  }
+  if(type == "pit_ecdf") {
+    if(exists("pit", where = exArgs)) { pit = exArgs$pit} else { pit = NULL}
+    if(exists("K", where = exArgs)) { K = exArgs$K} else { K = NULL}
+    if(exists("prob", where = exArgs)) { prob = exArgs$prob} else { prob = 0.99}
+    if(exists("plot_diff", where = exArgs)) { plot_diff = exArgs$plot_diff} else { plot_diff = FALSE}
+    if(exists("interpolate_adj", where = exArgs)) { interpolate_adj = exArgs$interpolate_adj} else { interpolate_adj = NULL}
+    if(x$data_format == "wide") {
+    gplot_e <- ppc_pit_ecdf(y = e_obs, yrep = e_rep[1 : ndisplay, ], pit = pit, K = K, prob = prob, plot_diff = plot_diff, interpolate_adj = interpolate_adj)
+    gplot_c <- ppc_pit_ecdf(y = c_obs, yrep = c_rep[1 : ndisplay, ], pit = pit, K = K, prob = prob, plot_diff = plot_diff, interpolate_adj = interpolate_adj)
+    for(trt_i in trt_lev) {
+      gplot_e_trt[[trt_i]] <- ppc_pit_ecdf(y = e_obs_trt[[trt_i]], yrep = e_rep_trt[[trt_i]][1 : ndisplay, ], pit = pit, K = K, prob = prob, plot_diff = plot_diff, interpolate_adj = interpolate_adj)
+      gplot_c_trt[[trt_i]] <- ppc_pit_ecdf(y = c_obs_trt[[trt_i]], yrep = c_rep_trt[[trt_i]][1 : ndisplay, ], pit = pit, K = K, prob = prob, plot_diff = plot_diff, interpolate_adj = interpolate_adj)
+    }
+    }
+    if(x$data_format == "long") {
+      for(time_i in 1:n_time) {
+        gplot_e_time[[time_i]] <- ppc_pit_ecdf(y = e_obs_time[[time_i]], yrep = e_rep_time[[time_i]][1 : ndisplay, ], pit = pit, K = K, prob = prob, plot_diff = plot_diff, interpolate_adj = interpolate_adj)
+        gplot_c_time[[time_i]] <- ppc_pit_ecdf(y = c_obs_time[[time_i]], yrep = c_rep_time[[time_i]][1 : ndisplay, ], pit = pit, K = K, prob = prob, plot_diff = plot_diff, interpolate_adj = interpolate_adj)
+      }
+      for(time_trt_i in time_trt_lev) {
+        gplot_e_time_trt[[time_trt_i]] <- ppc_pit_ecdf(y = e_obs_time_trt[[time_trt_i]], yrep = e_rep_time_trt[[time_trt_i]][1 : ndisplay, ], pit = pit, K = K, prob = prob, plot_diff = plot_diff, interpolate_adj = interpolate_adj)
+        gplot_c_time_trt[[time_trt_i]] <- ppc_pit_ecdf(y = c_obs_time_trt[[time_trt_i]], yrep = c_rep_time_trt[[time_trt_i]][1 : ndisplay, ], pit = pit, K = K, prob = prob, plot_diff = plot_diff, interpolate_adj = interpolate_adj)
+      }
+    }
+  }
+  if(type == "loo_pit_overlay") {
+    if(exists("lw", where = exArgs)) { lw = exArgs$lw} else { lw = NULL}
+    if(exists("psis_object", where = exArgs)) { psis_object = exArgs$psis_object} else { psis_object = NULL}
+    if(exists("pit ", where = exArgs)) { pit  = exArgs$pit } else { pit  = NULL}
+    if(exists("samples", where = exArgs)) { samples = exArgs$samples} else { samples = 100}
+    if(exists("size", where = exArgs)) { size = exArgs$size} else { size = 0.25}
+    if(exists("alpha", where = exArgs)) { alpha = exArgs$alpha} else { alpha = 0.7}
+    if(exists("boundary_correction", where = exArgs)) { boundary_correction = exArgs$boundary_correction} else { boundary_correction = TRUE}
+    if(exists("grid_len", where = exArgs)) { grid_len = exArgs$grid_len} else { grid_len = 512}
+    if(exists("bw", where = exArgs)) { bw = exArgs$bw} else { bw = "nrd0"}
+    if(exists("trim", where = exArgs)) { trim = exArgs$trim} else { trim = FALSE}
+    if(exists("adjust", where = exArgs)) { adjust = exArgs$adjust} else { adjust = 1}
+    if(exists("kernel", where = exArgs)) { kernel = exArgs$kernel} else { kernel = "gaussian"}
+    if(exists("n_dens", where = exArgs)) { n_dens = exArgs$n_dens} else { n_dens = 1024}
+    if(is.null(lw) & is.null(psis_object)) { stop("Please provide either a matrix of (smoothed) log weights or a 'psis_object' when computing LOO predictive checks.")}
+    if(!is.null(lw)) { lw = lw[1 : ndisplay, ]}
+    if(!is.null(psis_object)) { psis_object$log_weights = psis_object$log_weights[1 : ndisplay, ]}
+    if(x$data_format == "wide") {
+    if(outcome == "effects") {
+      gplot_e <- gplot_c <- ppc_loo_pit_overlay(y = e_obs, yrep = e_rep[1 : ndisplay, ], lw = lw, psis_object = psis_object, pit = pit, samples = samples, size = size, alpha = alpha, boundary_correction = boundary_correction,
+                                     grid_len = grid_len, bw = bw, trim = trim, adjust = adjust, kernel = kernel, n_dens = n_dens)
+      for(trt_i in trt_lev) {
+        if(!is.null(lw)) { lwt <- lw[, trt_obs_e == trt_i]} else {lwt <- lw}
+        if(!is.null(psis_object)) { 
+          psis_objectt <- psis_object
+          psis_objectt$log_weights <- psis_objectt$log_weights[, trt_obs_e == trt_i]
+          psis_objectt$diagnostics$pareto_k <- psis_object$diagnostics$pareto_k[trt_obs_e == trt_i]
+          psis_objectt$diagnostics$n_eff <- psis_object$diagnostics$n_eff[trt_obs_e == trt_i]
+          psis_objectt$diagnostics$r_eff <- psis_object$diagnostics$r_eff[trt_obs_e == trt_i]} else { psis_objectt <- psis_object}
+        gplot_e_trt[[trt_i]] <- gplot_c_trt[[trt_i]] <- ppc_loo_pit_overlay(y = e_obs_trt[[trt_i]], yrep = e_rep_trt[[trt_i]][1 : ndisplay, ], lw = lwt, psis_object = psis_objectt, pit = pit, samples = samples, size = size, alpha = alpha, boundary_correction = boundary_correction,
+                                                                            grid_len = grid_len, bw = bw, trim = trim, adjust = adjust, kernel = kernel, n_dens = n_dens)
+      }      
+    }
+    if(outcome == "costs") {
+      gplot_c <- gplot_e <- ppc_loo_pit_overlay(y = c_obs, yrep = c_rep[1 : ndisplay, ], lw = lw, psis_object = psis_object, pit = pit, samples = samples, size = size, alpha = alpha, boundary_correction = boundary_correction,
+                                                grid_len = grid_len, bw = bw, trim = trim, adjust = adjust, kernel = kernel, n_dens = n_dens)
+      for(trt_i in trt_lev) {
+        if(!is.null(lw)) { lwt <- lw[, trt_obs_c == trt_i]} else {lwt <- lw}
+        if(!is.null(psis_object)) { 
+          psis_objectt <- psis_object
+          psis_objectt$log_weights <- psis_objectt$log_weights[, trt_obs_c == trt_i]
+          psis_objectt$diagnostics$pareto_k <- psis_object$diagnostics$pareto_k[trt_obs_c == trt_i]
+          psis_objectt$diagnostics$n_eff <- psis_object$diagnostics$n_eff[trt_obs_c == trt_i]
+          psis_objectt$diagnostics$r_eff <- psis_object$diagnostics$r_eff[trt_obs_c == trt_i]} else { psis_objectt <- psis_object}
+        gplot_c_trt[[trt_i]] <- gplot_e_trt[[trt_i]] <- ppc_loo_pit_overlay(y = c_obs_trt[[trt_i]], yrep = c_rep_trt[[trt_i]][1 : ndisplay, ], lw = lwt, psis_object = psis_objectt, pit = pit, samples = samples, size = size, alpha = alpha, boundary_correction = boundary_correction,
+                                                                            grid_len = grid_len, bw = bw, trim = trim, adjust = adjust, kernel = kernel, n_dens = n_dens)
+      }      
+    }  
+    if(outcome == "both") {
+      gplot_e <- ppc_loo_pit_overlay(y = e_obs, yrep = e_rep[1 : ndisplay, ], lw = lw, psis_object = psis_object, pit = pit, samples = samples, size = size, alpha = alpha, boundary_correction = boundary_correction,
+                                                grid_len = grid_len, bw = bw, trim = trim, adjust = adjust, kernel = kernel, n_dens = n_dens)
+      gplot_c <- ppc_loo_pit_overlay(y = c_obs, yrep = c_rep[1 : ndisplay, ], lw = lw, psis_object = psis_object, pit = pit, samples = samples, size = size, alpha = alpha, boundary_correction = boundary_correction,
+                                                grid_len = grid_len, bw = bw, trim = trim, adjust = adjust, kernel = kernel, n_dens = n_dens)
+      for(trt_i in trt_lev) {
+        if(!is.null(lw)) { lwte <- lw[, trt_obs_e == trt_i]; lwtc <- lw[, trt_obs_c == trt_i]} else {lwte <- lw; lwtc <- lw}
+        if(!is.null(psis_object)) { 
+          psis_objectt <- psis_object
+          psis_objectt$log_weights <- psis_objectt$log_weights[, trt_obs_e == trt_i & trt_obs_c == trt_i]
+          psis_objectt$diagnostics$pareto_k <- psis_object$diagnostics$pareto_k[trt_obs_e == trt_i & trt_obs_c == trt_i]
+          psis_objectt$diagnostics$n_eff <- psis_object$diagnostics$n_eff[trt_obs_e == trt_i & trt_obs_c == trt_i]
+          psis_objectt$diagnostics$r_eff <- psis_object$diagnostics$r_eff[trt_obs_e == trt_i & trt_obs_c == trt_i]} else { psis_objectt <- psis_object}
+        gplot_e_trt[[trt_i]] <- ppc_loo_pit_overlay(y = e_obs_trt[[trt_i]], yrep = e_rep_trt[[trt_i]][1 : ndisplay, ], lw = lwte, psis_object = psis_objectt, pit = pit, samples = samples, size = size, alpha = alpha, boundary_correction = boundary_correction,
+                                                                            grid_len = grid_len, bw = bw, trim = trim, adjust = adjust, kernel = kernel, n_dens = n_dens)
+        gplot_c_trt[[trt_i]] <- ppc_loo_pit_overlay(y = c_obs_trt[[trt_i]], yrep = c_rep_trt[[trt_i]][1 : ndisplay, ], lw = lwtc, psis_object = psis_objectt, pit = pit, samples = samples, size = size, alpha = alpha, boundary_correction = boundary_correction,
+                                                    grid_len = grid_len, bw = bw, trim = trim, adjust = adjust, kernel = kernel, n_dens = n_dens)
+      }      
+    }
+    }
+    if(x$data_format == "long") {
+      if(outcome == "effects") {
+        for(time_i in 1:n_time) {
+          if(!is.null(lw)) { lwt <- lw[, time_obs_e == time_i]} else {lwt <- lw}
+          if(!is.null(psis_object)) { 
+            psis_objectt <- psis_object
+            psis_objectt$log_weights <- psis_objectt$log_weights[, time_obs_e == time_i]
+            psis_objectt$diagnostics$pareto_k <- psis_object$diagnostics$pareto_k[time_obs_e == time_i]
+            psis_objectt$diagnostics$n_eff <- psis_object$diagnostics$n_eff[time_obs_e == time_i]
+            psis_objectt$diagnostics$r_eff <- psis_object$diagnostics$r_eff[time_obs_e == time_i]} else { psis_objectt <- psis_object}
+          gplot_e_time[[time_i]] <- gplot_c_time[[time_i]] <- ppc_loo_pit_overlay(y = e_obs_time[[time_i]], yrep = e_rep_time[[time_i]][1 : ndisplay, ], lw = lwt, psis_object = psis_objectt, pit = pit, samples = samples, size = size, alpha = alpha, boundary_correction = boundary_correction,
+                                                                                  grid_len = grid_len, bw = bw, trim = trim, adjust = adjust, kernel = kernel, n_dens = n_dens)
+        }
+        for(time_trt_i in time_trt_lev) {
+          if(!is.null(lw)) { lwt <- lw[, time_trt_obs_e == time_trt_i]} else {lwt <- lw}
+          if(!is.null(psis_object)) { 
+            psis_objectt <- psis_object
+            psis_objectt$log_weights <- psis_objectt$log_weights[, time_trt_obs_e == time_trt_i]
+            psis_objectt$diagnostics$pareto_k <- psis_object$diagnostics$pareto_k[time_trt_obs_e == time_trt_i]
+            psis_objectt$diagnostics$n_eff <- psis_object$diagnostics$n_eff[time_trt_obs_e == time_trt_i]
+            psis_objectt$diagnostics$r_eff <- psis_object$diagnostics$r_eff[time_trt_obs_e == time_trt_i]} else { psis_objectt <- psis_object}
+          gplot_e_time_trt[[time_trt_i]] <- gplot_c_time_trt[[time_trt_i]] <- ppc_loo_pit_overlay(y = e_obs_time_trt[[time_trt_i]], yrep = e_rep_time_trt[[time_trt_i]][1 : ndisplay, ], lw = lwt, psis_object = psis_objectt, pit = pit, samples = samples, size = size, alpha = alpha, boundary_correction = boundary_correction,
+                                                                                                  grid_len = grid_len, bw = bw, trim = trim, adjust = adjust, kernel = kernel, n_dens = n_dens)
+        }      
+      }
+      if(outcome == "costs") {
+        for(time_i in 1:n_time) {
+          if(!is.null(lw)) { lwt <- lw[, time_obs_c == time_i]} else {lwt <- lw}
+          if(!is.null(psis_object)) { 
+            psis_objectt <- psis_object
+            psis_objectt$log_weights <- psis_objectt$log_weights[, time_obs_c == time_i]
+            psis_objectt$diagnostics$pareto_k <- psis_object$diagnostics$pareto_k[time_obs_c == time_i]
+            psis_objectt$diagnostics$n_eff <- psis_object$diagnostics$n_eff[time_obs_c == time_i]
+            psis_objectt$diagnostics$r_eff <- psis_object$diagnostics$r_eff[time_obs_c == time_i]} else { psis_objectt <- psis_object}
+          gplot_c_time[[time_i]] <- gplot_e_time[[time_i]] <- ppc_loo_pit_overlay(y = c_obs_time[[time_i]], yrep = c_rep_time[[time_i]][1 : ndisplay, ], lw = lwt, psis_object = psis_objectt, pit = pit, samples = samples, size = size, alpha = alpha, boundary_correction = boundary_correction,
+                                                                                  grid_len = grid_len, bw = bw, trim = trim, adjust = adjust, kernel = kernel, n_dens = n_dens)
+        }
+        for(time_trt_i in time_trt_lev) {
+          if(!is.null(lw)) { lwt <- lw[, time_trt_obs_c == time_trt_i]} else {lwt <- lw}
+          if(!is.null(psis_object)) { 
+            psis_objectt <- psis_object
+            psis_objectt$log_weights <- psis_objectt$log_weights[, time_trt_obs_c == time_trt_i]
+            psis_objectt$diagnostics$pareto_k <- psis_object$diagnostics$pareto_k[time_trt_obs_c == time_trt_i]
+            psis_objectt$diagnostics$n_eff <- psis_object$diagnostics$n_eff[time_trt_obs_c == time_trt_i]
+            psis_objectt$diagnostics$r_eff <- psis_object$diagnostics$r_eff[time_trt_obs_c == time_trt_i]} else { psis_objectt <- psis_object}
+          gplot_c_time_trt[[time_trt_i]] <- gplot_e_time_trt[[time_trt_i]] <- ppc_loo_pit_overlay(y = c_obs_time_trt[[time_trt_i]], yrep = c_rep_time_trt[[time_trt_i]][1 : ndisplay, ], lw = lwt, psis_object = psis_objectt, pit = pit, samples = samples, size = size, alpha = alpha, boundary_correction = boundary_correction,
+                                                                                                  grid_len = grid_len, bw = bw, trim = trim, adjust = adjust, kernel = kernel, n_dens = n_dens)
+        } 
+      }  
+      if(outcome == "both") {
+        for(time_i in 1:n_time) {
+          if(!is.null(lw)) { lwte <- lw[, time_obs_e == time_i]; lwtc <- lw[, time_obs_c == time_i]} else {lwte <- lw; lwtc <- lw}
+          if(!is.null(psis_object)) { 
+            psis_objectt <- psis_object
+            psis_objectt$log_weights <- psis_objectt$log_weights[, time_obs_e == time_i & time_obs_c == time_i]
+            psis_objectt$diagnostics$pareto_k <- psis_object$diagnostics$pareto_k[time_obs_e == time_i & time_obs_c == time_i]
+            psis_objectt$diagnostics$n_eff <- psis_object$diagnostics$n_eff[time_obs_e == time_i & time_obs_c == time_i]
+            psis_objectt$diagnostics$r_eff <- psis_object$diagnostics$r_eff[time_obs_e == time_i & time_obs_c == time_i]} else { psis_objectt <- psis_object}
+          gplot_e_time[[time_i]] <- ppc_loo_pit_overlay(y = e_obs_time[[time_i]], yrep = e_rep_time[[time_i]][1 : ndisplay, ], lw = lwte, psis_object = psis_objectt, pit = pit, samples = samples, size = size, alpha = alpha, boundary_correction = boundary_correction,
+                                                        grid_len = grid_len, bw = bw, trim = trim, adjust = adjust, kernel = kernel, n_dens = n_dens)
+          gplot_c_time[[time_i]] <- ppc_loo_pit_overlay(y = c_obs_time[[time_i]], yrep = c_rep_time[[time_i]][1 : ndisplay, ], lw = lwtc, psis_object = psis_objectt, pit = pit, samples = samples, size = size, alpha = alpha, boundary_correction = boundary_correction,
+                                                        grid_len = grid_len, bw = bw, trim = trim, adjust = adjust, kernel = kernel, n_dens = n_dens)
+        } 
+        for(time_trt_i in time_trt_lev) {
+          if(!is.null(lw)) { lwte <- lw[, time_trt_obs_e == time_trt_i]; lwtc <- lw[, time_trt_obs_c == time_trt_i]} else {lwte <- lw; lwtc <- lw}
+          if(!is.null(psis_object)) { 
+            psis_objectt <- psis_object
+            psis_objectt$log_weights <- psis_objectt$log_weights[, time_trt_obs_e == time_trt_i & time_trt_obs_c == time_trt_i]
+            psis_objectt$diagnostics$pareto_k <- psis_object$diagnostics$pareto_k[time_trt_obs_e == time_trt_i & time_trt_obs_c == time_trt_i]
+            psis_objectt$diagnostics$n_eff <- psis_object$diagnostics$n_eff[time_trt_obs_e == time_trt_i & time_trt_obs_c == time_trt_i]
+            psis_objectt$diagnostics$r_eff <- psis_object$diagnostics$r_eff[time_trt_obs_e == time_trt_i & time_trt_obs_c == time_trt_i]} else { psis_objectt <- psis_object}
+          gplot_e_time_trt[[time_trt_i]] <- ppc_loo_pit_overlay(y = e_obs_time_trt[[time_trt_i]], yrep = e_rep_time_trt[[time_trt_i]][1 : ndisplay, ], lw = lwte, psis_object = psis_objectt, pit = pit, samples = samples, size = size, alpha = alpha, boundary_correction = boundary_correction,
+                                                                grid_len = grid_len, bw = bw, trim = trim, adjust = adjust, kernel = kernel, n_dens = n_dens)
+          gplot_c_time_trt[[time_trt_i]] <- ppc_loo_pit_overlay(y = c_obs_time_trt[[time_trt_i]], yrep = c_rep_time_trt[[time_trt_i]][1 : ndisplay, ], lw = lwtc, psis_object = psis_objectt, pit = pit, samples = samples, size = size, alpha = alpha, boundary_correction = boundary_correction,
+                                                                grid_len = grid_len, bw = bw, trim = trim, adjust = adjust, kernel = kernel, n_dens = n_dens)
+        } 
+      }
+    }
+  }
+  if(type == "loo_pit_ecdf") {
+    if(exists("lw", where = exArgs)) { lw = exArgs$lw} else { lw = NULL}
+    if(exists("psis_object", where = exArgs)) { psis_object = exArgs$psis_object} else { psis_object = NULL}
+    if(exists("pit", where = exArgs)) { pit = exArgs$pit} else { pit = NULL}
+    if(exists("K", where = exArgs)) { K = exArgs$K} else { K = NULL}
+    if(exists("prob", where = exArgs)) { prob = exArgs$prob} else { prob = 0.99}
+    if(exists("plot_diff", where = exArgs)) { plot_diff = exArgs$plot_diff} else { plot_diff = FALSE}
+    if(exists("interpolate_adj", where = exArgs)) { interpolate_adj = exArgs$interpolate_adj} else { interpolate_adj = NULL}
+    if(is.null(lw) & is.null(psis_object)) { stop("Please provide either a matrix of (smoothed) log weights or a 'psis_object' when computing LOO predictive checks.")}
+    if(!is.null(lw)) { lw = lw[1 : ndisplay, ]}
+    if(!is.null(psis_object)) { psis_object$log_weights = psis_object$log_weights[1 : ndisplay, ]}
+    if(x$data_format == "wide") {
+    if(outcome == "effects") {
+      gplot_e <- gplot_c <- ppc_loo_pit_ecdf(y = e_obs, yrep = e_rep[1 : ndisplay, ], lw = lw, psis_object = psis_object, pit = pit, K = K, prob = prob, plot_diff = plot_diff, interpolate_adj = interpolate_adj)
+      for(trt_i in trt_lev) {
+        if(!is.null(lw)) { lwt <- lw[, trt_obs_e == trt_i]} else {lwt <- lw}
+        if(!is.null(psis_object)) { 
+          psis_objectt <- psis_object
+          psis_objectt$log_weights <- psis_objectt$log_weights[, trt_obs_e == trt_i]
+          psis_objectt$diagnostics$pareto_k <- psis_object$diagnostics$pareto_k[trt_obs_e == trt_i]
+          psis_objectt$diagnostics$n_eff <- psis_object$diagnostics$n_eff[trt_obs_e == trt_i]
+          psis_objectt$diagnostics$r_eff <- psis_object$diagnostics$r_eff[trt_obs_e == trt_i]} else { psis_objectt <- psis_object}
+        gplot_e_trt[[trt_i]] <- gplot_c_trt[[trt_i]] <- ppc_loo_pit_ecdf(y = e_obs_trt[[trt_i]], yrep = e_rep_trt[[trt_i]][1 : ndisplay, ], lw = lwt, psis_object = psis_objectt, pit = pit, K = K, prob = prob, plot_diff = plot_diff, interpolate_adj = interpolate_adj)
+      }      
+    }
+    if(outcome == "costs") {
+      gplot_c <- gplot_e <- ppc_loo_pit_ecdf(y = c_obs, yrep = c_rep[1 : ndisplay, ], lw = lw, psis_object = psis_object, pit = pit, K = K, prob = prob, plot_diff = plot_diff, interpolate_adj = interpolate_adj)
+      for(trt_i in trt_lev) {
+        if(!is.null(lw)) { lwt <- lw[, trt_obs_c == trt_i]} else {lwt <- lw}
+        if(!is.null(psis_object)) { 
+          psis_objectt <- psis_object
+          psis_objectt$log_weights <- psis_objectt$log_weights[, trt_obs_c == trt_i]
+          psis_objectt$diagnostics$pareto_k <- psis_object$diagnostics$pareto_k[trt_obs_c == trt_i]
+          psis_objectt$diagnostics$n_eff <- psis_object$diagnostics$n_eff[trt_obs_c == trt_i]
+          psis_objectt$diagnostics$r_eff <- psis_object$diagnostics$r_eff[trt_obs_c == trt_i]} else { psis_objectt <- psis_object}
+        gplot_c_trt[[trt_i]] <- gplot_e_trt[[trt_i]] <- ppc_loo_pit_ecdf(y = c_obs_trt[[trt_i]], yrep = c_rep_trt[[trt_i]][1 : ndisplay, ], lw = lwt, psis_object = psis_objectt, pit = pit, K = K, prob = prob, plot_diff = plot_diff, interpolate_adj = interpolate_adj)
+      }      
+    }  
+    if(outcome == "both") {
+      gplot_e <- ppc_loo_pit_ecdf(y = e_obs, yrep = e_rep[1 : ndisplay, ], lw = lw, psis_object = psis_object, pit = pit, K = K, prob = prob, plot_diff = plot_diff, interpolate_adj = interpolate_adj)
+      gplot_c <- ppc_loo_pit_ecdf(y = c_obs, yrep = c_rep[1 : ndisplay, ], lw = lw, psis_object = psis_object, pit = pit, K = K, prob = prob, plot_diff = plot_diff, interpolate_adj = interpolate_adj)
+      for(trt_i in trt_lev) {
+        if(!is.null(lw)) { lwte <- lw[, trt_obs_e == trt_i]; lwtc <- lw[, trt_obs_c == trt_i]} else {lwte <- lw; lwtc <- lw}
+        if(!is.null(psis_object)) { 
+          psis_objectt <- psis_object
+          psis_objectt$log_weights <- psis_objectt$log_weights[, trt_obs_e == trt_i & trt_obs_c == trt_i]
+          psis_objectt$diagnostics$pareto_k <- psis_object$diagnostics$pareto_k[trt_obs_e == trt_i & trt_obs_c == trt_i]
+          psis_objectt$diagnostics$n_eff <- psis_object$diagnostics$n_eff[trt_obs_e == trt_i & trt_obs_c == trt_i]
+          psis_objectt$diagnostics$r_eff <- psis_object$diagnostics$r_eff[trt_obs_e == trt_i & trt_obs_c == trt_i]} else { psis_objectt <- psis_object}
+        gplot_e_trt[[trt_i]] <- ppc_loo_pit_ecdf(y = e_obs_trt[[trt_i]], yrep = e_rep_trt[[trt_i]][1 : ndisplay, ], lw = lwte, psis_object = psis_objectt, pit = pit, K = K, prob = prob, plot_diff = plot_diff, interpolate_adj = interpolate_adj)
+        gplot_c_trt[[trt_i]] <- ppc_loo_pit_ecdf(y = c_obs_trt[[trt_i]], yrep = c_rep_trt[[trt_i]][1 : ndisplay, ], lw = lwtc, psis_object = psis_objectt, pit = pit, K = K, prob = prob, plot_diff = plot_diff, interpolate_adj = interpolate_adj)
+      }      
+    }
+    }
+    if(x$data_format == "long") {
+      if(outcome == "effects") {
+        for(time_i in 1:n_time) {
+          if(!is.null(lw)) { lwt <- lw[, time_obs_e == time_i]} else {lwt <- lw}
+          if(!is.null(psis_object)) { 
+            psis_objectt <- psis_object
+            psis_objectt$log_weights <- psis_objectt$log_weights[, time_obs_e == time_i]
+            psis_objectt$diagnostics$pareto_k <- psis_object$diagnostics$pareto_k[time_obs_e == time_i]
+            psis_objectt$diagnostics$n_eff <- psis_object$diagnostics$n_eff[time_obs_e == time_i]
+            psis_objectt$diagnostics$r_eff <- psis_object$diagnostics$r_eff[time_obs_e == time_i]} else { psis_objectt <- psis_object}
+          gplot_e_time[[time_i]] <- gplot_c_time[[time_i]] <- ppc_loo_pit_ecdf(y = e_obs_time[[time_i]], yrep = e_rep_time[[time_i]][1 : ndisplay, ], lw = lwt, psis_object = psis_objectt, pit = pit, K = K, prob = prob, plot_diff = plot_diff, interpolate_adj = interpolate_adj)
+        }  
+        for(time_trt_i in time_trt_lev) {
+          if(!is.null(lw)) { lwt <- lw[, time_trt_obs_e == time_trt_i]} else {lwt <- lw}
+          if(!is.null(psis_object)) { 
+            psis_objectt <- psis_object
+            psis_objectt$log_weights <- psis_objectt$log_weights[, time_trt_obs_e == time_trt_i]
+            psis_objectt$diagnostics$pareto_k <- psis_object$diagnostics$pareto_k[time_trt_obs_e == time_trt_i]
+            psis_objectt$diagnostics$n_eff <- psis_object$diagnostics$n_eff[time_trt_obs_e == time_trt_i]
+            psis_objectt$diagnostics$r_eff <- psis_object$diagnostics$r_eff[time_trt_obs_e == time_trt_i]} else { psis_objectt <- psis_object}
+          gplot_e_time_trt[[time_trt_i]] <- gplot_c_time_trt[[time_trt_i]] <- ppc_loo_pit_ecdf(y = e_obs_time_trt[[time_trt_i]], yrep = e_rep_time_trt[[time_trt_i]][1 : ndisplay, ], lw = lwt, psis_object = psis_objectt, pit = pit, K = K, prob = prob, plot_diff = plot_diff, interpolate_adj = interpolate_adj)
+        }      
+      }
+      if(outcome == "costs") {
+        for(time_i in 1:n_time) {
+          if(!is.null(lw)) { lwt <- lw[, time_obs_c == time_i]} else {lwt <- lw}
+          if(!is.null(psis_object)) { 
+            psis_objectt <- psis_object
+            psis_objectt$log_weights <- psis_objectt$log_weights[, time_obs_c == time_i]
+            psis_objectt$diagnostics$pareto_k <- psis_object$diagnostics$pareto_k[time_obs_c == time_i]
+            psis_objectt$diagnostics$n_eff <- psis_object$diagnostics$n_eff[time_obs_c == time_i]
+            psis_objectt$diagnostics$r_eff <- psis_object$diagnostics$r_eff[time_obs_c == time_i]} else { psis_objectt <- psis_object}
+          gplot_c_time[[time_i]] <- gplot_e_time[[time_i]] <- ppc_loo_pit_ecdf(y = c_obs_time[[time_i]], yrep = c_rep_time[[time_i]][1 : ndisplay, ], lw = lwt, psis_object = psis_objectt, pit = pit, K = K, prob = prob, plot_diff = plot_diff, interpolate_adj = interpolate_adj)
+        }
+        for(time_trt_i in time_trt_lev) {
+          if(!is.null(lw)) { lwt <- lw[, time_trt_obs_c == time_trt_i]} else {lwt <- lw}
+          if(!is.null(psis_object)) { 
+            psis_objectt <- psis_object
+            psis_objectt$log_weights <- psis_objectt$log_weights[, time_trt_obs_c == time_trt_i]
+            psis_objectt$diagnostics$pareto_k <- psis_object$diagnostics$pareto_k[time_trt_obs_c == time_trt_i]
+            psis_objectt$diagnostics$n_eff <- psis_object$diagnostics$n_eff[time_trt_obs_c == time_trt_i]
+            psis_objectt$diagnostics$r_eff <- psis_object$diagnostics$r_eff[time_trt_obs_c == time_trt_i]} else { psis_objectt <- psis_object}
+          gplot_c_time_trt[[time_trt_i]] <- gplot_e_time_trt[[time_trt_i]] <- ppc_loo_pit_ecdf(y = c_obs_time_trt[[time_trt_i]], yrep = c_rep_time_trt[[time_trt_i]][1 : ndisplay, ], lw = lwt, psis_object = psis_objectt, pit = pit, K = K, prob = prob, plot_diff = plot_diff, interpolate_adj = interpolate_adj)
+        }
+      }  
+      if(outcome == "both") {
+        for(time_i in 1:n_time) {
+          if(!is.null(lw)) { lwte <- lw[, time_obs_e == time_i]; lwtc <- lw[, time_obs_c == time_i]} else {lwte <- lw; lwtc <- lw}
+          if(!is.null(psis_object)) { 
+            psis_objectt <- psis_object
+            psis_objectt$log_weights <- psis_objectt$log_weights[, time_obs_e == time_i & trt_obs_c == time_i]
+            psis_objectt$diagnostics$pareto_k <- psis_object$diagnostics$pareto_k[time_obs_e == time_i & trt_obs_c == time_i]
+            psis_objectt$diagnostics$n_eff <- psis_object$diagnostics$n_eff[time_obs_e == time_i & trt_obs_c == time_i]
+            psis_objectt$diagnostics$r_eff <- psis_object$diagnostics$r_eff[time_obs_e == time_i & trt_obs_c == time_i]} else { psis_objectt <- psis_object}
+          gplot_e_time[[time_i]] <- ppc_loo_pit_ecdf(y = e_obs_time[[time_i]], yrep = e_rep_time[[time_i]][1 : ndisplay, ], lw = lwte, psis_object = psis_objectt, pit = pit, K = K, prob = prob, plot_diff = plot_diff, interpolate_adj = interpolate_adj)
+          gplot_c_time[[time_i]] <- ppc_loo_pit_ecdf(y = c_obs_time[[time_i]], yrep = c_rep_time[[time_i]][1 : ndisplay, ], lw = lwtc, psis_object = psis_objectt, pit = pit, K = K, prob = prob, plot_diff = plot_diff, interpolate_adj = interpolate_adj)
+        }
+        for(time_trt_i in time_trt_lev) {
+          if(!is.null(lw)) { lwte <- lw[, time_trt_obs_e == time_trt_i]; lwtc <- lw[, time_trt_obs_c == time_trt_i]} else {lwte <- lw; lwtc <- lw}
+          if(!is.null(psis_object)) { 
+            psis_objectt <- psis_object
+            psis_objectt$log_weights <- psis_objectt$log_weights[, time_trt_obs_e == time_trt_i & time_trt_obs_c == time_trt_i]
+            psis_objectt$diagnostics$pareto_k <- psis_object$diagnostics$pareto_k[time_trt_obs_e == time_trt_i & time_trt_obs_c == time_trt_i]
+            psis_objectt$diagnostics$n_eff <- psis_object$diagnostics$n_eff[time_trt_obs_e == time_trt_i & time_trt_obs_c == time_trt_i]
+            psis_objectt$diagnostics$r_eff <- psis_object$diagnostics$r_eff[time_trt_obs_e == time_trt_i & time_trt_obs_c == time_trt_i]} else { psis_objectt <- psis_object}
+          gplot_e_time_trt[[time_trt_i]] <- ppc_loo_pit_ecdf(y = e_obs_time_trt[[time_trt_i]], yrep = e_rep_time_trt[[time_trt_i]][1 : ndisplay, ], lw = lwte, psis_object = psis_objectt, pit = pit, K = K, prob = prob, plot_diff = plot_diff, interpolate_adj = interpolate_adj)
+          gplot_c_time_trt[[time_trt_i]] <- ppc_loo_pit_ecdf(y = c_obs_time_trt[[time_trt_i]], yrep = c_rep_time_trt[[time_trt_i]][1 : ndisplay, ], lw = lwtc, psis_object = psis_objectt, pit = pit, K = K, prob = prob, plot_diff = plot_diff, interpolate_adj = interpolate_adj)
+        }      
+      }
+    }
+  }
+  if(type == "stat" & is.null(corr)) {
+    if(!bpp){
+      if(exists("bins", where = exArgs)) { bins = exArgs$bins} else { bins = 30}
+      if(exists("freq", where = exArgs)) { freq = exArgs$freq} else { freq = TRUE}
+      if(exists("breaks", where = exArgs)) { breaks = exArgs$breaks} else { breaks = NULL}
+      if(x$data_format == "wide") {
+      gplot_e <- ppc_stat(y = e_obs, yrep = e_rep[1 : ndisplay, ], stat = stat, bins = bins, breaks = breaks, freq = freq)
+      gplot_c <- ppc_stat(y = c_obs, yrep = c_rep[1 : ndisplay, ], stat = stat, bins = bins, breaks = breaks, freq = freq)
+      for(trt_i in trt_lev) {
+        gplot_e_trt[[trt_i]] <- ppc_stat(y = e_obs_trt[[trt_i]], yrep = e_rep_trt[[trt_i]][1 : ndisplay, ], stat = stat, bins = bins, breaks = breaks, freq = freq)
+        gplot_c_trt[[trt_i]] <- ppc_stat(y = c_obs_trt[[trt_i]], yrep = c_rep_trt[[trt_i]][1 : ndisplay, ], stat = stat, bins = bins, breaks = breaks, freq = freq)
+      }
+      }
+      if(x$data_format == "long") {
+        for(time_i in 1:n_time) {
+          gplot_e_time[[time_i]] <- ppc_stat(y = e_obs_time[[time_i]], yrep = e_rep_time[[time_i]][1 : ndisplay, ], stat = stat, bins = bins, breaks = breaks, freq = freq)
+          gplot_c_time[[time_i]] <- ppc_stat(y = c_obs_time[[time_i]], yrep = c_rep_time[[time_i]][1 : ndisplay, ], stat = stat, bins = bins, breaks = breaks, freq = freq)
+        }
+        for(time_trt_i in time_trt_lev) {
+          gplot_e_time_trt[[time_trt_i]] <- ppc_stat(y = e_obs_time_trt[[time_trt_i]], yrep = e_rep_time_trt[[time_trt_i]][1 : ndisplay, ], stat = stat, bins = bins, breaks = breaks, freq = freq)
+          gplot_c_time_trt[[time_trt_i]] <- ppc_stat(y = c_obs_time_trt[[time_trt_i]], yrep = c_rep_time_trt[[time_trt_i]][1 : ndisplay, ], stat = stat, bins = bins, breaks = breaks, freq = freq)
+        } 
+      }
+    }
+    if(bpp){
+      if(exists("trim", where = exArgs)) { trim = exArgs$trim} else { trim = FALSE}
+      if(exists("size", where = exArgs)) { size = exArgs$size} else { size = 0.5}
+      if(exists("size.annotate", where = exArgs)) { size.annotate = exArgs$size.annotate} else { size.annotate = 3.5}
+      if(exists("alpha", where = exArgs)) { alpha = exArgs$alpha} else { alpha = 1}
+      if(exists("vjust", where = exArgs)) { vjust = exArgs$vjust } else { vjust = 1}
+      if(x$data_format == "wide") {
+      stat_e <- stat(e_obs); stat_c <- stat(c_obs)
+      stat_trt_e <- lapply(e_obs_trt, stat); stat_trt_c <- lapply(c_obs_trt, stat)
+      values_e <- apply(e_rep[1 : ndisplay, ], 1, stat)
+      values_c <- apply(c_rep[1 : ndisplay, ], 1, stat)
+      pval_e <- sum(values_e > stat_e) / length(values_e) 
+      pval_c <- sum(values_c > stat_c) / length(values_c)
+      paste_p_e <- sprintf("Prob (T(y[rep]) > T(y)) = %0.3f", pval_e)
+      paste_p_c <- sprintf("Prob (T(y[rep]) > T(y)) = %0.3f", pval_c)
+      values_trt_e <- values_trt_c <- pval_trt_e <- pval_trt_c <- paste_p_trt_e <- paste_p_trt_c <- list()
+      for(trt_i in trt_lev) {
+        values_trt_e[[trt_i]] <- apply(e_rep_trt[[trt_i]][1 : ndisplay, ], 1, stat)
+        values_trt_c[[trt_i]] <- apply(c_rep_trt[[trt_i]][1 : ndisplay, ], 1, stat)
+        pval_trt_e[[trt_i]] <- sum(values_trt_e[[trt_i]] > stat_trt_e[[trt_i]]) / length(values_trt_e[[trt_i]]) 
+        pval_trt_c[[trt_i]] <- sum(values_trt_c[[trt_i]] > stat_trt_c[[trt_i]]) / length(values_trt_c[[trt_i]])
+        paste_p_trt_e[[trt_i]] <- sprintf("Prob (T(y[rep]) > T(y)) = %0.3f", pval_trt_e[[trt_i]])
+        paste_p_trt_c[[trt_i]] <- sprintf("Prob (T(y[rep]) > T(y)) = %0.3f", pval_trt_c[[trt_i]])
+      }
+      df_stat0 <- data.frame(values = c(stat_e, stat_c), 
+                             outcome = factor(c("effects", "costs"), levels = c("effects", "costs")),
+                             text = c(paste_p_e, paste_p_c))
+      df_trt_stat0 <- data.frame(values = c(unlist(stat_trt_e), unlist(stat_trt_c)), 
+                                 outcome = factor(rep(c("effects", "costs"), each = n_trt), levels = c("effects", "costs")),
+                                 text = c(unlist(paste_p_trt_e), unlist(paste_p_trt_c)),
+                                 trt = factor(rep(trt_lev, 2), levels = trt_lev))
+      df_stat <- data.frame(values = c(values_e, values_c),
+                            outcome = factor(c(rep("effects", ndisplay), rep("costs", ndisplay)), 
+                                             levels = c("effects", "costs")))
+      df_stat_trt <- data.frame(values = c(unlist(values_trt_e), unlist(values_trt_c)),
+                                outcome = factor(c(rep("effects", ndisplay * n_trt), rep("costs", ndisplay * n_trt)), 
+                                                 levels = c("effects", "costs")),
+                                trt = factor(c(rep(trt_lev, each = ndisplay), rep(trt_lev, each = ndisplay)), 
+                                             levels = trt_lev))
+      if(outcome == "both") { 
+        df_stat <- df_stat; df_stat_trt <- df_stat_trt
+        df_stat0 <- df_stat0; df_trt_stat0 <- df_trt_stat0}
+      if(outcome == "effects") { 
+        df_stat <- df_stat[df_stat$outcome == "effects", ]
+        df_stat_trt <- df_stat_trt[df_stat_trt$outcome == "effects", ]
+        df_stat0 <- df_stat0[df_stat0$outcome == "effects"]
+        df_trt_stat0 <- df_trt_stat0[df_trt_stat0$outcome == "effects", ]}
+      if(outcome == "costs") { 
+        df_stat <- df_stat[df_stat$outcome == "costs", ]
+        df_stat_trt <- df_stat_trt[df_stat_trt$outcome == "costs", ]
+        df_stat0 <- df_stat0[df_stat0$outcome == "costs"]
+        df_trt_stat0 <- df_trt_stat0[df_trt_stat0$outcome == "costs", ]}
+      if(length(trt) == 1) {
+        if(trt == "none") { 
+          df_stat_gplot <- df_stat
+          df_stat0_gplot <- df_stat0
+          df.trt_name <- "none"}
+        if(trt == "all") { 
+          df_stat_gplot <- df_stat_trt
+          df_stat0_gplot <- df_trt_stat0
+          df.trt_name <- trt_lev}
+        if(!trt %in% c("all", "none") & is.character(trt)) { 
+          df_stat_gplot <- df_stat_trt[df_stat_trt$trt %in% trt, ]
+          df_stat0_gplot <- df_trt_stat0[df_trt_stat0$trt %in% trt, ]
+          df.trt_name <- trt
+          df_stat_gplot$trt <- factor(df_stat_gplot$trt, levels = df.trt_name)
+          df_stat0_gplot$trt <- factor(df_stat0_gplot$trt, levels = df.trt_name)}
+      } 
+      if(length(trt) > 1 & is.character(trt)) { 
+        df_stat_gplot <- df_stat_trt[df_stat_trt$trt %in% trt, ]
+        df_stat0_gplot <- df_trt_stat0[df_trt_stat0$trt %in% trt, ]
+        df.trt_name <- trt
+        df_stat_gplot$trt <- factor(df_stat_gplot$trt, levels = df.trt_name)
+        df_stat0_gplot$trt <- factor(df_stat0_gplot$trt, levels = df.trt_name)}
+      if(is.numeric(trt)) { 
+        df.trt_name <- trt_lev[trt]
+        df_stat_gplot <- df_stat_trt[df_stat_trt$trt %in% df.trt_name, ]
+        df_stat0_gplot <- df_trt_stat0[df_trt_stat0$trt %in% df.trt_name, ]
+        df_stat_gplot$trt <- factor(df_stat_gplot$trt, levels = df.trt_name)
+        df_stat0_gplot$trt <- factor(df_stat0_gplot$trt, levels = df.trt_name)}
+      }
+      if(x$data_format == "long") {
+        stat_time_e <- lapply(e_obs_time, stat); stat_time_c <- lapply(c_obs_time, stat)
+        stat_time_trt_e <- lapply(e_obs_time_trt, stat); stat_time_trt_c <- lapply(c_obs_time_trt, stat)
+        values_time_e <- values_time_c <- pval_time_e <- pval_time_c <- paste_p_time_e <- paste_p_time_c <- list()
+        values_time_trt_e <- values_time_trt_c <- pval_time_trt_e <- pval_time_trt_c <- paste_p_time_trt_e <- paste_p_time_trt_c <- list()
+        for(time_i in 1:n_time) {
+          values_time_e[[time_i]] <- apply(e_rep_time[[time_i]][1 : ndisplay, ], 1, stat)
+          values_time_c[[time_i]] <- apply(c_rep_time[[time_i]][1 : ndisplay, ], 1, stat)
+          pval_time_e[[time_i]] <- sum(values_time_e[[time_i]] > stat_time_e[[time_i]]) / length(values_time_e[[time_i]]) 
+          pval_time_c[[time_i]] <- sum(values_time_c[[time_i]] > stat_time_c[[time_i]]) / length(values_time_c[[time_i]])
+          paste_p_time_e[[time_i]] <- sprintf("Prob (T(y[rep]) > T(y)) = %0.3f", pval_time_e[[time_i]])
+          paste_p_time_c[[time_i]] <- sprintf("Prob (T(y[rep]) > T(y)) = %0.3f", pval_time_c[[time_i]])
+        }
+        for(time_trt_i in time_trt_lev) {
+          values_time_trt_e[[time_trt_i]] <- apply(e_rep_time_trt[[time_trt_i]][1 : ndisplay, ], 1, stat)
+          values_time_trt_c[[time_trt_i]] <- apply(c_rep_time_trt[[time_trt_i]][1 : ndisplay, ], 1, stat)
+          pval_time_trt_e[[time_trt_i]] <- sum(values_time_trt_e[[time_trt_i]] > stat_time_trt_e[[time_trt_i]]) / length(values_time_trt_e[[time_trt_i]]) 
+          pval_time_trt_c[[time_trt_i]] <- sum(values_time_trt_c[[time_trt_i]] > stat_time_trt_c[[time_trt_i]]) / length(values_time_trt_c[[time_trt_i]])
+          paste_p_time_trt_e[[time_trt_i]] <- sprintf("Prob (T(y[rep]) > T(y)) = %0.3f", pval_time_trt_e[[time_trt_i]])
+          paste_p_time_trt_c[[time_trt_i]] <- sprintf("Prob (T(y[rep]) > T(y)) = %0.3f", pval_time_trt_c[[time_trt_i]])
+        }
+        df_time_stat0 <- data.frame(values = c(unlist(stat_time_e), unlist(stat_time_c)), 
+                                    outcome = factor(rep(c("effects", "costs"), each = n_time), levels = c("effects", "costs")),
+                                    text = c(unlist(paste_p_time_e), unlist(paste_p_time_c)),
+                                    time = factor(rep(as.character(1:n_time), 2), levels = as.character(1:n_time)))
+        df_time_trt_stat0 <- data.frame(values = c(unlist(stat_time_trt_e), unlist(stat_time_trt_c)), 
+                                        outcome = factor(rep(c("effects", "costs"), each = length(time_trt_lev)), levels = c("effects", "costs")),
+                                        text = c(unlist(paste_p_time_trt_e), unlist(paste_p_time_trt_c)),
+                                        time_trt = factor(rep(time_trt_lev, 2), levels = time_trt_lev))
+        df_stat_time <- data.frame(values = c(unlist(values_time_e), unlist(values_time_c)),
+                                   outcome = factor(c(rep("effects", ndisplay * n_time), rep("costs", ndisplay * n_time)), 
+                                                    levels = c("effects", "costs")),
+                                   time = factor(c(rep(as.character(1:n_time), each = ndisplay), rep(as.character(1:n_time), each = ndisplay)), 
+                                                 levels = as.character(1:n_time)))
+        df_stat_time_trt <- data.frame(values = c(unlist(values_time_trt_e), unlist(values_time_trt_c)),
+                                       outcome = factor(c(rep("effects", ndisplay * length(time_trt_lev)), rep("costs", ndisplay * length(time_trt_lev))), 
+                                                        levels = c("effects", "costs")),
+                                       time_trt = factor(c(rep(time_trt_lev, each = ndisplay), rep(time_trt_lev, each = ndisplay)), 
+                                                         levels = time_trt_lev))
+        if(outcome == "both") { 
+          df_stat_time <- df_stat_time; df_stat_time_trt <- df_stat_time_trt
+          df_time_stat0 <- df_time_stat0; df_time_trt_stat0 <- df_time_trt_stat0}
+        if(outcome == "effects") { 
+          df_stat_time <- df_stat_time[df_stat_time$outcome == "effects", ]
+          df_stat_time_trt <- df_stat_time_trt[df_stat_time_trt$outcome == "effects", ]
+          df_time_stat0 <- df_time_stat0[df_time_stat0$outcome == "effects", ]
+          df_time_trt_stat0 <- df_time_trt_stat0[df_time_trt_stat0$outcome == "effects", ]}
+        if(outcome == "costs") { 
+          df_stat_time <- df_stat_time[df_stat_time$outcome == "costs", ]
+          df_stat_time_trt <- df_stat_time_trt[df_stat_time_trt$outcome == "costs", ]
+          df_time_stat0 <- df_time_stat0[df_time_stat0$outcome == "costs", ]
+          df_time_trt_stat0 <- df_time_trt_stat0[df_time_trt_stat0$outcome == "costs", ]}
+        if(all(length(list.trt_name) == 1 & length(list.time_name) == 1)) {
+          if(list.time_name %in% as.character(1:n_time)) {
+            if(list.trt_name == "none"){
+              df_stat_gplot <- df_stat_time[df_stat_time$time %in% as.character(list.time_name), ]
+              df_stat0_gplot <- df_time_stat0[df_time_stat0$time %in% as.character(list.time_name), ]
+              df_stat_gplot$time <- factor(df_stat_gplot$time, levels = list.time_name)
+              df_stat0_gplot$time <- factor(df_stat0_gplot$time, levels = list.time_name)
+            }
+            if(list.trt_name %in% trt_lev){
+              df_stat_gplot <- df_stat_time_trt[df_stat_time_trt$time_trt %in% c(sapply(as.character(list.time_name), paste, as.character(list.trt_name), sep = ".")), ]
+              df_stat0_gplot <- df_time_trt_stat0[df_time_trt_stat0$time_trt %in% c(sapply(as.character(list.time_name), paste, as.character(list.trt_name), sep = ".")), ]
+              df_stat_gplot$time_trt <- factor(df_stat_gplot$time_trt, levels = c(sapply(as.character(list.time_name), paste, as.character(list.trt_name), sep = ".")))
+              df_stat0_gplot$time_trt <- factor(df_stat0_gplot$time_trt, levels = c(sapply(as.character(list.time_name), paste, as.character(list.trt_name), sep = ".")))
+            }
+          }
+        }
+        if(all(length(list.trt_name) == 1 & length(list.time_name) > 1)) {
+          if(all(list.time_name %in% as.character(1:n_time))){
+            if(list.trt_name == "none"){
+              df_stat_gplot <- df_stat_time[df_stat_time$time %in% as.character(list.time_name), ]
+              df_stat0_gplot <- df_time_stat0[df_time_stat0$time %in% as.character(list.time_name), ]
+              df_stat_gplot$time <- factor(df_stat_gplot$time, levels = list.time_name)
+              df_stat0_gplot$time <- factor(df_stat0_gplot$time, levels = list.time_name)
+            }
+            if(list.trt_name %in% trt_lev){
+              df_stat_gplot <- df_stat_time_trt[df_stat_time_trt$time_trt %in% c(sapply(as.character(list.time_name), paste, as.character(list.trt_name), sep = ".")), ]
+              df_stat0_gplot <- df_time_trt_stat0[df_time_trt_stat0$time_trt %in% c(sapply(as.character(list.time_name), paste, as.character(list.trt_name), sep = ".")), ]
+              df_stat_gplot$time_trt <- factor(df_stat_gplot$time_trt, levels = c(sapply(as.character(list.time_name), paste, as.character(list.trt_name), sep = ".")))
+              df_stat0_gplot$time_trt <- factor(df_stat0_gplot$time_trt, levels = c(sapply(as.character(list.time_name), paste, as.character(list.trt_name), sep = ".")))
+            }
+          }
+          if(!any(list.time_name %in% as.character(1:n_time))){
+            stop("Please provide only valid time.plot values.")
+          }
+        }
+        if(all(length(list.trt_name) > 1 & length(list.time_name) == 1)) {
+          if(list.time_name %in% as.character(1:n_time)){
+            if(all(list.trt_name %in% trt_lev)){
+              df_stat_gplot <- df_stat_time_trt[df_stat_time_trt$time_trt %in% c(sapply(as.character(list.time_name), paste, as.character(list.trt_name), sep = ".")), ]
+              df_stat0_gplot <- df_time_trt_stat0[df_time_trt_stat0$time_trt %in% c(sapply(as.character(list.time_name), paste, as.character(list.trt_name), sep = ".")), ]
+              df_stat_gplot$time_trt <- factor(df_stat_gplot$time_trt, levels = c(sapply(as.character(list.time_name), paste, as.character(list.trt_name), sep = ".")))
+              df_stat0_gplot$time_trt <- factor(df_stat0_gplot$time_trt, levels = c(sapply(as.character(list.time_name), paste, as.character(list.trt_name), sep = ".")))
+            }
+            if(!any(as.character(list.trt_name) %in% trt_lev)){
+              stop("Please provide only valid treatment names or values.")
+            }
+          }
+        }
+        if(all(length(list.trt_name) > 1 & length(list.time_name) > 1)) {
+          if(all(list.time_name %in% as.character(1:n_time))){
+            if(all(list.trt_name %in% trt_lev)){
+              df_stat_gplot <- df_stat_time_trt[df_stat_time_trt$time_trt %in% c(sapply(as.character(list.time_name), paste, as.character(list.trt_name), sep = ".")), ]
+              df_stat0_gplot <- df_time_trt_stat0[df_time_trt_stat0$time_trt %in% c(sapply(as.character(list.time_name), paste, as.character(list.trt_name), sep = ".")), ]
+              df_stat_gplot$time_trt <- factor(df_stat_gplot$time_trt, levels = c(sapply(as.character(list.time_name), paste, as.character(list.trt_name), sep = ".")))
+              df_stat0_gplot$time_trt <- factor(df_stat0_gplot$time_trt, levels = c(sapply(as.character(list.time_name), paste, as.character(list.trt_name), sep = ".")))
+            }
+            if(!any(list.trt_name %in% trt_lev)){
+              stop("Please provide only valid treatment names or values.")
+            }
+          }
+          if(!any(list.time_name %in% as.character(1:n_time))){
+            stop("Please provide only valid time.plot values.")
+          }
+        }
+      }
       color_sheme_rep <- color_scheme_get()[1]
       color_sheme_rep_border <- color_scheme_get()[2]
       color_sheme_obs <- color_scheme_get()[5]
       color_sheme_obs_border <- color_scheme_get()[6]
       set_theme <- bayesplot_theme_get()
       ggplot2::theme_set(set_theme)
-      paste_p_e1 <- sprintf("Prob (T(y[rep]) > T(y)) == '%0.3f'", pval_e1)
-      paste_p_c1 <- sprintf("Prob (T(y[rep]) > T(y)) == '%0.3f'", pval_c1)
-      paste_p_e2 <- sprintf("Prob (T(y[rep]) > T(y)) == '%0.3f'", pval_e2)
-      paste_p_c2 <- sprintf("Prob (T(y[rep]) > T(y)) == '%0.3f'", pval_c2)
-      ppc_plot_e1 <- ggplot2::ggplot(df1, ggplot2::aes(x = values_e1)) + 
+      gplot_ppc <- ggplot2::ggplot(df_stat_gplot, ggplot2::aes(x = values)) +
         ggplot2::geom_density(fill = color_sheme_rep$light, color = color_sheme_rep_border$light_highlight, 
-                              trim = trim, size = size, alpha = alpha) +
-        ggplot2::geom_vline(xintercept = stat_e1, color = color_sheme_obs$dark, linewidth = 1, linetype = "dashed") +
-        ggplot2::scale_y_continuous(expand = c(0, 0)) +
-        ggplot2::theme(axis.text.y = ggplot2::element_blank(), axis.ticks.y = ggplot2::element_blank(), 
-                       axis.title.y = ggplot2::element_blank(), axis.title.x = ggplot2::element_blank()) +
-        ggplot2::annotate("text", x = -Inf, y = Inf, label = paste_p_e1, parse = TRUE, hjust = -0.1, vjust = 2, size = 4)
-      ppc_plot_c1 <- ggplot2::ggplot(df1, ggplot2::aes(x = values_c1)) + 
-        ggplot2::geom_density(fill = color_sheme_rep$light, color = color_sheme_rep_border$light_highlight, 
-                              trim = trim, size = size, alpha = alpha) +
-        ggplot2::geom_vline(xintercept = stat_c1, color = color_sheme_obs$dark, linewidth = 1, linetype = "dashed") +
-        ggplot2::scale_y_continuous(expand = c(0, 0)) +
-        ggplot2::theme(axis.text.y = ggplot2::element_blank(), axis.ticks.y = ggplot2::element_blank(), 
-                       axis.title.y = ggplot2::element_blank(), axis.title.x = ggplot2::element_blank()) +
-        ggplot2::annotate("text", x = -Inf, y = Inf, label = paste_p_c1, parse = TRUE, hjust = -0.1, vjust = 2, size = 4)
-      ppc_plot_e2 <- ggplot2::ggplot(df2, ggplot2::aes(x = values_e2)) + 
-        ggplot2::geom_density(fill = color_sheme_rep$light, color = color_sheme_rep_border$light_highlight, 
-                              trim = trim, size = size, alpha = alpha) +
-        ggplot2::geom_vline(xintercept = stat_e2, color = color_sheme_obs$dark, linewidth = 1, linetype = "dashed") +
-        ggplot2::scale_y_continuous(expand = c(0, 0)) +
-        ggplot2::theme(axis.text.y = ggplot2::element_blank(), axis.ticks.y = ggplot2::element_blank(), 
-                       axis.title.y = ggplot2::element_blank(), axis.title.x = ggplot2::element_blank()) +
-        ggplot2::annotate("text", x = -Inf, y = Inf, label = paste_p_e2, parse = TRUE, hjust = -0.1, vjust = 2, size = 4)
-      ppc_plot_c2 <- ggplot2::ggplot(df2, ggplot2::aes(x = values_c2)) + 
-        ggplot2::geom_density(fill = color_sheme_rep$light, color = color_sheme_rep_border$light_highlight, 
-                              trim = trim, size = size, alpha = alpha) +
-        ggplot2::geom_vline(xintercept = stat_c2, color = color_sheme_obs$dark, linewidth = 1, linetype = "dashed") +
-        ggplot2::scale_y_continuous(expand = c(0, 0)) +
-        ggplot2::theme(axis.text.y = ggplot2::element_blank(), axis.ticks.y = ggplot2::element_blank(), 
-                       axis.title.y = ggplot2::element_blank(), axis.title.x = ggplot2::element_blank()) +
-        ggplot2::annotate("text", x = -Inf, y = Inf, label = paste_p_c2, parse = TRUE, hjust = -0.1, vjust = 2, size = 4)
-     }
-  } else if(type == "stat" & is.null(corr) == FALSE) {
-      ec_arm1 <- cbind(x$data_set$effects$Control, x$data_set$costs$Control)[complete.cases(cbind(x$data_set$effects$Control, x$data_set$costs$Control)), ]
-      stat_biv1 <- corr(ec_arm1[, 1], ec_arm1[, 2])
-      array_1 <- array(data = NA, dim = c(nrow(e1_rep[1 : ndisplay, ]), nrow(ec_arm1), 2))
-      array_1[, , 1] <- e1_rep[1 : ndisplay, 1:nrow(ec_arm1)]
-      array_1[, , 2] <- c1_rep[1 : ndisplay, 1:nrow(ec_arm1)]
-      values_biv1 <- apply(array_1, 1, corr)[2, ]
-      df1 <- data.frame(values_biv1)
-      ec_arm2 <- cbind(x$data_set$effects$Intervention, x$data_set$costs$Intervention)[complete.cases(cbind(x$data_set$effects$Intervention, x$data_set$costs$Intervention)), ]
-      stat_biv2 <- corr(ec_arm2[, 1], ec_arm2[, 2])
-      array_2 <- array(data = NA, dim = c(nrow(e2_rep[1 : ndisplay, ]), nrow(ec_arm2), 2))
-      array_2[, , 1] <- e2_rep[1 : ndisplay, 1:nrow(ec_arm2)]
-      array_2[, , 2] <- c2_rep[1 : ndisplay, 1:nrow(ec_arm2)]
-      values_biv2 <- apply(array_2, 1, corr)[2, ]
-      df2 <- data.frame(values_biv2)
-      pval_1 <- sum(values_biv1 > stat_biv1) / length(values_biv1)
-      pval_2 <- sum(values_biv2 > stat_biv2) / length(values_biv2)
-      paste_p_biv1 <- sprintf("Prob (T(y[rep]) > T(y)) == '%0.3f'", pval_1)
-      paste_p_biv2 <- sprintf("Prob (T(y[rep]) > T(y)) == '%0.3f'", pval_2)
-      color_sheme_rep <- color_scheme_get()[1]
-      color_sheme_rep_border <- color_scheme_get()[2]
-      color_sheme_obs <- color_scheme_get()[5]
-      color_sheme_obs_border <- color_scheme_get()[6]
-      set_theme <- bayesplot_theme_get()
-      if(bpp == FALSE) {
-      if(exists("binwidth", where = exArgs)) {binwidth = exArgs$binwidth} else {binwidth = 1 / 30 }
-      ppc_plot_e1 <- ggplot2::ggplot(df1, ggplot2::aes(x = values_biv1)) + 
-        ggplot2::geom_histogram(fill = color_sheme_rep$light, 
-                                color = color_sheme_rep_border$light_highlight, 
-                                binwidth = binwidth) +
-        ggplot2::geom_vline(xintercept = stat_biv1, color = color_sheme_obs$dark, linewidth = 2) +
-        ggplot2::scale_y_continuous(expand = c(0, 0)) +
-        ggplot2::theme(axis.text.y = ggplot2::element_blank(), axis.ticks.y = ggplot2::element_blank(), 
-                       axis.title.y = ggplot2::element_blank(), axis.title.x = ggplot2::element_blank()) 
-      ppc_plot_c2 <- ggplot2::ggplot(df2, ggplot2::aes(x = values_biv2)) + 
-        ggplot2::geom_histogram(fill = color_sheme_rep$light, 
-                                color = color_sheme_rep_border$light_highlight, 
-                                binwidth = binwidth) +
-        ggplot2::geom_vline(xintercept = stat_biv2, color = color_sheme_obs$dark, linewidth = 2) +
-        ggplot2::scale_y_continuous(expand = c(0, 0)) +
-        ggplot2::theme(axis.text.y = ggplot2::element_blank(), axis.ticks.y = ggplot2::element_blank(), 
-                       axis.title.y = ggplot2::element_blank(), axis.title.x = ggplot2::element_blank())
+                              trim = trim, linewidth = size, alpha = alpha) +
+        ggplot2::geom_vline(data = df_stat0_gplot, ggplot2::aes(xintercept = values), color = color_sheme_obs$dark, 
+                            linewidth = size * 1.5, linetype = "dashed") +
+        ggplot2::geom_text(data = df_stat0_gplot, mapping = ggplot2::aes(x = -Inf, y = Inf, label = text), 
+                           hjust = hjust, vjust = vjust, size = size.annotate)
+      if(x$data_format == "wide") {
+      if(length(df.trt_name) == 1) { 
+        if(df.trt_name == "none"){
+          gplot_ppc <- gplot_ppc + ggplot2::facet_wrap( ~ outcome, scales = "free")}
+        if(df.trt_name %in% trt_lev){
+          gplot_ppc <- gplot_ppc + ggplot2::facet_wrap( ~ outcome, scales = "free")}
       }
-      if(bpp == TRUE) {
-        if(exists("trim", where = exArgs)) {trim = exArgs$trim} else {trim = FALSE }
-        if(exists("size", where = exArgs)) {size = exArgs$size} else {size = 0.5 }
-        if(exists("alpha", where = exArgs)) {alpha = exArgs$alpha} else {alpha = 1 } 
-        ppc_plot_e1 <- ggplot2::ggplot(df1, ggplot2::aes(x = values_biv1)) +
-          ggplot2::geom_density(fill = color_sheme_rep$light, 
-                                color = color_sheme_rep_border$light_highlight, trim = trim, size = size, alpha = alpha) +
-          ggplot2::geom_vline(xintercept = stat_biv1, color = color_sheme_obs$dark, linewidth = 1, linetype = "dashed") +
-          ggplot2::scale_y_continuous(expand = c(0, 0)) +
-          ggplot2::theme(axis.text.y = ggplot2::element_blank(), axis.ticks.y = ggplot2::element_blank(), 
-                         axis.title.y = ggplot2::element_blank(), axis.title.x = ggplot2::element_blank()) +
-          ggplot2::annotate("text", x = -Inf, y = Inf, 
-                            label = paste_p_biv1, parse = TRUE, hjust = -0.1, vjust = 2, size = 4)
-        ppc_plot_c2 <- ggplot2::ggplot(df2, ggplot2::aes(x = values_biv2)) +
-          ggplot2::geom_density(fill = color_sheme_rep$light, 
-                                color = color_sheme_rep_border$light_highlight, trim = trim, size = size, alpha = alpha) +
-          ggplot2::geom_vline(xintercept = stat_biv2, color = color_sheme_obs$dark, size = 1, linetype = "dashed") +
-          ggplot2::scale_y_continuous(expand = c(0, 0)) +
-          ggplot2::theme(axis.text.y = ggplot2::element_blank(), axis.ticks.y = ggplot2::element_blank(), 
-                         axis.title.y = ggplot2::element_blank(), axis.title.x = ggplot2::element_blank()) +
-          ggplot2::annotate("text", x = -Inf, y = Inf, 
-                            label = paste_p_biv2, parse = TRUE, hjust = -0.1, vjust = 2, size = 4)
+      if(length(df.trt_name) > 1) {
+        if(all(df.trt_name %in% trt_lev)){
+          gplot_ppc <- gplot_ppc + ggplot2::facet_wrap(outcome ~ trt, scales = "free")
+        }
+        if(!any(df.trt_name %in% trt_lev)){
+          stop("Please provide only valid treatment names or values.")}
       }
-  } else if(type == "stat_2d") {
-    if(exists("size", where = exArgs)) {size = exArgs$size} else {size = 2.5 }
-    if(exists("alpha", where = exArgs)) {alpha = exArgs$alpha} else {alpha = 0.7 }
-    if(exists("stat", where = exArgs)) {stat = exArgs$stat} else {stat = c("mean", "sd") }
-    ppc_plot_e1 <- ppc_stat_2d(y = e1_obs, yrep = e1_rep[1 : ndisplay, ], stat = stat, size = size, alpha = alpha)
-    ppc_plot_e2 <- ppc_stat_2d(y = e2_obs, yrep = e2_rep[1 : ndisplay, ], stat = stat, size = size, alpha = alpha)
-    ppc_plot_c1 <- ppc_stat_2d(y = c1_obs, yrep = c1_rep[1 : ndisplay, ], stat = stat, size = size, alpha = alpha)
-    ppc_plot_c2 <- ppc_stat_2d(y = c2_obs, yrep = c2_rep[1 : ndisplay, ], stat = stat, size = size, alpha = alpha)
-  } else if(type == "error_hist") {
-    if(exists("binwidth_e", where = exArgs)) {binwidth_e = exArgs$binwidth_e} else {binwidth_e = 1 / 30 }
-    if(exists("binwidth_c", where = exArgs)) {binwidth_c = exArgs$binwidth_c} else {binwidth_c = 30 }
-    if(exists("freq", where = exArgs)) {freq = exArgs$freq} else {freq = TRUE }
-    if(exists("breaks", where = exArgs)) {breaks = exArgs$breaks} else {breaks = NULL }
-    ppc_plot_e1 <- ppc_error_hist(y = e1_obs, yrep = e1_rep[1 : ndisplay, ], binwidth = binwidth_e, breaks = breaks, freq = freq)
-    ppc_plot_e2 <- ppc_error_hist(y = e2_obs, yrep = e2_rep[1 : ndisplay, ], binwidth = binwidth_e, breaks = breaks, freq = freq)
-    ppc_plot_c1 <- ppc_error_hist(y = c1_obs, yrep = c1_rep[1 : ndisplay, ], binwidth = binwidth_c, breaks = breaks, freq = freq)
-    ppc_plot_c2 <- ppc_error_hist(y = c2_obs, yrep = c2_rep[1 : ndisplay, ], binwidth = binwidth_c, breaks = breaks, freq = freq)
-  } else if(type == "error_scatter") {
-    if(exists("size", where = exArgs)) {size = exArgs$size} else {size = 2.5 }
-    if(exists("alpha", where = exArgs)) {alpha = exArgs$alpha} else {alpha = 0.8 }
-    ppc_plot_e1<- ppc_error_scatter(y = e1_obs, yrep = e1_rep[1 : ndisplay, ], size = size, alpha = alpha)
-    ppc_plot_e2<- ppc_error_scatter(y = e2_obs, yrep = e2_rep[1 : ndisplay, ], size = size, alpha = alpha)
-    ppc_plot_c1<- ppc_error_scatter(y = c1_obs, yrep = c1_rep[1 : ndisplay, ], size = size, alpha = alpha)
-    ppc_plot_c2<- ppc_error_scatter(y = c2_obs, yrep = c2_rep[1 : ndisplay, ], size = size, alpha = alpha)
-  } else if(type == "error_scatter_avg") {
-    if(exists("size", where = exArgs)) {size = exArgs$size} else {size = 2.5 }
-    if(exists("alpha", where = exArgs)) {alpha = exArgs$alpha} else {alpha = 0.8 }
-    ppc_plot_e1 <- ppc_error_scatter_avg(y = e1_obs, yrep = e1_rep[1 : ndisplay, ], size = size, alpha = alpha)
-    ppc_plot_e2 <- ppc_error_scatter_avg(y = e2_obs, yrep = e2_rep[1 : ndisplay, ], size = size, alpha = alpha)
-    ppc_plot_c1 <- ppc_error_scatter_avg(y = c1_obs, yrep = c1_rep[1 : ndisplay, ], size = size, alpha = alpha)
-    ppc_plot_c2 <- ppc_error_scatter_avg(y = c2_obs, yrep = c2_rep[1 : ndisplay, ], size = size, alpha = alpha)
-  } else if(type == "error_binned") {
-    if(exists("bins", where = exArgs)) {bins = exArgs$bins} else {bins = NULL }
-    if(exists("size", where = exArgs)) {size = exArgs$size} else {size = 1 }
-    if(exists("alpha", where = exArgs)) {alpha = exArgs$alpha} else {alpha = 0.25 }
-    ppc_plot_e1 <- ppc_error_binned(y = e1_obs, yrep = e1_rep[1 : ndisplay, ], bins = bins, size = size, alpha = alpha)
-    ppc_plot_e2 <- ppc_error_binned(y = e2_obs, yrep = e2_rep[1 : ndisplay, ], bins = bins, size = size, alpha = alpha)
-    ppc_plot_c1 <- ppc_error_binned(y = c1_obs, yrep = c1_rep[1 : ndisplay, ], bins = bins, size = size, alpha = alpha)
-    ppc_plot_c2 <- ppc_error_binned(y = c2_obs, yrep = c2_rep[1 : ndisplay, ], bins = bins, size = size, alpha = alpha)
-  } else if(type == "intervals") {
-    if(exists("prob", where = exArgs)) {prob = exArgs$prob} else {prob = 0.5 }
-    if(exists("prob_outer", where = exArgs)) {prob_outer = exArgs$prob_outer} else {prob_outer = 0.9 }
-    if(exists("size", where = exArgs)) {size = exArgs$size} else {size = 1 }
-    if(exists("fatten", where = exArgs)) {fatten = exArgs$fatten} else {fatten = 3 }
-    ppc_plot_e1 <- ppc_intervals(y = e1_obs, yrep = e1_rep[1 : ndisplay, ], prob = prob, prob_outer = prob_outer, size = size, fatten = fatten)
-    ppc_plot_e2 <- ppc_intervals(y = e2_obs, yrep = e2_rep[1 : ndisplay, ], prob = prob, prob_outer = prob_outer, size = size, fatten = fatten)
-    ppc_plot_c1 <- ppc_intervals(y = c1_obs, yrep = c1_rep[1 : ndisplay, ], prob = prob, prob_outer = prob_outer, size = size, fatten = fatten)
-    ppc_plot_c2 <- ppc_intervals(y = c2_obs, yrep = c2_rep[1 : ndisplay, ], prob = prob, prob_outer = prob_outer, size = size, fatten = fatten)
-  } else if(type == "ribbon") {
-    if(exists("prob", where = exArgs)) {prob = exArgs$prob} else {prob = 0.5 }
-    if(exists("prob_outer", where = exArgs)) {prob_outer = exArgs$prob_outer} else {prob_outer = 0.9 }
-    if(exists("size", where = exArgs)) {size = exArgs$size} else {size = 0.25 }
-    if(exists("alpha", where = exArgs)) {alpha = exArgs$alpha} else {alpha = 0.33 }
-    ppc_plot_e1 <- ppc_ribbon(y = e1_obs, yrep = e1_rep[1 : ndisplay, ], prob = prob, prob_outer = prob_outer, alpha = alpha, size = size)
-    ppc_plot_e2 <- ppc_ribbon(y = e2_obs, yrep = e2_rep[1 : ndisplay, ], prob = prob, prob_outer = prob_outer, alpha = alpha, size = size)
-    ppc_plot_c1 <- ppc_ribbon(y = c1_obs, yrep = c1_rep[1 : ndisplay, ], prob = prob, prob_outer = prob_outer, alpha = alpha, size = size)
-    ppc_plot_c2 <- ppc_ribbon(y = c2_obs, yrep = c2_rep[1 : ndisplay, ], prob = prob, prob_outer = prob_outer, alpha = alpha, size = size)
-  } else if(type == "scatter") {
-    if(exists("size", where = exArgs)) {size = exArgs$size} else {size = 2.5 }
-    if(exists("alpha", where = exArgs)) {alpha = exArgs$alpha} else {alpha = 0.8 }
-    ppc_plot_e1 <- ppc_scatter(y = e1_obs, yrep = e1_rep[1 : ndisplay, ], alpha = alpha, size = size)
-    ppc_plot_e2 <- ppc_scatter(y = e2_obs, yrep = e2_rep[1 : ndisplay, ], alpha = alpha, size = size)
-    ppc_plot_c1 <- ppc_scatter(y = c1_obs, yrep = c1_rep[1 : ndisplay, ], alpha = alpha, size = size)
-    ppc_plot_c2 <- ppc_scatter(y = c2_obs, yrep = c2_rep[1 : ndisplay, ], alpha = alpha, size = size)
-  } else if(type == "scatter_avg") {
-    if(exists("size", where = exArgs)) {size = exArgs$size} else {size = 2.5 }
-    if(exists("alpha", where = exArgs)) {alpha = exArgs$alpha} else {alpha = 0.8 }
-    ppc_plot_e1 <- ppc_scatter_avg(y = e1_obs, yrep = e1_rep[1 : ndisplay, ], alpha = alpha, size = size)
-    ppc_plot_e2 <- ppc_scatter_avg(y = e2_obs, yrep = e2_rep[1 : ndisplay, ], alpha = alpha, size = size)
-    ppc_plot_c1 <- ppc_scatter_avg(y = c1_obs, yrep = c1_rep[1 : ndisplay, ], alpha = alpha, size = size)
-    ppc_plot_c2 <- ppc_scatter_avg(y = c2_obs, yrep = c2_rep[1 : ndisplay, ], alpha = alpha, size = size)
+      }
+      if(x$data_format == "long") {
+        if(all(length(list.trt_name) == 1 & length(list.time_name) == 1)) { 
+          if(all(list.trt_name == "none" & list.time_name %in% as.character(1:n_time))){
+            gplot_ppc <- gplot_ppc + ggplot2::facet_wrap( ~ outcome, scales = "free")}
+          if(all(list.trt_name %in% trt_lev & list.time_name %in% as.character(1:n_time))){
+            gplot_ppc <- gplot_ppc + ggplot2::facet_wrap(outcome ~ time_trt, scales = "free")}
+        }
+        if(all(length(list.trt_name) == 1 & length(list.time_name) > 1)) { 
+          if(all(list.trt_name == "none" & list.time_name %in% as.character(1:n_time))){
+            gplot_ppc <- gplot_ppc + ggplot2::facet_wrap(outcome ~ time, scales = "free")}
+          if(all(list.trt_name %in% trt_lev & all(list.time_name %in% as.character(1:n_time)))){
+            gplot_ppc <- gplot_ppc + ggplot2::facet_wrap(outcome ~ time_trt, scales = "free")}
+        }
+        if(all(length(list.trt_name) > 1 & length(list.time_name) == 1)) {
+          if(all(all(list.trt_name %in% trt_lev) & list.time_name %in% as.character(1:n_time))){
+            gplot_ppc <- gplot_ppc + ggplot2::facet_wrap(outcome ~ time_trt, scales = "free")}
+        }
+        if(all(length(list.trt_name) > 1 & length(list.time_name) > 1)) {
+          if(all(all(list.trt_name %in% trt_lev) & all(list.time_name %in% as.character(1:n_time)))){
+            gplot_ppc <- gplot_ppc + ggplot2::facet_wrap(outcome ~ time_trt, scales = "free")}
+        }  
+      }
+    }
   }
-  if(outcome == "effects_arm1") {
-    ppc_plot_output <- ppc_plot_e1
-  } else if(outcome == "effects_arm2"){
-    ppc_plot_output <- ppc_plot_e2
-  } else if(outcome == "costs_arm1"){
-    ppc_plot_output <- ppc_plot_c1
-  } else if(outcome == "costs_arm2"){
-    ppc_plot_output <- ppc_plot_c2
-  } else if(outcome == "effects") {
-    ppc_plot_output <- ggpubr::ggarrange(ppc_plot_e1, ppc_plot_e2, labels = c("effects (t=1)", "effects (t=2)"), ncol = 2, nrow = 1, common.legend = TRUE, legend = legend)
-  } else if(outcome == "costs") {
-    ppc_plot_output <- ggpubr::ggarrange(ppc_plot_c1, ppc_plot_c2, labels = c("costs (t=1)", "costs (t=2)"), ncol = 2, nrow = 1, common.legend = TRUE, legend = legend)
-  } else if(outcome == "all") {
-    if(is.null(corr) == TRUE) {
-    ppc_plot_output <- ggpubr::ggarrange(ppc_plot_e1, ppc_plot_e2, ppc_plot_c1, ppc_plot_c2, 
-                                         labels = c("effects (t=1)", "effects (t=2)", "costs (t=1)", "costs (t=2)"), ncol = 2, nrow = 2, common.legend = TRUE, legend = legend)
+  if(type == "stat" & !is.null(corr)) {
+    if(x$data_format == "wide") {
+    df_ec <- data.frame(effects = x$data_set$data_raw$e, costs = x$data_set$data_raw$c,
+                        trt = x$data_set$data_raw$data$trt)  
+    df_ec_cc <- df_ec[complete.cases(df_ec), ]
+    stat_biv <- corr(df_ec_cc$effects, df_ec_cc$costs)
+    array_ec <- array(NA, dim = c(ndisplay, nrow(df_ec_cc), 2),
+                      dimnames = list(NULL, NULL, c("effects", "costs")))
+    array_ec[, , "effects"] <- e_rep[1 : ndisplay, 1:nrow(df_ec_cc)]
+    array_ec[, , "costs"] <- c_rep[1 : ndisplay, 1:nrow(df_ec_cc)]
+    df.values_biv <- data.frame(values = apply(array_ec, 1, corr)[2, ])
+    p_biv <- sum(df.values_biv$values > stat_biv) / length(df.values_biv$values)
+    paste_p_biv <- sprintf("Prob (T(y[rep]) > T(y)) = %0.3f", p_biv)
+    df_trt_ec <- df_trt_ec_cc <- stat_trt_biv <- array_trt_ec <- df.values_trt_biv <- p_trt_biv <- paste_p_trt_biv <- list()
+    for(trt_i in trt_lev) {
+      df_trt_ec[[trt_i]] <- df_ec[df_ec$trt == trt_i, ]
+      df_trt_ec_cc[[trt_i]] <- df_trt_ec[[trt_i]][complete.cases(df_trt_ec[[trt_i]]), ]
+      stat_trt_biv[[trt_i]] <- corr(df_trt_ec_cc[[trt_i]]$effects, df_trt_ec_cc[[trt_i]]$costs)
+      array_trt_ec[[trt_i]] <- array(NA, dim = c(ndisplay, nrow(df_trt_ec_cc[[trt_i]]), 2),
+                                     dimnames = list(NULL, NULL, c("effects", "costs")))
+      array_trt_ec[[trt_i]][, , "effects"] <- e_rep_trt[[trt_i]][1 : ndisplay, 1:nrow(df_trt_ec_cc[[trt_i]])]
+      array_trt_ec[[trt_i]][, , "costs"] <- c_rep_trt[[trt_i]][1 : ndisplay, 1:nrow(df_trt_ec_cc[[trt_i]])]
+      df.values_trt_biv[[trt_i]] <- data.frame(values = apply(array_trt_ec[[trt_i]], 1, corr)[2, ])
+      p_trt_biv[[trt_i]] <- sum(df.values_trt_biv[[trt_i]]$values > stat_trt_biv[[trt_i]]) / length(df.values_trt_biv[[trt_i]]$values)
+      paste_p_trt_biv[[trt_i]] <- sprintf("Prob (T(y[rep]) > T(y)) = %0.3f", p_trt_biv[[trt_i]])
     }
-    if(is.null(corr) == FALSE) {
-      ppc_plot_output <- ggpubr::ggarrange(ppc_plot_e1, ppc_plot_c2, labels = c("control", "intervention"), ncol = 2, nrow = 1, common.legend = TRUE, legend = legend)
+    df_biv0 <- data.frame(values = stat_biv, 
+                          text = paste_p_biv)
+    df_trt_biv0 <- data.frame(values = unlist(stat_trt_biv), 
+                              text = c(unlist(paste_p_trt_biv)),
+                              trt = factor(trt_lev, levels = trt_lev),
+                              row.names = NULL)
+    df_biv <- df.values_biv
+    df_biv_trt <- data.frame(values = unlist(df.values_trt_biv),
+                             trt = factor(rep(trt_lev, each = ndisplay), levels = trt_lev), 
+                             row.names = NULL)
+    if(length(trt) == 1) {
+      if(trt == "none") { 
+        df_biv_gplot <- df_biv
+        df_biv0_gplot <- df_biv0
+        df.trt_name <- "none"}
+      if(trt == "all") { 
+        df_biv_gplot <- df_biv_trt
+        df_biv0_gplot <- df_trt_biv0
+        df.trt_name <- trt_lev}
+      if(!trt %in% c("all", "none") & is.character(trt)) { 
+        df_biv_gplot <- df_biv_trt[df_biv_trt$trt %in% trt, ]
+        df_biv0_gplot <- df_trt_biv0[df_trt_biv0$trt %in% trt, ]
+        df.trt_name <- trt
+        df_biv_gplot$trt <- factor(df_biv_gplot$trt, levels = df.trt_name)
+        df_biv0_gplot$trt <- factor(df_biv0_gplot$trt, levels = df.trt_name)}
+    } 
+    if(length(trt) > 1 & is.character(trt)) { 
+      df_biv_gplot <- df_biv_trt[df_biv_trt$trt %in% trt, ]
+      df_biv0_gplot <- df_trt_biv0[df_trt_biv0$trt %in% trt, ]
+      df.trt_name <- trt
+      df_biv_gplot$trt <- factor(df_biv_gplot$trt, levels = df.trt_name)
+      df_biv0_gplot$trt <- factor(df_biv0_gplot$trt, levels = df.trt_name)}
+    if(is.numeric(trt)) { 
+      df.trt_name <- trt_lev[trt]
+      df_biv_gplot <- df_biv_trt[df_biv_trt$trt %in% df.trt_name, ]
+      df_biv0_gplot <- df_trt_biv0[df_trt_biv0$trt %in% df.trt_name, ]
+      df_biv_gplot$trt <- factor(df_biv_gplot$trt, levels = df.trt_name)
+      df_biv0_gplot$trt <- factor(df_biv0_gplot$trt, levels = df.trt_name)}
     }
-   }
+    if(x$data_format == "long") {
+      df_ec <- data.frame(effects = x$data_set$data_raw$data_long$e, costs = x$data_set$data_raw$data_long$c,
+                          time_trt = x$data_set$data_raw$data_long$time_trt, time = x$data_set$data_raw$data_long$time)
+      df_time_ec <- df_time_ec_cc <- stat_time_biv <- array_time_ec <- df.values_time_biv <- p_time_biv <- paste_p_time_biv <- list()
+      for(time_i in as.character(1:n_time)) {
+        df_time_ec[[time_i]] <- df_ec[df_ec$time == time_i, ]
+        df_time_ec_cc[[time_i]] <- df_time_ec[[time_i]][complete.cases(df_time_ec[[time_i]]), ]
+        stat_time_biv[[time_i]] <- corr(df_time_ec_cc[[time_i]]$effects, df_time_ec_cc[[time_i]]$costs)
+        array_time_ec[[time_i]] <- array(NA, dim = c(ndisplay, nrow(df_time_ec_cc[[time_i]]), 2),
+                                         dimnames = list(NULL, NULL, c("effects", "costs")))
+        array_time_ec[[time_i]][, , "effects"] <- e_rep_time[[time_i]][1 : ndisplay, 1:nrow(df_time_ec_cc[[time_i]])]
+        array_time_ec[[time_i]][, , "costs"] <- c_rep_time[[time_i]][1 : ndisplay, 1:nrow(df_time_ec_cc[[time_i]])]
+        df.values_time_biv[[time_i]] <- data.frame(values = apply(array_time_ec[[time_i]], 1, corr)[2, ])
+        p_time_biv[[time_i]] <- sum(df.values_time_biv[[time_i]]$values > stat_time_biv[[time_i]]) / length(df.values_time_biv[[time_i]]$values)
+        paste_p_time_biv[[time_i]] <- sprintf("Prob (T(y[rep]) > T(y)) = %0.3f", p_time_biv[[time_i]])
+      }
+      df_time_trt_ec <- df_time_trt_ec_cc <- stat_time_trt_biv <- array_time_trt_ec <- df.values_time_trt_biv <- p_time_trt_biv <- paste_p_time_trt_biv <- list()
+      for(time_trt_i in time_trt_lev) {
+        df_time_trt_ec[[time_trt_i]] <- df_ec[df_ec$time_trt == time_trt_i, ]
+        df_time_trt_ec_cc[[time_trt_i]] <- df_time_trt_ec[[time_trt_i]][complete.cases(df_time_trt_ec[[time_trt_i]]), ]
+        stat_time_trt_biv[[time_trt_i]] <- corr(df_time_trt_ec_cc[[time_trt_i]]$effects, df_time_trt_ec_cc[[time_trt_i]]$costs)
+        array_time_trt_ec[[time_trt_i]] <- array(NA, dim = c(ndisplay, nrow(df_time_trt_ec_cc[[time_trt_i]]), 2),
+                                                 dimnames = list(NULL, NULL, c("effects", "costs")))
+        array_time_trt_ec[[time_trt_i]][, , "effects"] <- e_rep_time_trt[[time_trt_i]][1 : ndisplay, 1:nrow(df_time_trt_ec_cc[[time_trt_i]])]
+        array_time_trt_ec[[time_trt_i]][, , "costs"] <- c_rep_time_trt[[time_trt_i]][1 : ndisplay, 1:nrow(df_time_trt_ec_cc[[time_trt_i]])]
+        df.values_time_trt_biv[[time_trt_i]] <- data.frame(values = apply(array_time_trt_ec[[time_trt_i]], 1, corr)[2, ])
+        p_time_trt_biv[[time_trt_i]] <- sum(df.values_time_trt_biv[[time_trt_i]]$values > stat_time_trt_biv[[time_trt_i]]) / length(df.values_time_trt_biv[[time_trt_i]]$values)
+        paste_p_time_trt_biv[[time_trt_i]] <- sprintf("Prob (T(y[rep]) > T(y)) = %0.3f", p_time_trt_biv[[time_trt_i]])
+      }
+      df_time_biv0 <- data.frame(values = unlist(stat_time_biv), 
+                                 text = c(unlist(paste_p_time_biv)),
+                                 time = factor(as.character(1:n_time), levels = as.character(1:n_time)),
+                                 row.names = NULL)
+      df_biv_time <- data.frame(values = unlist(df.values_time_biv),
+                                time = factor(rep(as.character(1:n_time), each = ndisplay), levels = as.character(1:n_time)), 
+                                row.names = NULL)
+      df_time_trt_biv0 <- data.frame(values = unlist(stat_time_trt_biv), 
+                                     text = c(unlist(paste_p_time_trt_biv)),
+                                     time_trt = factor(time_trt_lev, levels = time_trt_lev),
+                                     row.names = NULL)
+      df_biv_time_trt <- data.frame(values = unlist(df.values_time_trt_biv),
+                                    time_trt = factor(rep(time_trt_lev, each = ndisplay), levels = time_trt_lev), 
+                                    row.names = NULL)
+      if(all(length(list.trt_name) == 1 & length(list.time_name) == 1)) {
+        if(list.time_name %in% as.character(1:n_time)) {
+          if(list.trt_name == "none"){
+            df_biv_gplot <- df_biv_time[df_biv_time$time %in% as.character(list.time_name), ]
+            df_biv0_gplot <- df_time_biv0[df_time_biv0$time %in% as.character(list.time_name), ]
+            df_biv_gplot$time <- factor(df_biv_gplot$time, levels = list.time_name)
+            df_biv0_gplot$time <- factor(df_biv0_gplot$time, levels = list.time_name)
+          }
+          if(list.trt_name %in% trt_lev){
+            df_biv_gplot <- df_biv_time_trt[df_biv_time_trt$time_trt %in% c(sapply(as.character(list.time_name), paste, as.character(list.trt_name), sep = ".")), ]
+            df_biv0_gplot <- df_time_trt_biv0[df_time_trt_biv0$time_trt %in% c(sapply(as.character(list.time_name), paste, as.character(list.trt_name), sep = ".")), ]
+            df_biv_gplot$time_trt <- factor(df_biv_gplot$time_trt, levels = c(sapply(as.character(list.time_name), paste, as.character(list.trt_name), sep = ".")))
+            df_biv0_gplot$time_trt <- factor(df_biv0_gplot$time_trt, levels = c(sapply(as.character(list.time_name), paste, as.character(list.trt_name), sep = ".")))
+          }
+        }
+      }
+      if(all(length(list.trt_name) == 1 & length(list.time_name) > 1)) { 
+        if(all(list.trt_name == "none" & list.time_name %in% as.character(1:n_time))){
+          df_biv_gplot <- df_biv_time[df_biv_time$time %in% as.character(list.time_name), ]
+          df_biv0_gplot <- df_time_biv0[df_time_biv0$time %in% as.character(list.time_name), ]
+          df_biv_gplot$time <- factor(df_biv_gplot$time, levels = list.time_name)
+          df_biv0_gplot$time <- factor(df_biv0_gplot$time, levels = list.time_name)}
+        if(all(list.trt_name %in% trt_lev & all(list.time_name %in% as.character(1:n_time)))){
+          df_biv_gplot <- df_biv_time_trt[df_biv_time_trt$time_trt %in% c(sapply(as.character(list.time_name), paste, as.character(list.trt_name), sep = ".")), ]
+          df_biv0_gplot <- df_time_trt_biv0[df_time_trt_biv0$time_trt %in% c(sapply(as.character(list.time_name), paste, as.character(list.trt_name), sep = ".")), ]
+          df_biv_gplot$time_trt <- factor(df_biv_gplot$time_trt, levels = c(sapply(as.character(list.time_name), paste, as.character(list.trt_name), sep = ".")))
+          df_biv0_gplot$time_trt <- factor(df_biv0_gplot$time_trt, levels = c(sapply(as.character(list.time_name), paste, as.character(list.trt_name), sep = ".")))}
+      }
+      if(all(length(list.trt_name) > 1 & length(list.time_name) == 1)) {
+        if(all(all(list.trt_name %in% trt_lev) & list.time_name %in% as.character(1:n_time))){
+          df_biv_gplot <- df_biv_time_trt[df_biv_time_trt$time_trt %in% c(sapply(as.character(list.time_name), paste, as.character(list.trt_name), sep = ".")), ]
+          df_biv0_gplot <- df_time_trt_biv0[df_time_trt_biv0$time_trt %in% c(sapply(as.character(list.time_name), paste, as.character(list.trt_name), sep = ".")), ]
+          df_biv_gplot$time_trt <- factor(df_biv_gplot$time_trt, levels = c(sapply(as.character(list.time_name), paste, as.character(list.trt_name), sep = ".")))
+          df_biv0_gplot$time_trt <- factor(df_biv0_gplot$time_trt, levels = c(sapply(as.character(list.time_name), paste, as.character(list.trt_name), sep = ".")))}
+      }
+      if(all(length(list.trt_name) > 1 & length(list.time_name) > 1)) {
+        if(all(all(list.trt_name %in% trt_lev) & all(list.time_name %in% as.character(1:n_time)))){
+          df_biv_gplot <- df_biv_time_trt[df_biv_time_trt$time_trt %in% c(sapply(as.character(list.time_name), paste, as.character(list.trt_name), sep = ".")), ]
+          df_biv0_gplot <- df_time_trt_biv0[df_time_trt_biv0$time_trt %in% c(sapply(as.character(list.time_name), paste, as.character(list.trt_name), sep = ".")), ]
+          df_biv_gplot$time_trt <- factor(df_biv_gplot$time_trt, levels = c(sapply(as.character(list.time_name), paste, as.character(list.trt_name), sep = ".")))
+          df_biv0_gplot$time_trt <- factor(df_biv0_gplot$time_trt, levels = c(sapply(as.character(list.time_name), paste, as.character(list.trt_name), sep = ".")))}
+      }
+    }  
+    color_sheme_rep <- color_scheme_get()[1]
+    color_sheme_rep_border <- color_scheme_get()[2]
+    color_sheme_obs <- color_scheme_get()[5]
+    color_sheme_obs_border <- color_scheme_get()[6]
+    set_theme <- bayesplot_theme_get()
+    if(!bpp) {
+      if(exists("bins", where = exArgs)) {bins = exArgs$bins} else { bins = 30}
+      if(exists("size", where = exArgs)) { size = exArgs$size} else { size = 0.5}
+        gplot_ppc <- ggplot2::ggplot(df_biv_gplot, ggplot2::aes(x = values)) + 
+          ggplot2::geom_histogram(fill = color_sheme_rep$light, 
+                                color = color_sheme_rep_border$light_highlight, bins =  bins) +
+          ggplot2::geom_vline(data = df_biv0_gplot, ggplot2::aes(xintercept = values), color = color_sheme_obs$dark, 
+                            linewidth = size * 1.5, linetype = "dashed")
+    }
+    if(bpp) {
+      if(exists("trim", where = exArgs)) { trim = exArgs$trim} else { trim = FALSE}
+      if(exists("size", where = exArgs)) { size = exArgs$size} else { size = 0.5}
+      if(exists("size.annotate", where = exArgs)) { size.annotate = exArgs$size.annotate} else { size.annotate = 3.5}
+      if(exists("alpha", where = exArgs)) { alpha = exArgs$alpha} else { alpha = 1} 
+      if(exists("vjust", where = exArgs)) { vjust = exArgs$vjust } else { vjust = 1}
+        gplot_ppc <- ggplot2::ggplot(df_biv_gplot, ggplot2::aes(x = values)) +
+          ggplot2::geom_density(fill = color_sheme_rep$light, color = color_sheme_rep_border$light_highlight, 
+                              trim = trim, linewidth = size, alpha = alpha) +
+          ggplot2::geom_vline(data = df_biv0_gplot, ggplot2::aes(xintercept = values), color = color_sheme_obs$dark, 
+                            linewidth = size * 1.5, linetype = "dashed") +
+          ggplot2::geom_text(data = df_biv0_gplot, mapping = ggplot2::aes(x = -Inf, y = Inf, label = text), 
+                           hjust = hjust, vjust = vjust, size = size.annotate)
+    }
+  }
+  gg_leg <- ggplot2::theme(legend.position = legend.pos)
+  if(theme == "classic") {
+    gg_par  <- ggplot2::theme(panel.grid.major = ggplot2::element_blank(), 
+                              panel.grid.minor = ggplot2::element_blank(), 
+                              panel.background = ggplot2::element_blank(), 
+                              axis.line = ggplot2::element_line(colour = "black"), 
+                              strip.background = ggplot2::element_rect(fill="white"), 
+                              strip.text.x = ggplot2::element_text(size = 12, color = "black", face = "bold"),
+                              strip.text.y = ggplot2::element_text(size = 12, color = "black", face = "bold"))
+  }
+  if(theme == "base") gg_par <- ggthemes::theme_base()
+  if(theme == "calc") gg_par <-  ggthemes::theme_calc()
+  if(theme == "economist") gg_par <- ggthemes::theme_economist()
+  if(theme == "excel") gg_par <- ggthemes::theme_excel()
+  if(theme == "few") gg_par <- ggthemes::theme_few()
+  if(theme == "538") gg_par <- ggthemes::theme_fivethirtyeight()
+  if(theme == "gdocs") gg_par <- ggthemes::theme_gdocs()
+  if(theme == "hc") gg_par <- ggthemes::theme_hc()
+  if(theme == "par") gg_par <- ggthemes::theme_par()
+  if(theme == "solarized") gg_par <- ggthemes::theme_solarized()
+  if(theme == "pander") gg_par <- ggthemes::theme_pander()
+  if(theme == "stata") gg_par <- ggthemes::theme_stata()
+  if(theme == "tufte") gg_par <- ggthemes::theme_tufte()
+  if(theme == "wsj") gg_par <- ggthemes::theme_wsj()
+  if(x$data_format == "wide") {
+  if(length(gplot_e) != 0) {
+    gplot_e <- gplot_e + gg_leg + gg_par
+    gplot_c <- gplot_c + gg_leg + gg_par
+    gplot_e_trt <- lapply(gplot_e_trt, function(x) x + gg_leg + gg_par)
+    gplot_c_trt <- lapply(gplot_c_trt, function(x) x + gg_leg + gg_par)
+      if(length(trt) == 1) {
+        if(trt == "none") {
+          if(outcome == "both") {
+            gplot_ppc <- ggpubr::ggarrange(gplot_e, gplot_c, labels = c("effects", "costs"), 
+                                         ncol = 2, nrow = 1, common.legend = TRUE, 
+                                         legend = legend.pos, hjust = hjust, vjust = vjust)
+          }
+          if(outcome == "effects") {
+            gplot_ppc <- ggpubr::ggarrange(gplot_e, labels = "effects", 
+                                           ncol = 1, nrow = 1, common.legend = TRUE, 
+                                           legend = legend.pos, hjust = hjust, vjust = vjust)            
+          }
+          if(outcome == "costs") {
+            gplot_ppc <- ggpubr::ggarrange(gplot_c, labels = "costs", 
+                                           ncol = 1, nrow = 1, common.legend = TRUE, 
+                                           legend = legend.pos, hjust = hjust, vjust = vjust)            
+          }
+        } else if(trt == "all") {
+          if(outcome == "both") {
+            gplot_ppc <- ggpubr::ggarrange(plotlist = c(gplot_e_trt, gplot_c_trt), 
+                                         labels = c(paste("effects", names(gplot_e_trt), sep = " "),
+                                                    paste("costs", names(gplot_e_trt), sep = " ")),
+                                         ncol = length(names(gplot_e_trt)), nrow = 2, common.legend = TRUE,
+                                         legend = legend.pos, hjust = hjust, vjust = vjust)  
+          }
+          if(outcome == "effects") {
+            gplot_ppc <- ggpubr::ggarrange(plotlist = gplot_e_trt, 
+                                           labels = paste("effects", names(gplot_e_trt), sep = " "),
+                                           ncol = length(names(gplot_e_trt)), nrow = 1, common.legend = TRUE,
+                                           legend = legend.pos, hjust = hjust, vjust = vjust)           
+          }
+          if(outcome == "costs") {
+            gplot_ppc <- ggpubr::ggarrange(plotlist = gplot_c_trt, 
+                                           labels = paste("costs", names(gplot_c_trt), sep = " "),
+                                           ncol = length(names(gplot_c_trt)), nrow = 1, common.legend = TRUE,
+                                           legend = legend.pos, hjust = hjust, vjust = vjust)           
+          }          
+        } else {
+            gplot_e_trt <- gplot_e_trt[list.trt_name]; gplot_c_trt <- gplot_c_trt[list.trt_name]
+          if(outcome == "both") {
+            gplot_ppc <- ggpubr::ggarrange(plotlist = c(gplot_e_trt, gplot_c_trt), 
+                                         labels = c(paste("effects", names(gplot_e_trt), sep = " "),
+                                                    paste("costs", names(gplot_e_trt), sep = " ")),
+                                         ncol = length(names(gplot_e_trt)), nrow = 2, common.legend = TRUE,
+                                         legend = legend.pos, hjust = hjust, vjust = vjust)
+          }
+          if(outcome == "effects") {
+            gplot_ppc <- ggpubr::ggarrange(plotlist = gplot_e_trt, 
+                                           labels = paste("effects", names(gplot_e_trt), sep = " "),
+                                           ncol = length(names(gplot_e_trt)), nrow = 1, common.legend = TRUE,
+                                           legend = legend.pos, hjust = hjust, vjust = vjust)          
+          }
+          if(outcome == "costs") {
+            gplot_ppc <- ggpubr::ggarrange(plotlist = gplot_c_trt, 
+                                             labels = paste("costs", names(gplot_c_trt), sep = " "),
+                                             ncol = length(names(gplot_c_trt)), nrow = 1, common.legend = TRUE,
+                                             legend = legend.pos, hjust = hjust, vjust = vjust)          
+          }            
+        }
+      }
+      if(length(trt) > 1) {
+        gplot_e_trt <- gplot_e_trt[list.trt_name]; gplot_c_trt <- gplot_c_trt[list.trt_name]
+        if(outcome == "both") {
+          gplot_ppc <- ggpubr::ggarrange(plotlist = c(gplot_e_trt, gplot_c_trt), 
+                                         labels = c(paste("effects", names(gplot_e_trt), sep = " "),
+                                                    paste("costs", names(gplot_e_trt), sep = " ")),
+                                         ncol = length(names(gplot_e_trt)), nrow = 2, common.legend = TRUE,
+                                         legend = legend.pos, hjust = hjust, vjust = vjust)
+        }
+        if(outcome == "effects") {
+          gplot_ppc <- ggpubr::ggarrange(plotlist = gplot_e_trt, 
+                                         labels = paste("effects", names(gplot_e_trt), sep = " "),
+                                         ncol = length(names(gplot_e_trt)), nrow = 1, common.legend = TRUE,
+                                         legend = legend.pos, hjust = hjust, vjust = vjust)          
+        }
+        if(outcome == "costs") {
+          gplot_ppc <- ggpubr::ggarrange(plotlist = gplot_c_trt, 
+                                         labels = paste("costs", names(gplot_c_trt), sep = " "),
+                                         ncol = length(names(gplot_c_trt)), nrow = 1, common.legend = TRUE,
+                                         legend = legend.pos, hjust = hjust, vjust = vjust)          
+        } 
+      }
+  }
+  if(length(gplot_e) == 0) {
+    if(length(list.trt_name) == 1) { 
+      if(list.trt_name == "none"){
+        if(is.null(corr)) {
+          gplot_ppc <- gplot_ppc + ggplot2::facet_wrap( ~ outcome, scales = "free")}
+      }
+      if(list.trt_name %in% trt_lev){
+        if(is.null(corr)) {
+          gplot_ppc <- gplot_ppc + ggplot2::facet_wrap( ~ outcome, scales = "free")}
+      }
+    }
+    if(length(list.trt_name) > 1) {
+      if(all(list.trt_name %in% trt_lev)){
+        if(is.null(corr)) {
+        gplot_ppc <- gplot_ppc + ggplot2::facet_wrap(outcome ~ trt, scales = "free")
+        } else {
+        gplot_ppc <- gplot_ppc + ggplot2::facet_wrap( ~ trt, scales = "free")
+        }
+      }
+      if(!any(list.trt_name %in% trt_lev)){
+        stop("Please provide only valid treatment names or values.")
+      }
+    }
+  }
   }
   if(x$data_format == "long") {
-    if(is.numeric(ndisplay) == FALSE |  ndisplay < 1 | ndisplay > dim(x$model_output$`model summary`$BUGSoutput$sims.list$mu_e1)[1]) {
-      stop("number of replications to display is not valid")
-    }
-    if(is.null(time_plot) == FALSE) {
-      if(time_plot < 1 | time_plot > dim(x$data_set$effects$Control)[2] | is.numeric(time_plot) == FALSE | isTRUE(all.equal(time_plot, as.integer(time_plot))) == FALSE) {
-        stop("Time must be a numeric integer. Minimum time is 1 (baseline) and maximum time is the latest follow-up time in the data")
-      }
-    }
-    index_mis_e1 <- which(is.na(x$data_set$effects$Control), arr.ind = TRUE)
-    index_mis_e2 <- which(is.na(x$data_set$effects$Intervention), arr.ind = TRUE)
-    index_mis_c1 <- which(is.na(x$data_set$costs$Control), arr.ind = TRUE)
-    index_mis_c2 <- which(is.na(x$data_set$costs$Intervention), arr.ind = TRUE)
-    if(length(index_mis_e1) == 0 | length(index_mis_e2) == 0) {
-      stop("Missing values not found for the effects in both arms")
-    } 
-    if(length(index_mis_c1) == 0 | length(index_mis_c2) == 0) {
-      stop("Missing values not found for the costs in both arms")
-    } 
-    mis_e1_na <- is.na(x$data_set$effects$Control)
-    mis_e2_na <- is.na(x$data_set$effects$Intervention)
-    mis_c1_na <- is.na(x$data_set$costs$Control)
-    mis_c2_na <- is.na(x$data_set$costs$Intervention)
-    e1_obs <- replicate(dim(mis_e1_na)[2], list())
-    e2_obs <- replicate(dim(mis_e2_na)[2], list())
-    c1_obs <- replicate(dim(mis_c1_na)[2], list())
-    c2_obs <- replicate(dim(mis_c2_na)[2], list())
-    for(time in 1:dim(mis_e1_na)[2]) {
-      e1_obs[[time]] <- x$data_set$effects$Control[mis_e1_na[, time] == FALSE, time]
-      e2_obs[[time]] <- x$data_set$effects$Intervention[mis_e2_na[, time] == FALSE, time]
-      c1_obs[[time]] <- x$data_set$costs$Control[mis_c1_na[, time] == FALSE, time]
-      c2_obs[[time]] <- x$data_set$costs$Intervention[mis_c2_na[, time] == FALSE, time]
-    }
-    n1_e <- n2_e <- n1_c <- n2_c <- rep(NA, dim(mis_e1_na)[2])
-    n1_e <- unlist(lapply(e1_obs, length))
-    n1_c <- unlist(lapply(c1_obs, length))
-    n2_e <- unlist(lapply(e2_obs, length))
-    n2_c <- unlist(lapply(c2_obs, length))
-    e1_rep <- replicate(dim(mis_e1_na)[2], list())
-    e2_rep <- replicate(dim(mis_e2_na)[2], list())
-    c1_rep <- replicate(dim(mis_c1_na)[2], list())
-    c2_rep <- replicate(dim(mis_c2_na)[2], list())
-    for(time in 1:dim(mis_e1_na)[2]) {
-      e1_rep[[time]] <- matrix(NA, nrow = x$model_output$`model summary`$BUGSoutput$n.iter, n1_e[time])
-      c1_rep[[time]] <- matrix(NA, nrow = x$model_output$`model summary`$BUGSoutput$n.iter, n1_c[time])
-      e2_rep[[time]] <- matrix(NA, nrow = x$model_output$`model summary`$BUGSoutput$n.iter, n2_e[time])
-      c2_rep[[time]] <- matrix(NA, nrow = x$model_output$`model summary`$BUGSoutput$n.iter, n2_c[time])
-    }
-    if(x$model_output$dist_e == "norm") {
-      mu_e1 <- replicate(dim(mis_e1_na)[2], list())
-      mu_e2 <- replicate(dim(mis_e2_na)[2], list())
-      for(time in 1:dim(mis_e1_na)[2]) {
-        mu_e1[[time]] <- x$model_output$`model summary`$BUGSoutput$sims.list$mu_e1[, mis_e1_na[, time] == FALSE, time]
-        mu_e2[[time]] <- x$model_output$`model summary`$BUGSoutput$sims.list$mu_e2[, mis_e2_na[, time] == FALSE, time]
-        if(is.null(dim(mu_e1[[time]])) == TRUE | is.null(dim(mu_e2[[time]])) == TRUE){
-          stop("Not possible to plot posterior predictive checks with a single observed effect value in one arm at any time point.")
+    if(length(gplot_e_time) != 0) {
+      names(gplot_e_time) <- names(gplot_c_time) <- as.character(1:n_time)
+      gplot_e_time <- lapply(gplot_e_time, function(x) x + gg_leg + gg_par)
+      gplot_c_time <- lapply(gplot_c_time, function(x) x + gg_leg + gg_par)
+      gplot_e_time_trt <- lapply(gplot_e_time_trt, function(x) x + gg_leg + gg_par)
+      gplot_c_time_trt <- lapply(gplot_c_time_trt, function(x) x + gg_leg + gg_par)
+      if(all(length(trt) == 1 & length(list.time_name) == 1) | all(length(trt) == 1 & length(list.time_name) > 1)) {
+        if(trt == "none"){
+          gplot_e_time <- gplot_e_time[list.time_name]; gplot_c_time <- gplot_c_time[list.time_name]
+          if(outcome == "both") {
+            gplot_ppc <- ggpubr::ggarrange(plotlist = c(gplot_e_time, gplot_c_time), 
+                                           labels = c(paste("effects", names(gplot_e_time), sep = " "),
+                                                      paste("costs", names(gplot_e_time), sep = " ")),
+                                           ncol = length(names(gplot_e_time)), nrow = 2, common.legend = TRUE,
+                                           legend = legend.pos, hjust = hjust, vjust = vjust)
+          }
+          if(outcome == "effects") {
+            gplot_ppc <- ggpubr::ggarrange(plotlist = gplot_e_time, 
+                                           labels = paste("effects", names(gplot_e_time), sep = " "),
+                                           ncol = length(names(gplot_e_time)), nrow = 1, common.legend = TRUE,
+                                           legend = legend.pos, hjust = hjust, vjust = vjust)            
+          }
+          if(outcome == "costs") {
+            gplot_ppc <- ggpubr::ggarrange(plotlist = gplot_c_time, 
+                                           labels = paste("costs", names(gplot_c_time), sep = " "),
+                                           ncol = length(names(gplot_c_time)), nrow = 1, common.legend = TRUE,
+                                           legend = legend.pos, hjust = hjust, vjust = vjust)           
+          }
+        } else if(trt == "all") {
+          list.trt_name_select <- c(sapply(as.character(list.time_name), paste, as.character(list.trt_name), sep = "."))
+          gplot_e_time_trt <- gplot_e_time_trt[list.trt_name_select]; gplot_c_time_trt <- gplot_c_time_trt[list.trt_name_select]
+          if(outcome == "both") {
+            gplot_ppc <- ggpubr::ggarrange(plotlist = c(gplot_e_time_trt, gplot_c_time_trt), 
+                                           labels = c(paste("effects", names(gplot_e_time_trt), sep = " "),
+                                                      paste("costs", names(gplot_e_time_trt), sep = " ")),
+                                           ncol = length(names(gplot_e_time_trt)), nrow = 2, common.legend = TRUE,
+                                           legend = legend.pos, hjust = hjust, vjust = vjust)  
+          }
+          if(outcome == "effects") {
+            gplot_ppc <- ggpubr::ggarrange(plotlist = gplot_e_time_trt, 
+                                           labels = paste("effects", names(gplot_e_time_trt), sep = " "),
+                                           ncol = length(names(gplot_e_time_trt)), nrow = 1, common.legend = TRUE,
+                                           legend = legend.pos, hjust = hjust, vjust = vjust)           
+          }
+          if(outcome == "costs") {
+            gplot_ppc <- ggpubr::ggarrange(plotlist = gplot_c_time_trt, 
+                                           labels = paste("costs", names(gplot_c_time_trt), sep = " "),
+                                           ncol = length(names(gplot_c_time_trt)), nrow = 1, common.legend = TRUE,
+                                           legend = legend.pos, hjust = hjust, vjust = vjust)           
+          } 
+        } else {
+          list.trt_name_select <- c(sapply(as.character(list.time_name), paste, as.character(list.trt_name), sep = "."))
+          gplot_e_time_trt <- gplot_e_time_trt[list.trt_name_select]; gplot_c_time_trt <- gplot_c_time_trt[list.trt_name_select]
+          if(outcome == "both") {
+            gplot_ppc <- ggpubr::ggarrange(plotlist = c(gplot_e_time_trt, gplot_c_time_trt), 
+                                           labels = c(paste("effects", names(gplot_e_time_trt), sep = " "),
+                                                      paste("costs", names(gplot_e_time_trt), sep = " ")),
+                                           ncol = length(names(gplot_e_time_trt)), nrow = 2, common.legend = TRUE,
+                                           legend = legend.pos, hjust = hjust, vjust = vjust)
+          }
+          if(outcome == "effects") {
+            gplot_ppc <- ggpubr::ggarrange(plotlist = gplot_e_time_trt, 
+                                           labels = paste("effects", names(gplot_e_time_trt), sep = " "),
+                                           ncol = length(names(gplot_e_time_trt)), nrow = 1, common.legend = TRUE,
+                                           legend = legend.pos, hjust = hjust, vjust = vjust)          
+          }
+          if(outcome == "costs") {
+            gplot_ppc <- ggpubr::ggarrange(plotlist = gplot_c_time_trt, 
+                                           labels = paste("costs", names(gplot_c_time_trt), sep = " "),
+                                           ncol = length(names(gplot_c_time_trt)), nrow = 1, common.legend = TRUE,
+                                           legend = legend.pos, hjust = hjust, vjust = vjust)          
+          }
         }
       }
-      if(grepl("LONG", x$model_output$type) == TRUE){
-        sigma_e1 <- matrix(NA, nrow = x$model_output$`model summary`$BUGSoutput$n.iter, ncol = dim(mis_e1_na)[2])
-        sigma_e2 <- matrix(NA, nrow = x$model_output$`model summary`$BUGSoutput$n.iter, ncol = dim(mis_e2_na)[2])
-        for(time in 1:dim(mis_e1_na)[2]) {
-          sigma_e1[, time] <- 1 / sqrt(x$model_output$`model summary`$BUGSoutput$sims.list$tau_e[, 1, time])
-          sigma_e2[, time] <- 1 / sqrt(x$model_output$`model summary`$BUGSoutput$sims.list$tau_e[, 2, time])
-          for(i in 1 : nrow(e1_rep[[time]])){ e1_rep[[time]][i, ] <- rnorm(n1_e[[time]], mean = mu_e1[[time]][i, ], sd = sigma_e1[i, time]) } 
-          for(i in 1 : nrow(e2_rep[[time]])){ e2_rep[[time]][i, ] <- rnorm(n2_e[[time]], mean = mu_e2[[time]][i, ], sd = sigma_e2[i, time]) }
+      if(all(length(trt) > 1 & length(list.time_name) == 1) | all(length(trt) > 1 & length(list.time_name) > 1)) {
+        list.trt_name_select <- c(sapply(as.character(list.time_name), paste, as.character(list.trt_name), sep = "."))
+        gplot_e_time_trt <- gplot_e_time_trt[list.trt_name_select]; gplot_c_time_trt <- gplot_c_time_trt[list.trt_name_select]
+        if(outcome == "both") {
+          gplot_ppc <- ggpubr::ggarrange(plotlist = c(gplot_e_time_trt, gplot_c_time_trt), 
+                                         labels = c(paste("effects", names(gplot_e_time_trt), sep = " "),
+                                                    paste("costs", names(gplot_e_time_trt), sep = " ")),
+                                         ncol = length(names(gplot_e_time_trt)), nrow = 2, common.legend = TRUE,
+                                         legend = legend.pos, hjust = hjust, vjust = vjust)
         }
-      }
-    } else if(x$model_output$dist_e == "logis") {
-      mu_e1 <- replicate(dim(mis_e1_na)[2], list())
-      mu_e2 <- replicate(dim(mis_e2_na)[2], list())
-      for(time in 1:dim(mis_e1_na)[2]) {
-        mu_e1[[time]] <- x$model_output$`model summary`$BUGSoutput$sims.list$mu_e1[, mis_e1_na[, time] == FALSE, time]
-        mu_e2[[time]] <- x$model_output$`model summary`$BUGSoutput$sims.list$mu_e2[, mis_e2_na[, time] == FALSE, time]
-        if(is.null(dim(mu_e1[[time]])) == TRUE | is.null(dim(mu_e2[[time]])) == TRUE){
-          stop("Not possible to plot posterior predictive checks with a single observed effect value in one arm at any time point.")
+        if(outcome == "effects") {
+          gplot_ppc <- ggpubr::ggarrange(plotlist = gplot_e_time_trt, 
+                                         labels = paste("effects", names(gplot_e_time_trt), sep = " "),
+                                         ncol = length(names(gplot_e_time_trt)), nrow = 1, common.legend = TRUE,
+                                         legend = legend.pos, hjust = hjust, vjust = vjust)          
         }
-      }
-      if(grepl("LONG", x$model_output$type) == TRUE){
-        scale_e1 <- matrix(NA, nrow = x$model_output$`model summary`$BUGSoutput$n.iter, ncol = dim(mis_e1_na)[2])
-        scale_e2 <- matrix(NA, nrow = x$model_output$`model summary`$BUGSoutput$n.iter, ncol = dim(mis_e2_na)[2])
-        for(time in 1:dim(mis_e1_na)[2]) {
-          scale_e1[, time] <- 1 / x$model_output$`model summary`$BUGSoutput$sims.list$tau_e[, 1, time]
-          scale_e2[, time] <- 1 / x$model_output$`model summary`$BUGSoutput$sims.list$tau_e[, 2, time]
-          for(i in 1 : nrow(e1_rep[[time]])){ e1_rep[[time]][i, ] <- rlogis(n1_e[[time]], location = mu_e1[[time]][i, ], scale = scale_e1[i, time]) } 
-          for(i in 1 : nrow(e2_rep[[time]])){ e2_rep[[time]][i, ] <- rlogis(n2_e[[time]], location = mu_e2[[time]][i, ], scale = scale_e2[i, time]) }
-        }
-      }
-    } else if(x$model_output$dist_e == "nbinom") {
-      mu_e1 <- replicate(dim(mis_e1_na)[2], list())
-      mu_e2 <- replicate(dim(mis_e2_na)[2], list())
-      for(time in 1:dim(mis_e1_na)[2]) {
-        mu_e1[[time]] <- x$model_output$`model summary`$BUGSoutput$sims.list$mu_e1[, mis_e1_na[, time] == FALSE, time]
-        mu_e2[[time]] <- x$model_output$`model summary`$BUGSoutput$sims.list$mu_e2[, mis_e2_na[, time] == FALSE, time]
-        if(is.null(dim(mu_e1[[time]])) == TRUE | is.null(dim(mu_e2[[time]])) == TRUE){
-          stop("Not possible to plot posterior predictive checks with a single observed effect value in one arm at any time point.")
-        }
-      }
-      if(grepl("LONG", x$model_output$type) == TRUE){
-        prob_e1 <- replicate(dim(mis_e1_na)[2], list())
-        prob_e2 <- replicate(dim(mis_e2_na)[2], list())
-        size_e1 <- matrix(NA, nrow = x$model_output$`model summary`$BUGSoutput$n.iter, ncol = dim(mis_e1_na)[2])
-        size_e2 <- matrix(NA, nrow = x$model_output$`model summary`$BUGSoutput$n.iter, ncol = dim(mis_e2_na)[2])
-        for(time in 1:dim(mis_e1_na)[2]) {
-          prob_e1[[time]] <- x$model_output$`model summary`$BUGSoutput$sims.list$tau_e[, 1, time] / (x$model_output$`model summary`$BUGSoutput$sims.list$tau_e[, 1, time] + x$model_output$`model summary`$BUGSoutput$sims.list$mu_e1[, mis_e1_na[, time] == FALSE, time])
-          prob_e2[[time]] <- x$model_output$`model summary`$BUGSoutput$sims.list$tau_e[, 2, time] / (x$model_output$`model summary`$BUGSoutput$sims.list$tau_e[, 2, time] + x$model_output$`model summary`$BUGSoutput$sims.list$mu_e2[, mis_e2_na[, time] == FALSE, time])
-          size_e1[, time] <- x$model_output$`model summary`$BUGSoutput$sims.list$tau_e[, 1, time]
-          size_e2[, time] <- x$model_output$`model summary`$BUGSoutput$sims.list$tau_e[, 2, time]
-          for(i in 1 : nrow(e1_rep[[time]])){ e1_rep[[time]][i, ] <- rnbinom(n1_e[[time]], prob = prob_e1[[time]][i, ], size = size_e1[i, time]) } 
-          for(i in 1 : nrow(e2_rep[[time]])){ e2_rep[[time]][i, ] <- rnbinom(n2_e[[time]], prob = prob_e2[[time]][i, ], size = size_e2[i, time]) }
-        }
-      }
-    } else if(x$model_output$dist_e == "exp") {
-      mu_e1 <- replicate(dim(mis_e1_na)[2], list())
-      mu_e2 <- replicate(dim(mis_e2_na)[2], list())
-      rate_e1 <- replicate(dim(mis_e1_na)[2], list())
-      rate_e2 <- replicate(dim(mis_e2_na)[2], list())
-      for(time in 1:dim(mis_e1_na)[2]) {
-        mu_e1[[time]] <- x$model_output$`model summary`$BUGSoutput$sims.list$mu_e1[, mis_e1_na[, time] == FALSE, time]
-        mu_e2[[time]] <- x$model_output$`model summary`$BUGSoutput$sims.list$mu_e2[, mis_e2_na[, time] == FALSE, time]
-        if(is.null(dim(mu_e1[[time]])) == TRUE | is.null(dim(mu_e2[[time]])) == TRUE){
-          stop("Not possible to plot posterior predictive checks with a single observed effect value in one arm at any time point.")
-        }
-        rate_e1[[time]] <- 1 / mu_e1[[time]]
-        rate_e2[[time]] <- 1 / mu_e2[[time]]
-        for(i in 1 : nrow(e1_rep[[time]])){ e1_rep[[time]][i, ] <- rexp(n1_e[[time]], rate = rate_e1[[time]][i, ]) } 
-        for(i in 1 : nrow(e2_rep[[time]])){ e2_rep[[time]][i, ] <- rexp(n2_e[[time]], rate = rate_e2[[time]][i, ]) }
-      }
-    } else if(x$model_output$dist_e == "bern" | x$model_output$dist_e == "pois") {
-      mu_e1 <- replicate(dim(mis_e1_na)[2], list())
-      mu_e2 <- replicate(dim(mis_e2_na)[2], list())
-      for(time in 1:dim(mis_e1_na)[2]) {
-        mu_e1[[time]] <- x$model_output$`model summary`$BUGSoutput$sims.list$mu_e1[, mis_e1_na[, time] == FALSE, time]
-        mu_e2[[time]] <- x$model_output$`model summary`$BUGSoutput$sims.list$mu_e2[, mis_e2_na[, time] == FALSE, time]
-        if(is.null(dim(mu_e1[[time]])) == TRUE | is.null(dim(mu_e2[[time]])) == TRUE){
-          stop("Not possible to plot posterior predictive checks with a single observed effect value in one arm at any time point.")
-        }
-        if(x$model_output$dist_e == "bern"){
-          for(i in 1 : nrow(e1_rep[[time]])){ e1_rep[[time]][i, ] <- rbinom(n1_e[[time]], size = 1, prob = mu_e1[[time]][i, ]) } 
-          for(i in 1 : nrow(e2_rep[[time]])){ e2_rep[[time]][i, ] <- rbinom(n2_e[[time]], size = 1, prob = mu_e2[[time]][i, ]) }
-        }
-        if(x$model_output$dist_e == "pois"){
-          for(i in 1 : nrow(e1_rep[[time]])){ e1_rep[[time]][i, ] <- rpois(n1_e[[time]], lambda = mu_e1[[time]][i, ]) } 
-          for(i in 1 : nrow(e2_rep[[time]])){ e2_rep[[time]][i, ] <- rpois(n2_e[[time]], lambda = mu_e2[[time]][i, ]) }
-        }
-      }
-    } else if(x$model_output$dist_e == "gamma") {
-      shape_e1 <- rate_e1 <- replicate(dim(mis_e1_na)[2], list())
-      shape_e2 <- rate_e2 <- replicate(dim(mis_e2_na)[2], list())
-      for(time in 1:dim(mis_e1_na)[2]) {
-        shape_e1[[time]] <- x$model_output$`model summary`$BUGSoutput$sims.list$mu_e1[, mis_e1_na[, time] == FALSE, time] * x$model_output$`model summary`$BUGSoutput$sims.list$tau_e1[, mis_e1_na[, time] == FALSE, time]
-        rate_e1[[time]] <- x$model_output$`model summary`$BUGSoutput$sims.list$tau_e1[, mis_e1_na[, time] == FALSE, time]
-        shape_e2[[time]] <- x$model_output$`model summary`$BUGSoutput$sims.list$mu_e2[, mis_e2_na[, time] == FALSE, time] * x$model_output$`model summary`$BUGSoutput$sims.list$tau_e2[, mis_e2_na[, time] == FALSE, time]
-        rate_e2[[time]] <- x$model_output$`model summary`$BUGSoutput$sims.list$tau_e2[, mis_e2_na[, time] == FALSE, time]
-        if(is.null(dim(shape_e1[[time]])) == TRUE | is.null(dim(shape_e2[[time]])) == TRUE){
-          stop("Not possible to plot posterior predictive checks with a single observed effect value in one arm at any time point.")
-        }
-        for(i in 1 : nrow(e1_rep[[time]])){ e1_rep[[time]][i, ] <- rgamma(n1_e[[time]], shape = shape_e1[[time]][i, ], rate = rate_e1[[time]][i, ]) } 
-        for(i in 1 : nrow(e2_rep[[time]])){ e2_rep[[time]][i, ] <- rgamma(n2_e[[time]], shape = shape_e2[[time]][i, ], rate = rate_e2[[time]][i, ]) }
-      }
-    } else if(x$model_output$dist_e == "weibull") {
-      shape_e1 <- scale_e1 <- replicate(dim(mis_e1_na)[2], list())
-      shape_e2 <- scale_e2 <- replicate(dim(mis_e2_na)[2], list())
-      for(time in 1:dim(mis_e1_na)[2]) {
-        shape_e1[[time]] <- x$model_output$`model summary`$BUGSoutput$sims.list$tau_e1[, mis_e1_na[, time] == FALSE, time]
-        scale_e1[[time]] <- 1/((x$model_output$`model summary`$BUGSoutput$sims.list$mu_e1[, mis_e1_na[, time] == FALSE, time] / exp(lgamma(1 + 1 / x$model_output$`model summary`$BUGSoutput$sims.list$tau_e1[, mis_e1_na[, time] == FALSE, time])))^(1/x$model_output$`model summary`$BUGSoutput$sims.list$tau_e1[, mis_e1_na[, time] == FALSE, time]))
-        shape_e2[[time]] <- x$model_output$`model summary`$BUGSoutput$sims.list$tau_e2[, mis_e2_na[, time] == FALSE, time]
-        scale_e2[[time]] <- 1/((x$model_output$`model summary`$BUGSoutput$sims.list$mu_e2[, mis_e2_na[, time] == FALSE, time] / exp(lgamma(1 + 1 / x$model_output$`model summary`$BUGSoutput$sims.list$tau_e2[, mis_e2_na[, time] == FALSE, time])))^(1/x$model_output$`model summary`$BUGSoutput$sims.list$tau_e2[, mis_e2_na[, time] == FALSE, time]))
-        if(is.null(dim(shape_e1[[time]])) == TRUE | is.null(dim(shape_e2[[time]])) == TRUE){
-          stop("Not possible to plot posterior predictive checks with a single observed effect value in one arm at any time point.")
-        }
-        for(i in 1 : nrow(e1_rep[[time]])){ e1_rep[[time]][i, ] <- rweibull(n1_e[[time]], shape = shape_e1[[time]][i, ], scale = scale_e1[[time]][i, ]) } 
-        for(i in 1 : nrow(e2_rep[[time]])){ e2_rep[[time]][i, ] <- rweibull(n2_e[[time]], shape = shape_e2[[time]][i, ], scale = scale_e2[[time]][i, ]) }
-      }
-    } else if(x$model_output$dist_e == "beta") {
-      shape1_e1 <- shape2_e1 <- replicate(dim(mis_e1_na)[2], list())
-      shape1_e2 <- shape2_e2 <- replicate(dim(mis_e2_na)[2], list())
-      for(time in 1:dim(mis_e1_na)[2]) {
-        shape1_e1[[time]] <- x$model_output$`model summary`$BUGSoutput$sims.list$mu_e1[, mis_e1_na[, time] == FALSE, time] * x$model_output$`model summary`$BUGSoutput$sims.list$tau_e1[, mis_e1_na[, time] == FALSE, time]
-        shape2_e1[[time]] <- (1 - x$model_output$`model summary`$BUGSoutput$sims.list$mu_e1[, mis_e1_na[, time] == FALSE, time]) * x$model_output$`model summary`$BUGSoutput$sims.list$tau_e1[, mis_e1_na[, time] == FALSE, time]
-        shape1_e2[[time]] <- x$model_output$`model summary`$BUGSoutput$sims.list$mu_e2[, mis_e2_na[, time] == FALSE, time] * x$model_output$`model summary`$BUGSoutput$sims.list$tau_e2[, mis_e2_na[, time] == FALSE, time]
-        shape2_e2[[time]] <- (1 - x$model_output$`model summary`$BUGSoutput$sims.list$mu_e2[, mis_e2_na[, time] == FALSE, time]) * x$model_output$`model summary`$BUGSoutput$sims.list$tau_e2[, mis_e2_na[, time] == FALSE, time]
-        if(is.null(dim(shape1_e1[[time]])) == TRUE | is.null(dim(shape1_e2[[time]])) == TRUE){
-          stop("Not possible to plot posterior predictive checks with a single observed effect value in one arm at any time point.")
-        }
-        for(i in 1 : nrow(e1_rep[[time]])){ e1_rep[[time]][i, ] <- rbeta(n1_e[[time]], shape1 = shape1_e1[[time]][i, ], shape2 = shape2_e1[[time]][i, ]) } 
-        for(i in 1 : nrow(e2_rep[[time]])){ e2_rep[[time]][i, ] <- rbeta(n2_e[[time]], shape1 = shape1_e2[[time]][i, ], shape2 = shape2_e1[[time]][i, ]) }
+        if(outcome == "costs") {
+          gplot_ppc <- ggpubr::ggarrange(plotlist = gplot_c_time_trt, 
+                                         labels = paste("costs", names(gplot_c_time_trt), sep = " "),
+                                         ncol = length(names(gplot_c_time_trt)), nrow = 1, common.legend = TRUE,
+                                         legend = legend.pos, hjust = hjust, vjust = vjust)          
+        } 
       }
     }
-    if(x$model_output$dist_c == "norm") {
-      mu_c1 <- replicate(dim(mis_c1_na)[2], list())
-      mu_c2 <- replicate(dim(mis_c2_na)[2], list())
-      for(time in 1:dim(mis_c1_na)[2]) {
-        mu_c1[[time]] <- x$model_output$`model summary`$BUGSoutput$sims.list$mu_c1[, mis_c1_na[, time] == FALSE, time]
-        mu_c2[[time]] <- x$model_output$`model summary`$BUGSoutput$sims.list$mu_c2[, mis_c2_na[, time] == FALSE, time]
-        if(is.null(dim(mu_c1[[time]])) == TRUE | is.null(dim(mu_c2[[time]])) == TRUE){
-          stop("Not possible to plot posterior predictive checks with a single observed effect value in one arm at any time point.")
+    if(length(gplot_e_time) == 0) {
+      if(all(length(list.trt_name) == 1 & length(list.time_name) == 1)) {
+        if(list.time_name %in% as.character(1:n_time)) {
+        if(list.trt_name == "none"){
+          if(is.null(corr)) {
+            gplot_ppc <- gplot_ppc + ggplot2::facet_wrap( ~ outcome, scales = "free")
+          } 
+        }
+        if(list.trt_name %in% trt_lev){
+          if(is.null(corr)) {
+            gplot_ppc <- gplot_ppc + ggplot2::facet_wrap(outcome ~ time_trt, scales = "free")
+          } else {
+            gplot_ppc <- gplot_ppc + ggplot2::facet_wrap( ~ time_trt, scales = "free")
+            }
+        }
         }
       }
-      if(grepl("LONG", x$model_output$type) == TRUE){
-        sigma_c1 <- matrix(NA, nrow = x$model_output$`model summary`$BUGSoutput$n.iter, ncol = dim(mis_c1_na)[2])
-        sigma_c2 <- matrix(NA, nrow = x$model_output$`model summary`$BUGSoutput$n.iter, ncol = dim(mis_c2_na)[2])
-        for(time in 1:dim(mis_c1_na)[2]) {
-          sigma_c1[, time] <- 1 / sqrt(x$model_output$`model summary`$BUGSoutput$sims.list$tau_c[, 1, time])
-          sigma_c2[, time] <- 1 / sqrt(x$model_output$`model summary`$BUGSoutput$sims.list$tau_c[, 2, time])
-          for(i in 1 : nrow(c1_rep[[time]])){ c1_rep[[time]][i, ] <- rnorm(n1_c[[time]], mean = mu_c1[[time]][i, ], sd = sigma_c1[i, time]) } 
-          for(i in 1 : nrow(c2_rep[[time]])){ c2_rep[[time]][i, ] <- rnorm(n2_c[[time]], mean = mu_c2[[time]][i, ], sd = sigma_c2[i, time]) }
+      if(all(length(list.trt_name) == 1 & length(list.time_name) > 1)) { 
+        if(all(list.trt_name == "none" & list.time_name %in% as.character(1:n_time))){
+          if(is.null(corr)) {
+            gplot_ppc <- gplot_ppc + ggplot2::facet_wrap(outcome ~ time, scales = "free")
+          } else {
+            gplot_ppc <- gplot_ppc + ggplot2::facet_wrap( ~ time, scales = "free")
+            }
+        }
+        if(all(list.trt_name %in% trt_lev & all(list.time_name %in% as.character(1:n_time)))){
+          if(is.null(corr)) {
+            gplot_ppc <- gplot_ppc + ggplot2::facet_wrap(outcome ~ time_trt, scales = "free")
+          } else {
+            gplot_ppc <- gplot_ppc + ggplot2::facet_wrap( ~ time_trt, scales = "free")
+          }
         }
       }
-    } else if(x$model_output$dist_c == "gamma") {
-      shape_c1 <- rate_c1 <- replicate(dim(mis_c1_na)[2], list())
-      shape_c2 <- rate_c2 <- replicate(dim(mis_c2_na)[2], list())
-      for(time in 1:dim(mis_c1_na)[2]) {
-        shape_c1[[time]] <- x$model_output$`model summary`$BUGSoutput$sims.list$mu_c1[, mis_c1_na[, time] == FALSE, time] * x$model_output$`model summary`$BUGSoutput$sims.list$tau_c1[, mis_c1_na[, time] == FALSE, time]
-        rate_c1[[time]] <- x$model_output$`model summary`$BUGSoutput$sims.list$tau_c1[, mis_c1_na[, time] == FALSE, time]
-        shape_c2[[time]] <- x$model_output$`model summary`$BUGSoutput$sims.list$mu_c2[, mis_c2_na[, time] == FALSE, time] * x$model_output$`model summary`$BUGSoutput$sims.list$tau_c2[, mis_c2_na[, time] == FALSE, time]
-        rate_c2[[time]] <- x$model_output$`model summary`$BUGSoutput$sims.list$tau_c2[, mis_c2_na[, time] == FALSE, time]
-        if(is.null(dim(shape_c1[[time]])) == TRUE | is.null(dim(shape_c2[[time]])) == TRUE){
-          stop("Not possible to plot posterior predictive checks with a single observed effect value in one arm at any time point.")
-        }
-        for(i in 1 : nrow(c1_rep[[time]])){ c1_rep[[time]][i, ] <- rgamma(n1_c[[time]], shape = shape_c1[[time]][i, ], rate = rate_c1[[time]][i, ]) } 
-        for(i in 1 : nrow(c2_rep[[time]])){ c2_rep[[time]][i, ] <- rgamma(n2_c[[time]], shape = shape_c2[[time]][i, ], rate = rate_c2[[time]][i, ]) }
-      }
-    } else if(x$model_output$dist_c == "lnorm") {
-      mu_c1 <- replicate(dim(mis_c1_na)[2], list())
-      mu_c2 <- replicate(dim(mis_c2_na)[2], list())
-      for(time in 1:dim(mis_c1_na)[2]) {
-        mu_c1[[time]] <- x$model_output$`model summary`$BUGSoutput$sims.list$lmu_c1[, mis_c1_na[, time] == FALSE, time]
-        mu_c2[[time]] <- x$model_output$`model summary`$BUGSoutput$sims.list$lmu_c2[, mis_c2_na[, time] == FALSE, time]
-        if(is.null(dim(mu_c1[[time]])) == TRUE | is.null(dim(mu_c2[[time]])) == TRUE){
-          stop("Not possible to plot posterior predictive checks with a single observed effect value in one arm at any time point.")
+      if(all(length(list.trt_name) > 1 & length(list.time_name) == 1)) {
+        if(all(all(list.trt_name %in% trt_lev) & list.time_name %in% as.character(1:n_time))){
+          if(is.null(corr)) {
+            gplot_ppc <- gplot_ppc + ggplot2::facet_wrap(outcome ~ time_trt, scales = "free")
+          } else {
+            gplot_ppc <- gplot_ppc + ggplot2::facet_wrap( ~ time_trt, scales = "free")
+          }
         }
       }
-      if(grepl("LONG", x$model_output$type) == TRUE){
-        sigma_c1 <- matrix(NA, nrow = x$model_output$`model summary`$BUGSoutput$n.iter, ncol = dim(mis_c1_na)[2])
-        sigma_c2 <- matrix(NA, nrow = x$model_output$`model summary`$BUGSoutput$n.iter, ncol = dim(mis_c2_na)[2])
-        for(time in 1:dim(mis_c1_na)[2]) {
-          sigma_c1[, time] <- 1 / sqrt(x$model_output$`model summary`$BUGSoutput$sims.list$ltau_c[, 1, time])
-          sigma_c2[, time] <- 1 / sqrt(x$model_output$`model summary`$BUGSoutput$sims.list$ltau_c[, 2, time])
-          for(i in 1 : nrow(c1_rep[[time]])){ c1_rep[[time]][i, ] <- rlnorm(n1_c[[time]], meanlog = mu_c1[[time]][i, ], sdlog = sigma_c1[i, time]) } 
-          for(i in 1 : nrow(c2_rep[[time]])){ c2_rep[[time]][i, ] <- rlnorm(n2_c[[time]], meanlog = mu_c2[[time]][i, ], sdlog = sigma_c2[i, time]) }
-        }
-      } 
-    }
-    color_scheme_set(scheme = scheme_set) 
-    ppc_plot_e1 <- replicate(dim(mis_e1_na)[2], list())
-    ppc_plot_e2 <- replicate(dim(mis_e2_na)[2], list())
-    ppc_plot_c1 <- replicate(dim(mis_c1_na)[2], list())
-    ppc_plot_c2 <- replicate(dim(mis_c2_na)[2], list())
-    if(type == "histogram") {
-      if(exists("binwidth_e", where = exArgs)) {binwidth_e = exArgs$binwidth_e} else {binwidth_e = 1 / 30 }
-      if(exists("binwidth_c", where = exArgs)) {binwidth_c = exArgs$binwidth_c} else {binwidth_c = 30 }
-      if(exists("breaks", where = exArgs)) {breaks = exArgs$breaks} else {breaks = NULL }
-      if(exists("freq", where = exArgs)) {freq = exArgs$freq} else {freq = TRUE }
-      for(time in 1:dim(mis_c1_na)[2]) {
-        ppc_plot_e1[[time]] <- ppc_hist(y = e1_obs[[time]], yrep = e1_rep[[time]][1 : ndisplay, ], binwidth = binwidth_e, breaks = breaks, freq = freq)
-        ppc_plot_e2[[time]] <- ppc_hist(y = e2_obs[[time]], yrep = e2_rep[[time]][1 : ndisplay, ], binwidth = binwidth_e, breaks = breaks, freq = freq)
-        ppc_plot_c1[[time]] <- ppc_hist(y = c1_obs[[time]], yrep = c1_rep[[time]][1 : ndisplay, ], binwidth = binwidth_c, breaks = breaks, freq = freq)
-        ppc_plot_c2[[time]] <- ppc_hist(y = c2_obs[[time]], yrep = c2_rep[[time]][1 : ndisplay, ], binwidth = binwidth_c, breaks = breaks, freq = freq)
-      }
-    } else if(type == "boxplot") {
-      if(exists("notch", where = exArgs)) {notch = exArgs$notch} else {notch = FALSE }
-      if(exists("size", where = exArgs)) {size = exArgs$size} else {size = 0.5 }
-      if(exists("alpha", where = exArgs)) {alpha = exArgs$alpha} else {alpha = 1 }
-      for(time in 1:dim(mis_c1_na)[2]) {
-        ppc_plot_e1[[time]] <- ppc_boxplot(y = e1_obs[[time]], yrep = e1_rep[[time]][1 : ndisplay, ], notch = notch, size = size, alpha = alpha)
-        ppc_plot_e2[[time]] <- ppc_boxplot(y = e2_obs[[time]], yrep = e2_rep[[time]][1 : ndisplay, ], notch = notch, size = size, alpha = alpha)
-        ppc_plot_c1[[time]] <- ppc_boxplot(y = c1_obs[[time]], yrep = c1_rep[[time]][1 : ndisplay, ], notch = notch, size = size, alpha = alpha)
-        ppc_plot_c2[[time]] <- ppc_boxplot(y = c2_obs[[time]], yrep = c2_rep[[time]][1 : ndisplay, ], notch = notch, size = size, alpha = alpha)
-      }
-    } else if(type == "freqpoly") {
-      if(exists("binwidth_e", where = exArgs)) {binwidth_e = exArgs$binwidth_e} else {binwidth_e = 1 / 30 }
-      if(exists("binwidth_c", where = exArgs)) {binwidth_c = exArgs$binwidth_c} else {binwidth_c = 30 }
-      if(exists("freq", where = exArgs)) {freq = exArgs$freq} else {freq = TRUE }
-      if(exists("size", where = exArgs)) {size = exArgs$size} else {size = 0.25 }
-      if(exists("alpha", where = exArgs)) {alpha = exArgs$alpha} else {alpha = 1 }
-      for(time in 1:dim(mis_c1_na)[2]) {
-        ppc_plot_e1[[time]] <- ppc_freqpoly(y = e1_obs[[time]], yrep = e1_rep[[time]][1 : ndisplay, ], binwidth = binwidth_e, freq = freq, size = size, alpha = alpha)
-        ppc_plot_e2[[time]] <- ppc_freqpoly(y = e2_obs[[time]], yrep = e2_rep[[time]][1 : ndisplay, ], binwidth = binwidth_e, freq = freq, size = size, alpha = alpha)
-        ppc_plot_c1[[time]] <- ppc_freqpoly(y = c1_obs[[time]], yrep = c1_rep[[time]][1 : ndisplay, ], binwidth = binwidth_c, freq = freq, size = size, alpha = alpha)
-        ppc_plot_c2[[time]] <- ppc_freqpoly(y = c2_obs[[time]], yrep = c2_rep[[time]][1 : ndisplay, ], binwidth = binwidth_c, freq = freq, size = size, alpha = alpha)
-      }
-    } else if(type == "dens") {
-      if(exists("trim", where = exArgs)) {trim = exArgs$trim} else {trim = FALSE }
-      if(exists("size", where = exArgs)) {size = exArgs$size} else {size = 0.5 }
-      if(exists("alpha", where = exArgs)) {alpha = exArgs$alpha} else {alpha = 1 }
-      for(time in 1:dim(mis_c1_na)[2]) {
-        ppc_plot_e1[[time]] <- ppc_dens(y = e1_obs[[time]], yrep = e1_rep[[time]][1 : ndisplay, ], size = size, alpha = alpha, trim = FALSE)
-        ppc_plot_e2[[time]] <- ppc_dens(y = e2_obs[[time]], yrep = e2_rep[[time]][1 : ndisplay, ], size = size, alpha = alpha, trim = FALSE)
-        ppc_plot_c1[[time]] <- ppc_dens(y = c1_obs[[time]], yrep = c1_rep[[time]][1 : ndisplay, ], size = size, alpha = alpha, trim = FALSE)
-        ppc_plot_c2[[time]] <- ppc_dens(y = c2_obs[[time]], yrep = c2_rep[[time]][1 : ndisplay, ], size = size, alpha = alpha, trim = FALSE)
-      }
-    } else if(type == "dens_overlay") {
-      if(exists("adjust", where = exArgs)) {adjust = exArgs$adjust} else {adjust = 1 }
-      if(exists("bw", where = exArgs)) {bw = exArgs$bw} else {bw = "nrd0" }
-      if(exists("trim", where = exArgs)) {trim = exArgs$trim} else {trim = FALSE }
-      if(exists("size", where = exArgs)) {size = exArgs$size} else {size = 0.25 }
-      if(exists("alpha", where = exArgs)) {alpha = exArgs$alpha} else {alpha = 0.7 }
-      if(exists("kernel", where = exArgs)) {kernel = exArgs$kernel} else {kernel = "gaussian" }
-      if(exists("n_dens", where = exArgs)) {n_dens = exArgs$n_dens} else {n_dens = 1024 }
-      for(time in 1:dim(mis_c1_na)[2]) {
-        ppc_plot_e1[[time]] <- ppc_dens_overlay(y = e1_obs[[time]], yrep = e1_rep[[time]][1 : ndisplay, ], size = size, alpha = alpha, trim = FALSE, bw = bw, adjust = adjust, kernel = kernel, n_dens = n_dens)
-        ppc_plot_e2[[time]] <- ppc_dens_overlay(y = e2_obs[[time]], yrep = e2_rep[[time]][1 : ndisplay, ], size = size, alpha = alpha, trim = FALSE, bw = bw, adjust = adjust, kernel = kernel, n_dens = n_dens)
-        ppc_plot_c1[[time]] <- ppc_dens_overlay(y = c1_obs[[time]], yrep = c1_rep[[time]][1 : ndisplay, ], size = size, alpha = alpha, trim = FALSE, bw = bw, adjust = adjust, kernel = kernel, n_dens = n_dens)
-        ppc_plot_c2[[time]] <- ppc_dens_overlay(y = c2_obs[[time]], yrep = c2_rep[[time]][1 : ndisplay, ], size = size, alpha = alpha, trim = FALSE, bw = bw, adjust = adjust, kernel = kernel, n_dens = n_dens)
-      }
-    } else if(type == "ecdf_overlay") {
-      if(exists("size", where = exArgs)) {size = exArgs$size} else {size = 0.25 }
-      if(exists("alpha", where = exArgs)) {alpha = exArgs$alpha} else {alpha = 0.7 }
-      if(exists("pad", where = exArgs)) {pad = exArgs$pad} else {pad = TRUE }
-      if(exists("discrete", where = exArgs)) {discrete = exArgs$discrete} else {discrete = FALSE }
-      for(time in 1:dim(mis_c1_na)[2]) {
-        ppc_plot_e1[[time]] <- ppc_ecdf_overlay(y = e1_obs[[time]], yrep = e1_rep[[time]][1 : ndisplay, ], size = size, alpha = alpha, discrete = discrete, pad = pad)
-        ppc_plot_e2[[time]] <- ppc_ecdf_overlay(y = e2_obs[[time]], yrep = e2_rep[[time]][1 : ndisplay, ], size = size, alpha = alpha, discrete = discrete, pad = pad)
-        ppc_plot_c1[[time]] <- ppc_ecdf_overlay(y = c1_obs[[time]], yrep = c1_rep[[time]][1 : ndisplay, ], size = size, alpha = alpha, discrete = discrete, pad = pad)
-        ppc_plot_c2[[time]] <- ppc_ecdf_overlay(y = c2_obs[[time]], yrep = c2_rep[[time]][1 : ndisplay, ], size = size, alpha = alpha, discrete = discrete, pad = pad)
-      }
-    } else if(type == "stat" & is.null(corr) == TRUE) {
-      if(bpp == FALSE){
-        if(exists("binwidth_e", where = exArgs)) {binwidth_e = exArgs$binwidth_e} else {binwidth_e = 1 / 30 }
-        if(exists("binwidth_c", where = exArgs)) {binwidth_c = exArgs$binwidth_c} else {binwidth_c = 30 }
-        if(exists("freq", where = exArgs)) {freq = exArgs$freq} else {freq = TRUE }
-        if(exists("breaks", where = exArgs)) {breaks = exArgs$breaks} else {breaks = NULL }
-        for(time in 1:dim(mis_c1_na)[2]) {
-          ppc_plot_e1[[time]] <- ppc_stat(y = e1_obs[[time]], yrep = e1_rep[[time]][1 : ndisplay, ], stat = stat, binwidth = binwidth_e, breaks = breaks, freq = freq)
-          ppc_plot_e2[[time]] <- ppc_stat(y = e2_obs[[time]], yrep = e2_rep[[time]][1 : ndisplay, ], stat = stat, binwidth = binwidth_e, breaks = breaks, freq = freq)
-          ppc_plot_c1[[time]] <- ppc_stat(y = c1_obs[[time]], yrep = c1_rep[[time]][1 : ndisplay, ], stat = stat, binwidth = binwidth_c, breaks = breaks, freq = freq)
-          ppc_plot_c2[[time]] <- ppc_stat(y = c2_obs[[time]], yrep = c2_rep[[time]][1 : ndisplay, ], stat = stat, binwidth = binwidth_c, breaks = breaks, freq = freq)
-        }
-      }
-      if(bpp == TRUE){
-        if(exists("trim", where = exArgs)) {trim = exArgs$trim} else {trim = FALSE }
-        if(exists("size", where = exArgs)) {size = exArgs$size} else {size = 0.5 }
-        if(exists("alpha", where = exArgs)) {alpha = exArgs$alpha} else {alpha = 1 }    
-        stat_e1 <- lapply(e1_obs, stat)
-        stat_c1 <- lapply(c1_obs, stat)
-        values_e1 <- matrix(NA, nrow = ndisplay, ncol = dim(mis_c1_na)[2])
-        values_c1 <- matrix(NA, nrow = ndisplay, ncol = dim(mis_c1_na)[2])
-        df1 <- pval_e1 <- pval_c1 <- replicate(dim(mis_c1_na)[2], list())
-        paste_p_e1 <- paste_p_c1 <- replicate(dim(mis_c1_na)[2], list())
-        for(time in 1:dim(mis_c1_na)[2]) {
-          values_e1[, time] <- apply(e1_rep[[time]][1 : ndisplay, ], 1, stat)
-          values_c1[, time] <- apply(c1_rep[[time]][1 : ndisplay, ], 1, stat)
-          df1[[time]] <- data.frame(values_e1[, time], values_c1[, time])
-          names(df1[[time]]) <- c("values_e1", "values_c1")
-          pval_e1[[time]] <- sum(values_e1[, time] > stat_e1[[time]]) / length(values_e1[, time])
-          pval_c1[[time]] <- sum(values_c1[, time] > stat_c1[[time]]) / length(values_c1[, time])
-          paste_p_e1[[time]] <- sprintf("Prob (T(y[rep]) > T(y)) == '%0.3f'", pval_e1[[time]])
-          paste_p_c1[[time]] <- sprintf("Prob (T(y[rep]) > T(y)) == '%0.3f'", pval_c1[[time]])
-        }
-        stat_e2 <- lapply(e2_obs, stat)
-        stat_c2 <- lapply(c2_obs, stat)
-        values_e2 <- matrix(NA, nrow = ndisplay, ncol = dim(mis_c2_na)[2])
-        values_c2 <- matrix(NA, nrow = ndisplay, ncol = dim(mis_c2_na)[2])
-        df2 <- pval_e2 <- pval_c2 <- replicate(dim(mis_c2_na)[2], list())
-        paste_p_e2 <- paste_p_c2 <- replicate(dim(mis_c2_na)[2], list())
-        for(time in 1:dim(mis_c2_na)[2]) {
-          values_e2[, time] <- apply(e2_rep[[time]][1 : ndisplay, ], 1, stat)
-          values_c2[, time] <- apply(c2_rep[[time]][1 : ndisplay, ], 1, stat)
-          df2[[time]] <- data.frame(values_e2[, time], values_c2[, time])
-          names(df2[[time]]) <- c("values_e2", "values_c2")
-          pval_e2[[time]] <- sum(values_e2[, time] > stat_e2[[time]]) / length(values_e2[, time])
-          pval_c2[[time]] <- sum(values_c2[, time] > stat_c2[[time]]) / length(values_c2[, time])
-          paste_p_e2[[time]] <- sprintf("Prob (T(y[rep]) > T(y)) == '%0.3f'", pval_e2[[time]])
-          paste_p_c2[[time]] <- sprintf("Prob (T(y[rep]) > T(y)) == '%0.3f'", pval_c2[[time]])
-        }
-        color_sheme_rep <- color_scheme_get()[1]
-        color_sheme_rep_border <- color_scheme_get()[2]
-        color_sheme_obs <- color_scheme_get()[5]
-        color_sheme_obs_border <- color_scheme_get()[6]
-        set_theme <- bayesplot_theme_get()
-        ggplot2::theme_set(set_theme)
-        for(time in 1:dim(mis_c2_na)[2]) {
-          ppc_plot_e1[[time]] <- ggplot2::ggplot(df1[[time]], ggplot2::aes(x = values_e1)) + 
-            ggplot2::geom_density(fill = color_sheme_rep$light, color = color_sheme_rep_border$light_highlight, 
-                                  trim = trim, size = size, alpha = alpha) +
-            ggplot2::geom_vline(xintercept = stat_e1[[time]], color = color_sheme_obs$dark, linewidth = 1, linetype = "dashed") +
-            ggplot2::scale_y_continuous(expand = c(0, 0)) +
-            ggplot2::theme(axis.text.y = ggplot2::element_blank(), axis.ticks.y = ggplot2::element_blank(), 
-                           axis.title.y = ggplot2::element_blank(), axis.title.x = ggplot2::element_blank()) +
-            ggplot2::annotate("text", x = -Inf, y = Inf, label = paste_p_e1[[time]], parse = TRUE, hjust = -0.1, vjust = 2, size = 4)
-          ppc_plot_c1[[time]] <- ggplot2::ggplot(df1[[time]], ggplot2::aes(x = values_c1)) + 
-            ggplot2::geom_density(fill = color_sheme_rep$light, color = color_sheme_rep_border$light_highlight, 
-                                  trim = trim, size = size, alpha = alpha) +
-            ggplot2::geom_vline(xintercept = stat_c1[[time]], color = color_sheme_obs$dark, linewidth = 1, linetype = "dashed") +
-            ggplot2::scale_y_continuous(expand = c(0, 0)) +
-            ggplot2::theme(axis.text.y = ggplot2::element_blank(), axis.ticks.y = ggplot2::element_blank(), 
-                           axis.title.y = ggplot2::element_blank(), axis.title.x = ggplot2::element_blank()) +
-            ggplot2::annotate("text", x = -Inf, y = Inf, label = paste_p_c1[[time]], parse = TRUE, hjust = -0.1, vjust = 2, size = 4)
-          ppc_plot_e2[[time]] <- ggplot2::ggplot(df2[[time]], ggplot2::aes(x = values_e2)) + 
-            ggplot2::geom_density(fill = color_sheme_rep$light, color = color_sheme_rep_border$light_highlight, 
-                                  trim = trim, size = size, alpha = alpha) +
-            ggplot2::geom_vline(xintercept = stat_e2[[time]], color = color_sheme_obs$dark, linewidth = 1, linetype = "dashed") +
-            ggplot2::scale_y_continuous(expand = c(0, 0)) +
-            ggplot2::theme(axis.text.y = ggplot2::element_blank(), axis.ticks.y = ggplot2::element_blank(), 
-                           axis.title.y = ggplot2::element_blank(), axis.title.x = ggplot2::element_blank()) +
-            ggplot2::annotate("text", x = -Inf, y = Inf, label = paste_p_e2[[time]], parse = TRUE, hjust = -0.1, vjust = 2, size = 4)
-          ppc_plot_c2[[time]] <- ggplot2::ggplot(df2[[time]], ggplot2::aes(x = values_c2)) + 
-            ggplot2::geom_density(fill = color_sheme_rep$light, color = color_sheme_rep_border$light_highlight, 
-                                  trim = trim, size = size, alpha = alpha) +
-            ggplot2::geom_vline(xintercept = stat_c2[[time]], color = color_sheme_obs$dark, linewidth = 1, linetype = "dashed") +
-            ggplot2::scale_y_continuous(expand = c(0, 0)) +
-            ggplot2::theme(axis.text.y = ggplot2::element_blank(), axis.ticks.y = ggplot2::element_blank(), 
-                           axis.title.y = ggplot2::element_blank(), axis.title.x = ggplot2::element_blank()) +
-            ggplot2::annotate("text", x = -Inf, y = Inf, label = paste_p_c2[[time]], parse = TRUE, hjust = -0.1, vjust = 2, size = 4)
-        }
-      }
-    } else if(type == "stat" & is.null(corr) == FALSE) {
-      ec_arm1 <- array_1 <- values_biv1 <- df1 <- pval_1 <- paste_p_biv1 <- replicate(dim(mis_c1_na)[2], list())
-      stat_biv1 <- rep(NA, dim(mis_c1_na)[2])
-      ec_arm2 <- array_2 <- values_biv2 <- df2 <- pval_2 <- paste_p_biv2 <- replicate(dim(mis_c2_na)[2], list())
-      stat_biv2 <- rep(NA, dim(mis_c2_na)[2])
-      for(time in 1:dim(mis_c2_na)[2]) {
-        ec_arm1[[time]] <- cbind(x$data_set$effects$Control[, time], x$data_set$costs$Control[, time])[complete.cases(cbind(x$data_set$effects$Control[, time], x$data_set$costs$Control[, time])), ]
-        stat_biv1[time] <- corr(ec_arm1[[time]][, 1], ec_arm1[[time]][, 2])
-        array_1[[time]] <- array(data = NA, dim = c(nrow(e1_rep[[time]][1 : ndisplay, ]), nrow(ec_arm1[[time]]), 2))
-        array_1[[time]][, , 1] <- e1_rep[[time]][1 : ndisplay, 1:nrow(ec_arm1[[time]])]
-        array_1[[time]][, , 2] <- c1_rep[[time]][1 : ndisplay, 1:nrow(ec_arm1[[time]])]
-        values_biv1[[time]] <- apply(array_1[[time]], 1, corr)[2, ]
-        df1[[time]] <- data.frame(values_biv1[[time]])
-        pval_1[[time]] <- sum(values_biv1[[time]] > stat_biv1[time]) / length(values_biv1[[time]])
-        paste_p_biv1[[time]] <- sprintf("Prob (T(y[rep]) > T(y)) == '%0.3f'", pval_1[[time]])
-        ec_arm2[[time]] <- cbind(x$data_set$effects$Intervention[, time], x$data_set$costs$Intervention[, time])[complete.cases(cbind(x$data_set$effects$Intervention[, time], x$data_set$costs$Intervention[, time])), ]
-        stat_biv2[time] <- corr(ec_arm2[[time]][, 1], ec_arm2[[time]][, 2])
-        array_2[[time]] <- array(data = NA, dim = c(nrow(e2_rep[[time]][1 : ndisplay, ]), nrow(ec_arm2[[time]]), 2))
-        array_2[[time]][, , 1] <- e2_rep[[time]][1 : ndisplay, 1:nrow(ec_arm2[[time]])]
-        array_2[[time]][, , 2] <- c2_rep[[time]][1 : ndisplay, 1:nrow(ec_arm2[[time]])]
-        values_biv2[[time]] <- apply(array_2[[time]], 1, corr)[2, ]
-        df2[[time]] <- data.frame(values_biv2[[time]])
-        pval_2[[time]] <- sum(values_biv2[[time]] > stat_biv2[time]) / length(values_biv2[[time]])
-        paste_p_biv2[[time]] <- sprintf("Prob (T(y[rep]) > T(y)) == '%0.3f'", pval_2[[time]])
-      }
-      color_sheme_rep <- color_scheme_get()[1]
-      color_sheme_rep_border <- color_scheme_get()[2]
-      color_sheme_obs <- color_scheme_get()[5]
-      color_sheme_obs_border <- color_scheme_get()[6]
-      set_theme <- bayesplot_theme_get()
-      if(bpp == FALSE) {
-        if(exists("binwidth", where = exArgs)) {binwidth = exArgs$binwidth} else {binwidth = 1 / 30 }
-        for(time in 1:dim(mis_c2_na)[2]) {
-          ppc_plot_e1[[time]] <- ggplot2::ggplot(df1[[time]], ggplot2::aes(x = values_biv1[[time]])) + 
-            ggplot2::geom_histogram(fill = color_sheme_rep$light, 
-                                    color = color_sheme_rep_border$light_highlight, 
-                                    binwidth = binwidth) +
-            ggplot2::geom_vline(xintercept = stat_biv1[time], color = color_sheme_obs$dark, linewidth = 2) +
-            ggplot2::scale_y_continuous(expand = c(0, 0)) +
-            ggplot2::theme(axis.text.y = ggplot2::element_blank(), axis.ticks.y = ggplot2::element_blank(), 
-                           axis.title.y = ggplot2::element_blank(), axis.title.x = ggplot2::element_blank()) 
-          ppc_plot_c2[[time]] <- ggplot2::ggplot(df2[[time]], ggplot2::aes(x = values_biv2[[time]])) + 
-            ggplot2::geom_histogram(fill = color_sheme_rep$light, 
-                                    color = color_sheme_rep_border$light_highlight, 
-                                    binwidth = binwidth) +
-            ggplot2::geom_vline(xintercept = stat_biv2[time], color = color_sheme_obs$dark, linewidth = 2) +
-            ggplot2::scale_y_continuous(expand = c(0, 0)) +
-            ggplot2::theme(axis.text.y = ggplot2::element_blank(), axis.ticks.y = ggplot2::element_blank(), 
-                           axis.title.y = ggplot2::element_blank(), axis.title.x = ggplot2::element_blank())
-        }
-        labels_plots_time <- paste0("time", ' ', seq(1:dim(mis_c2_na)[2])) 
-        ppc_plot_output_e1 <- ggpubr::ggarrange(plotlist = ppc_plot_e1, labels = labels_plots_time, common.legend = FALSE)
-        ppc_plot_output_c2 <- ggpubr::ggarrange(plotlist = ppc_plot_c2, labels = labels_plots_time, common.legend = FALSE)
-      }
-      if(bpp == TRUE) {
-        if(exists("trim", where = exArgs)) {trim = exArgs$trim} else {trim = FALSE }
-        if(exists("size", where = exArgs)) {size = exArgs$size} else {size = 0.5 }
-        if(exists("alpha", where = exArgs)) {alpha = exArgs$alpha} else {alpha = 1 } 
-        for(time in 1:dim(mis_c2_na)[2]) {
-          ppc_plot_e1[[time]] <- ggplot2::ggplot(df1[[time]], ggplot2::aes(x = values_biv1[[time]])) +
-            ggplot2::geom_density(fill = color_sheme_rep$light, 
-                                  color = color_sheme_rep_border$light_highlight, trim = trim, size = size, alpha = alpha) +
-            ggplot2::geom_vline(xintercept = stat_biv1[time], color = color_sheme_obs$dark, linewidth = 1, linetype = "dashed") +
-            ggplot2::scale_y_continuous(expand = c(0, 0)) +
-            ggplot2::theme(axis.text.y = ggplot2::element_blank(), axis.ticks.y = ggplot2::element_blank(), 
-                           axis.title.y = ggplot2::element_blank(), axis.title.x = ggplot2::element_blank()) +
-            ggplot2::annotate("text", x = -Inf, y = Inf, 
-                              label = paste_p_biv1[[time]], parse = TRUE, hjust = -0.1, vjust = 2, size = 4)
-          ppc_plot_c2[[time]] <- ggplot2::ggplot(df2[[time]], ggplot2::aes(x = values_biv2[[time]])) +
-            ggplot2::geom_density(fill = color_sheme_rep$light, 
-                                  color = color_sheme_rep_border$light_highlight, trim = trim, size = size, alpha = alpha) +
-            ggplot2::geom_vline(xintercept = stat_biv2[time], color = color_sheme_obs$dark, linewidth = 1, linetype = "dashed") +
-            ggplot2::scale_y_continuous(expand = c(0, 0)) +
-            ggplot2::theme(axis.text.y = ggplot2::element_blank(), axis.ticks.y = ggplot2::element_blank(), 
-                           axis.title.y = ggplot2::element_blank(), axis.title.x = ggplot2::element_blank()) +
-            ggplot2::annotate("text", x = -Inf, y = Inf, 
-                              label = paste_p_biv2[[time]], parse = TRUE, hjust = -0.1, vjust = 2, size = 4)
-        }
-        labels_plots_time <- paste0("time", ' ', seq(1:dim(mis_c2_na)[2])) 
-        ppc_plot_output_e1 <- ggpubr::ggarrange(plotlist = ppc_plot_e1, labels = labels_plots_time, common.legend = FALSE)
-        ppc_plot_output_c2 <- ggpubr::ggarrange(plotlist = ppc_plot_c2, labels = labels_plots_time, common.legend = FALSE)
-      }
-    } else if(type == "stat_2d") {
-      if(exists("size", where = exArgs)) {size = exArgs$size} else {size = 2.5 }
-      if(exists("alpha", where = exArgs)) {alpha = exArgs$alpha} else {alpha = 0.7 }
-      if(exists("stat", where = exArgs)) {stat = exArgs$stat} else {stat = c("mean", "sd") }
-      for(time in 1:dim(mis_c2_na)[2]) {
-        ppc_plot_e1[[time]] <- ppc_stat_2d(y = e1_obs[[time]], yrep = e1_rep[[time]][1 : ndisplay, ], stat = stat, size = size, alpha = alpha)
-        ppc_plot_e2[[time]] <- ppc_stat_2d(y = e2_obs[[time]], yrep = e2_rep[[time]][1 : ndisplay, ], stat = stat, size = size, alpha = alpha)
-        ppc_plot_c1[[time]] <- ppc_stat_2d(y = c1_obs[[time]], yrep = c1_rep[[time]][1 : ndisplay, ], stat = stat, size = size, alpha = alpha)
-        ppc_plot_c2[[time]] <- ppc_stat_2d(y = c2_obs[[time]], yrep = c2_rep[[time]][1 : ndisplay, ], stat = stat, size = size, alpha = alpha)
-      }
-    } else if(type == "error_hist") {
-      if(exists("binwidth_e", where = exArgs)) {binwidth_e = exArgs$binwidth_e} else {binwidth_e = 1 / 30 }
-      if(exists("binwidth_c", where = exArgs)) {binwidth_c = exArgs$binwidth_c} else {binwidth_c = 30 }
-      if(exists("freq", where = exArgs)) {freq = exArgs$freq} else {freq = TRUE }
-      if(exists("breaks", where = exArgs)) {breaks = exArgs$breaks} else {breaks = NULL }
-      for(time in 1:dim(mis_c2_na)[2]) {
-        ppc_plot_e1[[time]] <- ppc_error_hist(y = e1_obs[[time]], yrep = e1_rep[[time]][1 : ndisplay, ], binwidth = binwidth_e, breaks = breaks, freq = freq)
-        ppc_plot_e2[[time]] <- ppc_error_hist(y = e2_obs[[time]], yrep = e2_rep[[time]][1 : ndisplay, ], binwidth = binwidth_e, breaks = breaks, freq = freq)
-        ppc_plot_c1[[time]] <- ppc_error_hist(y = c1_obs[[time]], yrep = c1_rep[[time]][1 : ndisplay, ], binwidth = binwidth_c, breaks = breaks, freq = freq)
-        ppc_plot_c2[[time]] <- ppc_error_hist(y = c2_obs[[time]], yrep = c2_rep[[time]][1 : ndisplay, ], binwidth = binwidth_c, breaks = breaks, freq = freq)
-      }
-    } else if(type == "error_scatter") {
-      if(exists("size", where = exArgs)) {size = exArgs$size} else {size = 2.5 }
-      if(exists("alpha", where = exArgs)) {alpha = exArgs$alpha} else {alpha = 0.8 }
-      for(time in 1:dim(mis_c2_na)[2]) {
-        ppc_plot_e1[[time]] <- ppc_error_scatter(y = e1_obs[[time]], yrep = e1_rep[[time]][1 : ndisplay, ], size = size, alpha = alpha)
-        ppc_plot_e2[[time]] <- ppc_error_scatter(y = e2_obs[[time]], yrep = e2_rep[[time]][1 : ndisplay, ], size = size, alpha = alpha)
-        ppc_plot_c1[[time]] <- ppc_error_scatter(y = c1_obs[[time]], yrep = c1_rep[[time]][1 : ndisplay, ], size = size, alpha = alpha)
-        ppc_plot_c2[[time]] <- ppc_error_scatter(y = c2_obs[[time]], yrep = c2_rep[[time]][1 : ndisplay, ], size = size, alpha = alpha)
-      }
-    } else if(type == "error_scatter_avg") {
-      if(exists("size", where = exArgs)) {size = exArgs$size} else {size = 2.5 }
-      if(exists("alpha", where = exArgs)) {alpha = exArgs$alpha} else {alpha = 0.8 }
-      for(time in 1:dim(mis_c2_na)[2]) {
-        ppc_plot_e1[[time]] <- ppc_error_scatter_avg(y = e1_obs[[time]], yrep = e1_rep[[time]][1 : ndisplay, ], size = size, alpha = alpha)
-        ppc_plot_e2[[time]] <- ppc_error_scatter_avg(y = e2_obs[[time]], yrep = e2_rep[[time]][1 : ndisplay, ], size = size, alpha = alpha)
-        ppc_plot_c1[[time]] <- ppc_error_scatter_avg(y = c1_obs[[time]], yrep = c1_rep[[time]][1 : ndisplay, ], size = size, alpha = alpha)
-        ppc_plot_c2[[time]] <- ppc_error_scatter_avg(y = c2_obs[[time]], yrep = c2_rep[[time]][1 : ndisplay, ], size = size, alpha = alpha)
-      }
-    } else if(type == "error_binned") {
-      if(exists("bins", where = exArgs)) {bins = exArgs$bins} else {bins = NULL }
-      if(exists("size", where = exArgs)) {size = exArgs$size} else {size = 1 }
-      if(exists("alpha", where = exArgs)) {alpha = exArgs$alpha} else {alpha = 0.25 }
-      for(time in 1:dim(mis_c2_na)[2]) {
-        ppc_plot_e1[[time]] <- ppc_error_binned(y = e1_obs[[time]], yrep = e1_rep[[time]][1 : ndisplay, ], bins = bins, size = size, alpha = alpha)
-        ppc_plot_e2[[time]] <- ppc_error_binned(y = e2_obs[[time]], yrep = e2_rep[[time]][1 : ndisplay, ], bins = bins, size = size, alpha = alpha)
-        ppc_plot_c1[[time]] <- ppc_error_binned(y = c1_obs[[time]], yrep = c1_rep[[time]][1 : ndisplay, ], bins = bins, size = size, alpha = alpha)
-        ppc_plot_c2[[time]] <- ppc_error_binned(y = c2_obs[[time]], yrep = c2_rep[[time]][1 : ndisplay, ], bins = bins, size = size, alpha = alpha)
-      }
-    } else if(type == "intervals") {
-      if(exists("prob", where = exArgs)) {prob = exArgs$prob} else {prob = 0.5 }
-      if(exists("prob_outer", where = exArgs)) {prob_outer = exArgs$prob_outer} else {prob_outer = 0.9 }
-      if(exists("size", where = exArgs)) {size = exArgs$size} else {size = 1 }
-      if(exists("fatten", where = exArgs)) {fatten = exArgs$fatten} else {fatten = 3 }
-      for(time in 1:dim(mis_c2_na)[2]) {
-        ppc_plot_e1[[time]] <- ppc_intervals(y = e1_obs[[time]], yrep = e1_rep[[time]][1 : ndisplay, ], prob = prob, prob_outer = prob_outer, size = size, fatten = fatten)
-        ppc_plot_e2[[time]] <- ppc_intervals(y = e2_obs[[time]], yrep = e2_rep[[time]][1 : ndisplay, ], prob = prob, prob_outer = prob_outer, size = size, fatten = fatten)
-        ppc_plot_c1[[time]] <- ppc_intervals(y = c1_obs[[time]], yrep = c1_rep[[time]][1 : ndisplay, ], prob = prob, prob_outer = prob_outer, size = size, fatten = fatten)
-        ppc_plot_c2[[time]] <- ppc_intervals(y = c2_obs[[time]], yrep = c2_rep[[time]][1 : ndisplay, ], prob = prob, prob_outer = prob_outer, size = size, fatten = fatten)
-      }
-    } else if(type == "ribbon") {
-      if(exists("prob", where = exArgs)) {prob = exArgs$prob} else {prob = 0.5 }
-      if(exists("prob_outer", where = exArgs)) {prob_outer = exArgs$prob_outer} else {prob_outer = 0.9 }
-      if(exists("size", where = exArgs)) {size = exArgs$size} else {size = 0.25 }
-      if(exists("alpha", where = exArgs)) {alpha = exArgs$alpha} else {alpha = 0.33 }
-      for(time in 1:dim(mis_c2_na)[2]) {
-        ppc_plot_e1[[time]] <- ppc_ribbon(y = e1_obs[[time]], yrep = e1_rep[[time]][1 : ndisplay, ], prob = prob, prob_outer = prob_outer, alpha = alpha, size = size)
-        ppc_plot_e2[[time]] <- ppc_ribbon(y = e2_obs[[time]], yrep = e2_rep[[time]][1 : ndisplay, ], prob = prob, prob_outer = prob_outer, alpha = alpha, size = size)
-        ppc_plot_c1[[time]] <- ppc_ribbon(y = c1_obs[[time]], yrep = c1_rep[[time]][1 : ndisplay, ], prob = prob, prob_outer = prob_outer, alpha = alpha, size = size)
-        ppc_plot_c2[[time]] <- ppc_ribbon(y = c2_obs[[time]], yrep = c2_rep[[time]][1 : ndisplay, ], prob = prob, prob_outer = prob_outer, alpha = alpha, size = size)
-      }
-    } else if(type == "scatter") {
-      if(exists("size", where = exArgs)) {size = exArgs$size} else {size = 2.5 }
-      if(exists("alpha", where = exArgs)) {alpha = exArgs$alpha} else {alpha = 0.8 }
-      for(time in 1:dim(mis_c2_na)[2]) {
-        ppc_plot_e1[[time]] <- ppc_scatter(y = e1_obs[[time]], yrep = e1_rep[[time]][1 : ndisplay, ], alpha = alpha, size = size)
-        ppc_plot_e2[[time]] <- ppc_scatter(y = e2_obs[[time]], yrep = e2_rep[[time]][1 : ndisplay, ], alpha = alpha, size = size)
-        ppc_plot_c1[[time]] <- ppc_scatter(y = c1_obs[[time]], yrep = c1_rep[[time]][1 : ndisplay, ], alpha = alpha, size = size)
-        ppc_plot_c2[[time]] <- ppc_scatter(y = c2_obs[[time]], yrep = c2_rep[[time]][1 : ndisplay, ], alpha = alpha, size = size)
-      }
-    } else if(type == "scatter_avg") {
-      if(exists("size", where = exArgs)) {size = exArgs$size} else {size = 2.5 }
-      if(exists("alpha", where = exArgs)) {alpha = exArgs$alpha} else {alpha = 0.8 }
-      for(time in 1:dim(mis_c2_na)[2]) {
-        ppc_plot_e1[[time]] <- ppc_scatter_avg(y = e1_obs[[time]], yrep = e1_rep[[time]][1 : ndisplay, ], alpha = alpha, size = size)
-        ppc_plot_e2[[time]] <- ppc_scatter_avg(y = e2_obs[[time]], yrep = e2_rep[[time]][1 : ndisplay, ], alpha = alpha, size = size)
-        ppc_plot_c1[[time]] <- ppc_scatter_avg(y = c1_obs[[time]], yrep = c1_rep[[time]][1 : ndisplay, ], alpha = alpha, size = size)
-        ppc_plot_c2[[time]] <- ppc_scatter_avg(y = c2_obs[[time]], yrep = c2_rep[[time]][1 : ndisplay, ], alpha = alpha, size = size)
+      if(all(length(list.trt_name) > 1 & length(list.time_name) > 1)) {
+        if(all(all(list.trt_name %in% trt_lev) & all(list.time_name %in% as.character(1:n_time)))){
+          if(is.null(corr)) {
+            gplot_ppc <- gplot_ppc + ggplot2::facet_wrap(outcome ~ time_trt, scales = "free")
+          } else {
+            gplot_ppc <- gplot_ppc + ggplot2::facet_wrap( ~ time_trt, scales = "free")
+          }
+        } 
       }
     }
-    if(outcome == "effects_arm1" & is.null(time_plot) == TRUE) {
-      labels_plots_time <- paste0("time", ' ', seq(1:dim(mis_c2_na)[2])) 
-      ppc_plot_output <- ggpubr::ggarrange(plotlist = ppc_plot_e1, labels = labels_plots_time, common.legend = FALSE)
-    } else if(outcome == "effects_arm1" & is.null(time_plot) == FALSE) {
-      ppc_plot_output <- ppc_plot_e1[[time_plot]]
-    } else if(outcome == "effects_arm2" & is.null(time_plot) == TRUE){
-      labels_plots_time <- paste0("time", ' ', seq(1:dim(mis_c2_na)[2])) 
-      ppc_plot_output <- ggpubr::ggarrange(plotlist = ppc_plot_e2, labels = labels_plots_time, common.legend = FALSE)
-    } else if(outcome == "effects_arm2" & is.null(time_plot) == FALSE) {
-      ppc_plot_output <- ppc_plot_e2[[time_plot]]
-    } else if(outcome == "costs_arm1" & is.null(time_plot) == TRUE){
-      labels_plots_time <- paste0("time", ' ', seq(1:dim(mis_c2_na)[2])) 
-      ppc_plot_output <- ggpubr::ggarrange(plotlist = ppc_plot_c1, labels = labels_plots_time, common.legend = FALSE)
-    } else if(outcome == "costs_arm1" & is.null(time_plot) == FALSE) {
-      ppc_plot_output <- ppc_plot_c1[[time_plot]]
-    } else if(outcome == "costs_arm2" & is.null(time_plot) == TRUE){
-      labels_plots_time <- paste0("time", ' ', seq(1:dim(mis_c2_na)[2])) 
-      ppc_plot_output <- ggpubr::ggarrange(plotlist = ppc_plot_c2, labels = labels_plots_time, common.legend = FALSE)
-    } else if(outcome == "costs_arm2" & is.null(time_plot) == FALSE){
-      ppc_plot_output <- ppc_plot_c2[[time_plot]]
-    } else if(outcome == "effects" & is.null(time_plot) == TRUE) {
-      labels_plots_time <- c(paste0("effects (t=1, time", ' ', seq(1:dim(mis_c2_na)[2]), ")"), paste0("effects (t=2, time", ' ', seq(1:dim(mis_c2_na)[2]), ")")) 
-      ppc_plot_output <- ggpubr::ggarrange(plotlist =  c(ppc_plot_e1, ppc_plot_e2), labels = labels_plots_time, common.legend = TRUE, legend = legend)
-    } else if(outcome == "effects" & is.null(time_plot) == FALSE) {
-      labels_plots_time <- c(paste0("effects (t=1, time", ' ', time_plot, ")"), paste0("effects (t=2, time", ' ', time_plot, ")"))
-      ppc_plot_output <- ggpubr::ggarrange(ppc_plot_e1[[time_plot]], ppc_plot_e2[[time_plot]], labels = labels_plots_time, common.legend = TRUE, legend = legend)
-    } else if(outcome == "costs" & is.null(time_plot) == TRUE) {
-      labels_plots_time <- c(paste0("costs (t=1, time", ' ', seq(1:dim(mis_c2_na)[2]), ")"), paste0("costs (t=2, time", ' ', seq(1:dim(mis_c2_na)[2]), ")")) 
-      ppc_plot_output <- ggpubr::ggarrange(plotlist =  c(ppc_plot_c1, ppc_plot_c2), labels = labels_plots_time, common.legend = TRUE, legend = legend)
-    } else if(outcome == "costs" & is.null(time_plot) == FALSE) {
-      labels_plots_time <- c(paste0("costs (t=1, time", ' ', time_plot, ")"), paste0("costs (t=2, time", ' ', time_plot, ")"))
-      ppc_plot_output <- ggpubr::ggarrange(ppc_plot_c1[[time_plot]], ppc_plot_c2[[time_plot]], labels = labels_plots_time, common.legend = TRUE, legend = legend)
-    } else if(outcome == "all" & is.null(time_plot) == TRUE) {
-      if(is.null(corr) == TRUE) {
-        labels_plots_time <- c(paste0("effects (t=1, time", ' ', seq(1:dim(mis_c2_na)[2]), ")"), paste0("effects (t=2, time", ' ', seq(1:dim(mis_c2_na)[2]), ")"), 
-                               paste0("costs (t=1, time", ' ', seq(1:dim(mis_c2_na)[2]), ")"), paste0("costs (t=2, time", ' ', seq(1:dim(mis_c2_na)[2]), ")")) 
-        ppc_plot_output <- ggpubr::ggarrange(plotlist =  c(ppc_plot_e1, ppc_plot_e2, ppc_plot_c1, ppc_plot_c2), labels = labels_plots_time, common.legend = TRUE, legend = legend)
-      }
-      if(is.null(corr) == FALSE) {
-        labels_plots_time <- c(paste0("control, (time", ' ', seq(1:dim(mis_c2_na)[2]), ")"), paste0("intervention (time", ' ', seq(1:dim(mis_c2_na)[2]), ")")) 
-        ppc_plot_output <- ggpubr::ggarrange(plotlist =  c(ppc_plot_e1, ppc_plot_c2), labels = labels_plots_time, common.legend = TRUE, legend = legend)
-      }
-    } else if(outcome == "all" & is.null(time_plot) == FALSE) {
-      if(is.null(corr) == TRUE) {
-        labels_plots_time <- c(paste0("effects (t=1, time", ' ', time_plot, ")"), paste0("effects (t=2, time", ' ', time_plot, ")"), 
-                               paste0("costs (t=1, time", ' ', time_plot, ")"), paste0("costs (t=2, time", ' ', time_plot, ")")) 
-        ppc_plot_output <- ggpubr::ggarrange(ppc_plot_e1[[time_plot]], ppc_plot_e2[[time_plot]], ppc_plot_c1[[time_plot]], ppc_plot_c2[[time_plot]], labels = labels_plots_time, common.legend = TRUE, legend = legend)
-      }
-      if(is.null(corr) == FALSE) {
-        labels_plots_time <- c(paste0("control, (time", ' ', time_plot, ")"), paste0("intervention (time", ' ', time_plot, ")")) 
-        ppc_plot_output <- ggpubr::ggarrange(ppc_plot_e1[[time_plot]], ppc_plot_c2[[time_plot]], labels = labels_plots_time, common.legend = TRUE, legend = legend)
-      }
-    }
-  }    
-  ppc_plot_output <- ppc_plot_output + ggplot2::theme(legend.position = legend)
-  if(length(theme) != 0) {
-    if(theme == "base") ppc_plot_output <- ppc_plot_output + ggthemes::theme_base()
-    if(theme == "calc") ppc_plot_output <- ppc_plot_output + ggthemes::theme_calc()
-    if(theme == "economist") ppc_plot_output <- ppc_plot_output + ggthemes::theme_economist()
-    if(theme == "excel") ppc_plot_output <- ppc_plot_output + ggthemes::theme_excel()
-    if(theme == "few") ppc_plot_output <- ppc_plot_output + ggthemes::theme_few()
-    if(theme == "538") ppc_plot_output <- ppc_plot_output + ggthemes::theme_fivethirtyeight()
-    if(theme == "gdocs") ppc_plot_output <- ppc_plot_output + ggthemes::theme_gdocs()
-    if(theme == "hc") ppc_plot_output <- ppc_plot_output + ggthemes::theme_hc()
-    if(theme == "par") ppc_plot_output <- ppc_plot_output + ggthemes::theme_par()
-    if(theme == "solarized") ppc_plot_output <- ppc_plot_output + ggthemes::theme_solarized()
-    if(theme == "pander") ppc_plot_output <- ppc_plot_output + ggthemes::theme_pander()
-    if(theme == "stata") ppc_plot_output <- ppc_plot_output + ggthemes::theme_stata()
-    if(theme == "tufte") ppc_plot_output <- ppc_plot_output + ggthemes::theme_tufte()
-    if(theme == "wsj") ppc_plot_output <- ppc_plot_output + ggthemes::theme_wsj()
-  }
-  if(legend == FALSE) { 
-    ppc_plot_output <- ppc_plot_output + legend_none() 
-  }
-  return(ppc_plot_output)
+  }  
+  gplot_ppc <- gplot_ppc + gg_leg + gg_par
+  return(gplot_ppc)
 }
-
-
-

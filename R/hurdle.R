@@ -7,7 +7,7 @@
 #' 
 #' @param data A data frame in which to find the variables supplied in \code{model.eff}, \code{model.cost} (model formulas for effects and costs) 
 #' and \code{model.se}, \code{model.sc} (model formulas for the structural effect and cost models). Among these,
-#' effectiveness, cost and treatment indicator (only two arms) variables must always be provided and named 'e', 'c' and 't', respectively. 
+#' effectiveness, cost and treatment indicator (only two arms) variables must always be provided and named 'e', 'c' and 'trt', respectively. 
 #' @param model.eff A formula expression in conventional \code{R} linear modelling syntax. The response must be a health economic
 #' effectiveness outcome ('e') whose name must correspond to that used in \code{data}. Any covariates in the model must be provided on the right-hand side of the formula. 
 #' If there are no covariates, \code{1} should be specified on the right hand side of the formula. By default, covariates are placed on the "location" parameter of the distribution through a linear model.
@@ -29,12 +29,12 @@
 #' no structural value is chosen and a standard model for the effects is run.
 #' @param sc Structural value to be found in the cost variables defined in \code{data}. If set to \code{NULL}, 
 #' no structural value is chosen and a standard model for the costs is run.
-#' @param dist_e Distribution assumed for the effects. Current available chocies are: Normal ('norm'), Beta ('beta'), Gamma ('gamma'), Exponential ('exp'),
-#' Weibull ('weibull'), Logistic ('logis'), Poisson ('pois'), Negative Binomial ('nbinom') or Bernoulli ('bern').
-#' @param dist_c Distribution assumed for the costs. Current available chocies are: Normal ('norm'), Gamma ('gamma') or LogNormal ('lnorm').
+#' @param dist_e Distribution assumed for the effects. Current available choices are: Normal ('norm'), Beta ('beta'), Gamma ('gamma'), Exponential ('exp'),
+#' Weibull ('weib'), Logistic ('logis'), Poisson ('pois'), Negative Binomial ('negbin') or Bernoulli ('bern').
+#' @param dist_c Distribution assumed for the costs. Current available choices are: Normal ('norm'), Gamma ('gamma') or LogNormal ('lnorm').
 #' @param type Type of structural value mechanism assumed. Choices are Structural Completely At Random (SCAR),
 #' and Structural At Random (SAR).
-#' @param prob A numeric vector of probabilities within the range (0,1), representing the upper and lower
+#' @param prob A numeric vector of probabilities within the range (0, 1), representing the upper and lower
 #'  CI sample quantiles to be calculated and returned for the imputed values.
 #' @param n.chains Number of chains.
 #' @param n.iter Number of iterations.
@@ -43,30 +43,23 @@
 #' \code{JAGS} model, or a function creating (possibly random) initial values. If \code{inits} is \code{NULL}, \code{JAGS}
 #' will generate initial values for all the model parameters.
 #' @param n.thin Thinning interval.
-#' @param ppc Logical. If \code{ppc} is \code{TRUE}, the estimates of the parameters that can be used to generate replications from the model are saved.
 #' @param save_model Logical. If \code{save_model} is \code{TRUE} a \code{txt} file containing the model code is printed
 #' in the current working directory.
-#' @param prior A list containing the hyperprior values provided by the user. Each element of this list must be a vector of length two
-#' containing the user-provided hyperprior values and must be named with the name of the corresponding parameter. For example, the hyperprior
-#' values for the standard deviation parameter for the effects can be provided using the list \code{prior = list('sigma.prior.e' = c(0, 100))}. For more information about how 
-#' to provide prior hypervalues for different types of parameters and models see details. 
-#' If \code{prior} is set to 'default', the default values will be used.  
-#' @param ... Additional arguments that can be provided by the user. Examples are \code{d_e} and \code{d_c}, which should correspond to two binary indicator vectors
-#' with length equal to the number of rows of \code{data}. By default these variables are constructed within the function based on the observed data
-#' but it is possible for the user to directly provide them as a means to explore some Structural Not At Random (SNAR) mechanism assumptions about one or both outcomes.
-#' Individuals whose corresponding indicator value is set to \code{1} or \code{0} will be respectively 
-#' associated with the structural or non-structural component in the model. Other optional arguments are \code{center = TRUE}, which centers all the covariates in the model or the additional arguments that can be provided 
-#' to the function \code{\link[BCEA]{bcea}} to summarise the health economic evaluation results. 
+#' @param center Logical. If \code{center} is \code{TRUE}, all covariates in both the effect and cost models will be centred.
+#' @param prior A list containing the hyperprior values provided by the user. Each element of this list must be a vector
+#' containing the user-provided prior distribution and parameter values and must be named with the name of the corresponding parameter. For example, the hyperprior
+#' values for the standard deviation parameter for the effects can be provided using the list \code{prior = list('sigma.prior.e' = c("unif", 0, 10))}. For more information about how 
+#' to provide prior hypervalues for different types of parameters and models see details. If \code{prior} is set to 'default', the default values will be used.  
+#' @param ... Additional arguments that can be provided by the user. Examples are the additional arguments that can be provided to the function \code{\link[BCEA]{bcea}} to summarise the health economic evaluation results. 
 #' @return An object of the class 'missingHE' containing the following elements
 #' \describe{
-#'   \item{data_set}{A list containing the original data set provided in \code{data} (see Arguments), the number of observed and missing individuals 
-#'   , the total number of individuals by treatment arm and the indicator vectors for the structural values}
+#'   \item{data_set}{A list containing the original data set provided in \code{data} (see Arguments). Additional information is also included about, among others, 
+#'   the number of observed and missing individuals, the total number of individuals by treatment arm and the indicator vectors for the structural values}
 #'   \item{model_output}{A list containing the output of a \code{JAGS} model generated from the functions \code{\link[R2jags]{jags}}, and 
-#'   the posterior samples for the main parameters of the model and the imputed values}
+#'   the posterior samples for the main parameters of the model}
 #'   \item{cea}{A list containing the output of the economic evaluation performed using the function \code{\link[BCEA]{bcea}}}
-#'   \item{type}{A character variable that indicate which type of structural value mechanism has been used to run the model, 
-#'   either \code{SCAR} or \code{SAR} (see details)}
-#'   \item{data_format}{A character variable that indicate which type of analysis was conducted, either using a \code{wide} or \code{long} dataset}
+#'   \item{type}{A character variable that indicate which type of structural value mechanism used to run the model, either \code{SCAR} or \code{SAR} (see details)}
+#'   \item{data_format}{A character variable that indicates which type of analysis was conducted, either using a \code{wide} or \code{long} dataset}
 #' }
 #' @seealso \code{\link[R2jags]{jags}}, \code{\link[BCEA]{bcea}}
 #' @keywords CEA JAGS missing data Hurdle Models 
@@ -78,43 +71,37 @@
 #' Usually, a logistic regression is used to estimate the probability of incurring a "structural" value (e.g. 0 for the costs, or 1 for the
 #' effects); this is then used to weigh the mean of the "non-structural" values estimated in the second component. 
 #' A simple example can be used to show how hurdle models are specified. 
-#' Consider a data set comprising a response variable \eqn{y} and a set of centered covariate \eqn{X_j}.Specifically, for each subject in the trial \eqn{i = 1, ..., n}
-#' we define an indicator variable \eqn{d_i} taking value \code{1} if the \eqn{i}-th individual is associated with a structural value and \code{0} otherwise.
+#' Consider a data set comprising a response variable \eqn{y} and a set of centered covariates \eqn{X_j}, for \eqn{i = j, ..., J}.Specifically, for each subject in the trial \eqn{i = 1, ..., n}
+#' we define an indicator variable \eqn{s_i} taking value \code{1} if the \eqn{i}-th individual is associated with a structural value and \code{0} otherwise.
 #' This is modelled as:
-#' \deqn{d_i ~ Bernoulli(\pi_i)}
-#' \deqn{logit(\pi_i) = \gamma_0 + \sum\gamma_j X_j}
+#' \deqn{s_i ~ Bernoulli(\pi_i)}
+#' \deqn{logit(\pi_i) = \sum\gamma_j X_j}
 #' where
 #' \itemize{
 #' \item \eqn{\pi_i} is the individual probability of a structural value in \eqn{y}.
-#' \item \eqn{\gamma_0} represents the marginal probability of a structural value in \eqn{y} on the logit scale.
-#' \item \eqn{\gamma_j} represents the impact on the probability of a structural value in \eqn{y} of the centered covariates \eqn{X_j}.
+#' \item \eqn{\gamma_j} represents the impact on the probability of a structural value in \eqn{y} of the covariate \eqn{X_j}.
 #' }
 #' When \eqn{\gamma_j = 0}, the model assumes a 'SCAR' mechanism, while when \eqn{\gamma_j != 0} the mechanism is 'SAR'.
-#' For the parameters indexing the structural value model, the default prior distributions assumed are the following:
+#' For the parameters indexing the structural value model, the default prior distributions assumed are:
 #' \itemize{
-#' \item \eqn{\gamma_0 ~ Logisitic(0, 1)}
 #' \item \eqn{\gamma_j ~ Normal(0, 0.01)}
 #' }
 #' When user-defined hyperprior values are supplied via the argument \code{prior} in the function \code{hurdle}, the elements of this list (see Arguments)
-#' must be vectors of length \code{2} containing the user-provided hyperprior values and must take specific names according to the parameters they are associated with. 
+#' must be vectors containing the user-provided distribution name and hyperprior values and must take specific names according to the parameters they are associated with. 
 #' Specifically, the names accepted by \strong{missingHE} are the following:
 #' \itemize{
-#' \item location parameters \eqn{\alpha_0, \beta_0}: "mean.prior.e"(effects) and/or "mean.prior.c"(costs)
 #' \item auxiliary parameters \eqn{\sigma}: "sigma.prior.e"(effects) and/or "sigma.prior.c"(costs)
 #' \item covariate parameters \eqn{\alpha_j, \beta_j}: "alpha.prior"(effects) and/or "beta.prior"(costs)
-#' \item marginal probability of structural values \eqn{\gamma_0}: "p.prior.e"(effects) and/or "p.prior.c"(costs)
 #' \item covariate parameters in the model of the structural values \eqn{\gamma_j} (if covariate data provided): "gamma.prior.e"(effects) and/or "gamma.prior.c"(costs)
 #' } 
-#' For simplicity, here we have assumed that the set of covariates \eqn{X_j} used in the models for the effects/costs and in the 
+#' For simplicity, here we assumed that the set of covariates \eqn{X_j} used in the models for the effects/costs and in the 
 #' model of the structural effect/cost values is the same. However, it is possible to specify different sets of covariates for each model
 #' using the arguments in the function \code{hurdle} (see Arguments).
 #' 
 #' For each model, random effects can also be specified for each parameter by adding the term + (x | z) to each model formula, 
 #' where x is the fixed regression coefficient for which also the random effects are desired and z is the clustering variable across which 
 #' the random effects are specified (must be the name of a factor variable in the dataset). Multiple random effects can be specified using the 
-#' notation + (x1 + x2 | site) for each covariate that was included in the fixed effects formula. Random intercepts are included by default in the models
-#' if a random effects are specified but they can be removed by adding the term 0 within the random effects formula, e.g. + (0 + x | z). 
-#' 
+#' notation + (x1 + x2 | site) for each covariate that was included in the fixed effects formula.
 #' 
 #' @author Andrea Gabrio
 #' @references
@@ -135,16 +122,16 @@
 #' 
 #' # Run the model using the hurdle function assuming a SCAR mechanism
 #' # Use only 100 iterations to run a quick check
-#' model.hurdle <- hurdle(data = MenSS.subset, model.eff = e ~ 1,model.cost = c ~ 1,
+#' model.hurdle <- hurdle(data = MenSS.subset, model.eff = e ~ trt, model.cost = c ~ trt,
 #'    model.se = se ~ 1, model.sc = sc ~ 1, se = 1, sc = 0, dist_e = "norm", dist_c = "norm",
-#'    type = "SCAR", n.chains = 2, n.iter = 100,  ppc = FALSE)
+#'    type = "SCAR", n.chains = 2, n.iter = 100)
 #' 
 #' # Print the results of the JAGS model
 #' print(model.hurdle)
 #' #
 #'
 #' # Use dic information criterion to assess model fit
-#' pic.dic <- pic(model.hurdle, criterion = "dic", module = "total")
+#' pic.dic <- pic(model.hurdle, criterion = "dic", cases = "cc")
 #' pic.dic
 #' #
 #' 
@@ -154,7 +141,7 @@
 #' 
 #' \dontshow{
 #' # Use waic information criterion to assess model fit
-#' pic.waic <- pic(model.hurdle, criterion = "waic", module = "total")
+#' pic.waic <- pic(model.hurdle, criterion = "waic", cases = "cc")
 #' pic.waic
 #' }
 #'
@@ -173,22 +160,22 @@
 #' 
 #' \donttest{
 #' # Further examples which take longer to run
-#' model.hurdle <- hurdle(data = MenSS, model.eff = e ~ u.0,model.cost = c ~ e,
-#'    model.se = se ~ u.0, model.sc = sc ~ 1, se = 1, sc = 0, dist_e = "norm", dist_c = "norm",
-#'    type = "SAR", n.chains = 2, n.iter = 500,  ppc = FALSE)
+#' model.hurdle <- hurdle(data = MenSS, model.eff = e ~ trt, model.cost = c ~ trt + e,
+#'    model.se = se ~ age, model.sc = sc ~ age, se = 1, sc = 0, dist_e = "norm", dist_c = "norm",
+#'    type = "SAR", n.chains = 2, n.iter = 500)
 #' #
 #' # Print results for all imputed values
-#' print(model.hurdle, value.mis = TRUE)
+#' print(model.hurdle)
 #' 
 #' # Use looic to assess model fit
-#' pic.looic<-pic(model.hurdle, criterion = "looic", module = "total")
+#' pic.looic <- pic(model.hurdle, criterion = "looic", cases = "cc")
 #' pic.looic
 #' 
-#' # Show density plots for all parameters
-#' diag.hist <- diagnostic(model.hurdle, type = "denplot", param = "all")
+#' # Show density plots for mean costs parameters
+#' diag.den <- diagnostic(model.hurdle, type = "denplot", param = "mu.c")
 #' 
 #' # Plots of imputations for all data
-#' p1 <- plot(model.hurdle, class = "scatter", outcome = "all")
+#' p1 <- plot(model.hurdle, class = "scatter", outcome = "both")
 #' 
 #' # Summarise the CEA results
 #' summary(model.hurdle)
@@ -198,490 +185,430 @@
 #' #
 
 
-hurdle <- function(data, model.eff, model.cost, model.se = se ~ 1, model.sc = sc ~ 1, se = 1, sc = 0, 
-                   dist_e, dist_c, type, prob = c(0.025, 0.975), n.chains = 2, n.iter = 20000, 
-                   n.burnin = floor(n.iter / 2), inits = NULL, n.thin = 1, ppc = FALSE, save_model = FALSE, prior = "default", ...) {
-  filein <- NULL
-  if(is.data.frame(data) == FALSE) {
-    stop("data must be in data frame format")
-  }
-  if(!all(c("e", "c", "t") %in% names(data)) == TRUE) {
-    stop("Please rename or provide variables in the data as 'e', 'c' and 't' for the effectiveness, cost and treatment indicator")
-  }
-  if(any(names(data) == "e") == TRUE & any(names(data) == "c") == TRUE) {
-    e <- as.name("e")
-    c <- as.name("c")
-  }
-  if(is.numeric(data$e) == FALSE | is.numeric(data$c) == FALSE) {
-    stop("Effectiveness and cost data must be numeric")
-  }
-  cov_matrix <- subset(data, select = -c(e, c))
-  cov_matrix <- cov_matrix[!unlist(vapply(cov_matrix, anyNA, logical(1)))]
-  if(!all(levels(as.factor(cov_matrix$t)) %in% c("1", "2")) == TRUE) {
-    stop("A two arm indicator variable must be provided with '1' for the control and '2' for the other intervention")
-  }
-  if(is.character(type) == FALSE | is.character(dist_e) == FALSE | is.character(dist_c) == FALSE) {
-    stop("you must provide character names for the objects 'type', 'dist_e' and 'dist_c'")
-  }
+hurdle <- function(data, model.eff, model.cost, 
+                   model.se = se ~ 1, model.sc = sc ~ 1, se = 1, sc = 0, 
+                   dist_e, dist_c, type, prob = c(0.025, 0.975), 
+                   n.chains = 2, n.iter = 10000, n.burnin = floor(n.iter / 2), 
+                   inits = NULL, n.thin = 1, save_model = FALSE, 
+                   prior = "default", center = FALSE, ...) {
+  if(is.data.frame(data) == FALSE) { stop("data must be in data frame format")}
+  if(!all(c("e", "c", "trt") %in% names(data)) == TRUE) {
+    stop("Please rename or provide names in the data as 'e', 
+         'c' and 'trt' for the effectiveness, cost and treatment variables")}
+  if(!is.numeric(data$e) | 
+     !is.numeric(data$c)) { stop("Effectiveness and cost data must be numeric")}
+  if(!is.factor(data$trt)) { stop("Please provide treatment `trt` as a factor variable")}
+  if(!is.character(type) | !is.character(dist_e) | !is.character(dist_c)) {
+    stop("Please provide valid names for 'type', 'dist_e' and 'dist_c'")}  
   dist_e <- tolower(dist_e)
   dist_c <- tolower(dist_c)
-  if(dist_e == "normal") { dist_e <- "norm" }
-  if(dist_e == "exponential") { dist_e <- "exp" }
-  if(dist_e == "logistic") { dist_e <- "logis" }
-  if(dist_e == "bernoulli") { dist_e <- "bern" }
-  if(dist_e == "poisson") { dist_e <- "pois" }
-  if(dist_e == "negative binomial") { dist_e <- "nbinom" }
-  if(dist_c == "normal") { dist_c <- "norm" }
-  if(dist_c == "lognormal") { dist_c <- "lnorm" }
-  if(!dist_e %in% c("norm", "beta", "exp", "weibull", "logis", "bern", "pois", "nbinom", "gamma") | !dist_c %in% c("norm", "gamma", "lnorm")) {
-    stop("Distributions available for use are 'norm', 'beta', 'gamma', 'logis', 'exp', 'weibull', 'nbinom', 'pois', 'bern'  for the effects and 'norm', 'gamma', 'lnorm' for the costs")
-  }
+  if(dist_e %in% c("normal","gaussian")) { dist_e <- "norm"}
+  if(dist_e %in% c("exponential")) { dist_e <- "exp"}
+  if(dist_e %in% c("weibull")) { dist_e <- "weib"}
+  if(dist_e %in% c("logistic")) { dist_e <- "logis"}
+  if(dist_e %in% c("bernoulli")) { dist_e <- "bern"}
+  if(dist_e %in% c("poisson")) { dist_e <- "pois"}
+  if(dist_e %in% c("negative binomial", "negbinom", "nbinom", "negbinomial")) { dist_e <- "negbin"}
+  if(dist_c %in% c("normal", "gaussian")) { dist_c <- "norm"}
+  if(dist_c %in% c("lognormal", "lognorm", "lnormal")) { dist_c <- "lnorm"}
+  if(!dist_e %in% c("norm", "beta", "exp", "weib", "logis", "bern", "pois", "negbin", "gamma") | 
+     !dist_c %in% c("norm", "gamma", "lnorm")) {
+    stop("Distributions available are 'norm', 'beta', 'gamma', 'logis', 'exp', 'weib', 'negbin', 'pois', 'bern'  for the effects 
+         and 'norm', 'gamma', 'lnorm' for the costs")}
   type <- toupper(type)
-  if(!type %in% c("SCAR", "SAR")) {
-    stop("Types available for use are 'SCAR' and 'SAR'")
+  if(!type %in% c("SCAR", "SAR")) { stop("Types available are 'SCAR' and 'SAR'")} 
+  if(!is.vector(prob) | length(prob) != 2 | !is.numeric(prob) | any(prob <= 0 | prob >= 1)) {
+    stop("Please provide a lower and an upper quantile for the imputed data distribution")}
+  if(!any(c(length(n.chains), length(n.iter), length(n.burnin), length(n.thin)) == 1)) {
+    stop("Please provide valid values for 'n.chains', 'n.iter', 'n.burnin', 'n.thin'")}
+  if(!any(is.numeric(n.chains), is.numeric(n.iter), is.numeric(n.burnin), is.numeric(n.thin))) {
+    stop("Please provide numeric values for 'n.chains', 'n.iter', 'n.burnin', 'n.thin'")}
+  if(!any(c(n.chains, n.iter, n.burnin, n.thin) > 0) | !any(c(n.chains, n.iter, n.burnin, n.thin) %% 1 == 0)) {
+    stop("Please provide valid integer values for 'n.chains', 'n.iter', 'n.burnin', 'n.thin'")}
+  if(!is.logical(save_model) | !is.logical(center)) {
+    stop("Please provide 'save_model', 'center' as logical values")}
+  e <- as.name("e")
+  c <- as.name("c")
+  trt <- as.name("trt")
+  cov_matrix <- subset(data, select = -c(e, c))
+  cov_matrix <- cov_matrix[!unlist(vapply(cov_matrix, anyNA, logical(1)))]
+  if(!inherits(model.eff, "formula") | !inherits(model.cost, "formula")) {
+    stop("`model.eff` and/or `model.cost` must be formula objects")}
+  fixed_e <- nobars_(model.eff)
+  fixed_c <- nobars_(model.cost)
+  random_e <- fb(model.eff)
+  random_c <- fb(model.cost)
+  clusn_e <- clusn_c <- NULL
+  clusn_se <- clusn_sc <- NULL  
+  if(!is.null(random_e) & length(random_e) > 1 | !is.null(random_c) & length(random_c) > 1) {
+    stop("Random effects can only be included through a single expression within brackets")}
+  if(!all(names(model.frame(fixed_e, data = data)) %in% c("e", names(cov_matrix))) | 
+     !all(names(model.frame(fixed_c, data = data)) %in% c("c", "e", names(cov_matrix)))) {
+    stop("Missing covariates cannot be included in the model")}
+  if(!all(names(model.frame(fixed_e, data = data)) %in% names(data)) | 
+     !all(names(model.frame(fixed_c, data = data)) %in% names(data))) {
+    stop("Please provide names in the formula that correspond to those in the data")}
+  if("e" %in% labels(terms(fixed_e)) | "c" %in% labels(terms(fixed_c))) {
+    stop("Please remove 'e' from the right-hand side of 'model.eff' and/or 'c' from the right-hand side of 'model.cost'")}
+  if(names(model.frame(fixed_e, data = data)[1]) != "e") {
+    stop("Please set 'e' as the response in 'model.eff'")}
+  if("c" %in% names(model.frame(fixed_e, data = data))) {
+    stop("Dependence allowed only through the cost model; please remove 'c' from 'model.eff'")}
+  if(names(model.frame(fixed_c, data = data)[1]) != "c") {
+    stop("Please set 'c' as the response in 'model.cost'")}
+  if("e" %in% labels(terms(fixed_c))) {
+    if(length(grep(":e", labels(terms(fixed_c)))) != 0 | length(grep("e:", labels(terms(fixed_c)))) != 0) {
+      stop("No interaction effects for 'e' is allowed")}
   }
-  if(length(prob) != 2 | is.numeric(prob) == FALSE | any(prob < 0) != FALSE | any(prob > 1) != FALSE) {
-    stop("You must provide valid lower/upper quantiles for the imputed data distribution")
-  }
-  if(is.logical(save_model) == FALSE | is.logical(ppc) == FALSE) {
-    stop("save_model and ppc are logical arguments and should be either TRUE or FALSE")
-  }
-  exArgs <- list(...)
-  if(exists("center", where = exArgs)) {
-    if(is.logical(exArgs$center) == FALSE) { stop("center must be either TRUE or FALSE") }
-    center = exArgs$center 
-  } else {center = FALSE }
-  data_read <- data_read_hurdle(data = data, model.eff = model.eff, model.cost = model.cost, 
-                                model.se = model.se, model.sc = model.sc, se = se, sc = sc, type = type, center = center)
+  if(!"trt" %in% names(model.frame(fixed_c, data = data)) | !"trt" %in% names(model.frame(fixed_e, data = data))) {
+    stop("Treatment indicator must be provided as covariate in 'model.eff' and/or 'model.cost'")}
+  trt_lev <- levels(cov_matrix$trt)
+  trt_pos <- which(trt_lev %in% levels(cov_matrix$trt))  
+  data_read <- data_read_hurdle(data = data, model.eff = model.eff, 
+                                   model.cost = model.cost, model.se = model.se,
+                                   model.sc = model.sc, se = se, sc = sc, 
+                                   cov_matrix = cov_matrix, type = type, center = center, 
+                                   fixed_e = fixed_e, fixed_c = fixed_c,
+                                   random_e = random_e, random_c = random_c,
+                                   trt_lev = trt_lev, trt_pos = trt_pos)  
   model_e_fixed <- labels(terms(data_read$model_formula$mf_model.e_fixed))
   model_c_fixed <- labels(terms(data_read$model_formula$mf_model.c_fixed))
   if(as.character(data_read$model_formula$mf_model.e_random)[3] == "1") {
     model_e_random <- c("1")
-  } else if(as.character(data_read$model_formula$mf_model.e_random)[3] == "0") {
-    model_e_random <- NULL
-  } else { model_e_random <- labels(terms(data_read$model_formula$mf_model.e_random)) }
+  } else { model_e_random <- labels(terms(data_read$model_formula$mf_model.e_random))}
   if(as.character(data_read$model_formula$mf_model.c_random)[3] == "1") {
     model_c_random <- c("1")
   } else if(as.character(data_read$model_formula$mf_model.c_random)[3] == "1 + e") {
     model_c_random <- c("1", "e")
-  } else if(as.character(data_read$model_formula$mf_model.c_random)[3] == "0") {
-    model_c_random <- NULL
-  } else { model_c_random <- labels(terms(data_read$model_formula$mf_model.c_random)) }
+  } else { model_c_random <- labels(terms(data_read$model_formula$mf_model.c_random))}
+  if(as.character(data_read$model_formula$mf_model.se_random)[3] == "1") {
+    model_se_random <- c("1")
+  } else if(as.character(data_read$model_formula$mf_model.se_random)[3] == "1 + e") {
+    model_se_random <- c("1", "e")
+  } else { model_se_random <- labels(terms(data_read$model_formula$mf_model.se_random))}
+  if(as.character(data_read$model_formula$mf_model.sc_random)[3] == "1") {
+    model_sc_random <- c("1")
+  } else if(as.character(data_read$model_formula$mf_model.sc_random)[3] == "1 + c") {
+    model_sc_random <- c("1", "c")
+  } else { model_sc_random <- labels(terms(data_read$model_formula$mf_model.sc_random))}  
   if(!is.null(se)) {
     if(as.character(data_read$model_formula$mf_model.se_random)[3] == "1") {
       model_se_random <- c("1")
     } else if(as.character(data_read$model_formula$mf_model.se_random)[3] == "0") {
       model_se_random <- NULL
-    } else { model_se_random <- labels(terms(data_read$model_formula$mf_model.se_random)) }
+    } else { model_se_random <- labels(terms(data_read$model_formula$mf_model.se_random))}
+    data_read$data_raw$data$se[is.na(data_read$data_raw$data$se)] <- -999999
+    str_eff_assumption <- model.frame(formula = data_read$model_formula$mf_model.se_fixed, data = data_read$data_raw$data)
+    data_read$data_raw$data$se <- data_read$data_raw$se
   } else { 
-    model_se_random <- NULL 
-  }
+    str_eff_assumption <- NULL
+    model_se_random <- NULL
+    }
   if(!is.null(sc)) {
     if(as.character(data_read$model_formula$mf_model.sc_random)[3] == "1") {
       model_sc_random <- c("1")
     } else if(as.character(data_read$model_formula$mf_model.sc_random)[3] == "0") {
       model_sc_random <- NULL
-    } else { model_sc_random <- labels(terms(data_read$model_formula$mf_model.sc_random)) }
+    } else { model_sc_random <- labels(terms(data_read$model_formula$mf_model.sc_random))}
+    data_read$data_raw$data$sc[is.na(data_read$data_raw$data$sc)] <- -999999
+    str_cost_assumption <- model.frame(formula = data_read$model_formula$mf_model.sc_fixed, data = data_read$data_raw$data)
+    data_read$data_raw$data$sc <- data_read$data_raw$sc
   } else { 
+    str_cost_assumption <- NULL
     model_sc_random <- NULL
   }
-  str_eff_assumption <- model.frame(formula = data_read$model_formula$mf_model.se_fixed, data = data_read$data_raw$data_ind)
-  str_cost_assumption <- model.frame(formula = data_read$model_formula$mf_model.sc_fixed, data = data_read$data_raw$data_ind)
-  if(length(names(str_eff_assumption)) == 1) {
-   type2e <- "SCAR"
-  } else if(length(names(str_eff_assumption)) > 1) {
-    type2e <- "SAR"
-  }
-  if(length(names(str_cost_assumption)) == 1) {
-    type2c <- "SCAR"
-  } else if(length(names(str_cost_assumption)) > 1) {
-    type2c <- "SAR"
-  }
+  if(length(names(str_eff_assumption)) == 0) { type_se <- "none"}
+  if(length(names(str_eff_assumption)) == 1) { type_se <- "SCAR"}
+  if(length(names(str_eff_assumption)) > 1) { type_se <- "SAR"}
+  if(length(names(str_cost_assumption)) == 0) { type_sc <- "none"}
+  if(length(names(str_cost_assumption)) == 1) { type_sc <- "SCAR"}
+  if(length(names(str_cost_assumption)) > 1) { type_sc <- "SAR"}  
   if(type == "SCAR") {
-  if(type != type2e | type != type2c) {
-    stop("Please remove covariates from 'model.se' and/or 'mode.sc' if 'SCAR' type selected")
-   }
-  } else if(type == "SAR") {
-    if(type != type2e & type != type2c) {
-      stop("Please add covariates to 'model.se' and/or 'mode.sc' if 'SAR' type selected")
-    }
-    if(type == type2e & is.null(se) == TRUE | type == type2c & is.null(sc) == TRUE) {
-      stop("It is not possible to assume mechanism if structural values are not provided")
-    }
+    if(!type %in% c(type_se, type_sc)) {
+      stop("Please remove covariates from 'model.se' and/or 'mode.sc' if 'SCAR' type selected.")}
   }
-  N1 <- data_read$data_raw$arm_lengths[1]
-  N2 <- data_read$data_raw$arm_lengths[2]
-  pe_fixed <- ncol(data_read$data_raw$covariates_effects_fixed$Intervention)
-  pc_fixed <- ncol(data_read$data_raw$covariates_costs_fixed$Intervention)
-  pe_random <- ncol(data_read$data_raw$covariates_effects_random$Intervention)
-  if(length(pe_random) == 0) {pe_random <- 0 }
-  pc_random <- ncol(data_read$data_raw$covariates_costs_random$Intervention)
-  if(length(pc_random) == 0) {pc_random <- 0 }
+  if(type == "SAR") {
+    if(!type %in% c(type_se, type_sc)) {
+      stop("Please add covariates to 'model.se' and/or 'mode.sc' if 'SAR' type selected.")}
+  if(type == type_se & is.null(se) | type == type_sc & is.null(sc)) {
+      stop("Cannot specify a mechanism if structural effect or cost values are not provided")}
+  }
+  n <- sum(data_read$data_raw$n)
+  pe_fixed <- as.numeric(lapply(data_read$data_raw$cov_fixed_e, ncol)[1])
+  pc_fixed <- as.numeric(lapply(data_read$data_raw$cov_fixed_c, ncol)[1])
+  if(is.list(data_read$data_raw$cov_random_e)) {
+    pe_random <- as.numeric(lapply(data_read$data_raw$cov_random_e, ncol)[1])
+  } else { pe_random <- 0}
+  if(is.list(data_read$data_raw$cov_random_c)) {
+    pc_random <- as.numeric(lapply(data_read$data_raw$cov_random_c, ncol)[1])
+  } else { pc_random <- 0}
   if(!is.null(se)) {
-  ze_fixed <- ncol(data_read$data_raw$covariates_structural_effects_fixed$Intervention)
-  ze_random <- ncol(data_read$data_raw$covariates_structural_effects_random$Intervention)
-  if(length(ze_random) == 0) {ze_random <- 0 }
-  } else {
-    ze_fixed <- 0
-    ze_random <- 0
-  }
+    ze_fixed <- as.numeric(lapply(data_read$data_raw$cov_fixed_se, ncol)[1])
+    if(is.list(data_read$data_raw$cov_random_se)) {
+      ze_random <- as.numeric(lapply(data_read$data_raw$cov_random_se, ncol)[1])
+    } else { ze_random <- 0}
+  } else { ze_fixed <- 0; ze_random <- 0}
   if(!is.null(sc)) {
-  zc_fixed <- ncol(data_read$data_raw$covariates_structural_costs_fixed$Intervention)
-  zc_random <- ncol(data_read$data_raw$covariates_structural_costs_random$Intervention)
-  if(length(zc_random) == 0) {zc_random <- 0 }
-  } else {
-    zc_fixed <- 0
-    zc_random <- 0
-  }
-  m_eff1 <- data_read$data_raw$missing_effects$Control
-  m_eff2 <- data_read$data_raw$missing_effects$Intervention
-  m_cost1 <- data_read$data_raw$missing_costs$Control
-  m_cost2 <- data_read$data_raw$missing_costs$Intervention
-  eff1 <- data_read$data_raw$raw_effects$Control
-  eff2 <- data_read$data_raw$raw_effects$Intervention
-  cost1 <- data_read$data_raw$raw_costs$Control
-  cost2 <- data_read$data_raw$raw_costs$Intervention
-  clus1_e <- data_read$data_raw$clus_e$Control
-  clus2_e <- data_read$data_raw$clus_e$Intervention
-  clus1_c <- data_read$data_raw$clus_c$Control
-  clus2_c <- data_read$data_raw$clus_c$Intervention
-  n1_clus_e <- length(unique(clus1_e))
-  n2_clus_e <- length(unique(clus2_e))
-  n1_clus_c <- length(unique(clus1_c))
-  n2_clus_c <- length(unique(clus2_c))
+    zc_fixed <- as.numeric(lapply(data_read$data_raw$cov_fixed_sc, ncol)[1])
+    if(is.list(data_read$data_raw$cov_random_sc)) {
+      zc_random <- as.numeric(lapply(data_read$data_raw$cov_random_sc, ncol)[1])
+    } else { zc_random <- 0}
+  } else { zc_fixed <- 0; zc_random <- 0}
+  eff <- data_read$data_raw$data$e
+  cost <- data_read$data_raw$data$c
+  m_eff <- data_read$data_raw$data$me
+  m_cost <- data_read$data_raw$data$mc
+  s_eff <- data_read$data_raw$se
+  s_cost <- data_read$data_raw$sc
+  if(!is.null(data_read$data_raw$clus_e)){ 
+    clus_e <- data_read$data_raw$clusn_e
+    n_clus_e <- length(data_read$data_raw$n_clus_e)
+  } else { 
+    clus_e <- NULL
+    n_clus_e <- NULL}
+  if(!is.null(data_read$data_raw$clus_c)){ 
+    clus_c <- data_read$data_raw$clusn_c
+    n_clus_c <- length(data_read$data_raw$n_clus_c)
+  } else { 
+    clus_c <- NULL
+    n_clus_c <- NULL}
+  if(!is.null(data_read$data_raw$clus_se)){ 
+    clus_se <- data_read$data_raw$clusn_se
+    n_clus_se <- length(data_read$data_raw$n_clus_se)
+  } else { 
+    clus_se <- NULL
+    n_clus_se <- NULL}
+  if(!is.null(data_read$data_raw$clus_sc)){ 
+    clus_sc <- data_read$data_raw$clusn_sc
+    n_clus_sc <- length(data_read$data_raw$n_clus_sc)
+  } else { 
+    clus_sc <- NULL
+    n_clus_sc <- NULL}
   if(!is.null(se)) {
-    d_eff1 <- data_read$data_raw$structural_effects$Control
-    d_eff2 <- data_read$data_raw$structural_effects$Intervention
-    clus1_se <- data_read$data_raw$clus_se$Control
-    clus2_se <- data_read$data_raw$clus_se$Intervention
-    n1_clus_se <- length(unique(clus1_se))
-    n2_clus_se <- length(unique(clus2_se))
-    formula.se_fixed <- all.vars(data_read$model_formula$mf_model.se_fixed)
-    formula.se.length_fixed <- length(formula.se_fixed)
-  } else {
-    d_eff1 <- d_eff2 <- NULL
-    clus1_se <- clus2_se <- NULL
-    n1_clus_se <- n2_clus_se <- NULL
-    formula.se_fixed <- 0
-    formula.se.length_fixed <- 0
-  }
+  formula.se_fixed <- all.vars(data_read$model_formula$mf_model.se_fixed)
+  formula.se.length_fixed <- length(formula.se_fixed)
+  } else { formula.se_fixed <- formula.se.length_fixed <- 0}
   if(!is.null(sc)) {
-    d_cost1 <- data_read$data_raw$structural_costs$Control
-    d_cost2 <- data_read$data_raw$structural_costs$Intervention
-    clus1_sc <- data_read$data_raw$clus_sc$Control
-    clus2_sc <- data_read$data_raw$clus_sc$Intervention
-    n1_clus_sc <- length(unique(clus1_sc))
-    n2_clus_sc <- length(unique(clus2_sc))
-    formula.sc_fixed <- all.vars(data_read$model_formula$mf_model.sc_fixed)
-    formula.sc.length_fixed <- length(formula.sc_fixed)
-  } else {
-    d_cost1 <- d_cost2 <- NULL
-    clus1_sc <- clus2_sc <- NULL
-    n1_clus_sc <- n2_clus_sc <- NULL
-    formula.sc_fixed <- 0
-    formula.sc.length_fixed <- 0
+  formula.sc_fixed <- all.vars(data_read$model_formula$mf_model.sc_fixed)
+  formula.sc.length_fixed <- length(formula.sc_fixed)
+  } else { formula.sc_fixed <- formula.sc.length_fixed <- 0}
+  if(!any(is.na(eff)) & !any(is.na(cost))) {
+    stop("At leat one missing value is required in either the effect or cost variables")}
+  if(!any(is.na(eff)) & !is.null(se)) {
+    if(formula.se.length_fixed != 1 | formula.se_fixed[1] != "se") {
+      stop("At least one missing effect value is required to specify `model.se`")}
   }
-  if(length(which(is.na(c(eff1, eff2)))) == 0 & length(which(is.na(c(cost1, cost2)))) == 0) {
-    stop("At leat one missing value is required in either the effects or costs variables")
+  if(!any(is.na(cost)) & !is.null(sc)) {
+    if(formula.sc.length_fixed != 1 | formula.sc_fixed[1] != "sc") {
+      stop("At least one missing cost value is required to specify `model.sc`")}
   }
-  N1_cc <- data_read$data_raw$arm_lengths_cc[, 1]
-  N2_cc <- data_read$data_raw$arm_lengths_cc[, 2]
-  N1_mis <- data_read$data_raw$arm_missing_data[, 1]
-  N2_mis <- data_read$data_raw$arm_missing_data[, 2]
-  X1_e_fixed <- as.matrix(data_read$data_raw$covariates_effects_fixed$Control)
-  X2_e_fixed <- as.matrix(data_read$data_raw$covariates_effects_fixed$Intervention)
-  X1_c_fixed <- as.matrix(data_read$data_raw$covariates_costs_fixed$Control)
-  X2_c_fixed <- as.matrix(data_read$data_raw$covariates_costs_fixed$Intervention)
-  if(pe_fixed == 1) {
-    X1_e_fixed <- as.vector(X1_e_fixed)
-    X2_e_fixed <- as.vector(X2_e_fixed)
-  }
-  if(pc_fixed == 1) {
-    X1_c_fixed <- as.vector(X1_c_fixed)
-    X2_c_fixed <- as.vector(X2_c_fixed)
-  }
-  mean_cov_e1_fixed <- as.vector(data_read$data_raw$mean_cov_effects_fixed$Control)
-  mean_cov_e2_fixed <- as.vector(data_read$data_raw$mean_cov_effects_fixed$Intervention)
-  mean_cov_c1_fixed <- as.vector(data_read$data_raw$mean_cov_costs_fixed$Control)
-  mean_cov_c2_fixed <- as.vector(data_read$data_raw$mean_cov_costs_fixed$Intervention)
+  X_e_fixed <- data_read$data_raw$x_e_fixed
+  X_c_fixed <- data_read$data_raw$x_c_fixed
+  mean_cov_e_fixed <- apply(X_e_fixed, 2, mean, na.rm = TRUE)
+  mean_cov_c_fixed <- apply(X_c_fixed, 2, mean, na.rm = TRUE)
   if(length(model_e_random) != 0 & pe_random != 0) { 
-    X1_e_random <- as.matrix(data_read$data_raw$covariates_effects_random$Control)
-    X2_e_random <- as.matrix(data_read$data_raw$covariates_effects_random$Intervention)
-    if(pe_random == 1) {
-      X1_e_random <- as.vector(X1_e_random)
-      X2_e_random <- as.vector(X2_e_random)
-    }
-    mean_cov_e1_random <- as.vector(data_read$data_raw$mean_cov_effects_random$Control)
-    mean_cov_e2_random <- as.vector(data_read$data_raw$mean_cov_effects_random$Intervention)
-  } else { 
-    X1_e_random <- X2_e_random <- NULL
-    mean_cov_e1_random <- mean_cov_e2_random <- NULL }
+    X_e_random <- data_read$data_raw$x_e_random
+    if(pe_random == 1) { 
+      X_e_random <- as.vector(X_e_random)
+      mean_cov_e_random <- mean(X_e_random, na.rm = TRUE)
+      } else if(pe_random > 1) {
+    mean_cov_e_random <- apply(X_e_random, 2, mean, na.rm = TRUE)}
+    } else { X_e_random <- mean_cov_e_random <- NULL}
   if(length(model_c_random) != 0 & pc_random != 0) { 
-    X1_c_random <- as.matrix(data_read$data_raw$covariates_costs_random$Control)
-    X2_c_random <- as.matrix(data_read$data_raw$covariates_costs_random$Intervention)
-    if(pc_random == 1) {
-      X1_c_random <- as.vector(X1_c_random)
-      X2_c_random <- as.vector(X2_c_random)
-    }
-    mean_cov_c1_random <- as.vector(data_read$data_raw$mean_cov_costs_random$Control)
-    mean_cov_c2_random <- as.vector(data_read$data_raw$mean_cov_costs_random$Intervention)
-  } else { 
-    X1_c_random <- X2_c_random <- NULL 
-    mean_cov_c1_random <- mean_cov_c2_random <- NULL }
-  if(is.null(sc) == TRUE & is.null(se) == FALSE) {
-  Z1_e_fixed <- as.matrix(data_read$data_raw$covariates_structural_effects_fixed$Control)
-  Z2_e_fixed <- as.matrix(data_read$data_raw$covariates_structural_effects_fixed$Intervention)
-  if(ze_fixed == 1) {
-    Z1_e_fixed <- as.vector(Z1_e_fixed)
-    Z2_e_fixed <- as.vector(Z2_e_fixed)
-  }
-  mean_z_e1_fixed <- as.vector(data_read$data_raw$mean_cov_structural_effects_fixed$Control)
-  mean_z_e2_fixed <- as.vector(data_read$data_raw$mean_cov_structural_effects_fixed$Intervention)
-  Z1_c_fixed <- as.vector(rep(0, N1))
-  Z2_c_fixed <- as.vector(rep(0, N2))
-  mean_z_c1_fixed <- as.vector(rep(0, 1)) 
-  mean_z_c2_fixed <- as.vector(rep(0, 1)) 
-  } else if(is.null(sc) == FALSE & is.null(se) == TRUE) {
-  Z1_c_fixed <- as.matrix(data_read$data_raw$covariates_structural_costs_fixed$Control)
-  Z2_c_fixed <- as.matrix(data_read$data_raw$covariates_structural_costs_fixed$Intervention)
-  if(zc_fixed == 1) {
-    Z1_c_fixed <- as.vector(Z1_c_fixed)
-    Z2_c_fixed <- as.vector(Z2_c_fixed)
-  }
-  mean_z_c1_fixed <- as.vector(data_read$data_raw$mean_cov_structural_costs_fixed$Control)
-  mean_z_c2_fixed <- as.vector(data_read$data_raw$mean_cov_structural_costs_fixed$Intervention)
-  Z1_e_fixed <- as.vector(rep(0, N1))
-  Z2_e_fixed <- as.vector(rep(0, N2))
-  mean_z_e1_fixed <- as.vector(rep(0, 1)) 
-  mean_z_e2_fixed <- as.vector(rep(0, 1)) 
-  } else if(is.null(sc) == FALSE & is.null(se) == FALSE) {
-  Z1_e_fixed <- as.matrix(data_read$data_raw$covariates_structural_effects_fixed$Control)
-  Z2_e_fixed <- as.matrix(data_read$data_raw$covariates_structural_effects_fixed$Intervention)
-  if(ze_fixed == 1) {
-    Z1_e_fixed <- as.vector(Z1_e_fixed)
-    Z2_e_fixed <- as.vector(Z2_e_fixed)
-  }
-  mean_z_e1_fixed <- as.vector(data_read$data_raw$mean_cov_structural_effects_fixed$Control)
-  mean_z_e2_fixed <- as.vector(data_read$data_raw$mean_cov_structural_effects_fixed$Intervention)
-  Z1_c_fixed <- as.matrix(data_read$data_raw$covariates_structural_costs_fixed$Control)
-  Z2_c_fixed <- as.matrix(data_read$data_raw$covariates_structural_costs_fixed$Intervention)
-  if(zc_fixed == 1) {
-    Z1_c_fixed <- as.vector(Z1_c_fixed)
-    Z2_c_fixed <- as.vector(Z2_c_fixed)
-  }
-  mean_z_c1_fixed <- as.vector(data_read$data_raw$mean_cov_structural_costs_fixed$Control)
-  mean_z_c2_fixed <- as.vector(data_read$data_raw$mean_cov_structural_costs_fixed$Intervention)
-  }
+    X_c_random <- data_read$data_raw$x_c_random
+    if(pc_random == 1) { 
+      X_c_random <- as.vector(X_c_random)
+      mean_cov_c_random <- mean(X_c_random, na.rm = TRUE)
+      } else if(pc_random > 1) {
+    mean_cov_c_random <- apply(X_c_random, 2, mean, na.rm = TRUE)}
+    } else { X_c_random <- mean_cov_c_random <- NULL}
+  if(!is.null(se)) {
+    Z_e_fixed <- data_read$data_raw$z_e_fixed
+    if(ze_fixed == 1) { 
+      Z_e_fixed <- as.vector(Z_e_fixed)
+      mean_z_e_fixed <- mean(Z_e_fixed, na.rm = TRUE)
+    } else if(ze_fixed > 1) {
+      mean_z_e_fixed <- apply(Z_e_fixed, 2, mean, na.rm = TRUE)}
+  } else { Z_e_fixed <- mean_z_e_fixed <- NULL}
+  if(!is.null(sc)) {
+    Z_c_fixed <- data_read$data_raw$z_c_fixed
+    if(zc_fixed == 1) { 
+      Z_c_fixed <- as.vector(Z_c_fixed)
+      mean_z_c_fixed <- mean(Z_c_fixed, na.rm = TRUE)
+    } else if(zc_fixed > 1) {
+      mean_z_c_fixed <- apply(Z_c_fixed, 2, mean, na.rm = TRUE)}
+  } else { Z_c_fixed <- mean_z_c_fixed <- NULL}
   corr_assumption_fixed <- model.frame(formula = data_read$model_formula$mf_model.c_fixed, data = data)
-  if("e" %in% names(corr_assumption_fixed)) {
-    ind_fixed = FALSE  
+  if("e" %in% names(corr_assumption_fixed)) { 
+    ind_fixed <- FALSE  
   } else {
-    ind_fixed = TRUE 
-    ind_random = TRUE 
-  }
-  if(ind_fixed == FALSE & "e" %in% model_c_random) {
-    ind_random = FALSE
-  } else if(ind_fixed == FALSE & !("e" %in% model_c_random)) {
-    ind_random = TRUE
-  }
-  if(length(model_se_random) != 0 & ze_random != 0 & is.null(se) == FALSE) {
-    Z1_e_random <- as.matrix(data_read$data_raw$covariates_structural_effects_random$Control)
-    Z2_e_random <- as.matrix(data_read$data_raw$covariates_structural_effects_random$Intervention)
-    if(ze_random == 1) {
-      Z1_e_random <- as.vector(Z1_e_random)
-      Z2_e_random <- as.vector(Z2_e_random)
-    }
-    mean_z_e1_random <- as.vector(data_read$data_raw$mean_cov_structural_effects_random$Control)
-    mean_z_e2_random <- as.vector(data_read$data_raw$mean_cov_structural_effects_random$Intervention)
-  } else {
-    Z1_e_random <- Z2_e_random <- NULL
-    mean_z_e1_random <- mean_z_e2_random <- NULL
-  }
-  if(length(model_sc_random) != 0 & zc_random != 0 & is.null(sc) == FALSE) {
-    Z1_c_random <- as.matrix(data_read$data_raw$covariates_structural_costs_random$Control)
-    Z2_c_random <- as.matrix(data_read$data_raw$covariates_structural_costs_random$Intervention)
-    if(zc_random == 1) {
-      Z1_c_random <- as.vector(Z1_c_random)
-      Z2_c_random <- as.vector(Z2_c_random)
-    }
-    mean_z_c1_random <- as.vector(data_read$data_raw$mean_cov_structural_costs_random$Control)
-    mean_z_c2_random <- as.vector(data_read$data_raw$mean_cov_structural_costs_random$Intervention)
-  } else {
-    Z1_c_random <- Z2_c_random <- NULL
-    mean_z_c1_random <- mean_z_c2_random <- NULL
-  }
+    ind_fixed <- TRUE 
+    ind_random <- TRUE}
+  if(!ind_fixed & "e" %in% model_c_random) {
+    ind_random <- FALSE
+  } else if(!ind_fixed & !("e" %in% model_c_random)) {
+    ind_random <- TRUE}
+  if(length(model_se_random) != 0 & ze_random != 0) {
+    Z_e_random <- data_read$data_raw$z_e_random
+    if(ze_random == 1) { 
+      Z_e_random <- as.vector(Z_e_random)
+      mean_z_e_random <- mean(Z_e_random, na.rm = TRUE)
+    } else if(ze_random > 1) {
+      mean_z_e_random <- apply(Z_e_random, 2, mean, na.rm = TRUE)}
+  } else { Z_e_random <- mean_z_e_random <- NULL}
+  if(length(model_sc_random) != 0 & zc_random != 0) {
+    Z_c_random <- data_read$data_raw$z_c_random
+    if(zc_random == 1) { 
+      Z_c_random <- as.vector(Z_c_random)
+      mean_z_c_random <- mean(Z_c_random, na.rm = TRUE)
+    } else if(zc_random > 1) {
+      mean_z_c_random <- apply(Z_c_random, 2, mean, na.rm = TRUE)}
+  } else { Z_c_random <- mean_z_c_random <- NULL}  
   if(anyDuplicated(names(prior)) > 0) {
-    stop("you cannot provide multiple priors with the same name") 
-  }
-  if(any(prior == "default") == TRUE) {
+    stop("You cannot provide multiple priors with the same name")}  
+  if(any(prior == "default")) {
     prior <- list(default = "default")
-    } else if(any(prior == "default") == FALSE) {
+  } else if(!any(prior == "default")) {
     list_check_vector <- lapply(prior, is.vector)
-    if(all(as.logical(list_check_vector)) == FALSE) {
-      stop("all user-supplied priors should be in vector format")
-    }
-    par_prior_fixed <- c("alpha0.prior", "beta0.prior", "sigma.prior.e", "sigma.prior.c", "gamma.prior.e", "gamma.prior.c", 
-                         "alpha.prior", "beta.prior", "gamma0.prior.e", "gamma0.prior.c", "se.prior", "sc.prior", "beta_f.prior")
-    par_prior_random <- c("mu.a0.prior", "mu.b0.prior", "mu.g.prior.e", "mu.g.prior.c", "mu.a.prior", "mu.b.prior", "mu.g0.prior.e", "mu.g0.prior.c", "mu.b_f.prior",
-                          "s.a0.prior", "s.b0.prior", "s.g.prior.e", "s.g.prior.c", "s.a.prior", "s.b.prior", "s.g0.prior.e", "s.g0.prior.c", "s.b_f.prior")
-    stop_mes <- "priors can be assigned only using specific string parameter names depending on the type of model assumed. Type ''help(hurdle)'' for more details"
-    if(!all(names(list_check_vector) %in% c(par_prior_fixed, par_prior_random) == TRUE)) { stop(stop_mes) }
-    if(is.vector(X1_e_fixed) == TRUE & identical(X1_e_fixed, rep(1, N1))) {
-      if("alpha.prior" %in% names(list_check_vector)) { stop(stop_mes) }
-    }
-    if(is.vector(X1_c_fixed) == TRUE & identical(X1_c_fixed, rep(1, N1))) {
-      if("beta.prior" %in% names(list_check_vector)) { stop(stop_mes) }
-    }
-    if(is.vector(Z1_e_fixed) == TRUE & identical(Z1_e_fixed, rep(1, N1))) {
-      if("gamma.prior.e" %in% names(list_check_vector)) { stop(stop_mes) }
-    }
-    if(is.vector(Z1_c_fixed) == TRUE & identical(Z1_c_fixed, rep(1, N1))) {
-      if("gamma.prior.c" %in% names(list_check_vector)) { stop(stop_mes) }
-    }
+    if(!all(as.logical(list_check_vector))) {
+      stop("All user-supplied priors should be in list format")}
+    par_prior_fixed <- c("sigma.prior.e", "sigma.prior.c", "gamma.prior.e", "gamma.prior.c", 
+                         "alpha.prior", "beta.prior", "beta_f.prior")
+    par_prior_random <- c("mu.g.prior.e", "mu.g.prior.c", "mu.a.prior", "mu.b.prior", 
+                          "mu.b_f.prior", "s.g.prior.e", "s.g.prior.c", 
+                          "s.a.prior", "s.b.prior", "s.b_f.prior")
+    stop_mes <- "Please specify priors using required names/values and according to assumed model structure. Type ''help(selection)'' for more details."
+    if(!all(names(list_check_vector) %in% c(par_prior_fixed, par_prior_random))) { stop(stop_mes)}
     if(length(model_e_random) == 0 | pe_random == 0) {
-      if("mu.a0.prior" %in% names(list_check_vector) | "s.a0.prior" %in% names(list_check_vector) |
-         "mu.a.prior" %in% names(list_check_vector) | "s.a.prior" %in% names(list_check_vector)) { stop(stop_mes)}
-    } else if(length(model_e_random) != 0 & pe_random == 1) { 
-      if("mu.a.prior" %in% names(list_check_vector) | "s.a.prior" %in% names(list_check_vector)) { stop(stop_mes) }
+      if(any(names(list_check_vector) %in% c("mu.a.prior", "s.a.prior"))) { stop(stop_mes)}
     }
     if(length(model_c_random) == 0 | pc_random == 0) {
-      if("mu.b0.prior" %in% names(list_check_vector) | "s.b0.prior" %in% names(list_check_vector) |
-         "mu.b.prior" %in% names(list_check_vector) | "s.b.prior" %in% names(list_check_vector)) { stop(stop_mes)}
-    } else if(length(model_c_random) != 0 & pc_random == 1) { 
-      if("mu.b.prior" %in% names(list_check_vector) | "s.b.prior" %in% names(list_check_vector)) { stop(stop_mes) }
+      if(any(names(list_check_vector) %in% c("mu.b.prior", "s.b.prior"))) { stop(stop_mes)}
     }
-    if(is.null(se) == TRUE) {
-      if("se.prior" %in% names(list_check_vector)) {stop(stop_mes) }
-      if("gamma0.prior.e" %in% names(list_check_vector) | "gamma.prior.e" %in% names(list_check_vector)) {stop(stop_mes) }
-      if("mu.g0.prior.e" %in% names(list_check_vector) | "mu.g.prior.e" %in% names(list_check_vector) |
-         "s.g0.prior.e" %in% names(list_check_vector) | "s.g.prior.e" %in% names(list_check_vector)) { stop(stop_mes)}
-    } else if(is.null(se) == FALSE) {
-      if(length(model_se_random) == 0 | ze_random == 0) {
-        if("mu.g0.prior.e" %in% names(list_check_vector) | "mu.g.prior.e" %in% names(list_check_vector) |
-           "s.g0.prior.e" %in% names(list_check_vector) | "s.g.prior.e" %in% names(list_check_vector)) { stop(stop_mes)}
-      } else if(length(model_se_random) != 0 & ze_random == 1) { 
-        if("mu.g.prior.e" %in% names(list_check_vector) | "s.g.prior.e" %in% names(list_check_vector)) { stop(stop_mes) }
-      } 
+    if(length(Z_e_fixed) == 0 | ze_fixed == 0) {
+      if(any(names(list_check_vector) %in% c("gamma.prior.e"))) { stop(stop_mes)}
     }
-    if(is.null(sc) == TRUE) {
-      if("sc.prior" %in% names(list_check_vector)) {stop(stop_mes) }
-      if("gamma0.prior.c" %in% names(list_check_vector) | "gamma.prior.c" %in% names(list_check_vector)) {stop(stop_mes) }
-      if("mu.g0.prior.c" %in% names(list_check_vector) | "s.g0.prior.c" %in% names(list_check_vector) | 
-         "mu.g.prior.c" %in% names(list_check_vector) | "s.g.prior.c" %in% names(list_check_vector)) { stop(stop_mes)}
-    } else if(is.null(sc) == FALSE) {
-      if(length(model_sc_random) == 0 | zc_random == 0) {
-        if("mu.g0.prior.c" %in% names(list_check_vector) | "s.g0.prior.c" %in% names(list_check_vector) | 
-           "mu.g.prior.c" %in% names(list_check_vector) | "s.g.prior.c" %in% names(list_check_vector)) { stop(stop_mes)}
-      } else if(length(model_sc_random) != 0 & zc_random == 1) { 
-        if("mu.g.prior.c" %in% names(list_check_vector) | "s.g.prior.c" %in% names(list_check_vector)) { stop(stop_mes) }
-      }
+    if(length(Z_c_fixed) == 0 | zc_fixed == 0) {
+      if(any(names(list_check_vector) %in% c("gamma.prior.c"))) { stop(stop_mes)}
     }
-    if(ind_fixed == TRUE) {
-      if("beta_f.prior" %in% names(list_check_vector)) { stop(stop_mes) } 
-      if("b_f.prior" %in% names(list_check_vector)) { stop(stop_mes) } 
+    if(length(model_se_random) == 0 | ze_random == 0) {
+      if(any(names(list_check_vector) %in% c("mu.g.prior.e", "s.g.prior.e"))) { stop(stop_mes)}
     }
-    if(ind_fixed == FALSE & ind_random == TRUE) {
-      if("mu.b_f.prior" %in% names(list_check_vector) | "s.b_f.prior" %in% names(list_check_vector)) { stop(stop_mes) } 
+    if(length(model_sc_random) == 0 | zc_random == 0) {
+      if(any(names(list_check_vector) %in% c("mu.g.prior.c", "s.g.prior.c"))) { stop(stop_mes)}
+    }
+    if(ind_fixed) {
+      if(any(names(list_check_vector) %in% c("beta_f.prior", "b_f.prior"))) { stop(stop_mes)}
+    }
+    if(!ind_fixed & ind_random) {
+      if(any(names(list_check_vector) %in% c("mu.b_f.prior", "s.b_f.prior"))) { stop(stop_mes)}
     }
   }
   if(length(model_c_random) == 1) {
-    if(model_c_random == "e") {is_c_random_c <- TRUE} else {is_c_random_c <- FALSE}
-  } else {is_c_random_c <- FALSE }
+    if(model_c_random == "e") { 
+      is_c_random_c <- TRUE} else { is_c_random_c <- FALSE}
+  } else { is_c_random_c <- FALSE}
   if(length(model_c_random) == 2) {
-    if(all(model_c_random == c("1", "e")) == TRUE) {is_int_c_random_c <- TRUE} else {is_int_c_random_c <- FALSE}
-  } else {is_int_c_random_c <- FALSE }
-  if(exists("sigma.prior.e", where = prior)) {sigma.prior.e = prior$sigma.prior.e} else {sigma.prior.e = NULL }
-  if(exists("sigma.prior.c", where = prior)) {sigma.prior.c = prior$sigma.prior.c} else {sigma.prior.c = NULL }
-  if(exists("alpha0.prior", where = prior)) {alpha0.prior = prior$alpha0.prior} else {alpha0.prior = NULL }
-  if(exists("beta0.prior", where = prior)) {beta0.prior = prior$beta0.prior} else {beta0.prior = NULL }
-  if(exists("alpha.prior", where = prior)) {alpha.prior = prior$alpha.prior} else {alpha.prior = NULL }
-  if(exists("beta.prior", where = prior)) {beta.prior = prior$beta.prior} else {beta.prior = NULL }
-  if(exists("gamma.prior.e", where = prior)) {gamma.prior.e = prior$gamma.prior.e} else {gamma.prior.e = NULL }
-  if(exists("gamma.prior.c", where = prior)) {gamma.prior.c = prior$gamma.prior.c} else {gamma.prior.c = NULL }
-  if(exists("gamma0.prior.e", where = prior)) {gamma0.prior.e = prior$gamma0.prior.e} else {gamma0.prior.e = NULL }
-  if(exists("gamma0.prior.c", where = prior)) {gamma0.prior.c = prior$gamma0.prior.c} else {gamma0.prior.c = NULL }
-  if(exists("se.prior", where = prior)) {se.prior = prior$se.prior} else {se.prior = 0.0000001 }
-  if(exists("sc.prior", where = prior)) {sc.prior = prior$sc.prior} else {sc.prior = 0.0000001 }
-  if(exists("beta_f.prior", where = prior)) {beta_f.prior = prior$beta_f.prior} else {beta_f.prior = NULL }
-  if(exists("mu.a0.prior", where = prior)) {mu.a0.prior = prior$mu.a0.prior} else {mu.a0.prior = NULL }
-  if(exists("s.a0.prior", where = prior)) {s.a0.prior = prior$s.a0.prior} else {s.a0.prior = NULL }
-  if(exists("mu.b0.prior", where = prior)) {mu.b0.prior = prior$mu.b0.prior} else {mu.b0.prior = NULL }
-  if(exists("s.b0.prior", where = prior)) {s.b0.prior = prior$s.b0.prior} else {s.b0.prior = NULL }
-  if(exists("mu.a.prior", where = prior)) {mu.a.prior = prior$mu.a.prior} else {mu.a.prior = NULL }
-  if(exists("s.a.prior", where = prior)) {s.a.prior = prior$s.a.prior} else {s.a.prior = NULL }
-  if(exists("mu.b.prior", where = prior)) {mu.b.prior = prior$mu.b.prior} else {mu.b.prior = NULL }
-  if(exists("s.b.prior", where = prior)) {s.b.prior = prior$s.b.prior} else {s.b.prior = NULL }
-  if(exists("mu.g.prior.e", where = prior)) {mu.g.prior.e = prior$mu.g.prior.e} else {mu.g.prior.e = NULL }
-  if(exists("s.g.prior.e", where = prior)) {s.g.prior.e = prior$s.g.prior.e} else {s.g.prior.e = NULL }
-  if(exists("mu.g0.prior.e", where = prior)) {mu.g0.prior.e = prior$mu.g0.prior.e} else {mu.g0.prior.e = NULL }
-  if(exists("s.g0.prior.e", where = prior)) {s.g0.prior.e = prior$s.g0.prior.e} else {s.g0.prior.e = NULL }
-  if(exists("mu.g0.prior.c", where = prior)) {mu.g0.prior.c = prior$mu.g0.prior.c} else {mu.g0.prior.c = NULL }
-  if(exists("s.g0.prior.c", where = prior)) {s.g0.prior.c = prior$s.g0.prior.c} else {s.g0.prior.c = NULL }
-  if(exists("mu.g.prior.c", where = prior)) {mu.g.prior.c = prior$mu.g.prior.c} else {mu.g.prior.c = NULL }
-  if(exists("s.g.prior.c", where = prior)) {s.g.prior.c = prior$s.g.prior.c} else {s.g.prior.c = NULL }
-  if(exists("mu.b_f.prior", where = prior)) {mu.b_f.prior = prior$mu.b_f.prior} else {mu.b_f.prior = NULL }
-  if(exists("s.b_f.prior", where = prior)) {s.b_f.prior = prior$s.b_f.prior} else {s.b_f.prior = NULL }
+    if(all(model_c_random == c("1", "e"))) { is_int_c_random_c <- TRUE} else { is_int_c_random_c <- FALSE}
+  } else { is_int_c_random_c <- FALSE}
+  if(exists("sigma.prior.e", where = prior)) { sigma.prior.e = prior$sigma.prior.e} else { sigma.prior.e = NULL}
+  if(exists("sigma.prior.c", where = prior)) { sigma.prior.c = prior$sigma.prior.c} else { sigma.prior.c = NULL}
+  if(exists("alpha.prior", where = prior)) { alpha.prior = prior$alpha.prior} else { alpha.prior = NULL}
+  if(exists("beta.prior", where = prior)) { beta.prior = prior$beta.prior} else { beta.prior = NULL}
+  if(exists("gamma.prior.e", where = prior)) { gamma.prior.e = prior$gamma.prior.e} else { gamma.prior.e = NULL}
+  if(exists("gamma.prior.c", where = prior)) { gamma.prior.c = prior$gamma.prior.c} else { gamma.prior.c = NULL}
+  if(exists("beta_f.prior", where = prior)) { beta_f.prior = prior$beta_f.prior} else { beta_f.prior = NULL}
+  if(exists("mu.a.prior", where = prior)) { mu.a.prior = prior$mu.a.prior} else { mu.a.prior = NULL}
+  if(exists("s.a.prior", where = prior)) { s.a.prior = prior$s.a.prior} else { s.a.prior = NULL}
+  if(exists("mu.b.prior", where = prior)) { mu.b.prior = prior$mu.b.prior} else { mu.b.prior = NULL}
+  if(exists("s.b.prior", where = prior)) { s.b.prior = prior$s.b.prior} else { s.b.prior = NULL}
+  if(exists("mu.g.prior.e", where = prior)) { mu.g.prior.e = prior$mu.g.prior.e} else { mu.g.prior.e = NULL}
+  if(exists("s.g.prior.e", where = prior)) { s.g.prior.e = prior$s.g.prior.e} else { s.g.prior.e = NULL}
+  if(exists("mu.g.prior.c", where = prior)) { mu.g.prior.c = prior$mu.g.prior.c} else { mu.g.prior.c = NULL}
+  if(exists("s.g.prior.c", where = prior)) { s.g.prior.c = prior$s.g.prior.c} else { s.g.prior.c = NULL}
+  if(exists("mu.b_f.prior", where = prior)) { mu.b_f.prior = prior$mu.b_f.prior} else { mu.b_f.prior = NULL}
+  if(exists("s.b_f.prior", where = prior)) { s.b_f.prior = prior$s.b_f.prior} else { s.b_f.prior = NULL}
+  exArgs <- list(...)
+  if(exists("se.prior", where = exArgs)) { se.prior = exArgs$se.prior} else { se.prior = 0.0000001 }
+  if(exists("sc.prior", where = exArgs)) { sc.prior = exArgs$sc.prior} else { sc.prior = 0.0000001 }
   sde <- se.prior
   sdc <- sc.prior
-  if(length(sde) != 1 | length(sdc) != 1) {stop("single value priors on std for structural values must be provided") }
-  if(exists("d_e", where = exArgs)) {d_e = as.vector(exArgs$d_e) } else {d_e = NULL }
-  if(is.null(d_e) == FALSE) {
-    if(length(d_e) != length(data$e)) {stop("please provide valid structural value indicator vector") }
-    d_eff1 = d_e[data$t == 1]
-    d_eff2 = d_e[data$t == 2]
-    if(is.null(se) == TRUE) {stop("no structural value provided") }
-    data_read$data_raw$structural_effects[[1]] <- d_eff1
-    data_read$data_raw$structural_effects[[2]] <- d_eff2
-  }
-  if(exists("d_c", where = exArgs)) {d_c = as.vector(exArgs$d_c) } else {d_c = NULL }
-  if(is.null(d_c) == FALSE) {
-    if(length(d_c) != length(data$c)) {stop("please provide valid structural value indicator vector") }
-    d_cost1 = d_c[data$t == 1]
-    d_cost2 = d_c[data$t == 2]
-    if(is.null(sc) == TRUE) {stop("no structural value provided") }
-    data_read$data_raw$structural_costs[[1]] <- d_cost1
-    data_read$data_raw$structural_costs[[2]] <- d_cost2
-  }
-    if(is.null(sc) == TRUE & is.null(se) == FALSE) {
-      data_set <- list("effects" = data_read$data_raw$raw_effects, "costs" = data_read$data_raw$raw_costs, "N in reference arm" = N1, "N in comparator arm" = N2, 
-                       "N observed in reference arm" = N1_cc, "N observed in comparator arm" = N2_cc, "N missing in reference arm" = N1_mis, "N missing in comparator arm" = N2_mis, 
-                       "covariates_effects_fixed" = data_read$data_raw$covariates_effects_fixed, "covariates_costs_fixed" = data_read$data_raw$covariates_costs_fixed, 
-                       "covariates_structural_effects_fixed" = data_read$data_raw$covariates_structural_effects_fixed, 
-                       "covariates_effects_random" = data_read$data_raw$covariates_effects_random, "covariates_costs_random" = data_read$data_raw$covariates_costs_random, 
-                       "covariates_structural_effects_random" = data_read$data_raw$covariates_structural_effects_random, "structural_effects" = data_read$data_raw$structural_effects, 
-                       "missing_effects" = data_read$data_raw$missing_effects, "missing_costs" = data_read$data_raw$missing_costs, 
-                       "clus_effects" = data_read$data_raw$clus_e, "clus_costs" = data_read$data_raw$clus_c, "clus_structural_effects" = data_read$data_raw$clus_se)
-    } else if(is.null(sc) == FALSE & is.null(se) == TRUE) {
-      data_set <- list("effects" = data_read$data_raw$raw_effects, "costs" = data_read$data_raw$raw_costs, "N in reference arm" = N1, "N in comparator arm" = N2, 
-                       "N observed in reference arm" = N1_cc, "N observed in comparator arm" = N2_cc, "N missing in reference arm" = N1_mis, "N missing in comparator arm" = N2_mis, 
-                       "covariates_effects_fixed" = data_read$data_raw$covariates_effects_fixed, "covariates_costs_fixed" = data_read$data_raw$covariates_costs_fixed, 
-                       "covariates_structural_costs_fixed" = data_read$data_raw$covariates_structural_costs_fixed, 
-                       "covariates_effects_random" = data_read$data_raw$covariates_effects_random, "covariates_costs_random" = data_read$data_raw$covariates_costs_random, 
-                       "covariates_structural_costs_random" = data_read$data_raw$covariates_structural_costs_random, "structural_costs" = data_read$data_raw$structural_costs, 
-                       "missing_effects" = data_read$data_raw$missing_effects, "missing_costs" = data_read$data_raw$missing_costs,
-                       "clus_effects" = data_read$data_raw$clus_e, "clus_costs" = data_read$data_raw$clus_c, "clus_structural_costs" = data_read$data_raw$clus_sc)
-    } else if(is.null(sc) == FALSE & is.null(se) == FALSE) {
-      data_set <- list("effects" = data_read$data_raw$raw_effects, "costs" = data_read$data_raw$raw_costs, "N in reference arm" = N1, "N in comparator arm" = N2, 
-                       "N observed in reference arm" = N1_cc, "N observed in comparator arm" = N2_cc, "N missing in reference arm" = N1_mis, "N missing in comparator arm" = N2_mis, 
-                       "covariates_effects_fixed" = data_read$data_raw$covariates_effects_fixed, "covariates_costs_fixed" = data_read$data_raw$covariates_costs_fixed, 
-                       "covariates_structural_effects_fixed" = data_read$data_raw$covariates_structural_effects_fixed, "covariates_structural_costs_fixed" = data_read$data_raw$covariates_structural_costs_fixed,
-                       "covariates_effects_random" = data_read$data_raw$covariates_effects_random, "covariates_costs_random" = data_read$data_raw$covariates_costs_random, 
-                       "covariates_structural_effects_random" = data_read$data_raw$covariates_structural_effects_random, "covariates_structural_costs_random" = data_read$data_raw$covariates_structural_costs_random, 
-                       "structural_effects" = data_read$data_raw$structural_effects, "structural_costs" = data_read$data_raw$structural_costs, "missing_effects" = data_read$data_raw$missing_effects, "missing_costs" = data_read$data_raw$missing_costs,
-                       "clus_effects" = data_read$data_raw$clus_e, "clus_costs" = data_read$data_raw$clus_c, "clus_structural_effects" = data_read$data_raw$clus_se, "clus_structural_costs" = data_read$data_raw$clus_sc)
+  if(length(sde) != 1 | length(sdc) != 1) { stop("single value priors on std for structural values must be provided")}
+  if(exists("s_e", where = exArgs)) { s_e = as.vector(exArgs$s_e)} else { s_e = NULL}
+  if(!is.null(s_e)) {
+    if(length(s_e) != length(data$e)) { stop("Please provide a valid structural value indicator vector") }
+    s_eff = s_e
+    if(is.null(se)) { stop("No structural values provided in the model formula")}
+    data_read$data_raw$se <- s_eff
+    for(i in trt_lev) {
+      data_read$data_raw$s_efft[[i]] <- s_eff[data_read$data_raw$trt_index[[i]]]
+      data_read$data_raw$n_ns_eff[i] <- length(na.omit(data_read$data_raw$efft[[i]])[na.omit(data_read$data_raw$efft[[i]]) != se])
     }
-    model_output <- run_hurdle(type = type, dist_e = dist_e, dist_c = dist_c, inits = inits, se = se, sc = sc, sde = sde, sdc = sdc, ppc = ppc)
-    if(save_model == FALSE) {
-      unlink(filein)
+    data_read$data_raw$n_s_eff <- data_read$data_raw$n_obs_e - data_read$data_raw$n_ns_eff
+  }
+  if(exists("s_c", where = exArgs)) { s_c = as.vector(exArgs$s_c)} else { s_c = NULL}
+  if(!is.null(s_c)) {
+    if(length(s_c) != length(data$c)) { stop("Please provide a valid structural value indicator vector") }
+    s_cost = s_c
+    if(is.null(sc)) { stop("No structural values provided in the model formula")}
+    data_read$data_raw$sc <- s_cost
+    for(i in trt_lev) {
+      data_read$data_raw$s_costt[[i]] <- s_cost[data_read$data_raw$trt_index[[i]]]
+      data_read$data_raw$n_ns_cost[i] <- length(na.omit(data_read$data_raw$costt[[i]])[na.omit(data_read$data_raw$costt[[i]]) != sc])
     }
-    if(exists("ref", where = exArgs)) {ref = exArgs$ref } else {ref = 2 }
-    if(exists("interventions", where = exArgs)) {interventions = exArgs$interventions } else {interventions = NULL }
-    if(exists("Kmax", where = exArgs)) {Kmax = exArgs$Kmax } else {Kmax = 50000 }
-    if(exists("wtp", where = exArgs)) {wtp = exArgs$wtp } else {wtp = NULL }
-    if(exists("plot", where = exArgs)) {plot = exArgs$plot } else {plot = FALSE }
-    cea <- BCEA::bcea(e = model_output$mean_effects, c = model_output$mean_costs, ref = ref, interventions = interventions, Kmax = Kmax, k = wtp, plot = plot)
-    format <- "wide"
-    res <- list(data_set = data_set, model_output = model_output, cea = cea, type = type, data_format = format)
-  class(res) <- "missingHE"
+    data_read$data_raw$n_s_cost <- data_read$data_raw$n_obs_c - data_read$data_raw$n_ns_cost
+  }
+  data_model <- list("n" = n, "eff" = eff, "cost" = cost, "m_eff" = m_eff, "m_cost" = m_cost, 
+                     "s_eff" = s_eff, "s_cost" = s_cost, "se" = se, "sc" = sc, "sde" = sde, "sdc" = sdc,
+                     "X_e_fixed" = X_e_fixed, "X_c_fixed" = X_c_fixed, "Z_e_fixed" = Z_e_fixed, "Z_c_fixed" = Z_c_fixed,
+                     "mean_cov_e_fixed" = mean_cov_e_fixed, "mean_cov_c_fixed" = mean_cov_c_fixed, 
+                     "mean_z_e_fixed" = mean_z_e_fixed, "mean_z_c_fixed" = mean_z_c_fixed, 
+                     "pe_fixed" = pe_fixed, "pc_fixed" = pc_fixed, "ze_fixed" = ze_fixed, "zc_fixed" = zc_fixed,
+                     "X_e_random" = X_e_random, "X_c_random" = X_c_random, "mean_cov_e_random" = mean_cov_e_random,
+                     "mean_cov_c_random" = mean_cov_c_random, "pe_random" = pe_random, "pc_random" = pc_random,
+                     "clus_e" = clus_e, "clus_c" = clus_c, "n_clus_e" = n_clus_e, "n_clus_c" = n_clus_c, 
+                     "Z_e_random" = Z_e_random, "Z_c_random" = Z_c_random, "mean_z_e_random" = mean_z_e_random, 
+                     "mean_z_c_random" = mean_z_c_random, "ze_random" = ze_random, "zc_random" = zc_random,
+                     "clus_se" = clus_se, "clus_sc" = clus_sc, "n_clus_se" = n_clus_se, "n_clus_sc" = n_clus_sc,
+                     "trt_pos_e" = data_read$data_raw$trt_pos_e, "trt_pos_c" = data_read$data_raw$trt_pos_c,
+                     "trt_pos_se" = data_read$data_raw$trt_pos_se, "trt_pos_sc" = data_read$data_raw$trt_pos_sc,
+                     "n_trt" = data_read$data_raw$n, "trt_index" = data_read$data_raw$trt_index, "trt_lev" = trt_lev,
+                     "efft" = data_read$data_raw$efft, "costt" = data_read$data_raw$costt, 
+                     "m_efft" = data_read$data_raw$m_efft, "m_costt" = data_read$data_raw$m_costt,
+                     "s_efft" = data_read$data_raw$s_efft, "s_costt" = data_read$data_raw$s_costt,
+                     "clus_e_lev" = data_read$data_raw$clus_e_lev, "clus_c_lev" = data_read$data_raw$clus_c_lev,
+                     "clus_se_lev" = data_read$data_raw$clus_se_lev, "clus_sc_lev" = data_read$data_raw$clus_sc_lev)
+  if(exists("dic", where = exArgs)) { dic = exArgs$dic} else { dic = TRUE}
+  if(exists("pd", where = exArgs)) { pd = exArgs$pd} else { pd = FALSE}
+  if(exists("n.iter.pd", where = exArgs)) { n.iter.pd = exArgs$n.iter.pd} else { n.iter.pd = 1000}
+  if(exists("n.adapt", where = exArgs)) { n.adapt = exArgs$n.adapt} else { n.adapt = 100}
+  if(exists("n.mci", where = exArgs)) { n.mci = exArgs$n.mci} else { n.mci = n.iter}
+  if(!is.logical(dic)) { stop("Please provide logical value for dic argument")}  
+  model_info <- list("is_c_random_c" = is_c_random_c, "is_int_c_random_c" = is_int_c_random_c, 
+                     "ind_random" = ind_random, "ind_fixed" = ind_fixed,
+                     "model_e_fixed" = model_e_fixed, "model_c_fixed" = model_c_fixed,
+                     "model_e_random" = model_e_random, "model_c_random" = model_c_random, 
+                     "model_se_random" = model_se_random, "model_sc_random" = model_sc_random, 
+                     "dic" = dic, "pd" = pd,  "n.iter.pd" = n.iter.pd, "n.adapt" = n.adapt, 
+                     "inits" = inits, "n.chains" = n.chains, "n.iter" = n.iter, 
+                     "n.burnin" = n.burnin, "n.thin" = n.thin, "prior" = prior, 
+                     "n.mci" = n.mci, "prob" = prob)  
+  model_output <- run_hurdle(data_model = data_model, type = type, 
+                                dist_e = dist_e, dist_c = dist_c, model_info = model_info)
+  if(!save_model) { unlink(model_output$filein)}
+  if(exists("ref", where = exArgs)) {
+    if(length(exArgs$ref) != 1 | !is.numeric(exArgs$ref)) { stop("Please provide a single numeric indicator for the reference treatment")}
+    if(exArgs$ref <= 0 | !exArgs$ref %% 1 == 0) { stop("Please provide a valid indicator value for the reference treatment")}
+    ref = exArgs$ref } else { ref = 1}
+  if(exists("interventions", where = exArgs)) { interventions = exArgs$interventions} else { interventions = NULL}
+  if(exists("Kmax", where = exArgs)) { Kmax = exArgs$Kmax} else { Kmax = 50000}
+  if(exists("wtp", where = exArgs)) { wtp = exArgs$wtp} else { wtp = NULL}
+  if(exists("plot", where = exArgs)) { plot = exArgs$plot} else { plot = FALSE}
+  cea <- BCEA::bcea(e = model_output$mean_effects, c = model_output$mean_costs, ref = ref, 
+                    interventions = interventions, Kmax = Kmax, k = wtp, plot = plot)
+  format <- "wide"
+  res <- list(data_set = data_read, model_output = model_output, 
+              cea = cea, type = type, data_format = format)
+  class(res) <- "missingHE"  
   return(res)
 }
