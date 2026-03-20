@@ -498,7 +498,7 @@ write_pattern <- function(dist_e , dist_c, type, model_txt_info) {
         if(dist_e == "negbin") {model_string_jags <- gsub("tau_e_p[2] <- tau_e_p[1]", "tau_e_p[2] ~ dunif(0, 100)", model_string_jags, fixed = TRUE) }        
       }
       if(all(model_txt_info$d_or %in% c(1, 4))) {
-        if(type %in% c("MNAR", "MNAR_cost")) {model_string_jags <- gsub("mu_c_p[2] <- meanc_p[2]", "mu_c_p1[2] <- meanc_p[2] + delta_c", model_string_jags, fixed = TRUE) }
+        if(type %in% c("MNAR", "MNAR_cost")) {model_string_jags <- gsub("mu_c_p[2] <- meanc_p[2]", "mu_c_p[2] <- meanc_p[2] + delta_c", model_string_jags, fixed = TRUE) }
         model_string_jags <- gsub("beta_p[j, 2] ~ dnorm(0, 0.0000001)", "beta_p[j, 2] <- beta_p[j, 1]", model_string_jags, fixed = TRUE) 
         if(dist_c == "norm") {model_string_jags <- gsub("s_c_p[2] ~ dt(0, pow(2.5, -2), 1)T(0,)", "s_c_p[2] <- s_c_p[1]", model_string_jags, fixed = TRUE) }
         if(dist_c == "lnorm") {model_string_jags <- gsub("ls_c_p[2] ~ dunif(0, 10)", "ls_c_p[2] <- ls_c_p[1]", model_string_jags, fixed = TRUE) }
@@ -518,7 +518,7 @@ write_pattern <- function(dist_e , dist_c, type, model_txt_info) {
       if(dist_c == "lnorm") {
         model_string_jags <- gsub("ls_c_p[4] <- ls_c_p[2]", "", model_string_jags, fixed = TRUE)
         model_string_jags <- gsub("s_c_p[4] <- s_c_p[2]", "", model_string_jags, fixed = TRUE) }
-      if(dist_e == "norm") {model_string_jags <- gsub("s_e_p1[4] <- s_e_p1[3]", "", model_string_jags, fixed = TRUE) }
+      if(dist_e == "norm") {model_string_jags <- gsub("s_e_p[4] <- s_e_p[3]", "", model_string_jags, fixed = TRUE) }
       if(dist_e %in% c("beta", "gamma", "exp", "weib", "logis", "bern", "pois")) {model_string_jags <- gsub("s_e_p[4] <- s_e_p[3]", "", model_string_jags, fixed = TRUE) }
       if(dist_e == "negbin") {model_string_jags <- gsub("tau_e_p[4] <- tau_e_p[3]", "", model_string_jags, fixed = TRUE) }
       if(!model_txt_info$ind_fixed) {model_string_jags <- gsub("beta_f_p[4] <- beta_f_p[1]" , "", model_string_jags, fixed = TRUE) }      
