@@ -182,8 +182,8 @@ prior_pattern <- function(type, dist_e, dist_c, model_txt_info, model_string_jag
       prior_deltae_str1 <- paste("alpha_p[j, 1] ~ ", paste(prior.dist.d["alpha.prior"]), "(", alpha.prior[1], ", ", alpha.prior[2], ", ", alpha.prior[3], ", ", alpha.prior[4], ")", sep = "")
       prior_deltae_str3 <- paste("alpha_p[j, 3] ~ ", paste(prior.dist.d["alpha.prior"]), "(", alpha.prior[1], ", ", alpha.prior[2], ", ", alpha.prior[3], ", ", alpha.prior[4], ")", sep = "")
     }
-    model_string_jags <- gsub("alpha_p[j, 1] ~ dnorm(0, 0.0000001)", prior_deltae_str1, model_string_jags, fixed = TRUE)
-    model_string_jags <- gsub("alpha_p[j, 3] ~ dnorm(0, 0.0000001)", prior_deltae_str3, model_string_jags, fixed = TRUE)
+    model_string_jags <- gsub("alpha_p[j, 1] ~ dnorm(0, 0.001)", prior_deltae_str1, model_string_jags, fixed = TRUE)
+    model_string_jags <- gsub("alpha_p[j, 3] ~ dnorm(0, 0.001)", prior_deltae_str3, model_string_jags, fixed = TRUE)
    }  
   }
   if(model_txt_info$n_patterns == 3 & !2 %in% model_txt_info$d_or & model_txt_info$restriction == "CC") {
@@ -225,8 +225,8 @@ prior_pattern <- function(type, dist_e, dist_c, model_txt_info, model_string_jag
         prior_deltae_str1 <- paste("alpha_p[j, 1] ~ ", paste(prior.dist.d["alpha.prior"]), "(", alpha.prior[1], ", ", alpha.prior[2], ", ", alpha.prior[3], ", ", alpha.prior[4], ")", sep = "")
         prior_deltae_str3 <- paste("alpha_p[j, 3] ~ ", paste(prior.dist.d["alpha.prior"]), "(", alpha.prior[1], ", ", alpha.prior[2], ", ", alpha.prior[3], ", ", alpha.prior[4], ")", sep = "")
       }
-      model_string_jags <- gsub("alpha_p[j, 1] ~ dnorm(0, 0.0000001)", prior_deltae_str1, model_string_jags, fixed = TRUE)
-      model_string_jags <- gsub("alpha_p[j, 3] ~ dnorm(0, 0.0000001)", prior_deltae_str3, model_string_jags, fixed = TRUE)
+      model_string_jags <- gsub("alpha_p[j, 1] ~ dnorm(0, 0.001)", prior_deltae_str1, model_string_jags, fixed = TRUE)
+      model_string_jags <- gsub("alpha_p[j, 3] ~ dnorm(0, 0.001)", prior_deltae_str3, model_string_jags, fixed = TRUE)
     }    
   }
   if(model_txt_info$n_patterns == 3 & !1 %in% model_txt_info$d_or & model_txt_info$restriction == "AC") {
@@ -261,7 +261,7 @@ prior_pattern <- function(type, dist_e, dist_c, model_txt_info, model_string_jag
         alpha.prior <- as.numeric(prior.list$alpha.prior[-1])
         prior_deltae_str3 <- paste("alpha_p[j, 3] ~ ", paste(prior.dist.d["alpha.prior"]), "(", alpha.prior[1], ", ", alpha.prior[2], ", ", alpha.prior[3], ", ", alpha.prior[4], ")", sep = "")
       }
-      model_string_jags <- gsub("alpha_p[j, 3] ~ dnorm(0, 0.0000001)", prior_deltae_str3, model_string_jags, fixed = TRUE)
+      model_string_jags <- gsub("alpha_p[j, 3] ~ dnorm(0, 0.001)", prior_deltae_str3, model_string_jags, fixed = TRUE)
     }    
   }
   if(model_txt_info$n_patterns == 3 & !3 %in% model_txt_info$d_or & model_txt_info$restriction == "CC") {
@@ -296,7 +296,7 @@ prior_pattern <- function(type, dist_e, dist_c, model_txt_info, model_string_jag
         alpha.prior <- as.numeric(prior.list$alpha.prior[-1])
         prior_deltae_str1 <- paste("alpha_p[j, 1] ~ ", paste(prior.dist.d["alpha.prior"]), "(", alpha.prior[1], ", ", alpha.prior[2], ", ", alpha.prior[3], ", ", alpha.prior[4], ")", sep = "")
       }
-      model_string_jags <- gsub("alpha_p[j, 1] ~ dnorm(0, 0.0000001)", prior_deltae_str1, model_string_jags, fixed = TRUE)
+      model_string_jags <- gsub("alpha_p[j, 1] ~ dnorm(0, 0.001)", prior_deltae_str1, model_string_jags, fixed = TRUE)
     }    
   }  
   if(model_txt_info$n_patterns == 3 & !4 %in% model_txt_info$d_or) {
@@ -338,8 +338,8 @@ prior_pattern <- function(type, dist_e, dist_c, model_txt_info, model_string_jag
         prior_deltae_str1 <- paste("alpha_p[j, 1] ~ ", paste(prior.dist.d["alpha.prior"]), "(", alpha.prior[1], ", ", alpha.prior[2], ", ", alpha.prior[3], ", ", alpha.prior[4], ")", sep = "")
         prior_deltae_str3 <- paste("alpha_p[j, 3] ~ ", paste(prior.dist.d["alpha.prior"]), "(", alpha.prior[1], ", ", alpha.prior[2], ", ", alpha.prior[3], ", ", alpha.prior[4], ")", sep = "")
       }
-      model_string_jags <- gsub("alpha_p[j, 1] ~ dnorm(0, 0.0000001)", prior_deltae_str1, model_string_jags, fixed = TRUE)
-      model_string_jags <- gsub("alpha_p[j, 3] ~ dnorm(0, 0.0000001)", prior_deltae_str3, model_string_jags, fixed = TRUE)
+      model_string_jags <- gsub("alpha_p[j, 1] ~ dnorm(0, 0.001)", prior_deltae_str1, model_string_jags, fixed = TRUE)
+      model_string_jags <- gsub("alpha_p[j, 3] ~ dnorm(0, 0.001)", prior_deltae_str3, model_string_jags, fixed = TRUE)
     }    
   }  
   if(model_txt_info$n_patterns == 2 & !all(c(2, 3) %in% model_txt_info$d_or) & model_txt_info$restriction == "CC") {
@@ -374,7 +374,7 @@ prior_pattern <- function(type, dist_e, dist_c, model_txt_info, model_string_jag
         alpha.prior <- as.numeric(prior.list$alpha.prior[-1])
         prior_deltae_str1 <- paste("alpha_p[j, 1] ~ ", paste(prior.dist.d["alpha.prior"]), "(", alpha.prior[1], ", ", alpha.prior[2], ", ", alpha.prior[3], ", ", alpha.prior[4], ")", sep = "")
       }
-      model_string_jags <- gsub("alpha_p[j, 1] ~ dnorm(0, 0.0000001)", prior_deltae_str1, model_string_jags, fixed = TRUE)
+      model_string_jags <- gsub("alpha_p[j, 1] ~ dnorm(0, 0.001)", prior_deltae_str1, model_string_jags, fixed = TRUE)
     }    
   }   
   if(model_txt_info$n_patterns == 2 & !all(c(2, 4) %in% model_txt_info$d_or) & model_txt_info$restriction == "CC") {
@@ -416,8 +416,8 @@ prior_pattern <- function(type, dist_e, dist_c, model_txt_info, model_string_jag
         prior_deltae_str1 <- paste("alpha_p[j, 1] ~ ", paste(prior.dist.d["alpha.prior"]), "(", alpha.prior[1], ", ", alpha.prior[2], ", ", alpha.prior[3], ", ", alpha.prior[4], ")", sep = "")
         prior_deltae_str2 <- paste("alpha_p[j, 2] ~ ", paste(prior.dist.d["alpha.prior"]), "(", alpha.prior[1], ", ", alpha.prior[2], ", ", alpha.prior[3], ", ", alpha.prior[4], ")", sep = "")
       }
-      model_string_jags <- gsub("alpha_p[j, 1] ~ dnorm(0, 0.0000001)", prior_deltae_str1, model_string_jags, fixed = TRUE)
-      model_string_jags <- gsub("alpha_p[j, 2] ~ dnorm(0, 0.0000001)", prior_deltae_str2, model_string_jags, fixed = TRUE)
+      model_string_jags <- gsub("alpha_p[j, 1] ~ dnorm(0, 0.001)", prior_deltae_str1, model_string_jags, fixed = TRUE)
+      model_string_jags <- gsub("alpha_p[j, 2] ~ dnorm(0, 0.001)", prior_deltae_str2, model_string_jags, fixed = TRUE)
     }    
   }  
   if(model_txt_info$n_patterns == 2 & !all(c(3, 4) %in% model_txt_info$d_or) & model_txt_info$restriction == "CC") {
@@ -452,7 +452,7 @@ prior_pattern <- function(type, dist_e, dist_c, model_txt_info, model_string_jag
         alpha.prior <- as.numeric(prior.list$alpha.prior[-1])
         prior_deltae_str1 <- paste("alpha_p[j, 1] ~ ", paste(prior.dist.d["alpha.prior"]), "(", alpha.prior[1], ", ", alpha.prior[2], ", ", alpha.prior[3], ", ", alpha.prior[4], ")", sep = "")
       }
-      model_string_jags <- gsub("alpha_p[j, 1] ~ dnorm(0, 0.0000001)", prior_deltae_str1, model_string_jags, fixed = TRUE)
+      model_string_jags <- gsub("alpha_p[j, 1] ~ dnorm(0, 0.001)", prior_deltae_str1, model_string_jags, fixed = TRUE)
     }    
   }     
   if(model_txt_info$n_patterns == 2 & !all(c(1, 4) %in% model_txt_info$d_or) & model_txt_info$restriction == "AC") {
@@ -487,7 +487,7 @@ prior_pattern <- function(type, dist_e, dist_c, model_txt_info, model_string_jag
         alpha.prior <- as.numeric(prior.list$alpha.prior[-1])
         prior_deltae_str1 <- paste("alpha_p[j, 1] ~ ", paste(prior.dist.d["alpha.prior"]), "(", alpha.prior[1], ", ", alpha.prior[2], ", ", alpha.prior[3], ", ", alpha.prior[4], ")", sep = "")
       }
-      model_string_jags <- gsub("alpha_p[j, 1] ~ dnorm(0, 0.0000001)", prior_deltae_str1, model_string_jags, fixed = TRUE)
+      model_string_jags <- gsub("alpha_p[j, 1] ~ dnorm(0, 0.001)", prior_deltae_str1, model_string_jags, fixed = TRUE)
     }    
   } 
   if(length(model_txt_info$model_e_random) != 0) { 
@@ -603,8 +603,8 @@ prior_pattern <- function(type, dist_e, dist_c, model_txt_info, model_string_jag
         prior_deltac_str1 <- paste("beta_p[j, 1] ~ ", paste(prior.dist.d["beta.prior"]), "(", beta.prior[1], ", ", beta.prior[2], ", ", beta.prior[3], ", ", beta.prior[4], ")", sep = "")
         prior_deltac_str2 <- paste("beta_p[j, 2] ~ ", paste(prior.dist.d["beta.prior"]), "(", beta.prior[1], ", ", beta.prior[2], ", ", beta.prior[3], ", ", beta.prior[4], ")", sep = "")
       }
-      model_string_jags <- gsub("beta_p[j, 1] ~ dnorm(0, 0.0000001)", prior_deltac_str1, model_string_jags, fixed = TRUE)
-      model_string_jags <- gsub("beta_p[j, 2] ~ dnorm(0, 0.0000001)", prior_deltac_str2, model_string_jags, fixed = TRUE)
+      model_string_jags <- gsub("beta_p[j, 1] ~ dnorm(0, 0.001)", prior_deltac_str1, model_string_jags, fixed = TRUE)
+      model_string_jags <- gsub("beta_p[j, 2] ~ dnorm(0, 0.001)", prior_deltac_str2, model_string_jags, fixed = TRUE)
     }  
   }
   if(model_txt_info$n_patterns == 3 & !2 %in% model_txt_info$d_or & model_txt_info$restriction == "CC") {
@@ -639,7 +639,7 @@ prior_pattern <- function(type, dist_e, dist_c, model_txt_info, model_string_jag
         beta.prior <- as.numeric(prior.list$beta.prior[-1])
         prior_deltac_str1 <- paste("beta_p[j, 1] ~ ", paste(prior.dist.d["beta.prior"]), "(", beta.prior[1], ", ", beta.prior[2], ", ", beta.prior[3], ", ", beta.prior[4], ")", sep = "")
       }
-      model_string_jags <- gsub("beta_p[j, 1] ~ dnorm(0, 0.0000001)", prior_deltac_str1, model_string_jags, fixed = TRUE)
+      model_string_jags <- gsub("beta_p[j, 1] ~ dnorm(0, 0.001)", prior_deltac_str1, model_string_jags, fixed = TRUE)
     }    
   }  
   if(model_txt_info$n_patterns == 3 & !1 %in% model_txt_info$d_or & model_txt_info$restriction == "AC") {
@@ -674,7 +674,7 @@ prior_pattern <- function(type, dist_e, dist_c, model_txt_info, model_string_jag
         beta.prior <- as.numeric(prior.list$beta.prior[-1])
         prior_deltac_str1 <- paste("beta_p[j, 2] ~ ", paste(prior.dist.d["beta.prior"]), "(", beta.prior[1], ", ", beta.prior[2], ", ", beta.prior[3], ", ", beta.prior[4], ")", sep = "")
       }
-      model_string_jags <- gsub("beta_p[j, 2] ~ dnorm(0, 0.0000001)", prior_deltac_str1, model_string_jags, fixed = TRUE)
+      model_string_jags <- gsub("beta_p[j, 2] ~ dnorm(0, 0.001)", prior_deltac_str1, model_string_jags, fixed = TRUE)
     }    
   }  
   if(model_txt_info$n_patterns == 3 & !3 %in% model_txt_info$d_or & model_txt_info$restriction == "CC") {
@@ -716,8 +716,8 @@ prior_pattern <- function(type, dist_e, dist_c, model_txt_info, model_string_jag
         prior_deltac_str1 <- paste("beta_p[j, 1] ~ ", paste(prior.dist.d["beta.prior"]), "(", beta.prior[1], ", ", beta.prior[2], ", ", beta.prior[3], ", ", beta.prior[4], ")", sep = "")
         prior_deltac_str2 <- paste("beta_p[j, 2] ~ ", paste(prior.dist.d["beta.prior"]), "(", beta.prior[1], ", ", beta.prior[2], ", ", beta.prior[3], ", ", beta.prior[4], ")", sep = "")
       }
-      model_string_jags <- gsub("beta_p[j, 1] ~ dnorm(0, 0.0000001)", prior_deltac_str1, model_string_jags, fixed = TRUE)
-      model_string_jags <- gsub("beta_p[j, 2] ~ dnorm(0, 0.0000001)", prior_deltac_str2, model_string_jags, fixed = TRUE)
+      model_string_jags <- gsub("beta_p[j, 1] ~ dnorm(0, 0.001)", prior_deltac_str1, model_string_jags, fixed = TRUE)
+      model_string_jags <- gsub("beta_p[j, 2] ~ dnorm(0, 0.001)", prior_deltac_str2, model_string_jags, fixed = TRUE)
     } 
   } 
   if(model_txt_info$n_patterns == 3 & !4 %in% model_txt_info$d_or) {
@@ -759,8 +759,8 @@ prior_pattern <- function(type, dist_e, dist_c, model_txt_info, model_string_jag
         prior_deltac_str1 <- paste("beta_p[j, 1] ~ ", paste(prior.dist.d["beta.prior"]), "(", beta.prior[1], ", ", beta.prior[2], ", ", beta.prior[3], ", ", beta.prior[4], ")", sep = "")
         prior_deltac_str2 <- paste("beta_p[j, 2] ~ ", paste(prior.dist.d["beta.prior"]), "(", beta.prior[1], ", ", beta.prior[2], ", ", beta.prior[3], ", ", beta.prior[4], ")", sep = "")
       }
-      model_string_jags <- gsub("beta_p[j, 1] ~ dnorm(0, 0.0000001)", prior_deltac_str1, model_string_jags, fixed = TRUE)
-      model_string_jags <- gsub("beta_p[j, 2] ~ dnorm(0, 0.0000001)", prior_deltac_str2, model_string_jags, fixed = TRUE)
+      model_string_jags <- gsub("beta_p[j, 1] ~ dnorm(0, 0.001)", prior_deltac_str1, model_string_jags, fixed = TRUE)
+      model_string_jags <- gsub("beta_p[j, 2] ~ dnorm(0, 0.001)", prior_deltac_str2, model_string_jags, fixed = TRUE)
     } 
   }        
   if(model_txt_info$n_patterns == 2 & !all(c(2, 3) %in% model_txt_info$d_or) & model_txt_info$restriction == "CC") {
@@ -795,7 +795,7 @@ prior_pattern <- function(type, dist_e, dist_c, model_txt_info, model_string_jag
         beta.prior <- as.numeric(prior.list$beta.prior[-1])
         prior_deltac_str1 <- paste("beta_p[j, 1] ~ ", paste(prior.dist.d["beta.prior"]), "(", beta.prior[1], ", ", beta.prior[2], ", ", beta.prior[3], ", ", beta.prior[4], ")", sep = "")
       }
-      model_string_jags <- gsub("beta_p[j, 1] ~ dnorm(0, 0.0000001)", prior_deltac_str1, model_string_jags, fixed = TRUE)
+      model_string_jags <- gsub("beta_p[j, 1] ~ dnorm(0, 0.001)", prior_deltac_str1, model_string_jags, fixed = TRUE)
     }    
   }   
   if(model_txt_info$n_patterns == 2 & !all(c(2, 4) %in% model_txt_info$d_or) & model_txt_info$restriction == "CC") {
@@ -831,7 +831,7 @@ prior_pattern <- function(type, dist_e, dist_c, model_txt_info, model_string_jag
         beta.prior <- as.numeric(prior.list$beta.prior[-1])
         prior_deltac_str1 <- paste("beta_p[j, 1] ~ ", paste(prior.dist.d["beta.prior"]), "(", beta.prior[1], ", ", beta.prior[2], ", ", beta.prior[3], ", ", beta.prior[4], ")", sep = "")
       }
-      model_string_jags <- gsub("beta_p[j, 1] ~ dnorm(0, 0.0000001)", prior_deltac_str1, model_string_jags, fixed = TRUE)
+      model_string_jags <- gsub("beta_p[j, 1] ~ dnorm(0, 0.001)", prior_deltac_str1, model_string_jags, fixed = TRUE)
     }    
   }  
   if(model_txt_info$n_patterns == 2 & !all(c(3, 4) %in% model_txt_info$d_or) & model_txt_info$restriction == "CC") {
@@ -873,8 +873,8 @@ prior_pattern <- function(type, dist_e, dist_c, model_txt_info, model_string_jag
         prior_deltac_str1 <- paste("beta_p[j, 1] ~ ", paste(prior.dist.d["beta.prior"]), "(", beta.prior[1], ", ", beta.prior[2], ", ", beta.prior[3], ", ", beta.prior[4], ")", sep = "")
         prior_deltac_str2 <- paste("beta_p[j, 2] ~ ", paste(prior.dist.d["beta.prior"]), "(", beta.prior[1], ", ", beta.prior[2], ", ", beta.prior[3], ", ", beta.prior[4], ")", sep = "")
       }
-      model_string_jags <- gsub("beta_p[j, 1] ~ dnorm(0, 0.0000001)", prior_deltac_str1, model_string_jags, fixed = TRUE)
-      model_string_jags <- gsub("beta_p[j, 2] ~ dnorm(0, 0.0000001)", prior_deltac_str2, model_string_jags, fixed = TRUE)
+      model_string_jags <- gsub("beta_p[j, 1] ~ dnorm(0, 0.001)", prior_deltac_str1, model_string_jags, fixed = TRUE)
+      model_string_jags <- gsub("beta_p[j, 2] ~ dnorm(0, 0.001)", prior_deltac_str2, model_string_jags, fixed = TRUE)
     }    
   }     
   if(model_txt_info$n_patterns == 2 & !all(c(1, 4) %in% model_txt_info$d_or) & model_txt_info$restriction == "AC") {
@@ -909,7 +909,7 @@ prior_pattern <- function(type, dist_e, dist_c, model_txt_info, model_string_jag
         beta.prior <- as.numeric(prior.list$beta.prior[-1])
         prior_deltac_str2 <- paste("beta_p[j, 2] ~ ", paste(prior.dist.d["beta.prior"]), "(", beta.prior[1], ", ", beta.prior[2], ", ", beta.prior[3], ", ", beta.prior[4], ")", sep = "")
       }
-      model_string_jags <- gsub("beta_p[j, 2] ~ dnorm(0, 0.0000001)", prior_deltac_str1, model_string_jags, fixed = TRUE)
+      model_string_jags <- gsub("beta_p[j, 2] ~ dnorm(0, 0.001)", prior_deltac_str1, model_string_jags, fixed = TRUE)
     }    
   }
   if(length(model_txt_info$model_c_random) != 0) { 
@@ -1960,7 +1960,7 @@ prior_pattern <- function(type, dist_e, dist_c, model_txt_info, model_string_jag
       beta_f.prior <- as.numeric(prior.list$beta_f.prior[-1])
       prior_deltae_str <- paste("beta_f_p[1] ~ ", paste(prior.dist.d["beta_f.prior"]), "(", beta_f.prior[1], ", ", beta_f.prior[2], ", ", beta_f.prior[3], ", ", beta_f.prior[4], ")", sep = "")
     }
-    model_string_jags <- gsub("beta_f_p[1] ~ dnorm(0, 0.0000001)", prior_deltae_str, model_string_jags, fixed = TRUE)
+    model_string_jags <- gsub("beta_f_p[1] ~ dnorm(0, 0.001)", prior_deltae_str, model_string_jags, fixed = TRUE)
   }  
   if(!is.null(prior.list$mu.b_f.prior) & grepl("mu_b_f_hat ~", model_string_jags, fixed = TRUE)) {
     mu_b_f_hat_text <- paste("mu_b_f_hat ~ ")

@@ -156,31 +156,31 @@ run_hurdle <- function(data_model, type, dist_e, dist_c, model_info) {
   if(dist_c %in% c("gamma", "lnorm")) {
     if(!is.null(datalist$sc)) {
       if(data_model$sc == 0) { 
-        datalist$sc = log(0.0000001)
+        datalist$sc = log(0.00001)
         index_c_0 <- which(datalist$cost == 0)
-        datalist$cost[index_c_0] = 0.0000001
+        datalist$cost[index_c_0] = 0.00001
       } else { datalist$sc = log(datalist$sc)}
     }
   }
   if(dist_e %in% c("gamma", "weib", "exp", "pois", "negbin")) {
     if(!is.null(data_model$se)) {
       if(data_model$se == 0) { 
-        datalist$se = log(0.0000001)
+        datalist$se = log(0.00001)
         index_e_0 <- which(datalist$eff == 0)
-        datalist$eff[index_e_0] = 0.0000001
+        datalist$eff[index_e_0] = 0.00001
       } else { datalist$se = log(datalist$se)}
     }
   }
   if(dist_e == "beta") {
     if(!is.null(data_model$se)) {
       if(data_model$se == 1) { 
-        datalist$se = qlogis(1 - 0.0000001)
+        datalist$se = qlogis(1 - 0.00001)
         index_e_1 <- which(datalist$eff == 1)
-        datalist$eff[index_e_1] = 1 - 0.0000001
+        datalist$eff[index_e_1] = 1 - 0.00001
       } else if(data_model$se == 0) { 
-        datalist$se = qlogis(0 + 0.0000001)
+        datalist$se = qlogis(0 + 0.00001)
         index_e_0 <- which(datalist$eff == 0)
-        datalist$eff[index_e_0] = 0 + 0.0000001
+        datalist$eff[index_e_0] = 0 + 0.00001
       } else { datalist$se = qlogis(datalist$se)}
     }
   }

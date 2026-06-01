@@ -86,11 +86,11 @@ write_selection <- function(dist_e , dist_c, type, model_txt_info) {
   
   #priors for mean regression coefficients
   for (j in 1:pe_fixed) {#begin alpha priors effects
-  alpha[j] ~ dnorm(0, 0.0000001)
+  alpha[j] ~ dnorm(0, 0.001)
   }#end alpha priors effects
 
   for (j in 1:pc_fixed) {#begin beta priors costs
-  beta[j] ~ dnorm(0, 0.0000001)
+  beta[j] ~ dnorm(0, 0.001)
   }#end beta priors costs
 
   #priors for mean regression random coefficients
@@ -107,7 +107,7 @@ write_selection <- function(dist_e , dist_c, type, model_txt_info) {
   s_e ~ dt(0, pow(2.5, -2), 1)T(0,)
 
   #correlation
-  beta_f ~ dnorm(0, 0.0000001)
+  beta_f ~ dnorm(0, 0.001)
   
   # mean and sd mean regression random coefficients priors
   for(j in 1:pc_random) {mu_b_hat[j] ~ dnorm(0, 0.001)
@@ -415,7 +415,7 @@ write_selection <- function(dist_e , dist_c, type, model_txt_info) {
   } 
   if(model_txt_info$ind_fixed) {
   model_string_jags <- gsub(" + beta_f * (eff[i] - tmu_e)", "", model_string_jags, fixed = TRUE)
-  model_string_jags <- gsub("beta_f ~ dnorm(0, 0.0000001)", "", model_string_jags, fixed = TRUE)
+  model_string_jags <- gsub("beta_f ~ dnorm(0, 0.001)", "", model_string_jags, fixed = TRUE)
   model_string_jags <- gsub("#correlation", "", model_string_jags, fixed = TRUE)
   } 
   if(dist_c == "norm") {

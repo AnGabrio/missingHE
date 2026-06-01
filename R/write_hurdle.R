@@ -87,17 +87,17 @@ write_hurdle <- function(dist_e , dist_c, type, model_txt_info) {
   
   #priors for mean regression coefficients
   for (j in 2:pe_fixed) {#begin alpha priors effects
-  alpha[j, 1] ~ dnorm(0, 0.0000001)
+  alpha[j, 1] ~ dnorm(0, 0.001)
   alpha[j, 2] <- 0
   }#end alpha priors effects
-  alpha[1, 1] ~ dnorm(0, 0.0000001)
+  alpha[1, 1] ~ dnorm(0, 0.001)
   alpha[1, 2] <- se
 
   for (j in 2:pc_fixed) {#begin beta priors costs
-  beta[j, 1] ~ dnorm(0, 0.0000001)
+  beta[j, 1] ~ dnorm(0, 0.001)
   beta[j, 2] <- 0
   }#end beta priors costs
-  beta[1, 1] ~ dnorm(0, 0.0000001)
+  beta[1, 1] ~ dnorm(0, 0.001)
   beta[1, 2] <- sc
 
   #priors for mean regression random coefficients
@@ -116,7 +116,7 @@ write_hurdle <- function(dist_e , dist_c, type, model_txt_info) {
   s_e[2] <- sde
 
   #correlation
-  beta_f[1] ~ dnorm(0, 0.0000001)
+  beta_f[1] ~ dnorm(0, 0.001)
   beta_f[2] <- 0
   
   # mean and sd mean regression random coefficients priors
@@ -169,9 +169,9 @@ if(is.null(model_txt_info$se) & !is.null(model_txt_info$sc)) {
                             "tmu_ns_e <- inprod(mean_cov_e_fixed[], alpha[]) + inprod(mean_cov_e_random[], mu_a_hat[])", model_string_jags, fixed = TRUE)
   model_string_jags <- gsub("tmu_e <- tmu_ns_e * (1 - p_e) + se * p_e", "tmu_e <- tmu_ns_e", model_string_jags, fixed = TRUE)
   model_string_jags <- gsub("p_e <- ilogit(inprod(mean_z_e_fixed[], gamma_e[]) + inprod(mean_z_e_random[], mu_g_e_hat[]))", "", model_string_jags, fixed = TRUE)
-  model_string_jags <- gsub("alpha[j, 1] ~ dnorm(0, 0.0000001)", "alpha[j] ~ dnorm(0, 0.0000001)", model_string_jags, fixed = TRUE)
+  model_string_jags <- gsub("alpha[j, 1] ~ dnorm(0, 0.001)", "alpha[j] ~ dnorm(0, 0.001)", model_string_jags, fixed = TRUE)
   model_string_jags <- gsub("alpha[j, 2] <- 0", "", model_string_jags, fixed = TRUE)
-  model_string_jags <- gsub("alpha[1, 1] ~ dnorm(0, 0.0000001)", "alpha[1] ~ dnorm(0, 0.0000001)", model_string_jags, fixed = TRUE)
+  model_string_jags <- gsub("alpha[1, 1] ~ dnorm(0, 0.001)", "alpha[1] ~ dnorm(0, 0.001)", model_string_jags, fixed = TRUE)
   model_string_jags <- gsub("alpha[1, 2] <- se", "", model_string_jags, fixed = TRUE)
   model_string_jags <- gsub("s_e[1] ~ dt(0, pow(2.5, -2), 1)T(0,)", "s_e ~ dt(0, pow(2.5, -2), 1)T(0,)", model_string_jags, fixed = TRUE)
   model_string_jags <- gsub("s_e[2] <- sde", "", model_string_jags, fixed = TRUE)  
@@ -200,16 +200,16 @@ if(!is.null(model_txt_info$se) & is.null(model_txt_info$sc)) {
   model_string_jags <- gsub("tmu_ns_c <- inprod(mean_cov_c_fixed[], beta[, 1])", "tmu_ns_c <- inprod(mean_cov_c_fixed[], beta[])", model_string_jags, fixed = TRUE)
   model_string_jags <- gsub("tmu_c <- tmu_ns_c * (1 - p_c) + sc * p_c", "tmu_c <- tmu_ns_c", model_string_jags, fixed = TRUE)
   model_string_jags <- gsub("p_c <- ilogit(inprod(mean_z_c_fixed[], gamma_c[]) + inprod(mean_z_c_random[], mu_g_c_hat[]))", "", model_string_jags, fixed = TRUE)
-  model_string_jags <- gsub("beta[j, 1] ~ dnorm(0, 0.0000001)", "beta[j] ~ dnorm(0, 0.0000001)", model_string_jags, fixed = TRUE)
+  model_string_jags <- gsub("beta[j, 1] ~ dnorm(0, 0.001)", "beta[j] ~ dnorm(0, 0.001)", model_string_jags, fixed = TRUE)
   model_string_jags <- gsub("beta[j, 2] <- 0", "", model_string_jags, fixed = TRUE)
-  model_string_jags <- gsub("beta[1, 1] ~ dnorm(0, 0.0000001)", "beta[1] ~ dnorm(0, 0.0000001)", model_string_jags, fixed = TRUE)
+  model_string_jags <- gsub("beta[1, 1] ~ dnorm(0, 0.001)", "beta[1] ~ dnorm(0, 0.001)", model_string_jags, fixed = TRUE)
   model_string_jags <- gsub("beta[1, 2] <- sc", "", model_string_jags, fixed = TRUE)
   model_string_jags <- gsub("s_c[1] ~ dt(0, pow(2.5, -2), 1)T(0,)", "s_c ~ dt(0, pow(2.5, -2), 1)T(0,)", model_string_jags, fixed = TRUE)
   model_string_jags <- gsub("s_c[2] <- sdc", "", model_string_jags, fixed = TRUE)
   model_string_jags <- gsub("for (j in 1:zc_fixed) {#begin gamma priors costs", "", model_string_jags, fixed = TRUE)
   model_string_jags <- gsub("gamma_c[j] ~ dnorm(0, 0.01)", "", model_string_jags, fixed = TRUE)
   model_string_jags <- gsub("}#end gamma priors costs", "", model_string_jags, fixed = TRUE)
-  model_string_jags <- gsub("beta_f[1] ~ dnorm(0, 0.0000001)", "beta_f ~ dnorm(0, 0.0000001)", model_string_jags, fixed = TRUE)
+  model_string_jags <- gsub("beta_f[1] ~ dnorm(0, 0.001)", "beta_f ~ dnorm(0, 0.001)", model_string_jags, fixed = TRUE)
   model_string_jags <- gsub("beta_f[2] <- 0", "", model_string_jags, fixed = TRUE)
   model_string_jags <- gsub("loglik_c[i] <- logdensity.norm(cost[i], cmu_c[i], tau_c[s_cost[i] + 1])", "loglik_c[i] <- logdensity.norm(cost[i], cmu_c[i], tau_c)", model_string_jags, fixed = TRUE)
   model_string_jags <- gsub("loglik_sc[i] <- logdensity.bern(s_cost[i], pc[i])", "", model_string_jags, fixed = TRUE)
@@ -910,12 +910,12 @@ if(!is.null(model_txt_info$se) & is.null(model_txt_info$sc)) {
 if(model_txt_info$ind_fixed) {
   if(!is.null(model_txt_info$sc)) {
     model_string_jags <- gsub(" + beta_f[s_cost[i] + 1] * (eff[i] - tmu_e)", "", model_string_jags, fixed = TRUE)
-    model_string_jags <- gsub("beta_f[1] ~ dnorm(0, 0.0000001)", "", model_string_jags, fixed = TRUE)
+    model_string_jags <- gsub("beta_f[1] ~ dnorm(0, 0.001)", "", model_string_jags, fixed = TRUE)
     model_string_jags <- gsub("beta_f[2] <- 0", "", model_string_jags, fixed = TRUE)
     model_string_jags <- gsub("#correlation", "", model_string_jags, fixed = TRUE)
   } else if(is.null(model_txt_info$sc)) {
     model_string_jags <- gsub(" + beta_f * (eff[i] - tmu_e)", "", model_string_jags, fixed = TRUE)
-    model_string_jags <- gsub("beta_f ~ dnorm(0, 0.0000001)", "", model_string_jags, fixed = TRUE)
+    model_string_jags <- gsub("beta_f ~ dnorm(0, 0.001)", "", model_string_jags, fixed = TRUE)
     model_string_jags <- gsub("#correlation", "", model_string_jags, fixed = TRUE)
   }
 }

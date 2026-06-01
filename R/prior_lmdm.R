@@ -522,7 +522,7 @@ prior_lmdm <- function(type, dist_e, dist_c, model_txt_info, model_string_jags) 
       alpha.prior <- as.numeric(prior.list$alpha.prior[-1])
       prior_deltae_str <- paste("alpha[j] ~ ", paste(prior.dist.d["alpha.prior"]), "(", alpha.prior[1], ", ", alpha.prior[2], ", ", alpha.prior[3], ", ", alpha.prior[4], ")", sep = "")
     }
-    model_string_jags <- gsub("alpha[j, time] ~ dnorm(0, 0.0000001)", prior_deltae_str, model_string_jags, fixed = TRUE)
+    model_string_jags <- gsub("alpha[j, time] ~ dnorm(0, 0.001)", prior_deltae_str, model_string_jags, fixed = TRUE)
   }
   if(length(model_txt_info$model_e_random) != 0) { 
     if(model_txt_info$pe_random == 1) { 
@@ -629,7 +629,7 @@ prior_lmdm <- function(type, dist_e, dist_c, model_txt_info, model_string_jags) 
       beta.prior <- as.numeric(prior.list$beta.prior[-1])
       prior_deltae_str <- paste("beta[j, time] ~ ", paste(prior.dist.d["beta.prior"]), "(", beta.prior[1], ", ", beta.prior[2], ", ", beta.prior[3], ", ", beta.prior[4], ")", sep = "")
     }
-    model_string_jags <- gsub("beta[j, time] ~ dnorm(0, 0.0000001)", prior_deltae_str, model_string_jags, fixed = TRUE)
+    model_string_jags <- gsub("beta[j, time] ~ dnorm(0, 0.001)", prior_deltae_str, model_string_jags, fixed = TRUE)
   }
   if(length(model_txt_info$model_c_random) != 0) { 
     if(model_txt_info$pc_random == 1) { 
@@ -827,7 +827,7 @@ prior_lmdm <- function(type, dist_e, dist_c, model_txt_info, model_string_jags) 
       beta_f.prior <- as.numeric(prior.list$beta_f.prior[-1])
       prior_deltae_str <- paste("beta_f[time] ~ ", paste(prior.dist.d["beta_f.prior"]), "(", beta_f.prior[1], ", ", beta_f.prior[2], ", ", beta_f.prior[3], ", ", beta_f.prior[4], ")", sep = "")
     }
-    model_string_jags <- gsub("beta_f[time] ~ dnorm(0, 0.0000001)", prior_deltae_str, model_string_jags, fixed = TRUE)
+    model_string_jags <- gsub("beta_f[time] ~ dnorm(0, 0.001)", prior_deltae_str, model_string_jags, fixed = TRUE)
   }  
   if(!is.null(prior.list$mu.b_f.prior) & grepl("mu_b_f_hat[time] ~", model_string_jags, fixed = TRUE)) {
     mu_b_f_hat_text <- paste("mu_b_f_hat[time] ~ ")
@@ -929,7 +929,7 @@ prior_lmdm <- function(type, dist_e, dist_c, model_txt_info, model_string_jags) 
       alpha_te.prior <- as.numeric(prior.list$alpha_te.prior[-1])
       prior_deltae_str <- paste("alpha_te[time] ~ ", paste(prior.dist.d["alpha_te.prior"]), "(", alpha_te.prior[1], ", ", alpha_te.prior[2], ", ", alpha_te.prior[3], ", ", alpha_te.prior[4], ")", sep = "")
     }
-    model_string_jags <- gsub("alpha_te[time] ~ dnorm(0, 0.0000001)", prior_deltae_str, model_string_jags, fixed = TRUE)
+    model_string_jags <- gsub("alpha_te[time] ~ dnorm(0, 0.001)", prior_deltae_str, model_string_jags, fixed = TRUE)
   }
   if(!is.null(prior.list$alpha_tc.prior) & grepl("alpha_tc[time] ~ ", model_string_jags, fixed = TRUE)) {
     if(prior.dist["alpha_tc.prior"] %in% c("chisqr", "exp", "bern", "cat", "pois")) {
@@ -962,7 +962,7 @@ prior_lmdm <- function(type, dist_e, dist_c, model_txt_info, model_string_jags) 
       alpha_tc.prior <- as.numeric(prior.list$alpha_tc.prior[-1])
       prior_deltae_str <- paste("alpha_tc[time] ~ ", paste(prior.dist.d["alpha_tc.prior"]), "(", alpha_tc.prior[1], ", ", alpha_tc.prior[2], ", ", alpha_tc.prior[3], ", ", alpha_tc.prior[4], ")", sep = "")
     }
-    model_string_jags <- gsub("alpha_tc[time] ~ dnorm(0, 0.0000001)", prior_deltae_str, model_string_jags, fixed = TRUE)
+    model_string_jags <- gsub("alpha_tc[time] ~ dnorm(0, 0.001)", prior_deltae_str, model_string_jags, fixed = TRUE)
   }  
   if(length(model_txt_info$model_e_random) != 0) { 
       mu_a_hat_text <- paste("mu_a_te_hat[time] ~ ")
@@ -1133,7 +1133,7 @@ prior_lmdm <- function(type, dist_e, dist_c, model_txt_info, model_string_jags) 
         beta_te.prior <- as.numeric(prior.list$beta_te.prior[-1])
         prior_deltae_str <- paste("beta_te[time] ~ ", paste(prior.dist.d["beta_te.prior"]), "(", beta_te.prior[1], ", ", beta_te.prior[2], ", ", beta_te.prior[3], ", ", beta_te.prior[4], ")", sep = "")
       }
-      model_string_jags <- gsub("beta_te[time] ~ dnorm(0, 0.0000001)", prior_deltae_str, model_string_jags, fixed = TRUE)
+      model_string_jags <- gsub("beta_te[time] ~ dnorm(0, 0.001)", prior_deltae_str, model_string_jags, fixed = TRUE)
     }
     if(!is.null(prior.list$beta_tc.prior) & grepl("beta_tc[time] ~ ", model_string_jags, fixed = TRUE)) {
       if(prior.dist["beta_tc.prior"] %in% c("chisqr", "exp", "bern", "cat", "pois")) {
@@ -1166,7 +1166,7 @@ prior_lmdm <- function(type, dist_e, dist_c, model_txt_info, model_string_jags) 
         beta_tc.prior <- as.numeric(prior.list$beta_tc.prior[-1])
         prior_deltae_str <- paste("beta_tc[time] ~ ", paste(prior.dist.d["beta_tc.prior"]), "(", beta_tc.prior[1], ", ", beta_tc.prior[2], ", ", beta_tc.prior[3], ", ", beta_tc.prior[4], ")", sep = "")
       }
-      model_string_jags <- gsub("beta_tc[time] ~ dnorm(0, 0.0000001)", prior_deltae_str, model_string_jags, fixed = TRUE)
+      model_string_jags <- gsub("beta_tc[time] ~ dnorm(0, 0.001)", prior_deltae_str, model_string_jags, fixed = TRUE)
     }      
     if(length(model_txt_info$model_c_random) != 0) { 
       mu_b_hat_text <- paste("mu_b_te_hat[time] ~ ")

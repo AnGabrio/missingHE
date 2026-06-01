@@ -529,8 +529,8 @@ hurdle <- function(data, model.eff, model.cost,
   if(exists("mu.b_f.prior", where = prior)) { mu.b_f.prior = prior$mu.b_f.prior} else { mu.b_f.prior = NULL}
   if(exists("s.b_f.prior", where = prior)) { s.b_f.prior = prior$s.b_f.prior} else { s.b_f.prior = NULL}
   exArgs <- list(...)
-  if(exists("se.prior", where = exArgs)) { se.prior = exArgs$se.prior} else { se.prior = 0.0000001 }
-  if(exists("sc.prior", where = exArgs)) { sc.prior = exArgs$sc.prior} else { sc.prior = 0.0000001 }
+  if(exists("se.prior", where = exArgs)) { se.prior = exArgs$se.prior} else { se.prior = 0.00001 }
+  if(exists("sc.prior", where = exArgs)) { sc.prior = exArgs$sc.prior} else { sc.prior = 0.00001 }
   sde <- se.prior
   sdc <- sc.prior
   if(length(sde) != 1 | length(sdc) != 1) { stop("single value priors on std for structural values must be provided")}

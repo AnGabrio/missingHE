@@ -135,13 +135,13 @@ write_lmdm <- function(dist_e , dist_c, type, model_txt_info) {
   #priors for mean regression coefficients
   for(time in 1:max_time) {# loop through time alpha
   for (j in 1:pe_fixed) {#begin alpha priors effects
-  alpha[j, time] ~ dnorm(0, 0.0000001)
+  alpha[j, time] ~ dnorm(0, 0.001)
   }#end alpha priors effects
   }#end alpha loop time
 
   for(time in 1:max_time) {# loop through time beta
   for (j in 1:pc_fixed) {#begin beta priors costs
-  beta[j, time] ~ dnorm(0, 0.0000001)
+  beta[j, time] ~ dnorm(0, 0.001)
   }#end beta priors costs
   }#end beta loop time
 
@@ -164,13 +164,13 @@ write_lmdm <- function(dist_e , dist_c, type, model_txt_info) {
   s_e[time] ~ dt(0, pow(2.5, -2), 1)T(0,)
 
   #correlation
-  beta_f[time] ~ dnorm(0, 0.0000001)
+  beta_f[time] ~ dnorm(0, 0.001)
   
   #time dependence
-  beta_te[time] ~ dnorm(0, 0.0000001)
-  beta_tc[time] ~ dnorm(0, 0.0000001)
-  alpha_te[time] ~ dnorm(0, 0.0000001)
-  alpha_tc[time] ~ dnorm(0, 0.0000001)
+  beta_te[time] ~ dnorm(0, 0.001)
+  beta_tc[time] ~ dnorm(0, 0.001)
+  alpha_te[time] ~ dnorm(0, 0.001)
+  alpha_tc[time] ~ dnorm(0, 0.001)
 
   # mean and sd mean regression random coefficients priors
   for(j in 1:pc_random) {mu_b_hat[j, time] ~ dnorm(0, 0.001)
@@ -698,16 +698,16 @@ write_lmdm <- function(dist_e , dist_c, type, model_txt_info) {
   if(model_txt_info$ind_fixed) {
     model_string_jags <- gsub("+ beta_f[1] * (eff[i, 1] - tmu_e[1])", "", model_string_jags, fixed = TRUE)
     model_string_jags <- gsub("+ beta_f[time] * (eff[i, time] - tmu_e[time])", "", model_string_jags, fixed = TRUE)
-    model_string_jags <- gsub("beta_f[time] ~ dnorm(0, 0.0000001)", "", model_string_jags, fixed = TRUE)
+    model_string_jags <- gsub("beta_f[time] ~ dnorm(0, 0.001)", "", model_string_jags, fixed = TRUE)
     model_string_jags <- gsub("#correlation", "", model_string_jags, fixed = TRUE)
   } 
  if(model_txt_info$time_dep %in% c("none", "biv")) {
    model_string_jags <- gsub("+ beta_te[time] * (eff[i, time - 1] - tmu_e[time - 1]) + beta_tc[time] * (cost[i, time - 1] - tmu_c[time - 1])", "", model_string_jags, fixed = TRUE)
    model_string_jags <- gsub("+ alpha_te[time] * (eff[i, time - 1] - tmu_e[time - 1]) + alpha_tc[time] * (cost[i, time - 1] - tmu_c[time - 1])", "", model_string_jags, fixed = TRUE)  
-   model_string_jags <- gsub("beta_te[time] ~ dnorm(0, 0.0000001)", "", model_string_jags, fixed = TRUE)
-   model_string_jags <- gsub("beta_tc[time] ~ dnorm(0, 0.0000001)", "", model_string_jags, fixed = TRUE)
-   model_string_jags <- gsub("alpha_te[time] ~ dnorm(0, 0.0000001)", "", model_string_jags, fixed = TRUE)
-   model_string_jags <- gsub("alpha_tc[time] ~ dnorm(0, 0.0000001)", "", model_string_jags, fixed = TRUE)
+   model_string_jags <- gsub("beta_te[time] ~ dnorm(0, 0.001)", "", model_string_jags, fixed = TRUE)
+   model_string_jags <- gsub("beta_tc[time] ~ dnorm(0, 0.001)", "", model_string_jags, fixed = TRUE)
+   model_string_jags <- gsub("alpha_te[time] ~ dnorm(0, 0.001)", "", model_string_jags, fixed = TRUE)
+   model_string_jags <- gsub("alpha_tc[time] ~ dnorm(0, 0.001)", "", model_string_jags, fixed = TRUE)
    model_string_jags <- gsub("#time dependence", "", model_string_jags, fixed = TRUE)
  }  
   if(dist_c == "norm") {
@@ -899,9 +899,9 @@ write_lmdm <- function(dist_e , dist_c, type, model_txt_info) {
    model_string_jags <- gsub("inprod(mean_cov_c_fixed[], beta[, time])", "beta_f[time] * (mean(eff[, time]) - tmu_e[time])", model_string_jags, fixed = TRUE)
    }
    model_string_jags <- gsub("for (j in 1:pc_fixed) {#begin beta priors costs", "", model_string_jags, fixed = TRUE)
-   model_string_jags <- gsub("beta[j, time] ~ dnorm(0, 0.0000001)", prior_beta, model_string_jags, fixed = TRUE)
+   model_string_jags <- gsub("beta[j, time] ~ dnorm(0, 0.001)", prior_beta, model_string_jags, fixed = TRUE)
    model_string_jags <- gsub("}#end beta priors costs", end_prior_beta,model_string_jags, fixed = TRUE)
-   model_string_jags <- gsub("beta[1, time] ~ dnorm(0, 0.0000001)", "", model_string_jags, fixed = TRUE)
+   model_string_jags <- gsub("beta[1, time] ~ dnorm(0, 0.001)", "", model_string_jags, fixed = TRUE)
    model_string_jags <- gsub("for(time in 1:max_time) {# loop through time beta", "", model_string_jags, fixed = TRUE)
    model_string_jags <- gsub("#end beta priors costs", "", model_string_jags, fixed = TRUE)
    model_string_jags <- gsub("}#end beta loop time", "", model_string_jags, fixed = TRUE)
