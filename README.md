@@ -2,7 +2,7 @@
 missingHE: Missing Cost Effectiveness Models
 ================
 
-[![Build Status]((https://app.travis-ci.com/AnGabrio/missingHE)](https://app.travis-ci.com/AnGabrio/missingHE)
+[![Build Status](https://app.travis-ci.com/AnGabrio/missingHE)](https://app.travis-ci.com/AnGabrio/missingHE)
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/missingHE)](https://cran.r-project.org/package=missingHE)
 [![CRAN_Download_Badge](http://cranlogs.r-pkg.org/badges/missingHE)](https://cran.r-project.org/package=missingHE)
 [![CRAN_Download_Badge](https://cranlogs.r-pkg.org:443/badges/grand-total/missingHE?color=orange)](https://cranlogs.r-pkg.org:443/badges/grand-total/missingHE?color=orange)
