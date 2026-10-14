@@ -8,7 +8,7 @@
 #' Weibull ('weib'), Logistic ('logis'), Poisson ('pois'), Negative Binomial ('negbin') or Bernoulli ('bern').
 #' @param dist_c Distribution assumed for the costs. Current available choices are: Normal ('norm'), Gamma ('gamma') or LogNormal ('lnorm').
 #' @param model_info list containing model and MCMC information to be passed to JAGS. 
-#' @keywords JAGS Bayesian pattern mixture models 
+#' @keywords internal
 #' @importFrom stats rnorm rbeta rgamma rlnorm rweibull rnbinom rbinom rpois rlogis rexp
 #' @examples
 #' #Internal function only
@@ -17,9 +17,6 @@
 #' #
 
 run_pattern <- function(data_model, type, dist_e, dist_c, model_info) {
-  if(!isTRUE(requireNamespace("R2jags", quietly = TRUE))) {
-    stop("You need to install the R package 'R2jags'. Please run in your R terminal:\n install.packages('R2jags')")
-  }
   n <- data_model$n; trt_lev <- names(data_model$n_trt); pe_fixed <- data_model$pe_fixed; pc_fixed <- data_model$pc_fixed
   mean_cov_e_fixed <- data_model$mean_cov_e_fixed; mean_cov_c_fixed <- data_model$mean_cov_c_fixed
   mean_cov_e_random <- data_model$mean_cov_e_random; mean_cov_c_random <- data_model$mean_cov_c_random
@@ -61,6 +58,10 @@ run_pattern <- function(data_model, type, dist_e, dist_c, model_info) {
   pd <- model_info$pd
   n.iter.pd <- model_info$n.iter.pd
   n.adapt <- model_info$n.adapt
+  progress.bar <- model_info$progress.bar
+  refresh <- model_info$refresh
+  RNGname <- model_info$RNGname
+  quiet <- model_info$quiet  
   is_c_random_c <- model_info$is_c_random_c
   is_int_c_random_c <- model_info$is_int_c_random_c
   ind_random <- model_info$ind_random
@@ -128,7 +129,8 @@ run_pattern <- function(data_model, type, dist_e, dist_c, model_info) {
   model <- R2jags::jags(data = datalist, inits = inits, parameters.to.save = params, 
                         model.file = filein, n.chains = n.chains, n.iter = n.iter, 
                         n.burnin = n.burnin, DIC = DIC, pD = pd, n.thin = n.thin,
-                        n.iter.pd = n.iter.pd, n.adapt = n.adapt)
+                        n.iter.pd = n.iter.pd, n.adapt = n.adapt, progress.bar = progress.bar,
+                        refresh = refresh, RNGname = RNGname, quiet = quiet)
   tmu_e <- model$BUGSoutput$sims.list$tmu_e
   tmu_c <- model$BUGSoutput$sims.list$tmu_c
   s_c <- model$BUGSoutput$sims.list$s_c_p
@@ -316,7 +318,7 @@ run_pattern <- function(data_model, type, dist_e, dist_c, model_info) {
   loglik_d <- model$BUGSoutput$sims.list$loglik_d
   if(!ind_fixed) {
     beta_f <- model$BUGSoutput$sims.list$beta_f_p
-    colnames(beta_f) <- paste0("e", 1:model_txt_info$n_patterns)
+    colnames(beta_f) <- paste0("e.", 1:model_txt_info$n_patterns)
     beta <- list("beta" = beta, "beta_f" = beta_f)}
   if(length(model_info$model_c_random) != 0 & !ind_random) {
     b_f <- model$BUGSoutput$sims.list$b_f

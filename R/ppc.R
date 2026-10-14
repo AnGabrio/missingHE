@@ -929,23 +929,22 @@ ppc <- function(x, type = "histogram", outcome = "both", ndisplay = 15,
     if(exists("size", where = exArgs)) { size = exArgs$size} else { size = 0.25}
     if(exists("alpha", where = exArgs)) { alpha = exArgs$alpha} else { alpha = 0.7}
     if(exists("pad", where = exArgs)) { pad = exArgs$pad} else { pad = TRUE}
-    if(exists("discrete", where = exArgs)) { discrete = exArgs$discrete} else { discrete = FALSE}
     if(x$data_format == "wide") {
-    gplot_e <- ppc_ecdf_overlay(y = e_obs, yrep = e_rep[1 : ndisplay, ], size = size, alpha = alpha, discrete = discrete, pad = pad)
-    gplot_c <- ppc_ecdf_overlay(y = c_obs, yrep = c_rep[1 : ndisplay, ], size = size, alpha = alpha, discrete = discrete, pad = pad)
+    gplot_e <- ppc_ecdf_overlay(y = e_obs, yrep = e_rep[1 : ndisplay, ], size = size, alpha = alpha, pad = pad)
+    gplot_c <- ppc_ecdf_overlay(y = c_obs, yrep = c_rep[1 : ndisplay, ], size = size, alpha = alpha, pad = pad)
     for(trt_i in trt_lev) {
-      gplot_e_trt[[trt_i]] <- ppc_ecdf_overlay(y = e_obs_trt[[trt_i]], yrep = e_rep_trt[[trt_i]][1 : ndisplay, ], size = size, alpha = alpha, discrete = discrete, pad = pad)
-      gplot_c_trt[[trt_i]] <- ppc_ecdf_overlay(y = c_obs_trt[[trt_i]], yrep = c_rep_trt[[trt_i]][1 : ndisplay, ], size = size, alpha = alpha, discrete = discrete, pad = pad)
+      gplot_e_trt[[trt_i]] <- ppc_ecdf_overlay(y = e_obs_trt[[trt_i]], yrep = e_rep_trt[[trt_i]][1 : ndisplay, ], size = size, alpha = alpha, pad = pad)
+      gplot_c_trt[[trt_i]] <- ppc_ecdf_overlay(y = c_obs_trt[[trt_i]], yrep = c_rep_trt[[trt_i]][1 : ndisplay, ], size = size, alpha = alpha, pad = pad)
     }
     }
     if(x$data_format == "long") {
       for(time_i in 1:n_time) {
-        gplot_e_time[[time_i]] <- ppc_ecdf_overlay(y = e_obs_time[[time_i]], yrep = e_rep_time[[time_i]][1 : ndisplay, ], size = size, alpha = alpha, discrete = discrete, pad = pad)
-        gplot_c_time[[time_i]] <- ppc_ecdf_overlay(y = c_obs_time[[time_i]], yrep = c_rep_time[[time_i]][1 : ndisplay, ], size = size, alpha = alpha, discrete = discrete, pad = pad)
+        gplot_e_time[[time_i]] <- ppc_ecdf_overlay(y = e_obs_time[[time_i]], yrep = e_rep_time[[time_i]][1 : ndisplay, ], size = size, alpha = alpha, pad = pad)
+        gplot_c_time[[time_i]] <- ppc_ecdf_overlay(y = c_obs_time[[time_i]], yrep = c_rep_time[[time_i]][1 : ndisplay, ], size = size, alpha = alpha, pad = pad)
       }
       for(time_trt_i in time_trt_lev) {
-        gplot_e_time_trt[[time_trt_i]] <- ppc_ecdf_overlay(y = e_obs_time_trt[[time_trt_i]], yrep = e_rep_time_trt[[time_trt_i]][1 : ndisplay, ], size = size, alpha = alpha, discrete = discrete, pad = pad)
-        gplot_c_time_trt[[time_trt_i]] <- ppc_ecdf_overlay(y = c_obs_time_trt[[time_trt_i]], yrep = c_rep_time_trt[[time_trt_i]][1 : ndisplay, ], size = size, alpha = alpha, discrete = discrete, pad = pad)
+        gplot_e_time_trt[[time_trt_i]] <- ppc_ecdf_overlay(y = e_obs_time_trt[[time_trt_i]], yrep = e_rep_time_trt[[time_trt_i]][1 : ndisplay, ], size = size, alpha = alpha, pad = pad)
+        gplot_c_time_trt[[time_trt_i]] <- ppc_ecdf_overlay(y = c_obs_time_trt[[time_trt_i]], yrep = c_rep_time_trt[[time_trt_i]][1 : ndisplay, ], size = size, alpha = alpha, pad = pad)
       } 
     }
   }
@@ -1160,22 +1159,27 @@ ppc <- function(x, type = "histogram", outcome = "both", ndisplay = 15,
     if(exists("prob", where = exArgs)) { prob = exArgs$prob} else { prob = 0.99}
     if(exists("plot_diff", where = exArgs)) { plot_diff = exArgs$plot_diff} else { plot_diff = FALSE}
     if(exists("interpolate_adj", where = exArgs)) { interpolate_adj = exArgs$interpolate_adj} else { interpolate_adj = NULL}
+    if(exists("method", where = exArgs)) { method = exArgs$method} else { method = "correlated"}
     if(x$data_format == "wide") {
-    gplot_e <- ppc_pit_ecdf(y = e_obs, yrep = e_rep[1 : ndisplay, ], pit = pit, K = K, prob = prob, plot_diff = plot_diff, interpolate_adj = interpolate_adj)
-    gplot_c <- ppc_pit_ecdf(y = c_obs, yrep = c_rep[1 : ndisplay, ], pit = pit, K = K, prob = prob, plot_diff = plot_diff, interpolate_adj = interpolate_adj)
+    gplot_e <- ppc_pit_ecdf(y = e_obs, yrep = e_rep[1 : ndisplay, ], pit = pit, K = K, prob = prob, plot_diff = plot_diff, interpolate_adj = interpolate_adj, method = method)
+    gplot_c <- ppc_pit_ecdf(y = c_obs, yrep = c_rep[1 : ndisplay, ], pit = pit, K = K, prob = prob, plot_diff = plot_diff, interpolate_adj = interpolate_adj, method = method)
     for(trt_i in trt_lev) {
-      gplot_e_trt[[trt_i]] <- ppc_pit_ecdf(y = e_obs_trt[[trt_i]], yrep = e_rep_trt[[trt_i]][1 : ndisplay, ], pit = pit, K = K, prob = prob, plot_diff = plot_diff, interpolate_adj = interpolate_adj)
-      gplot_c_trt[[trt_i]] <- ppc_pit_ecdf(y = c_obs_trt[[trt_i]], yrep = c_rep_trt[[trt_i]][1 : ndisplay, ], pit = pit, K = K, prob = prob, plot_diff = plot_diff, interpolate_adj = interpolate_adj)
+      gplot_e_trt[[trt_i]] <- ppc_pit_ecdf(y = e_obs_trt[[trt_i]], yrep = e_rep_trt[[trt_i]][1 : ndisplay, ], pit = pit, K = K, prob = prob, plot_diff = plot_diff, 
+                                           interpolate_adj = interpolate_adj, method = method)
+      gplot_c_trt[[trt_i]] <- ppc_pit_ecdf(y = c_obs_trt[[trt_i]], yrep = c_rep_trt[[trt_i]][1 : ndisplay, ], pit = pit, K = K, prob = prob, plot_diff = plot_diff, 
+                                           interpolate_adj = interpolate_adj, method = method)
     }
     }
     if(x$data_format == "long") {
       for(time_i in 1:n_time) {
-        gplot_e_time[[time_i]] <- ppc_pit_ecdf(y = e_obs_time[[time_i]], yrep = e_rep_time[[time_i]][1 : ndisplay, ], pit = pit, K = K, prob = prob, plot_diff = plot_diff, interpolate_adj = interpolate_adj)
-        gplot_c_time[[time_i]] <- ppc_pit_ecdf(y = c_obs_time[[time_i]], yrep = c_rep_time[[time_i]][1 : ndisplay, ], pit = pit, K = K, prob = prob, plot_diff = plot_diff, interpolate_adj = interpolate_adj)
+        gplot_e_time[[time_i]] <- ppc_pit_ecdf(y = e_obs_time[[time_i]], yrep = e_rep_time[[time_i]][1 : ndisplay, ], pit = pit, K = K, prob = prob, plot_diff = plot_diff, interpolate_adj = interpolate_adj, method = method)
+        gplot_c_time[[time_i]] <- ppc_pit_ecdf(y = c_obs_time[[time_i]], yrep = c_rep_time[[time_i]][1 : ndisplay, ], pit = pit, K = K, prob = prob, plot_diff = plot_diff, interpolate_adj = interpolate_adj, method = method)
       }
       for(time_trt_i in time_trt_lev) {
-        gplot_e_time_trt[[time_trt_i]] <- ppc_pit_ecdf(y = e_obs_time_trt[[time_trt_i]], yrep = e_rep_time_trt[[time_trt_i]][1 : ndisplay, ], pit = pit, K = K, prob = prob, plot_diff = plot_diff, interpolate_adj = interpolate_adj)
-        gplot_c_time_trt[[time_trt_i]] <- ppc_pit_ecdf(y = c_obs_time_trt[[time_trt_i]], yrep = c_rep_time_trt[[time_trt_i]][1 : ndisplay, ], pit = pit, K = K, prob = prob, plot_diff = plot_diff, interpolate_adj = interpolate_adj)
+        gplot_e_time_trt[[time_trt_i]] <- ppc_pit_ecdf(y = e_obs_time_trt[[time_trt_i]], yrep = e_rep_time_trt[[time_trt_i]][1 : ndisplay, ], pit = pit, K = K, prob = prob, plot_diff = plot_diff, 
+                                                       interpolate_adj = interpolate_adj, method = method)
+        gplot_c_time_trt[[time_trt_i]] <- ppc_pit_ecdf(y = c_obs_time_trt[[time_trt_i]], yrep = c_rep_time_trt[[time_trt_i]][1 : ndisplay, ], pit = pit, K = K, prob = prob, plot_diff = plot_diff, 
+                                                       interpolate_adj = interpolate_adj, method = method)
       }
     }
   }
@@ -1334,12 +1338,14 @@ ppc <- function(x, type = "histogram", outcome = "both", ndisplay = 15,
     if(exists("prob", where = exArgs)) { prob = exArgs$prob} else { prob = 0.99}
     if(exists("plot_diff", where = exArgs)) { plot_diff = exArgs$plot_diff} else { plot_diff = FALSE}
     if(exists("interpolate_adj", where = exArgs)) { interpolate_adj = exArgs$interpolate_adj} else { interpolate_adj = NULL}
+    if(exists("method", where = exArgs)) { method = exArgs$method} else { method = "correlated"}
     if(is.null(lw) & is.null(psis_object)) { stop("Please provide either a matrix of (smoothed) log weights or a 'psis_object' when computing LOO predictive checks.")}
     if(!is.null(lw)) { lw = lw[1 : ndisplay, ]}
     if(!is.null(psis_object)) { psis_object$log_weights = psis_object$log_weights[1 : ndisplay, ]}
     if(x$data_format == "wide") {
     if(outcome == "effects") {
-      gplot_e <- gplot_c <- ppc_loo_pit_ecdf(y = e_obs, yrep = e_rep[1 : ndisplay, ], lw = lw, psis_object = psis_object, pit = pit, K = K, prob = prob, plot_diff = plot_diff, interpolate_adj = interpolate_adj)
+      gplot_e <- gplot_c <- ppc_loo_pit_ecdf(y = e_obs, yrep = e_rep[1 : ndisplay, ], lw = lw, psis_object = psis_object, pit = pit, K = K, prob = prob, plot_diff = plot_diff, 
+                                             interpolate_adj = interpolate_adj, method = method)
       for(trt_i in trt_lev) {
         if(!is.null(lw)) { lwt <- lw[, trt_obs_e == trt_i]} else {lwt <- lw}
         if(!is.null(psis_object)) { 
@@ -1348,11 +1354,13 @@ ppc <- function(x, type = "histogram", outcome = "both", ndisplay = 15,
           psis_objectt$diagnostics$pareto_k <- psis_object$diagnostics$pareto_k[trt_obs_e == trt_i]
           psis_objectt$diagnostics$n_eff <- psis_object$diagnostics$n_eff[trt_obs_e == trt_i]
           psis_objectt$diagnostics$r_eff <- psis_object$diagnostics$r_eff[trt_obs_e == trt_i]} else { psis_objectt <- psis_object}
-        gplot_e_trt[[trt_i]] <- gplot_c_trt[[trt_i]] <- ppc_loo_pit_ecdf(y = e_obs_trt[[trt_i]], yrep = e_rep_trt[[trt_i]][1 : ndisplay, ], lw = lwt, psis_object = psis_objectt, pit = pit, K = K, prob = prob, plot_diff = plot_diff, interpolate_adj = interpolate_adj)
+        gplot_e_trt[[trt_i]] <- gplot_c_trt[[trt_i]] <- ppc_loo_pit_ecdf(y = e_obs_trt[[trt_i]], yrep = e_rep_trt[[trt_i]][1 : ndisplay, ], lw = lwt, psis_object = psis_objectt, pit = pit, K = K, prob = prob, plot_diff = plot_diff, 
+                                                                         interpolate_adj = interpolate_adj, method = method)
       }      
     }
     if(outcome == "costs") {
-      gplot_c <- gplot_e <- ppc_loo_pit_ecdf(y = c_obs, yrep = c_rep[1 : ndisplay, ], lw = lw, psis_object = psis_object, pit = pit, K = K, prob = prob, plot_diff = plot_diff, interpolate_adj = interpolate_adj)
+      gplot_c <- gplot_e <- ppc_loo_pit_ecdf(y = c_obs, yrep = c_rep[1 : ndisplay, ], lw = lw, psis_object = psis_object, pit = pit, K = K, prob = prob, plot_diff = plot_diff, 
+                                             interpolate_adj = interpolate_adj, method = method)
       for(trt_i in trt_lev) {
         if(!is.null(lw)) { lwt <- lw[, trt_obs_c == trt_i]} else {lwt <- lw}
         if(!is.null(psis_object)) { 
@@ -1361,12 +1369,15 @@ ppc <- function(x, type = "histogram", outcome = "both", ndisplay = 15,
           psis_objectt$diagnostics$pareto_k <- psis_object$diagnostics$pareto_k[trt_obs_c == trt_i]
           psis_objectt$diagnostics$n_eff <- psis_object$diagnostics$n_eff[trt_obs_c == trt_i]
           psis_objectt$diagnostics$r_eff <- psis_object$diagnostics$r_eff[trt_obs_c == trt_i]} else { psis_objectt <- psis_object}
-        gplot_c_trt[[trt_i]] <- gplot_e_trt[[trt_i]] <- ppc_loo_pit_ecdf(y = c_obs_trt[[trt_i]], yrep = c_rep_trt[[trt_i]][1 : ndisplay, ], lw = lwt, psis_object = psis_objectt, pit = pit, K = K, prob = prob, plot_diff = plot_diff, interpolate_adj = interpolate_adj)
+        gplot_c_trt[[trt_i]] <- gplot_e_trt[[trt_i]] <- ppc_loo_pit_ecdf(y = c_obs_trt[[trt_i]], yrep = c_rep_trt[[trt_i]][1 : ndisplay, ], lw = lwt, psis_object = psis_objectt, pit = pit, K = K, prob = prob, plot_diff = plot_diff, 
+                                                                         interpolate_adj = interpolate_adj, method = method)
       }      
     }  
     if(outcome == "both") {
-      gplot_e <- ppc_loo_pit_ecdf(y = e_obs, yrep = e_rep[1 : ndisplay, ], lw = lw, psis_object = psis_object, pit = pit, K = K, prob = prob, plot_diff = plot_diff, interpolate_adj = interpolate_adj)
-      gplot_c <- ppc_loo_pit_ecdf(y = c_obs, yrep = c_rep[1 : ndisplay, ], lw = lw, psis_object = psis_object, pit = pit, K = K, prob = prob, plot_diff = plot_diff, interpolate_adj = interpolate_adj)
+      gplot_e <- ppc_loo_pit_ecdf(y = e_obs, yrep = e_rep[1 : ndisplay, ], lw = lw, psis_object = psis_object, pit = pit, K = K, prob = prob, plot_diff = plot_diff, 
+                                  interpolate_adj = interpolate_adj, method = method)
+      gplot_c <- ppc_loo_pit_ecdf(y = c_obs, yrep = c_rep[1 : ndisplay, ], lw = lw, psis_object = psis_object, pit = pit, K = K, prob = prob, plot_diff = plot_diff, 
+                                  interpolate_adj = interpolate_adj, method = method)
       for(trt_i in trt_lev) {
         if(!is.null(lw)) { lwte <- lw[, trt_obs_e == trt_i]; lwtc <- lw[, trt_obs_c == trt_i]} else {lwte <- lw; lwtc <- lw}
         if(!is.null(psis_object)) { 
@@ -1375,8 +1386,10 @@ ppc <- function(x, type = "histogram", outcome = "both", ndisplay = 15,
           psis_objectt$diagnostics$pareto_k <- psis_object$diagnostics$pareto_k[trt_obs_e == trt_i & trt_obs_c == trt_i]
           psis_objectt$diagnostics$n_eff <- psis_object$diagnostics$n_eff[trt_obs_e == trt_i & trt_obs_c == trt_i]
           psis_objectt$diagnostics$r_eff <- psis_object$diagnostics$r_eff[trt_obs_e == trt_i & trt_obs_c == trt_i]} else { psis_objectt <- psis_object}
-        gplot_e_trt[[trt_i]] <- ppc_loo_pit_ecdf(y = e_obs_trt[[trt_i]], yrep = e_rep_trt[[trt_i]][1 : ndisplay, ], lw = lwte, psis_object = psis_objectt, pit = pit, K = K, prob = prob, plot_diff = plot_diff, interpolate_adj = interpolate_adj)
-        gplot_c_trt[[trt_i]] <- ppc_loo_pit_ecdf(y = c_obs_trt[[trt_i]], yrep = c_rep_trt[[trt_i]][1 : ndisplay, ], lw = lwtc, psis_object = psis_objectt, pit = pit, K = K, prob = prob, plot_diff = plot_diff, interpolate_adj = interpolate_adj)
+        gplot_e_trt[[trt_i]] <- ppc_loo_pit_ecdf(y = e_obs_trt[[trt_i]], yrep = e_rep_trt[[trt_i]][1 : ndisplay, ], lw = lwte, psis_object = psis_objectt, pit = pit, K = K, prob = prob, plot_diff = plot_diff, 
+                                                 interpolate_adj = interpolate_adj, method = method)
+        gplot_c_trt[[trt_i]] <- ppc_loo_pit_ecdf(y = c_obs_trt[[trt_i]], yrep = c_rep_trt[[trt_i]][1 : ndisplay, ], lw = lwtc, psis_object = psis_objectt, pit = pit, K = K, prob = prob, plot_diff = plot_diff, 
+                                                 interpolate_adj = interpolate_adj, method = method)
       }      
     }
     }
@@ -1390,7 +1403,8 @@ ppc <- function(x, type = "histogram", outcome = "both", ndisplay = 15,
             psis_objectt$diagnostics$pareto_k <- psis_object$diagnostics$pareto_k[time_obs_e == time_i]
             psis_objectt$diagnostics$n_eff <- psis_object$diagnostics$n_eff[time_obs_e == time_i]
             psis_objectt$diagnostics$r_eff <- psis_object$diagnostics$r_eff[time_obs_e == time_i]} else { psis_objectt <- psis_object}
-          gplot_e_time[[time_i]] <- gplot_c_time[[time_i]] <- ppc_loo_pit_ecdf(y = e_obs_time[[time_i]], yrep = e_rep_time[[time_i]][1 : ndisplay, ], lw = lwt, psis_object = psis_objectt, pit = pit, K = K, prob = prob, plot_diff = plot_diff, interpolate_adj = interpolate_adj)
+          gplot_e_time[[time_i]] <- gplot_c_time[[time_i]] <- ppc_loo_pit_ecdf(y = e_obs_time[[time_i]], yrep = e_rep_time[[time_i]][1 : ndisplay, ], lw = lwt, psis_object = psis_objectt, pit = pit, K = K, prob = prob, plot_diff = plot_diff, 
+                                                                               interpolate_adj = interpolate_adj, method = method)
         }  
         for(time_trt_i in time_trt_lev) {
           if(!is.null(lw)) { lwt <- lw[, time_trt_obs_e == time_trt_i]} else {lwt <- lw}
@@ -1400,7 +1414,8 @@ ppc <- function(x, type = "histogram", outcome = "both", ndisplay = 15,
             psis_objectt$diagnostics$pareto_k <- psis_object$diagnostics$pareto_k[time_trt_obs_e == time_trt_i]
             psis_objectt$diagnostics$n_eff <- psis_object$diagnostics$n_eff[time_trt_obs_e == time_trt_i]
             psis_objectt$diagnostics$r_eff <- psis_object$diagnostics$r_eff[time_trt_obs_e == time_trt_i]} else { psis_objectt <- psis_object}
-          gplot_e_time_trt[[time_trt_i]] <- gplot_c_time_trt[[time_trt_i]] <- ppc_loo_pit_ecdf(y = e_obs_time_trt[[time_trt_i]], yrep = e_rep_time_trt[[time_trt_i]][1 : ndisplay, ], lw = lwt, psis_object = psis_objectt, pit = pit, K = K, prob = prob, plot_diff = plot_diff, interpolate_adj = interpolate_adj)
+          gplot_e_time_trt[[time_trt_i]] <- gplot_c_time_trt[[time_trt_i]] <- ppc_loo_pit_ecdf(y = e_obs_time_trt[[time_trt_i]], yrep = e_rep_time_trt[[time_trt_i]][1 : ndisplay, ], lw = lwt, psis_object = psis_objectt, pit = pit, K = K, prob = prob, plot_diff = plot_diff, 
+                                                                                               interpolate_adj = interpolate_adj, method = method)
         }      
       }
       if(outcome == "costs") {
@@ -1412,7 +1427,8 @@ ppc <- function(x, type = "histogram", outcome = "both", ndisplay = 15,
             psis_objectt$diagnostics$pareto_k <- psis_object$diagnostics$pareto_k[time_obs_c == time_i]
             psis_objectt$diagnostics$n_eff <- psis_object$diagnostics$n_eff[time_obs_c == time_i]
             psis_objectt$diagnostics$r_eff <- psis_object$diagnostics$r_eff[time_obs_c == time_i]} else { psis_objectt <- psis_object}
-          gplot_c_time[[time_i]] <- gplot_e_time[[time_i]] <- ppc_loo_pit_ecdf(y = c_obs_time[[time_i]], yrep = c_rep_time[[time_i]][1 : ndisplay, ], lw = lwt, psis_object = psis_objectt, pit = pit, K = K, prob = prob, plot_diff = plot_diff, interpolate_adj = interpolate_adj)
+          gplot_c_time[[time_i]] <- gplot_e_time[[time_i]] <- ppc_loo_pit_ecdf(y = c_obs_time[[time_i]], yrep = c_rep_time[[time_i]][1 : ndisplay, ], lw = lwt, psis_object = psis_objectt, pit = pit, K = K, prob = prob, plot_diff = plot_diff, 
+                                                                               interpolate_adj = interpolate_adj, method = method)
         }
         for(time_trt_i in time_trt_lev) {
           if(!is.null(lw)) { lwt <- lw[, time_trt_obs_c == time_trt_i]} else {lwt <- lw}
@@ -1422,7 +1438,8 @@ ppc <- function(x, type = "histogram", outcome = "both", ndisplay = 15,
             psis_objectt$diagnostics$pareto_k <- psis_object$diagnostics$pareto_k[time_trt_obs_c == time_trt_i]
             psis_objectt$diagnostics$n_eff <- psis_object$diagnostics$n_eff[time_trt_obs_c == time_trt_i]
             psis_objectt$diagnostics$r_eff <- psis_object$diagnostics$r_eff[time_trt_obs_c == time_trt_i]} else { psis_objectt <- psis_object}
-          gplot_c_time_trt[[time_trt_i]] <- gplot_e_time_trt[[time_trt_i]] <- ppc_loo_pit_ecdf(y = c_obs_time_trt[[time_trt_i]], yrep = c_rep_time_trt[[time_trt_i]][1 : ndisplay, ], lw = lwt, psis_object = psis_objectt, pit = pit, K = K, prob = prob, plot_diff = plot_diff, interpolate_adj = interpolate_adj)
+          gplot_c_time_trt[[time_trt_i]] <- gplot_e_time_trt[[time_trt_i]] <- ppc_loo_pit_ecdf(y = c_obs_time_trt[[time_trt_i]], yrep = c_rep_time_trt[[time_trt_i]][1 : ndisplay, ], lw = lwt, psis_object = psis_objectt, pit = pit, K = K, prob = prob, plot_diff = plot_diff, 
+                                                                                               interpolate_adj = interpolate_adj, method = method)
         }
       }  
       if(outcome == "both") {
@@ -1434,8 +1451,10 @@ ppc <- function(x, type = "histogram", outcome = "both", ndisplay = 15,
             psis_objectt$diagnostics$pareto_k <- psis_object$diagnostics$pareto_k[time_obs_e == time_i & trt_obs_c == time_i]
             psis_objectt$diagnostics$n_eff <- psis_object$diagnostics$n_eff[time_obs_e == time_i & trt_obs_c == time_i]
             psis_objectt$diagnostics$r_eff <- psis_object$diagnostics$r_eff[time_obs_e == time_i & trt_obs_c == time_i]} else { psis_objectt <- psis_object}
-          gplot_e_time[[time_i]] <- ppc_loo_pit_ecdf(y = e_obs_time[[time_i]], yrep = e_rep_time[[time_i]][1 : ndisplay, ], lw = lwte, psis_object = psis_objectt, pit = pit, K = K, prob = prob, plot_diff = plot_diff, interpolate_adj = interpolate_adj)
-          gplot_c_time[[time_i]] <- ppc_loo_pit_ecdf(y = c_obs_time[[time_i]], yrep = c_rep_time[[time_i]][1 : ndisplay, ], lw = lwtc, psis_object = psis_objectt, pit = pit, K = K, prob = prob, plot_diff = plot_diff, interpolate_adj = interpolate_adj)
+          gplot_e_time[[time_i]] <- ppc_loo_pit_ecdf(y = e_obs_time[[time_i]], yrep = e_rep_time[[time_i]][1 : ndisplay, ], lw = lwte, psis_object = psis_objectt, pit = pit, K = K, prob = prob, plot_diff = plot_diff, 
+                                                     interpolate_adj = interpolate_adj, method = method)
+          gplot_c_time[[time_i]] <- ppc_loo_pit_ecdf(y = c_obs_time[[time_i]], yrep = c_rep_time[[time_i]][1 : ndisplay, ], lw = lwtc, psis_object = psis_objectt, pit = pit, K = K, prob = prob, plot_diff = plot_diff, 
+                                                     interpolate_adj = interpolate_adj, method = method)
         }
         for(time_trt_i in time_trt_lev) {
           if(!is.null(lw)) { lwte <- lw[, time_trt_obs_e == time_trt_i]; lwtc <- lw[, time_trt_obs_c == time_trt_i]} else {lwte <- lw; lwtc <- lw}
@@ -1445,8 +1464,10 @@ ppc <- function(x, type = "histogram", outcome = "both", ndisplay = 15,
             psis_objectt$diagnostics$pareto_k <- psis_object$diagnostics$pareto_k[time_trt_obs_e == time_trt_i & time_trt_obs_c == time_trt_i]
             psis_objectt$diagnostics$n_eff <- psis_object$diagnostics$n_eff[time_trt_obs_e == time_trt_i & time_trt_obs_c == time_trt_i]
             psis_objectt$diagnostics$r_eff <- psis_object$diagnostics$r_eff[time_trt_obs_e == time_trt_i & time_trt_obs_c == time_trt_i]} else { psis_objectt <- psis_object}
-          gplot_e_time_trt[[time_trt_i]] <- ppc_loo_pit_ecdf(y = e_obs_time_trt[[time_trt_i]], yrep = e_rep_time_trt[[time_trt_i]][1 : ndisplay, ], lw = lwte, psis_object = psis_objectt, pit = pit, K = K, prob = prob, plot_diff = plot_diff, interpolate_adj = interpolate_adj)
-          gplot_c_time_trt[[time_trt_i]] <- ppc_loo_pit_ecdf(y = c_obs_time_trt[[time_trt_i]], yrep = c_rep_time_trt[[time_trt_i]][1 : ndisplay, ], lw = lwtc, psis_object = psis_objectt, pit = pit, K = K, prob = prob, plot_diff = plot_diff, interpolate_adj = interpolate_adj)
+          gplot_e_time_trt[[time_trt_i]] <- ppc_loo_pit_ecdf(y = e_obs_time_trt[[time_trt_i]], yrep = e_rep_time_trt[[time_trt_i]][1 : ndisplay, ], lw = lwte, psis_object = psis_objectt, pit = pit, K = K, prob = prob, plot_diff = plot_diff, 
+                                                             interpolate_adj = interpolate_adj, method = method)
+          gplot_c_time_trt[[time_trt_i]] <- ppc_loo_pit_ecdf(y = c_obs_time_trt[[time_trt_i]], yrep = c_rep_time_trt[[time_trt_i]][1 : ndisplay, ], lw = lwtc, psis_object = psis_objectt, pit = pit, K = K, prob = prob, plot_diff = plot_diff, 
+                                                             interpolate_adj = interpolate_adj, method = method)
         }      
       }
     }

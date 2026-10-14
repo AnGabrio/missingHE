@@ -7,7 +7,7 @@
 diagnostic(x, type = "denplot", param = "all", theme = NULL, ...)
 }
 \arguments{
-\item{x}{An object of class "missingHE" containing the posterior results of a full Bayesian model implemented using the function \code{\link{selection}}, 
+\item{x}{An object of class "missingHE" containing the posterior results of a full Bayesian model implemented using the function \code{\link{selection}},
 \code{\link{pattern}}, \code{\link{hurdle}} or \code{\link{lmdm}}.}
 
 \item{type}{Type of diagnostic check to be plotted for the model parameter selected. Available choices include: 'histogram' for histogram plots,
@@ -15,9 +15,9 @@ diagnostic(x, type = "denplot", param = "all", theme = NULL, ...)
 'compare' for comparing the distribution of the whole chain with only its last part, 'cross' for cross correlation plots, 'Rhat' for the potential scale reduction factor, 'geweke' for the geweke diagnostic,
 'pairs' for posterior correlation among the parameters,'caterpillar' for caterpillar plots.}
 
-\item{param}{Name of the family of parameters to process, as given by a regular expression. For example the mean parameters 
+\item{param}{Name of the family of parameters to process, as given by a regular expression. For example the mean parameters
 for the effect and cost variables can be specified using 'mu.e' and 'mu.c', respectively. Different types of
-models may have different parameters depending on the assumed distributions and missing data assumptions. 
+models may have different parameters depending on the assumed distributions and missing data assumptions.
 To see a complete list of all possible parameters by types of models assumed see details.}
 
 \item{theme}{Type of ggplot theme among some pre-defined themes, mostly taken from the package \strong{ggthemes}. For a full list of available themes see details.}
@@ -28,11 +28,11 @@ To see a complete list of all possible parameters by types of models assumed see
 A \strong{ggplot} object containing the plots specified in the argument \code{type}
 }
 \description{
-The focus is restricted to full Bayesian models in cost-effectiveness analyses based on the function \code{\link{selection}}, \code{\link{pattern}}, 
+The focus is restricted to full Bayesian models in cost-effectiveness analyses based on the function \code{\link{selection}}, \code{\link{pattern}},
 \code{\link{hurdle}} and \code{\link{lmdm}}, with convergence of the MCMC chains that is assessed through graphical checks of the posterior distribution of the parameters of interest,
-Examples are density plots, trace plots, autocorrelation plots, etc. Other types of posterior checks are related to some summary MCMC statistics 
+Examples are density plots, trace plots, autocorrelation plots, etc. Other types of posterior checks are related to some summary MCMC statistics
 that are able to detect possible issues in the convergence of the algorithm, such as the potential scale reduction factor or the effective sample size.
-Different types of diagnostic tools and statistics are used to assess model convergence using functions contained in the package \strong{ggmcmc}. 
+Different types of diagnostic tools and statistics are used to assess model convergence using functions contained in the package \strong{ggmcmc}.
 Graphics and plots are managed using functions contained in the package \strong{ggplot2} and \strong{ggthemes}.
 }
 \details{
@@ -69,7 +69,7 @@ must be specified in the argument \code{param} according to the specific model i
 \item "random.delta.c" the random effects mnar parameters for the costs (only with the function \code{selection} or \code{lmdm}).
 \item "all" all available parameters stored in \code{x}.
 }
-When the object \code{x} is created using the function \code{pattern}, pattern-specific standard deviation ("sd.e", "sd.c") and regression coefficient 
+When the object \code{x} is created using the function \code{pattern}, pattern-specific standard deviation ("sd.e", "sd.c") and regression coefficient
 parameters ("alpha", "beta") for both outcomes can be visualised. The parameters associated with a missingness mechanism can be accessed only when \code{x}
 is created using the function \code{selection}, \code{pattern} or \code{lmdm}, while the parameters associated with the model for the structural values mechanism
 can be accessed only when \code{x} is created using the function \code{hurdle}.

@@ -18,6 +18,4 @@ An internal function to separate the fixed and random effects components from an
 #
 #
 }
-\keyword{effects}
-\keyword{models}
-\keyword{random}
+\keyword{internal}

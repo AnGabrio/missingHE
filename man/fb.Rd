@@ -18,6 +18,4 @@ An internal function to extract the random effects component from an object of c
 #
 #
 }
-\keyword{effects}
-\keyword{models}
-\keyword{random}
+\keyword{internal}

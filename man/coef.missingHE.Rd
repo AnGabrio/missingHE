@@ -20,7 +20,7 @@ CI sample quantiles to be calculated and returned for the estimates.}
 }
 \value{
 Prints a table with some summary statistics, including posterior mean, standard deviation and lower and upper quantiles based on the
-values specified in \code{prob}, for the posterior distributions of the regression coefficients of the effects and costs models run using the 
+values specified in \code{prob}, for the posterior distributions of the regression coefficients of the effects and costs models run using the
 function \code{selection}, \code{pattern}, \code{hurdle} or \code{\link{lmdm}}.
 }
 \description{

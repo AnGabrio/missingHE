@@ -1,27 +1,56 @@
 
-missingHE [![Travis-CI Build Status](https://app.travis-ci.com/AnGabrio/missingHE)](https://app.travis-ci.com/AnGabrio/missingHE)[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/AnGabrio/missingHE?branch=master&svg=true)](https://ci.appveyor.com/project/AnGabrio/missingHE)[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/missingHE)](https://cran.r-project.org/package=missingHE)[![CRAN_Download_Badge](http://cranlogs.r-pkg.org/badges/missingHE)](https://cran.r-project.org/package=missingHE)[![CRAN_Download_Badge](https://cranlogs.r-pkg.org:443/badges/grand-total/missingHE?color=orange)](https://cranlogs.r-pkg.org:443/badges/grand-total/missingHE?color=orange)
-===========================================================================================================================================
+missingHE: Missing Cost Effectiveness Models
+================
 
-Missing Outcome Data in Health Economic Evaluation
---------------------------------------------------
+[![Build Status]((https://app.travis-ci.com/AnGabrio/missingHE)](https://app.travis-ci.com/AnGabrio/missingHE)
+[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/missingHE)](https://cran.r-project.org/package=missingHE)
+[![CRAN_Download_Badge](http://cranlogs.r-pkg.org/badges/missingHE)](https://cran.r-project.org/package=missingHE)
+[![CRAN_Download_Badge](https://cranlogs.r-pkg.org:443/badges/grand-total/missingHE?color=orange)](https://cranlogs.r-pkg.org:443/badges/grand-total/missingHE?color=orange)
 
-Contains a suite of functions for health economic evaluations with missing outcome data. The package can fit different types of statistical models under a fully Bayesian approach using Markov Chain Monte Carlo (MCMC) methods. Three classes of models can be fitted under a variety of missing data assumptions: selection models, pattern mixture models and hurdle models. In addition to model fitting, `missingHE` provides a set of specialised functions to assess model convergence and summarise the statistical and economic results using different types of measures and graphs. 
+> Fit Bayesian Missing Cost Effectiveness Models in R.
 
-Installation
-------------
+:rocket: This is the **development version** of the `R` package `missingHE`. The stable version is now release 1.6.2,
+on [CRAN](https://cran.r-project.org/web/packages/missingHE/index.html).
 
-There are two ways of installing `missingHE`. A "stable" version is packaged and binary files are available for Windows and as source. To install the stable version on a Windows machine, run the following command
-```R
+## Contents
+
+- [Overview](#introduction)
+- [Features](#features)
+- [Installation](#installation)
+- [Further details](#further-details)
+
+## Overview
+
+Given a individual-level partially-observed cost-effectiveness outcome data in the form of a dataframe, 
+fits different types of Bayesian models to handle missing effect and/or cost values under different 
+assumptions about the missing data mechanisms, assesses model performance and Markov chain Monte Carlo (MCMC) 
+convergence, and summarises statistical and economic results based on the posterior distribution of
+key model parameters.
+
+## Features
+
+Main features of `missingHE` include:
+
+- Analysis of partially-observed effects/costs data via Bayesian missingness models
+- Model assessment measures/plots and MCMC convergence checks
+- Posterior summaries for key model parameters and cost-effectiveness measures 
+- Standard cost-effectiveness measures/graphs based on model results
+
+## Installation
+
+Install the [released version from CRAN](https://cran.r-project.org/package=missingHE) with
+
+```r
 install.packages("missingHE")
 ```
-which installs the package from a [CRAN mirror](https://cran.r-project.org/index.html) and ensures that `install.packages()` can also install the "dependencies" (e.g. other packages that are required for `missingHE` to work).
 
-It is also possible to install `missingHE` using the "development" version - this will usually be updated frequently and may be continuously tested. On Windows machines, you need to install a few dependencies, including [Rtools](https://cran.r-project.org/bin/windows/Rtools/) first, e.g. by running
+The development version (in this repo, which can be updated more quickly and more often than 
+the stable one) can be installed using the following command
 
 ``` r
-pkgs <- c("R2jags","ggplot2","gridExtra","BCEA","ggmcmc","loo","Rtools","devtools", "utils")
+pkgs <- c("R2jags", "ggplot2", "gridExtra", "BCEA", "ggmcmc", "loo", "Rtools", "devtools", "utils")
 repos <- c("https://cran.rstudio.com") 
-install.packages(pkgs,repos=repos,dependencies = "Depends")
+install.packages(pkgs, repos = repos, dependencies = "Depends")
 ```
 
 before installing the package using `devtools`:
@@ -29,12 +58,63 @@ before installing the package using `devtools`:
 ``` r
 devtools::install_github("AnGabrio/missingHE", build_vignettes = TRUE)
 ```
-The optional argument `build_vignettes = TRUE` allows to install the vignettes of the package locally on your computer. These consist in brief tutorials to guide the user on how to use and customise the models in `missingHE` using different functions of the package. Once the package is installed, they can be accessed using the command
+
+The optional argument `build_vignettes = TRUE` allows to install the vignettes of the package locally on your computer. 
+These consist in brief tutorials to guide the user on how to use and customise the 
+models in `missingHE` using different functions of the package. Once the package is installed, 
+they can be accessed using the command
 
 ``` r
 utils::browseVignettes(package = "missingHE")
 ```
-which shows all the vignettes available for the package.
 
-All models implemented in `missingHE` are written in the BUGS language using the software [JAGS](https://mcmc-jags.sourceforge.io/), which needs to be installed from its own repository and instructions for installations under different OS can be found online. Once installed, the software is called in `missingHE` via the R package [R2jags](https://cran.r-project.org/package=R2jags).
-Note that the `missingHE` package is currently under active development and therefore it is advisable to reinstall the package directly from GitHub before each use to ensure that you are using the most updated version.
+which shows all the vignettes available for the package. Alternatively, 
+you can install the development version using `remotes`, with the following command.
+
+```r
+install.packages("remotes")
+remotes::install_github("AnGabrio/missingHE")
+```
+
+**NB**: On Windows machines, you need to install a few dependencies, 
+including [Rtools](https://cran.r-project.org/bin/windows/Rtools/) first, e.g. by running
+
+```r
+pkgs <- c("MASS", "Rtools", "remotes")
+repos <- "https://cran.rstudio.com"
+install.packages(pkgs, repos = repos, dependencies = "Depends")
+```
+
+before installing the package using `remotes`.
+
+All models implemented in `missingHE` are written in the `BUGS` language using the 
+software [JAGS](https://mcmc-jags.sourceforge.io/), which needs to be installed from its own
+repository and instructions for installations under different OS can be found online. 
+Once installed, the software is called in `missingHE` via the `R` 
+package [R2jags](https://cran.r-project.org/package=R2jags).
+Note that the `missingHE` package is currently under active development and 
+therefore it is advisable to re-install the package directly from GitHub 
+before each use to ensure that you are using the most updated version.
+
+
+## Further details
+
+More details on `missingHE` are available in our 
+[_vignettes_](https://cran.r-project.org/web/packages/missingHE/vignettes/). Also, 
+details about the package, including some references and links to a pdf presentation and 
+some posts on my own blog) are given [here](https://angabrio.github.io/software/missingHE/).
+
+## License
+
+[![License: GPL v2](https://img.shields.io/badge/License-GPLv2-blue.svg)](https://www.gnu.org/licenses/gpl-2.0)
+
+## Contributing
+
+Please submit contributions through `Pull Requests`, following 
+the [contributing guidelines](https://github.com/AnGabrio/missingHE).
+To report issues and/or seek support, please file a new ticket in the
+[issue](https://github.com/AnGabrio/missingHE/issues) tracker.
+
+Please note that this project is released with 
+a [Contributor Code of Conduct](https://github.com/AnGabrio/missingHE). 
+By participating in this project you agree to abide by its terms.

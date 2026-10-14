@@ -28,7 +28,4 @@ This function fits a JAGS using the \code{\link[R2jags]{jags}} function and obta
 #
 #
 }
-\keyword{Bayesian}
-\keyword{JAGS}
-\keyword{models}
-\keyword{selection}
+\keyword{internal}

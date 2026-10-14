@@ -8,7 +8,7 @@ structural value mechanism and outcome distributions assumed}
 prior_hurdle(type, dist_e, dist_c, model_txt_info, model_string_jags)
 }
 \arguments{
-\item{type}{Type of structural value mechanism assumed. Choices are Structural Completely At Random (SCAR) and Structural At Random (SAR). 
+\item{type}{Type of structural value mechanism assumed. Choices are Structural Completely At Random (SCAR) and Structural At Random (SAR).
 For a complete list of all available hyper parameters and types of models see the manual.}
 
 \item{dist_e}{distribution assumed for the effects. Current available choices are: Normal ('norm'), Beta ('beta'), Gamma ('gamma'), Exponential ('exp'),
@@ -21,7 +21,7 @@ Weibull ('weibull'), Logistic ('logis'), Poisson ('pois'), Negative Binomial ('n
 \item{model_string_jags}{text file of the model.}
 }
 \description{
-This function modifies default hyper prior parameter values in the type of hurdle model selected according 
+This function modifies default hyper prior parameter values in the type of hurdle model selected according
 to the type of structural value mechanism and distributions for the outcomes assumed.
 }
 \examples{
@@ -30,7 +30,4 @@ to the type of structural value mechanism and distributions for the outcomes ass
 #
 #
 }
-\keyword{Hurdle}
-\keyword{distributions}
-\keyword{models}
-\keyword{priors}
+\keyword{internal}

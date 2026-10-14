@@ -30,7 +30,7 @@
 #' @param fixed_c Fixed effects variables to be included in the costs model
 #' @param random_e Random effects variables to be included in the effects model
 #' @param random_c Random effects variables to be included in the costs model
-#' @keywords read data
+#' @keywords internal
 #' @importFrom stats setNames na.omit sd as.formula model.matrix model.frame model.response terms
 #' @export
 #' @examples

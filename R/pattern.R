@@ -105,7 +105,7 @@
 #' @export
 #' 
 #' @examples
-#' # Quck example to run using subset of MenSS dataset
+#' # Quick example to run using subset of MenSS dataset
 #' MenSS.subset <- MenSS[50:100, ]
 #' 
 #' # Run the model using the pattern function assuming a MAR mechanism
@@ -217,6 +217,12 @@ pattern <- function(data, model.eff, model.cost,
   e <- as.name("e")
   c <- as.name("c")
   trt <- as.name("trt")
+  cl <- match.call()
+  mf <- match.call(expand.dots = FALSE)
+  m <- match(c("model.eff", "model.cost", "data", "dist_e", "dist_c", 
+               "restriction", "type", "n.chains",
+               "n.iter", "n.burnin", "n.thin"), names(mf), 0L)
+  mf <- mf[c(1L, m)]
   cov_matrix <- subset(data, select = -c(e, c))
   cov_matrix <- cov_matrix[!unlist(vapply(cov_matrix, anyNA, logical(1)))]  
   if(!inherits(model.eff, "formula") | !inherits(model.cost, "formula")) {
@@ -336,7 +342,7 @@ pattern <- function(data, model.eff, model.cost,
     par_prior_fixed <- c("sigma.prior.e", "sigma.prior.c", "alpha.prior", "beta.prior", 
                          "delta.prior.e", "delta.prior.c", "beta_f.prior", "patterns.prior")
     par_prior_random <- c("mu.a.prior", "mu.b.prior", "mu.b_f.prior", "s.a.prior", "s.b.prior", "s.b_f.prior")
-    stop_mes <- "Please specify priors using required names/values and according to assumed model structure. Type ''help(selection)'' for more details."
+    stop_mes <- "Please specify priors using required names/values and according to assumed model structure. Type ''help(pattern)'' for more details."
     if(!all(names(list_check_vector) %in% c(par_prior_fixed, par_prior_random))) { stop(stop_mes)}
     if(length(model_e_random) == 0 | pe_random == 0) {
       if(any(names(list_check_vector) %in% c("mu.a.prior", "s.a.prior"))) { stop(stop_mes)}
@@ -414,6 +420,10 @@ pattern <- function(data, model.eff, model.cost,
   if(exists("n.iter.pd", where = exArgs)) { n.iter.pd = exArgs$n.iter.pd} else { n.iter.pd = 1000}
   if(exists("n.adapt", where = exArgs)) { n.adapt = exArgs$n.adapt} else { n.adapt = 100}
   if(exists("n.mci", where = exArgs)) { n.mci = exArgs$n.mci} else { n.mci = n.iter}
+  if(exists("progress.bar", where = exArgs)) { progress.bar = exArgs$progress.bar} else { progress.bar = "text"}
+  if(exists("refresh", where = exArgs)) { refresh = exArgs$refresh} else { refresh = n.iter/50}
+  if(exists("RNGname", where = exArgs)) { RNGname = exArgs$RNGname} else { RNGname = "Wichmann-Hill"}
+  if(exists("quiet", where = exArgs)) { quiet = exArgs$quiet} else { quiet = FALSE}
   if(!is.logical(dic)) { stop("Please provide logical value for dic argument")}  
   model_info <- list("is_c_random_c" = is_c_random_c, "is_int_c_random_c" = is_int_c_random_c,
                      "ind_random" = ind_random, "ind_fixed" = ind_fixed,
@@ -422,9 +432,22 @@ pattern <- function(data, model.eff, model.cost,
                      "dic" = dic, "pd" = pd,  "n.iter.pd" = n.iter.pd, "n.adapt" = n.adapt, 
                      "inits" = inits, "n.chains" = n.chains, "n.iter" = n.iter, 
                      "n.burnin" = n.burnin, "n.thin" = n.thin, "prior" = prior, "patterns.prior" = patterns.prior,
-                     "n.mci" = n.mci, "prob" = prob, "restriction" = restriction)
+                     "n.mci" = n.mci, "prob" = prob, "restriction" = restriction, 
+                     "progress.bar" = progress.bar, "refresh" = refresh, 
+                     "RNGname" = RNGname, "quiet" = quiet)
   model_output <- run_pattern(data_model = data_model, type = type, 
-                                dist_e = dist_e, dist_c = dist_c, model_info = model_info)  
+                                dist_e = dist_e, dist_c = dist_c, model_info = model_info) 
+  effects_fixed <- cbind.data.frame(model_output$effects_fixed)
+  print_mod_e <- apply(effects_fixed, 2, mean)
+  if(!is.list(model_output$costs_fixed)) {
+    costs_fixed <- cbind.data.frame(model_output$costs_fixed)
+  } else if(is.list(model_output$costs_fixed)) { 
+    costs_fixed <- cbind(as.data.frame(model_output$costs_fixed$beta), 
+                         as.data.frame(model_output$costs_fixed$beta_f))}
+  print_mod_c <- apply(costs_fixed, 2, mean)
+  print_mod_p <- apply(model_output$p_pattern, 2, mean)
+  print_mod_est <- list("model.eff" = print_mod_e, "model.cost" = print_mod_c, 
+                        "model.pattern" = print_mod_p)
   if(!save_model) { unlink(model_output$filein)}
   if(exists("ref", where = exArgs)) {
     if(length(exArgs$ref) != 1 | !is.numeric(exArgs$ref)) { stop("Please provide a single numeric indicator for the reference treatment")}
@@ -437,8 +460,8 @@ pattern <- function(data, model.eff, model.cost,
   cea <- BCEA::bcea(e = model_output$mean_effects, c = model_output$mean_costs, ref = ref, 
                     interventions = interventions, Kmax = Kmax, k = wtp, plot = plot)
   format <- "wide"
-  res <- list(data_set = data_read, model_output = model_output, 
-              cea = cea, type = type, data_format = format)
+  res <- list(data_set = data_read, model_output = model_output, mod_est = print_mod_est,
+              cea = cea, type = type, data_format = format, call = mf)
   class(res) <- "missingHE"
   return(res)
 }

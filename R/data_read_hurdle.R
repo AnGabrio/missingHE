@@ -34,7 +34,7 @@
 #' @param trt_pos Numeric position of the treatment indicator within the model formula.
 #' @param type Type of structural value mechanism assumed, either 'SCAR' (Structural Completely At Random) or 'SAR' (Strcutural At Random).
 #' @param center Logical. If \code{center} is \code{TRUE} all the covariates in the model are centered.
-#' @keywords read data hurdle models
+#' @keywords internal
 #' @importFrom stats setNames na.omit sd as.formula model.matrix model.frame model.response terms
 #' @export
 #' @examples

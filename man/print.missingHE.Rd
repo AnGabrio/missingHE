@@ -2,36 +2,38 @@
 % Please edit documentation in R/print.missingHE.R
 \name{print.missingHE}
 \alias{print.missingHE}
-\title{Print method for the posterior results contained in the objects of class \code{missingHE}}
+\title{Print method for objects in the class \code{missingHE}}
 \usage{
-\method{print}{missingHE}(x, display = "fixed", digits = 3, ...)
+\method{print}{missingHE}(x, digits = 3, ...)
 }
 \arguments{
-\item{x}{A \code{missingHE} object containing the results of the Bayesian model run using the function \code{\link{selection}}, \code{\link{pattern}},
-\code{\link{hurdle}} or \code{\link{lmdm}}.}
-
-\item{display}{Set of parameters for which posterior summaries are displayed. Choices are: fixed effects ('fixed'), random effects ('random'),
-individual log likelihood values ('loglik'), individual conditional parameter values ('conditional') and individual imputed values ('mis').}
+\item{x}{A \code{missingHE} object containing the results of the Bayesian modelling and the economic evaluation.}
 
 \item{digits}{Integer indicating the number of decimal places to be used for rounding (default = 3).}
 
-\item{...}{additional arguments affecting the output produced. For example: \code{param = } JAGS name assigned to the specific model parameters 
-to be shown in the printed table.}
+\item{...}{Additional arguments affecting the summary produced.}
+}
+\value{
+Prints all fixed regression coefficients based on the type of model fitted using the function \code{selection}, \code{pattern}, \code{hurdle} or \code{\link{lmdm}}.
+Summary estimates based on posterior means of each fixed regression coefficient included into the fitted models are provided.
 }
 \description{
-Prints the summary table for the model fitted, with the estimate of the parameters and/or missing values.
+Produces a printout of the (posterior mean) estimate for each regression coefficient included in the outcome and missingness/structural value
+models based on the health economic evaluation probabilistic model run using the function \code{\link{selection}}, \code{\link{pattern}},
+\code{\link{hurdle}} or \code{\link{lmdm}}.
 }
 \examples{
- 
 # For examples see the function \code{\link{selection}}, \code{\link{pattern}}, 
 # \code{\link{hurdle}} or \code{\link{lmdm}}
-# 
-# 
+#
+#
+}
+\references{
+Baio, G.(2012). \emph{Bayesian Methods in Health Economcis}. CRC/Chapman Hall, London.
+}
+\seealso{
+\code{\link{selection}} \code{\link{pattern}} \code{\link{hurdle}} \code{\link{lmdm}} \code{\link{diagnostic}} \code{\link{plot.missingHE}}
 }
 \author{
 Andrea Gabrio
 }
-\keyword{JAGS}
-\keyword{data}
-\keyword{missing}
-\keyword{print}

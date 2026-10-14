@@ -4,7 +4,7 @@
 #'type of missingness mechanism assumed and independence or joint modelling
 
 #' This function selects which type of model to execute.
-#' @keywords JAGS Pattern mixture models
+#' @keywords internal
 #' @param dist_e Distribution assumed for the effects. Current available choices are: Normal ('norm'), Beta ('beta'), Gamma ('gamma'), Exponential ('exp'),
 #' Weibull ('weib'), Logistic ('logis'), Poisson ('pois'), Negative Binomial ('negbin') or Bernoulli ('bern')
 #' @param dist_c Distribution assumed for the costs. Current available choices are: Normal ('norm'), Gamma ('gamma') or LogNormal ('lnorm')

@@ -3,7 +3,7 @@
 #' 
 #' This function modifies default hyper prior parameter values in the type of pattern mixture model selected according 
 #' to the type of missingness mechanism and distributions for the outcomes assumed.
-#' @keywords priors distributions Pattern mixture models
+#' @keywords internal
 #' @param type Type of missingness mechanism assumed. Choices are Missing At Random (MAR), Missing Not At Random for the effects (MNAR_eff),
 #' Missing Not At Random for the costs (MNAR_cost), and Missing Not At Random for both (MNAR). For a complete list of all available hyper parameters 
 #' and types of models see the manual.

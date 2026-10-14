@@ -2,6 +2,7 @@
 
 S3method(coef,missingHE)
 S3method(plot,missingHE)
+S3method(postsum,missingHE)
 S3method(print,missingHE)
 S3method(summary,missingHE)
 export(data_read_hurdle)
@@ -14,60 +15,67 @@ export(jagsresults)
 export(lmdm)
 export(pattern)
 export(pic)
+export(postsum)
 export(ppc)
 export(selection)
 import(ggplot2)
 import(ggpubr)
 import(mcmcr)
-importFrom(bayesplot,bayesplot_theme_get)
-importFrom(bayesplot,color_scheme_get)
-importFrom(bayesplot,color_scheme_set)
-importFrom(bayesplot,legend_none)
-importFrom(bayesplot,ppc_boxplot)
-importFrom(bayesplot,ppc_dens)
-importFrom(bayesplot,ppc_dens_overlay)
-importFrom(bayesplot,ppc_ecdf_overlay)
-importFrom(bayesplot,ppc_error_binned)
-importFrom(bayesplot,ppc_error_hist)
-importFrom(bayesplot,ppc_error_scatter)
-importFrom(bayesplot,ppc_error_scatter_avg)
-importFrom(bayesplot,ppc_freqpoly)
-importFrom(bayesplot,ppc_hist)
-importFrom(bayesplot,ppc_intervals)
-importFrom(bayesplot,ppc_loo_pit_ecdf)
-importFrom(bayesplot,ppc_loo_pit_overlay)
-importFrom(bayesplot,ppc_pit_ecdf)
-importFrom(bayesplot,ppc_ribbon)
-importFrom(bayesplot,ppc_scatter)
-importFrom(bayesplot,ppc_scatter_avg)
-importFrom(bayesplot,ppc_stat)
-importFrom(bayesplot,ppc_stat_2d)
-importFrom(coda,"varnames<-")
-importFrom(coda,as.mcmc)
-importFrom(coda,varnames)
+importFrom(bayesplot,
+  bayesplot_theme_get,
+  color_scheme_get,
+  color_scheme_set,
+  legend_none,
+  ppc_boxplot,
+  ppc_dens,
+  ppc_dens_overlay,
+  ppc_ecdf_overlay,
+  ppc_error_binned,
+  ppc_error_hist,
+  ppc_error_scatter,
+  ppc_error_scatter_avg,
+  ppc_freqpoly,
+  ppc_hist,
+  ppc_intervals,
+  ppc_loo_pit_ecdf,
+  ppc_loo_pit_overlay,
+  ppc_pit_ecdf,
+  ppc_ribbon,
+  ppc_scatter,
+  ppc_scatter_avg,
+  ppc_stat,
+  ppc_stat_2d
+)
+importFrom(coda,
+  "varnames<-",
+  as.mcmc,
+  varnames
+)
 importFrom(graphics,text)
 importFrom(methods,is)
-importFrom(stats,aggregate)
-importFrom(stats,as.formula)
-importFrom(stats,complete.cases)
-importFrom(stats,model.frame)
-importFrom(stats,model.matrix)
-importFrom(stats,model.response)
-importFrom(stats,na.omit)
-importFrom(stats,qlogis)
-importFrom(stats,quantile)
-importFrom(stats,rbeta)
-importFrom(stats,rbinom)
-importFrom(stats,reshape)
-importFrom(stats,rexp)
-importFrom(stats,rgamma)
-importFrom(stats,rlnorm)
-importFrom(stats,rlogis)
-importFrom(stats,rnbinom)
-importFrom(stats,rnorm)
-importFrom(stats,rpois)
-importFrom(stats,rweibull)
-importFrom(stats,sd)
-importFrom(stats,setNames)
-importFrom(stats,terms)
-importFrom(stats,var)
+importFrom(stats,
+  aggregate,
+  as.formula,
+  complete.cases,
+  model.frame,
+  model.matrix,
+  model.response,
+  na.omit,
+  qlogis,
+  quantile,
+  rbeta,
+  rbinom,
+  reshape,
+  rexp,
+  rgamma,
+  rlnorm,
+  rlogis,
+  rnbinom,
+  rnorm,
+  rpois,
+  rweibull,
+  sd,
+  setNames,
+  terms,
+  var
+)

@@ -3,7 +3,7 @@
 #' 
 #' This function modifies default hyper prior parameter values in the type of hurdle model selected according 
 #' to the type of structural value mechanism and distributions for the outcomes assumed.
-#' @keywords priors distributions Hurdle models
+#' @keywords internal
 #' @param type Type of structural value mechanism assumed. Choices are Structural Completely At Random (SCAR) and Structural At Random (SAR). 
 #' For a complete list of all available hyper parameters and types of models see the manual.
 #' @param dist_e distribution assumed for the effects. Current available choices are: Normal ('norm'), Beta ('beta'), Gamma ('gamma'), Exponential ('exp'),

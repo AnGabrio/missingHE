@@ -1,7 +1,7 @@
 #' An internal function to summarise results from BUGS model
 #'
 #' This function hides missing data distribution from summary results of BUGS models
-#' @keywords summary JAGS model
+#' @keywords internal
 #' @param x The \code{rjags}, \code{rjags.parallel}, or \code{mcmc.list} object
 #'   for which results will be printed.
 #' @param params Character vector or a regular expression pattern. The 
@@ -19,7 +19,7 @@
 #'   expressions (\code{\link{regex}}). 
 #' @param invert Logical. If \code{invert} is \code{TRUE}, only those parameters
 #'   that do not match elements of \code{params} will be returned.
-#' @param probs A numeric vector of probabilities within range [0, 1],
+#' @param probs A numeric vector of probabilities,
 #'   representing the sample quantiles to be calculated and returned.
 #' @param signif If supplied, all columns other than \code{n.eff} will have 
 #'   their values rounded such that the most extreme value has the specified

@@ -1,6 +1,6 @@
 #' An internal function to separate the fixed and random effects components from an object of class formula
 #' 
-#' @keywords random effects models
+#' @keywords internal
 #' @param term formula to be processed
 #' @examples
 #' #Internal function only

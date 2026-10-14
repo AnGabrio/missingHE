@@ -1,7 +1,7 @@
 #' Full Bayesian Models to handle missingness in Economic Evaluations (Hurdle Models)
 #' 
 #' Full Bayesian cost-effectiveness models to handle missing data in the outcomes using Hurdle models
-#' under a variatey of alternative parametric distributions for the effect and cost variables. Alternative
+#' under a variety of alternative parametric distributions for the effect and cost variables. Alternative
 #' assumptions about the mechanisms of the structural values are implemented using a hurdle approach. The analysis is performed using the \code{BUGS} language, 
 #' which is implemented in the software \code{JAGS} using the function \code{\link[R2jags]{jags}}. The output is stored in an object of class 'missingHE'.
 #' 
@@ -117,14 +117,16 @@
 #' @export
 #'
 #' @examples
-#' # Quck example to run using subset of MenSS dataset
-#' MenSS.subset <- MenSS[50:100, ]
+#' # Quick example to run using the MenSS dataset
 #' 
 #' # Run the model using the hurdle function assuming a SCAR mechanism
-#' # Use only 100 iterations to run a quick check
-#' model.hurdle <- hurdle(data = MenSS.subset, model.eff = e ~ trt, model.cost = c ~ trt,
-#'    model.se = se ~ 1, model.sc = sc ~ 1, se = 1, sc = 0, dist_e = "norm", dist_c = "norm",
-#'    type = "SCAR", n.chains = 2, n.iter = 100)
+#' # Use subset of dataset to produce quick results
+#' MenSS_ex <- MenSS[MenSS$age > 25, ]
+#' 
+#' # Use only 50 iterations to run a quick check
+#' model.hurdle <- hurdle(data = MenSS_ex, model.eff = e ~ trt, model.cost = c ~ trt,
+#'    model.se = se ~ 1, model.sc = sc ~ 1, se = NULL, sc = 0, dist_e = "norm", dist_c = "gamma",
+#'    type = "SCAR", n.chains = 2, n.iter = 50)
 #' 
 #' # Print the results of the JAGS model
 #' print(model.hurdle)
@@ -151,7 +153,7 @@
 #' #
 #'
 #' # Compare observed effect data with imputations from the model
-#' # using plots (posteiror means and credible intervals)
+#' # using plots (posterior means and credible intervals)
 #' p1 <- plot(model.hurdle, class = "scatter", outcome = "effects")
 #' #
 #'
@@ -161,7 +163,7 @@
 #' \donttest{
 #' # Further examples which take longer to run
 #' model.hurdle <- hurdle(data = MenSS, model.eff = e ~ trt, model.cost = c ~ trt + e,
-#'    model.se = se ~ age, model.sc = sc ~ age, se = 1, sc = 0, dist_e = "norm", dist_c = "norm",
+#'    model.se = se ~ age, model.sc = sc ~ age, se = 1, sc = 0, dist_e = "beta", dist_c = "gamma",
 #'    type = "SAR", n.chains = 2, n.iter = 500)
 #' #
 #' # Print results for all imputed values
@@ -230,6 +232,12 @@ hurdle <- function(data, model.eff, model.cost,
   e <- as.name("e")
   c <- as.name("c")
   trt <- as.name("trt")
+  cl <- match.call()
+  mf <- match.call(expand.dots = FALSE)
+  m <- match(c("model.eff", "model.cost", "model.se", "model.sc", 
+               "data", "se", "sc", "dist_e", "dist_c", "type", "n.chains",
+               "n.iter", "n.burnin", "n.thin"), names(mf), 0L)
+  mf <- mf[c(1L, m)]
   cov_matrix <- subset(data, select = -c(e, c))
   cov_matrix <- cov_matrix[!unlist(vapply(cov_matrix, anyNA, logical(1)))]
   if(!inherits(model.eff, "formula") | !inherits(model.cost, "formula")) {
@@ -477,7 +485,7 @@ hurdle <- function(data, model.eff, model.cost,
     par_prior_random <- c("mu.g.prior.e", "mu.g.prior.c", "mu.a.prior", "mu.b.prior", 
                           "mu.b_f.prior", "s.g.prior.e", "s.g.prior.c", 
                           "s.a.prior", "s.b.prior", "s.b_f.prior")
-    stop_mes <- "Please specify priors using required names/values and according to assumed model structure. Type ''help(selection)'' for more details."
+    stop_mes <- "Please specify priors using required names/values and according to assumed model structure. Type ''help(hurdle)'' for more details."
     if(!all(names(list_check_vector) %in% c(par_prior_fixed, par_prior_random))) { stop(stop_mes)}
     if(length(model_e_random) == 0 | pe_random == 0) {
       if(any(names(list_check_vector) %in% c("mu.a.prior", "s.a.prior"))) { stop(stop_mes)}
@@ -583,6 +591,10 @@ hurdle <- function(data, model.eff, model.cost,
   if(exists("n.iter.pd", where = exArgs)) { n.iter.pd = exArgs$n.iter.pd} else { n.iter.pd = 1000}
   if(exists("n.adapt", where = exArgs)) { n.adapt = exArgs$n.adapt} else { n.adapt = 100}
   if(exists("n.mci", where = exArgs)) { n.mci = exArgs$n.mci} else { n.mci = n.iter}
+  if(exists("progress.bar", where = exArgs)) { progress.bar = exArgs$progress.bar} else { progress.bar = "text"}
+  if(exists("refresh", where = exArgs)) { refresh = exArgs$refresh} else { refresh = n.iter/50}
+  if(exists("RNGname", where = exArgs)) { RNGname = exArgs$RNGname} else { RNGname = "Wichmann-Hill"}
+  if(exists("quiet", where = exArgs)) { quiet = exArgs$quiet} else { quiet = FALSE}
   if(!is.logical(dic)) { stop("Please provide logical value for dic argument")}  
   model_info <- list("is_c_random_c" = is_c_random_c, "is_int_c_random_c" = is_int_c_random_c, 
                      "ind_random" = ind_random, "ind_fixed" = ind_fixed,
@@ -592,9 +604,25 @@ hurdle <- function(data, model.eff, model.cost,
                      "dic" = dic, "pd" = pd,  "n.iter.pd" = n.iter.pd, "n.adapt" = n.adapt, 
                      "inits" = inits, "n.chains" = n.chains, "n.iter" = n.iter, 
                      "n.burnin" = n.burnin, "n.thin" = n.thin, "prior" = prior, 
-                     "n.mci" = n.mci, "prob" = prob)  
+                     "n.mci" = n.mci, "prob" = prob, "progress.bar" = progress.bar, 
+                     "refresh" = refresh, "RNGname" = RNGname, "quiet" = quiet)  
   model_output <- run_hurdle(data_model = data_model, type = type, 
                                 dist_e = dist_e, dist_c = dist_c, model_info = model_info)
+  print_mod_e <- apply(model_output$effects_fixed, 2, mean)
+  if(is.matrix(model_output$costs_fixed)) { 
+    print_mod_c <- apply(model_output$costs_fixed, 2, mean)
+  } else if(is.list(model_output$costs_fixed)) { 
+    costs_fixed <- cbind(as.data.frame(model_output$costs_fixed$beta), 
+                         as.data.frame(model_output$costs_fixed$beta_f))
+    print_mod_c <- apply(costs_fixed, 2, mean)}
+  if(!is.null(se)) {
+    print_mod_p_e <- apply(model_output$str_effects_fixed, 2, mean)
+    } else { print_mod_p_e <- NA}
+  if(!is.null(sc)) {
+    print_mod_p_c <- apply(model_output$str_costs_fixed, 2, mean)
+    } else { print_mod_p_c <- NA}
+  print_mod_est <- list("model.eff" = print_mod_e, "model.cost" = print_mod_c, 
+                        "model.se" = print_mod_p_e, "model.sc" = print_mod_p_c)
   if(!save_model) { unlink(model_output$filein)}
   if(exists("ref", where = exArgs)) {
     if(length(exArgs$ref) != 1 | !is.numeric(exArgs$ref)) { stop("Please provide a single numeric indicator for the reference treatment")}
@@ -607,8 +635,8 @@ hurdle <- function(data, model.eff, model.cost,
   cea <- BCEA::bcea(e = model_output$mean_effects, c = model_output$mean_costs, ref = ref, 
                     interventions = interventions, Kmax = Kmax, k = wtp, plot = plot)
   format <- "wide"
-  res <- list(data_set = data_read, model_output = model_output, 
-              cea = cea, type = type, data_format = format)
+  res <- list(data_set = data_read, model_output = model_output, mod_est = print_mod_est,
+              cea = cea, type = type, data_format = format, call = mf)
   class(res) <- "missingHE"  
   return(res)
 }

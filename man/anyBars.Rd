@@ -18,6 +18,4 @@ An internal function to detect the random effects component from an object of cl
 #
 #
 }
-\keyword{effects}
-\keyword{models}
-\keyword{random}
+\keyword{internal}

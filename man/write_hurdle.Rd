@@ -2,7 +2,7 @@
 % Please edit documentation in R/write_hurdle.R
 \name{write_hurdle}
 \alias{write_hurdle}
-\title{An internal function to select which type of hurdle model to execute. 
+\title{An internal function to select which type of hurdle model to execute.
 Alternatives vary depending on the type of distribution assumed for the effect and cost variables,
 type of structural value mechanism assumed and independence or joint modelling
 This function selects which type of model to execute.}
@@ -20,7 +20,7 @@ Weibull ('weib'), Logistic ('logis'), Poisson ('pois'), Negative Binomial ('negb
 \item{model_txt_info}{list containing model specification information used to write the txt file of the JAGS model.}
 }
 \description{
-An internal function to select which type of hurdle model to execute. 
+An internal function to select which type of hurdle model to execute.
 Alternatives vary depending on the type of distribution assumed for the effect and cost variables,
 type of structural value mechanism assumed and independence or joint modelling
 This function selects which type of model to execute.
@@ -31,6 +31,4 @@ This function selects which type of model to execute.
 #
 #
 }
-\keyword{Hurdle}
-\keyword{JAGS}
-\keyword{models}
+\keyword{internal}

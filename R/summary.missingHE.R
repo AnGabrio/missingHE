@@ -102,4 +102,4 @@ summary.missingHE <- function(object, incremental = FALSE, prob = c(0.025, 0.975
   print(tbl_res2, quote = FALSE, digits = digits, justify = "center")
   cat(text3)
   print(tbl_res3, quote = FALSE, digits = digits, justify = "center")
- }
+}

@@ -24,34 +24,34 @@ data_read_hurdle(
 )
 }
 \arguments{
-\item{data}{A data frame in which to find variables supplied in \code{model.eff}, \code{model.cost} (model formulas for effects and costs) 
+\item{data}{A data frame in which to find variables supplied in \code{model.eff}, \code{model.cost} (model formulas for effects and costs)
 and \code{model.se}, \code{model.sc} (model formulas for the structural effect and cost models) . Among these,
 effectiveness, cost and treatment indicator variables must always be provided and named 'e', 'c' and 'trt' respectively.}
 
 \item{model.eff}{A formula expression in conventional \code{R} linear modelling syntax. The response must be a health economics
-effectiveness outcome ('e') whose name must correspond to that used in \code{data}, and 
-any covariates are given on the right-hand side. If there are no covariates, specify \code{1} on the right hand side. 
+effectiveness outcome ('e') whose name must correspond to that used in \code{data}, and
+any covariates are given on the right-hand side. If there are no covariates, specify \code{1} on the right hand side.
 Random effects can also be specified for each model parameter.}
 
 \item{model.cost}{A formula expression in conventional \code{R} linear modelling syntax. The response must be a health economics
-cost outcome ('c') whose name must correspond to that used in \code{data}, and any covariates are given on the right-hand side. 
-If there are no covariates, specify \code{1} on the right hand side. By default, covariates are placed on the "location" 
+cost outcome ('c') whose name must correspond to that used in \code{data}, and any covariates are given on the right-hand side.
+If there are no covariates, specify \code{1} on the right hand side. By default, covariates are placed on the "location"
 parameter of the distribution through a linear model. Random effects can also be specified for each model parameter.}
 
 \item{model.se}{A formula expression in conventional \code{R} linear modelling syntax. The response must be a health economics
-effectiveness outcome ('e') whose name must correspond to that used in \code{data}, and 
+effectiveness outcome ('e') whose name must correspond to that used in \code{data}, and
 any covariates used to estimate the probability of structural effects are given on the right-hand side. If there are no covariates, specify \code{1} on the right hand side.
 By default, covariates are placed on the "probability" parameter for the structural effects through a logistic-linear model. Random effects can also be specified for each model parameter.}
 
 \item{model.sc}{A formula expression in conventional \code{R} linear modelling syntax. The response must be a health economics
-cost outcome ('c') whose name must correspond to that used in \code{data}, and 
+cost outcome ('c') whose name must correspond to that used in \code{data}, and
 any covariates used to estimate the probability of structural costs are given on the right-hand side. If there are no covariates, specify \code{1} on the right hand side.
 By default, covariates are placed on the "probability" parameter for the structural costs through a logistic-linear model. Random effects can also be specified for each model parameter.}
 
-\item{se}{Structural value to be found in the effect data defined in \code{data}. If set to \code{NULL}, 
+\item{se}{Structural value to be found in the effect data defined in \code{data}. If set to \code{NULL},
 no structural value is chosen and a standard model for the effects is run.}
 
-\item{sc}{Structural value to be found in the cost data defined in \code{data}. If set to \code{NULL}, 
+\item{sc}{Structural value to be found in the cost data defined in \code{data}. If set to \code{NULL},
 no structural value is chosen and a standard model for the costs is run.}
 
 \item{cov_matrix}{Covariance matrix containing all model covariates.}
@@ -82,7 +82,4 @@ according to the information provided by the user.
 #
 #
 }
-\keyword{data}
-\keyword{hurdle}
-\keyword{models}
-\keyword{read}
+\keyword{internal}

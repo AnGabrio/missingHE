@@ -205,10 +205,16 @@ lmdm <- function(data, model.eff, model.cost,
   if(!is.logical(save_model) | !is.logical(center)) {
     stop("Please provide 'save_model', 'center' as logical values")}
   if(!time_dep %in% c("AR1", "biv", "none")) { 
-    stop("Time dependence structures available are 'AR1' and 'none'")}  
+    stop("Time dependence structures available are 'AR1', 'biv' and 'none'")}  
   e <- as.name("e")
   c <- as.name("c")
   trt <- as.name("trt")
+  cl <- match.call()
+  mf <- match.call(expand.dots = FALSE)
+  m <- match(c("model.eff", "model.cost", "model.me", "model.mc", 
+               "data", "dist_e", "dist_c", "type", "time_dep", "n.chains",
+               "n.iter", "n.burnin", "n.thin"), names(mf), 0L)
+  mf <- mf[c(1L, m)]
   cov_matrix <- subset(data, select = -c(e, c))
   cov_matrix <- cov_matrix[!unlist(vapply(cov_matrix, anyNA, logical(1)))]  
   if(!inherits(model.eff, "formula") | !inherits(model.cost, "formula")) {
@@ -441,7 +447,7 @@ lmdm <- function(data, model.eff, model.cost,
                           "s.a.prior", "s.b.prior", "s.d.prior.e", "s.d.prior.c", "s.b_f.prior",
                           "mu.a_te.prior", "s.a_te.prior", "mu.a_tc.prior", "s.a_tc.prior", "mu.b_te.prior", 
                           "s.b_te.prior", "mu.b_tc.prior", "s.b_tc.prior")
-    stop_mes <- "Please specify priors using required names/values and according to assumed model structure. Type ''help(selection)'' for more details."
+    stop_mes <- "Please specify priors using required names/values and according to assumed model structure. Type ''help(lmdm)'' for more details."
     if(!all(names(list_check_vector) %in% c(par_prior_fixed, par_prior_random))) { stop(stop_mes)}
     if(length(model_e_random) == 0 | pe_random == 0) {
       if(any(names(list_check_vector) %in% c("mu.a.prior", "s.a.prior"))) { stop(stop_mes)}
@@ -578,6 +584,10 @@ lmdm <- function(data, model.eff, model.cost,
   if(exists("n.iter.pd", where = exArgs)) { n.iter.pd = exArgs$n.iter.pd} else { n.iter.pd = 1000}
   if(exists("n.adapt", where = exArgs)) { n.adapt = exArgs$n.adapt} else { n.adapt = 100}
   if(exists("n.mci", where = exArgs)) { n.mci = exArgs$n.mci} else { n.mci = n.iter}
+  if(exists("progress.bar", where = exArgs)) { progress.bar = exArgs$progress.bar} else { progress.bar = "text"}
+  if(exists("refresh", where = exArgs)) { refresh = exArgs$refresh} else { refresh = n.iter/50}
+  if(exists("RNGname", where = exArgs)) { RNGname = exArgs$RNGname} else { RNGname = "Wichmann-Hill"}
+  if(exists("quiet", where = exArgs)) { quiet = exArgs$quiet} else { quiet = FALSE}
   if(!is.logical(dic)) { stop("Please provide logical value for dic argument")}  
   model_info <- list("is_c_random_c" = is_c_random_c, "is_int_c_random_c" = is_int_c_random_c,
                      "is_me_random_e" = is_me_random_e, "is_mc_random_c" = is_mc_random_c, 
@@ -589,9 +599,50 @@ lmdm <- function(data, model.eff, model.cost,
                      "dic" = dic, "pd" = pd,  "n.iter.pd" = n.iter.pd, "n.adapt" = n.adapt, 
                      "inits" = inits, "n.chains" = n.chains, "n.iter" = n.iter, 
                      "n.burnin" = n.burnin, "n.thin" = n.thin, "prior" = prior, 
-                     "n.mci" = n.mci, "prob" = prob)
+                     "n.mci" = n.mci, "prob" = prob, "progress.bar" = progress.bar, 
+                     "refresh" = refresh, "RNGname" = RNGname, "quiet" = quiet)
   model_output <- run_lmdm(data_model = data_model, type = type, 
                                 dist_e = dist_e, dist_c = dist_c, model_info = model_info)
+  if(time_dep %in% c("none", "biv")) {
+    effects_fixed <- cbind.data.frame(model_output$effects_fixed)
+    if(is.array(model_output$costs_fixed)) { 
+      costs_fixed <- cbind.data.frame(model_output$costs_fixed)
+    } else if(is.list(model_output$costs_fixed)) { 
+      costs_fixed <- cbind(as.data.frame(model_output$costs_fixed$beta), 
+                           as.data.frame(model_output$costs_fixed$beta_f))}
+  }
+  if(time_dep %in% c("AR1")) {
+    effects_fixed <- cbind(as.data.frame(model_output$effects_fixed$alpha), 
+                           as.data.frame(model_output$effects_fixed$alpha_te),
+                           as.data.frame(model_output$effects_fixed$alpha_tc))
+    if(!"beta_f" %in% names(model_output$costs_fixed)) {
+      costs_fixed <- cbind(as.data.frame(model_output$costs_fixed$beta), 
+                           as.data.frame(model_output$costs_fixed$beta_te),
+                           as.data.frame(model_output$costs_fixed$beta_tc))}
+    if("beta_f" %in% names(model_output$costs_fixed)) {
+      costs_fixed <- cbind(as.data.frame(model_output$costs_fixed$beta),
+                           as.data.frame(model_output$costs_fixed$beta_f),
+                           as.data.frame(model_output$costs_fixed$beta_te),
+                           as.data.frame(model_output$costs_fixed$beta_tc))}
+  }
+  print_mod_e <- apply(effects_fixed, 2, mean) 
+  print_mod_c <- apply(costs_fixed, 2, mean)
+  mis_effects_fixed <- model_output$mis_effects_fixed
+  mis_costs_fixed <- model_output$mis_costs_fixed
+  if(time_dep %in% c("none", "biv")) {
+    dimnames(mis_effects_fixed)[[3]] <- paste0("r.", dimnames(mis_effects_fixed)[[3]])
+    dimnames(mis_costs_fixed)[[3]] <- paste0("r.", dimnames(mis_costs_fixed)[[3]])
+  }
+  if(time_dep %in% "AR1") {
+    dimnames(mis_effects_fixed)[[4]] <- paste0("r.", dimnames(mis_effects_fixed)[[4]])
+    dimnames(mis_costs_fixed)[[4]] <- paste0("r.", dimnames(mis_costs_fixed)[[4]])
+  }
+  mis_effects_fixed <- cbind.data.frame(mis_effects_fixed)
+  mis_costs_fixed <- cbind.data.frame(mis_costs_fixed)
+  print_mod_p_e <- apply(mis_effects_fixed, 2, mean)
+  print_mod_p_c <- apply(mis_costs_fixed, 2, mean)
+  print_mod_est <- list("model.eff" = print_mod_e, "model.cost" = print_mod_c, 
+                        "model.me" = print_mod_p_e, "model.mc" = print_mod_p_c)
   if(!save_model) { unlink(model_output$filein)}
   if(exists("ref", where = exArgs)) {
     if(length(exArgs$ref) != 1 | !is.numeric(exArgs$ref)) { stop("Please provide a single numeric indicator for the reference treatment")}
@@ -630,8 +681,8 @@ lmdm <- function(data, model.eff, model.cost,
   cea <- BCEA::bcea(e = e_mean, c = c_mean, ref = ref, interventions = interventions, 
                     Kmax = Kmax, k = wtp, plot = plot)
   format <- "long"
-  res <- list(data_set = data_read, model_output = model_output, 
-              cea = cea, type = type, data_format = format, time_dep = time_dep)
+  res <- list(data_set = data_read, model_output = model_output, mod_est = print_mod_est,
+              cea = cea, type = type, data_format = format, time_dep = time_dep, call = mf)
   class(res) <- "missingHE"
   return(res)
 }

@@ -35,7 +35,7 @@ Random effects can also be specified for each model parameter. See details for h
 
 \item{model.cost}{A formula expression in conventional \code{R} linear modelling syntax. The response must be a health economic
 cost outcome ('c') whose name must correspond to that used in \code{data}. Any covariates in the model must be provided on the right-hand side of the formula.
-If there are no covariates, \code{1} should be specified on the right hand side of the formula. By default, covariates are placed on the "location" parameter of the distribution through a linear model. 
+If there are no covariates, \code{1} should be specified on the right hand side of the formula. By default, covariates are placed on the "location" parameter of the distribution through a linear model.
 A joint bivariate distribution for effects and costs can be specified by including 'e' on the right-hand side of the formula for the costs model.
 Random effects can also be specified for each model parameter. See details for how these can be specified.}
 
@@ -46,7 +46,7 @@ Weibull ('weib'), Logistic ('logis'), Poisson ('pois'), Negative Binomial ('negb
 
 \item{type}{Type of missingness mechanism assumed. Choices are Missing At Random (MAR) and Missing Not At Random (MNAR).}
 
-\item{restriction}{type of identifying restriction to be imposed to identify the distributions of the missing data in each pattern. 
+\item{restriction}{type of identifying restriction to be imposed to identify the distributions of the missing data in each pattern.
 Available choices are: complete case restrcition ('CC') - default - or available case restriction ('AC').}
 
 \item{prob}{A numeric vector of probabilities within the range (0, 1), representing the upper and lower
@@ -69,7 +69,7 @@ in the current working directory.}
 
 \item{prior}{A list containing the hyperprior values provided by the user. Each element of this list must be a vector
 containing the user-provided prior distribution and parameter values and must be named with the name of the corresponding parameter. For example, the hyperprior
-values for the standard deviation parameter for the effects can be provided using the list \code{prior = list('sigma.prior.e' = c("unif", 0, 10))}. For more information about how 
+values for the standard deviation parameter for the effects can be provided using the list \code{prior = list('sigma.prior.e' = c("unif", 0, 10))}. For more information about how
 to provide prior hypervalues for different types of parameters and models see details. If \code{prior} is set to 'default', the default values will be used.}
 
 \item{center}{Logical. If \code{center} is \code{TRUE}, all covariates in both the effect and cost models will be centred.}
@@ -79,34 +79,34 @@ to provide prior hypervalues for different types of parameters and models see de
 \value{
 An object of the class 'missingHE' containing the following elements
 \describe{
-  \item{data_set}{A list containing the original data set provided in \code{data} (see Arguments). Additional information is also included about, among others, 
-  the number of observed and missing individuals, the total number of individuals by treatment arm and the indicator vectors for the missing values}
-  \item{model_output}{A list containing the output of a \code{JAGS} model generated from the functions \code{\link[R2jags]{jags}}, and 
-  the posterior samples for the main parameters of the model}
-  \item{cea}{A list containing the output of the economic evaluation performed using the function \code{\link[BCEA]{bcea}}}
-  \item{type}{A character variable that indicate which type of missing value mechanism used to run the model, either \code{MAR} or \code{MNAR} (see details)}
-  \item{data_format}{A character variable that indicates which type of analysis was conducted, either using a \code{wide} or \code{long} dataset}
+\item{data_set}{A list containing the original data set provided in \code{data} (see Arguments). Additional information is also included about, among others,
+the number of observed and missing individuals, the total number of individuals by treatment arm and the indicator vectors for the missing values}
+\item{model_output}{A list containing the output of a \code{JAGS} model generated from the functions \code{\link[R2jags]{jags}}, and
+the posterior samples for the main parameters of the model}
+\item{cea}{A list containing the output of the economic evaluation performed using the function \code{\link[BCEA]{bcea}}}
+\item{type}{A character variable that indicate which type of missing value mechanism used to run the model, either \code{MAR} or \code{MNAR} (see details)}
+\item{data_format}{A character variable that indicates which type of analysis was conducted, either using a \code{wide} or \code{long} dataset}
 }
 }
 \description{
-Full Bayesian cost-effectiveness models to handle missing data in the outcomes under different missing data 
-mechanism assumptions, using alternative parametric distributions for the effect and cost variables and 
-using a pattern mixture model approach to identify the model. The analysis is performed using the \code{BUGS} language, 
+Full Bayesian cost-effectiveness models to handle missing data in the outcomes under different missing data
+mechanism assumptions, using alternative parametric distributions for the effect and cost variables and
+using a pattern mixture model approach to identify the model. The analysis is performed using the \code{BUGS} language,
 which is implemented in the software \code{JAGS} using the function \code{\link[R2jags]{jags}} The output is stored in an object of class 'missingHE'.
 }
 \details{
 Depending on the distributions specified for the outcome variables in the arguments \code{dist_e} and
 \code{dist_c} and the type of missingness mechanism specified in the argument \code{type}, different pattern mixture models
-are built and run in the background by the function \code{pattern}. The model for the outcomes is fitted in each missingness pattern 
+are built and run in the background by the function \code{pattern}. The model for the outcomes is fitted in each missingness pattern
 and the parameters indexing the missing data distributions are identified using: the corresponding parameters identified from the observed data
-in other patterns (under 'MAR'); or a combination of the parameters identified by the observed data and some sensitivity parameters (under 'MNAR'). 
-A simple example can be used to show how pattern mixture models are specified. 
-Consider a data set comprising a response variable \eqn{y} and a set of centered covariates \eqn{X_j}. We denote with \eqn{d_i} the patterns' indicator variable for each 
-subject in the trial \eqn{i = 1, ..., n} such that: \eqn{d_i = 1} indicates the completers (both e and c observed), \eqn{d_i = 2} and \eqn{d_i = 3} indicate that 
-only the costs or effects are observed, respectively, while \eqn{d_i = 4} indicates that neither of the two outcomes is observed. \eqn{d_i} is assigned a multinomial distribution, 
-which probabilities are modelled using a Dirichlet prior. Next, the outcomes model is fitted in each pattern and parameters that cannot be identified in each pattern (d = 2, 3, 4), 
+in other patterns (under 'MAR'); or a combination of the parameters identified by the observed data and some sensitivity parameters (under 'MNAR').
+A simple example can be used to show how pattern mixture models are specified.
+Consider a data set comprising a response variable \eqn{y} and a set of centered covariates \eqn{X_j}. We denote with \eqn{d_i} the patterns' indicator variable for each
+subject in the trial \eqn{i = 1, ..., n} such that: \eqn{d_i = 1} indicates the completers (both e and c observed), \eqn{d_i = 2} and \eqn{d_i = 3} indicate that
+only the costs or effects are observed, respectively, while \eqn{d_i = 4} indicates that neither of the two outcomes is observed. \eqn{d_i} is assigned a multinomial distribution,
+which probabilities are modelled using a Dirichlet prior. Next, the outcomes model is fitted in each pattern and parameters that cannot be identified in each pattern (d = 2, 3, 4),
 e.g. \eqn{mu_e[d]} and \code{mu_c[d]}, are identified using some restrictions based on the parameters estimated from other patterns. Two choices are currently available: the complete cases ('CC') or available cases ('AC').
-For example, using the 'CC' restriction, the parameters indexing the distributions of the missing data are identified as: 
+For example, using the 'CC' restriction, the parameters indexing the distributions of the missing data are identified as:
 \deqn{mu_e[2] = \mu_e[4] = \mu_e[1] + \delta_e}
 \deqn{mu_c[3] = \mu_c[4] = \mu_c[1] + \delta_c}
 where
@@ -116,12 +116,12 @@ where
 \item \eqn{\delta_e} is the sensitivity parameters associated with the marginal effects mean.
 \item \eqn{\delta_c} is the sensitivity parameters associated with the marginal costs mean.
 }
-If the 'AC' restriction is chosen, only the parameters estimated from the observed data in pattern 2 (costs) and pattern 3 (effects) are used to identify those in the other patterns.  
-When \eqn{\delta_e = 0} and \eqn{\delta_c = 0} the model assumes a 'MAR' mechanism. When \eqn{\delta_e != 0} and/or \eqn{\delta_c != 0} 'MNAR' departures for the 
-effects and/or costs are explored with priors on sensitivity parameters that must be provided by the user (see Arguments). 
+If the 'AC' restriction is chosen, only the parameters estimated from the observed data in pattern 2 (costs) and pattern 3 (effects) are used to identify those in the other patterns.
+When \eqn{\delta_e = 0} and \eqn{\delta_c = 0} the model assumes a 'MAR' mechanism. When \eqn{\delta_e != 0} and/or \eqn{\delta_c != 0} 'MNAR' departures for the
+effects and/or costs are explored with priors on sensitivity parameters that must be provided by the user (see Arguments).
 
 When user-defined hyperprior values are supplied via the argument \code{prior} in the function \code{pattern}, the elements of this list (see Arguments)
-must be vectors containing the user-provided distribution name and hyperprior values and must take specific names according to the parameters they are associated with. 
+must be vectors containing the user-provided distribution name and hyperprior values and must take specific names according to the parameters they are associated with.
 Specifically, the names for the parameters indexing the model which are accepted by \strong{missingHE} are the following:
 \itemize{
 \item auxiliary parameters \eqn{\sigma}: "sigma.prior.e"(effects) and/or "sigma.prior.c"(costs)
@@ -131,13 +131,13 @@ Specifically, the names for the parameters indexing the model which are accepted
 \item missingness patterns' probabilities \eqn{\pi}: "patterns.prior"
 }
 
-For each outcome model, random effects can also be specified for each parameter by adding the term + (x | z) to each model formula, 
-where x is the fixed regression coefficient for which also the random effects are desired and z is the clustering variable across which 
-the random effects are specified (must be the name of a factor variable in the dataset). Multiple random effects can be specified using the 
+For each outcome model, random effects can also be specified for each parameter by adding the term + (x | z) to each model formula,
+where x is the fixed regression coefficient for which also the random effects are desired and z is the clustering variable across which
+the random effects are specified (must be the name of a factor variable in the dataset). Multiple random effects can be specified using the
 notation + (x1 + x2 | site) for each covariate that was included in the fixed effects formula.
 }
 \examples{
-# Quck example to run using subset of MenSS dataset
+# Quick example to run using subset of MenSS dataset
 MenSS.subset <- MenSS[50:100, ]
 
 # Run the model using the pattern function assuming a MAR mechanism

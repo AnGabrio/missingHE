@@ -481,5 +481,5 @@ diagnostic <- function(x, type = "denplot", param = "all", theme = NULL, ...) {
   if(theme == "stata") ggmcmc_out <- ggmcmc_out + ggthemes::theme_stata()
   if(theme == "tufte") ggmcmc_out <- ggmcmc_out + ggthemes::theme_tufte()
   if(theme == "wsj") ggmcmc_out <- ggmcmc_out + ggthemes::theme_wsj()
-  return(print(ggmcmc_out))
+  return(ggmcmc_out)
 }

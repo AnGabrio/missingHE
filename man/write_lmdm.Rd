@@ -2,7 +2,7 @@
 % Please edit documentation in R/write_lmdm.R
 \name{write_lmdm}
 \alias{write_lmdm}
-\title{An internal function to select which type of longitudinal missing data model to execute. 
+\title{An internal function to select which type of longitudinal missing data model to execute.
 Alternatives vary depending on the type of distribution assumed for the effect and cost variables,
 type of missingness mechanism assumed and independence or joint modelling
 This function selects which type of model to execute.}
@@ -21,7 +21,7 @@ Missing Not At Random for the costs (MNAR_cost), and Missing Not At Random for b
 \item{model_txt_info}{list containing model specification information used to write the txt file of the JAGS model.}
 }
 \description{
-An internal function to select which type of longitudinal missing data model to execute. 
+An internal function to select which type of longitudinal missing data model to execute.
 Alternatives vary depending on the type of distribution assumed for the effect and cost variables,
 type of missingness mechanism assumed and independence or joint modelling
 This function selects which type of model to execute.
@@ -32,8 +32,4 @@ This function selects which type of model to execute.
 #
 #
 }
-\keyword{JAGS}
-\keyword{Longitudinal}
-\keyword{data}
-\keyword{missing}
-\keyword{models}
+\keyword{internal}

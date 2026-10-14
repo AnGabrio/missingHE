@@ -109,7 +109,7 @@
 #' @export
 #'
 #' @examples
-#' # Quck example to run using subset of MenSS dataset
+#' # Quick example to run using subset of MenSS dataset
 #' MenSS.subset <- MenSS[50:100, ]
 #' 
 #' # Run the model using the selection function assuming a SCAR mechanism
@@ -222,6 +222,12 @@ selection <- function(data, model.eff, model.cost,
   e <- as.name("e")
   c <- as.name("c")
   trt <- as.name("trt")
+  cl <- match.call()
+  mf <- match.call(expand.dots = FALSE)
+  m <- match(c("model.eff", "model.cost", "model.me", "model.mc", 
+               "data", "dist_e", "dist_c", "type", "n.chains",
+               "n.iter", "n.burnin", "n.thin"), names(mf), 0L)
+  mf <- mf[c(1L, m)]
   cov_matrix <- subset(data, select = -c(e, c))
   cov_matrix <- cov_matrix[!unlist(vapply(cov_matrix, anyNA, logical(1)))]
   if(!inherits(model.eff, "formula") | !inherits(model.cost, "formula")) {
@@ -534,6 +540,10 @@ selection <- function(data, model.eff, model.cost,
   if(exists("n.iter.pd", where = exArgs)) { n.iter.pd = exArgs$n.iter.pd} else { n.iter.pd = 1000}
   if(exists("n.adapt", where = exArgs)) { n.adapt = exArgs$n.adapt} else { n.adapt = 100}
   if(exists("n.mci", where = exArgs)) { n.mci = exArgs$n.mci} else { n.mci = n.iter}
+  if(exists("progress.bar", where = exArgs)) { progress.bar = exArgs$progress.bar} else { progress.bar = "text"}
+  if(exists("refresh", where = exArgs)) { refresh = exArgs$refresh} else { refresh = n.iter/50}
+  if(exists("RNGname", where = exArgs)) { RNGname = exArgs$RNGname} else { RNGname = "Wichmann-Hill"}
+  if(exists("quiet", where = exArgs)) { quiet = exArgs$quiet} else { quiet = FALSE}
   if(!is.logical(dic)) { stop("Please provide logical value for dic argument")}
   model_info <- list("is_c_random_c" = is_c_random_c, "is_int_c_random_c" = is_int_c_random_c,
                      "is_me_random_e" = is_me_random_e, "is_mc_random_c" = is_mc_random_c, 
@@ -545,9 +555,21 @@ selection <- function(data, model.eff, model.cost,
                      "dic" = dic, "pd" = pd,  "n.iter.pd" = n.iter.pd, "n.adapt" = n.adapt, 
                      "inits" = inits, "n.chains" = n.chains, "n.iter" = n.iter, 
                      "n.burnin" = n.burnin, "n.thin" = n.thin, "prior" = prior, 
-                     "n.mci" = n.mci, "prob" = prob)
+                     "n.mci" = n.mci, "prob" = prob, "progress.bar" = progress.bar, 
+                     "refresh" = refresh, "RNGname" = RNGname, "quiet" = quiet)
   model_output <- run_selection(data_model = data_model, type = type, 
                                 dist_e = dist_e, dist_c = dist_c, model_info = model_info)
+  print_mod_e <- apply(model_output$effects_fixed, 2, mean)
+  if(is.matrix(model_output$costs_fixed)) { 
+    print_mod_c <- apply(model_output$costs_fixed, 2, mean)
+    } else if(is.list(model_output$costs_fixed)) { 
+    costs_fixed <- cbind(as.data.frame(model_output$costs_fixed$beta), 
+                         as.data.frame(model_output$costs_fixed$beta_f))
+    print_mod_c <- apply(costs_fixed, 2, mean)}
+  print_mod_p_e <- apply(model_output$mis_effects_fixed, 2, mean)
+  print_mod_p_c <- apply(model_output$mis_costs_fixed, 2, mean)
+  print_mod_est <- list("model.eff" = print_mod_e, "model.cost" = print_mod_c, 
+                        "model.me" = print_mod_p_e, "model.mc" = print_mod_p_c)
   if(!save_model) { unlink(model_output$filein)}
   if(exists("ref", where = exArgs)) {
     if(length(exArgs$ref) != 1 | !is.numeric(exArgs$ref)) { stop("Please provide a single numeric indicator for the reference treatment")}
@@ -560,8 +582,8 @@ selection <- function(data, model.eff, model.cost,
   cea <- BCEA::bcea(e = model_output$mean_effects, c = model_output$mean_costs, ref = ref, 
                     interventions = interventions, Kmax = Kmax, k = wtp, plot = plot)
   format <- "wide"
-  res <- list(data_set = data_read, model_output = model_output, 
-              cea = cea, type = type, data_format = format)
+  res <- list(data_set = data_read, model_output = model_output, mod_est = print_mod_est,
+              cea = cea, type = type, data_format = format, call = mf)
   class(res) <- "missingHE"
   return(res)
 }

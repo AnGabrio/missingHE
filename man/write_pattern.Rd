@@ -2,7 +2,7 @@
 % Please edit documentation in R/write_pattern.R
 \name{write_pattern}
 \alias{write_pattern}
-\title{An internal function to select which type of pattern mixture model to execute. 
+\title{An internal function to select which type of pattern mixture model to execute.
 Alternatives vary depending on the type of distribution assumed for the effect and cost variables,
 type of missingness mechanism assumed and independence or joint modelling
 This function selects which type of model to execute.}
@@ -21,7 +21,7 @@ Missing Not At Random for the costs (MNAR_cost), and Missing Not At Random for b
 \item{model_txt_info}{list containing model specification information used to write the txt file of the JAGS model.}
 }
 \description{
-An internal function to select which type of pattern mixture model to execute. 
+An internal function to select which type of pattern mixture model to execute.
 Alternatives vary depending on the type of distribution assumed for the effect and cost variables,
 type of missingness mechanism assumed and independence or joint modelling
 This function selects which type of model to execute.
@@ -32,7 +32,4 @@ This function selects which type of model to execute.
 #
 #
 }
-\keyword{JAGS}
-\keyword{Pattern}
-\keyword{mixture}
-\keyword{models}
+\keyword{internal}

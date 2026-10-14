@@ -19,7 +19,7 @@ CI quantiles to be calculated and returned for the posterior estimates.}
 \item{...}{Additional arguments affecting the summary produced.}
 }
 \value{
-Prints tables with information on the CE results based on a model fitted using the function \code{selection}, \code{pattern} or \code{hurdle}. 
+Prints tables with information on the CE results based on a model fitted using the function \code{selection}, \code{pattern} or \code{hurdle}.
 Summary information on the main parameters of interests is provided.
 }
 \description{

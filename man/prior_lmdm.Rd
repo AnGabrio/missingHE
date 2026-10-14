@@ -9,7 +9,7 @@ prior_lmdm(type, dist_e, dist_c, model_txt_info, model_string_jags)
 }
 \arguments{
 \item{type}{Type of missingness mechanism assumed. Choices are Missing At Random (MAR), Missing Not At Random for the effects (MNAR_eff),
-Missing Not At Random for the costs (MNAR_cost), and Missing Not At Random for both (MNAR). For a complete list of all available hyper parameters 
+Missing Not At Random for the costs (MNAR_cost), and Missing Not At Random for both (MNAR). For a complete list of all available hyper parameters
 and types of models see the manual.}
 
 \item{dist_e}{distribution assumed for the effects. Current available choices are: Normal ('norm'), Beta ('beta'), Gamma ('gamma'), Exponential ('exp'),
@@ -22,7 +22,7 @@ Weibull ('weib'), Logistic ('logis'), Poisson ('pois'), Negative Binomial ('negb
 \item{model_string_jags}{text file of the model.}
 }
 \description{
-This function modifies default hyper prior parameter values in the type of longitudinal missing data model selected according 
+This function modifies default hyper prior parameter values in the type of longitudinal missing data model selected according
 to the type of missingness mechanism and distributions for the outcomes assumed.
 }
 \examples{
@@ -31,9 +31,4 @@ to the type of missingness mechanism and distributions for the outcomes assumed.
 #
 #
 }
-\keyword{Longitudinal}
-\keyword{data}
-\keyword{distributions}
-\keyword{missing}
-\keyword{models}
-\keyword{priors}
+\keyword{internal}

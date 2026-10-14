@@ -137,11 +137,9 @@ coef.missingHE <- function(object, prob = c(0.025, 0.975),
  if(object$data_format == "long") {
   max_time <- max(object$data_set$data_raw$time_long, na.rm = TRUE)
   if(is.null(names(object$model_output$effects_fixed))) {
-    dimnames(object$model_output$effects_fixed)[[3]] <- paste0("time.", dimnames(object$model_output$effects_fixed)[[3]])
     effects_fixed <- as.data.frame(object$model_output$effects_fixed)
   }
   if(!is.null(names(object$model_output$effects_fixed))) {
-    dimnames(object$model_output$effects_fixed$alpha)[[3]] <- paste0("time.", dimnames(object$model_output$effects_fixed$alpha)[[3]])
     if(!all(c("alpha_te", "alpha_tc") %in% names(object$model_output$effects_fixed))) {
       effects_fixed <- as.data.frame(object$model_output$effects_fixed$alpha)
     }
@@ -157,11 +155,9 @@ coef.missingHE <- function(object, prob = c(0.025, 0.975),
   ql_cov_e_fixed <- apply(effects_fixed, 2 , quantile, prob = prob[1])
   qu_cov_e_fixed <- apply(effects_fixed, 2 , quantile, prob = prob[2])
   if(is.null(names(object$model_output$costs_fixed))) {
-    dimnames(object$model_output$costs_fixed)[[3]] <- paste0("time.", dimnames(object$model_output$costs_fixed)[[3]])
     costs_fixed <- as.data.frame(object$model_output$costs_fixed)
   }
   if(!is.null(names(object$model_output$costs_fixed))) {
-    dimnames(object$model_output$costs_fixed$beta)[[3]] <- paste0("time.", dimnames(object$model_output$costs_fixed$beta)[[3]])
     if(!all(c("beta_f", "beta_te", "beta_tc") %in% names(object$model_output$costs_fixed))) {
       costs_fixed <- as.data.frame(object$model_output$costs_fixed$beta)
     }
@@ -190,24 +186,21 @@ coef.missingHE <- function(object, prob = c(0.025, 0.975),
   p_e_random <- 0
   if(!is.null(object$model_output$effects_random)) {
   if(is.null(names(object$model_output$effects_random))) {
-    dimnames(object$model_output$effects_random)[[3]] <- paste0("time.", dimnames(object$model_output$effects_random)[[3]])
     effects_random <- as.data.frame(object$model_output$effects_random)
   }
   if(!is.null(names(object$model_output$effects_random))) {
     if(!all(c("a_te", "a_tc") %in% names(object$model_output$effects_random)) & "a" %in% names(object$model_output$effects_random)) {
-      dimnames(object$model_output$effects_random$a)[[3]] <- paste0("time.", dimnames(object$model_output$effects_random$a)[[3]])
       effects_random <- as.data.frame(object$model_output$effects_random$a)
     }
     if(all(c("a_te", "a_tc") %in% names(object$model_output$effects_random)) & !"a" %in% names(object$model_output$effects_random)) {
-      dimnames(object$model_output$effects_random$a_te)[[3]] <- paste0("time.", dimnames(object$model_output$effects_random$a_te)[[3]])
-      dimnames(object$model_output$effects_random$a_tc)[[3]] <- paste0("time.", dimnames(object$model_output$effects_random$a_tc)[[3]])
+      dimnames(object$model_output$effects_random$a_te)[[3]] <- paste0("a.e.time.", dimnames(object$model_output$effects_random$a_te)[[3]])
+      dimnames(object$model_output$effects_random$a_tc)[[3]] <- paste0("a.c.time.", dimnames(object$model_output$effects_random$a_tc)[[3]])
       effects_random <- cbind(as.data.frame(object$model_output$effects_random$a_te), 
                               as.data.frame(object$model_output$effects_random$a_tc))
     }
     if(all(c("a", "a_te", "a_tc") %in% names(object$model_output$effects_random))) { 
-      dimnames(object$model_output$effects_random$a)[[3]] <- paste0("time.", dimnames(object$model_output$effects_random$a)[[3]])
-      dimnames(object$model_output$effects_random$a_te)[[3]] <- paste0("time.", dimnames(object$model_output$effects_random$a_te)[[3]])
-      dimnames(object$model_output$effects_random$a_tc)[[3]] <- paste0("time.", dimnames(object$model_output$effects_random$a_tc)[[3]])
+      dimnames(object$model_output$effects_random$a_te)[[3]] <- paste0("a.e.time.", dimnames(object$model_output$effects_random$a_te)[[3]])
+      dimnames(object$model_output$effects_random$a_tc)[[3]] <- paste0("a.c.time.", dimnames(object$model_output$effects_random$a_tc)[[3]])
       effects_random <- cbind(as.data.frame(object$model_output$effects_random$a), as.data.frame(object$model_output$effects_random$a_te), 
                              as.data.frame(object$model_output$effects_random$a_tc))
     }
@@ -223,44 +216,36 @@ coef.missingHE <- function(object, prob = c(0.025, 0.975),
   p_c_random <- 0
   if(!is.null(object$model_output$costs_random)) {
     if(is.null(names(object$model_output$costs_random))) {
-      dimnames(object$model_output$costs_random)[[3]] <- paste0("time.", dimnames(object$model_output$costs_random)[[3]])
       costs_random <- as.data.frame(object$model_output$costs_random)
     }
     if(!is.null(names(object$model_output$costs_random))) {
       if(!all(c("b_te", "b_tc", "b_f") %in% names(object$model_output$costs_random)) & "b" %in% names(object$model_output$costs_random)) {
-        dimnames(object$model_output$costs_random$b)[[3]] <- paste0("time.", dimnames(object$model_output$costs_random$b)[[3]])
         costs_random <- as.data.frame(object$model_output$costs_random$b)
       }
       if(!all(c("b_te", "b_tc") %in% names(object$model_output$costs_random)) & all(c("b", "b_f") %in% names(object$model_output$costs_random))) {
-        dimnames(object$model_output$costs_random$b)[[3]] <- paste0("time.", dimnames(object$model_output$costs_random$b)[[3]])
-        dimnames(object$model_output$costs_random$b_f)[[3]] <- paste0("time.", dimnames(object$model_output$costs_random$b_f)[[3]])
         costs_random <- cbind(as.data.frame(object$model_output$costs_random$b), as.data.frame(object$model_output$costs_random$b_f))
       }
       if(all(c("b_te", "b_tc") %in% names(object$model_output$costs_random)) & !all(c("b", "b_f") %in% names(object$model_output$costs_random))) {
-        dimnames(object$model_output$costs_random$b_te)[[3]] <- paste0("time.", dimnames(object$model_output$costs_random$b_te)[[3]])
-        dimnames(object$model_output$costs_random$b_tc)[[3]] <- paste0("time.", dimnames(object$model_output$costs_random$b_tc)[[3]])
+        dimnames(object$model_output$costs_random$b_te)[[3]] <- paste0("b.e.time.", dimnames(object$model_output$costs_random$b_te)[[3]])
+        dimnames(object$model_output$costs_random$b_tc)[[3]] <- paste0("b.c.time.", dimnames(object$model_output$costs_random$b_tc)[[3]])
         costs_random <- cbind(as.data.frame(object$model_output$costs_random$b_te), 
                                 as.data.frame(object$model_output$costs_random$b_tc))
       }
       if(all(c("b_te", "b_tc", "b_f") %in% names(object$model_output$costs_random)) & !"b" %in% names(object$model_output$costs_random)) {
-        dimnames(object$model_output$costs_random$b_f)[[3]] <- paste0("time.", dimnames(object$model_output$costs_random$b_f)[[3]])
-        dimnames(object$model_output$costs_random$b_te)[[3]] <- paste0("time.", dimnames(object$model_output$costs_random$b_te)[[3]])
-        dimnames(object$model_output$costs_random$b_tc)[[3]] <- paste0("time.", dimnames(object$model_output$costs_random$b_tc)[[3]])
+        dimnames(object$model_output$costs_random$b_te)[[3]] <- paste0("b.e.time.", dimnames(object$model_output$costs_random$b_te)[[3]])
+        dimnames(object$model_output$costs_random$b_tc)[[3]] <- paste0("b.c.time.", dimnames(object$model_output$costs_random$b_tc)[[3]])
         costs_random <- cbind(as.data.frame(object$model_output$costs_random$b_te), 
                               as.data.frame(object$model_output$costs_random$b_tc))
       }
       if(all(c("b", "b_te", "b_tc") %in% names(object$model_output$costs_random)) & !"b_f" %in% names(object$model_output$costs_random)) { 
-        dimnames(object$model_output$costs_random$b)[[3]] <- paste0("time.", dimnames(object$model_output$costs_random$b)[[3]])
-        dimnames(object$model_output$costs_random$b_te)[[3]] <- paste0("time.", dimnames(object$model_output$costs_random$b_te)[[3]])
-        dimnames(object$model_output$costs_random$b_tc)[[3]] <- paste0("time.", dimnames(object$model_output$costs_random$b_tc)[[3]])
+        dimnames(object$model_output$costs_random$b_te)[[3]] <- paste0("b.e.time.", dimnames(object$model_output$costs_random$b_te)[[3]])
+        dimnames(object$model_output$costs_random$b_tc)[[3]] <- paste0("b.c.time.", dimnames(object$model_output$costs_random$b_tc)[[3]])
         costs_random <- cbind(as.data.frame(object$model_output$costs_random$b), as.data.frame(object$model_output$costs_random$b_te), 
                               as.data.frame(object$model_output$costs_random$b_tc))
       }
       if(all(c("b", "b_te", "b_tc", "b_f") %in% names(object$model_output$costs_random))) { 
-        dimnames(object$model_output$costs_random$b)[[3]] <- paste0("time.", dimnames(object$model_output$costs_random$b)[[3]])
-        dimnames(object$model_output$costs_random$b_f)[[3]] <- paste0("time.", dimnames(object$model_output$costs_random$b_f)[[3]])
-        dimnames(object$model_output$costs_random$b_te)[[3]] <- paste0("time.", dimnames(object$model_output$costs_random$b_te)[[3]])
-        dimnames(object$model_output$costs_random$b_tc)[[3]] <- paste0("time.", dimnames(object$model_output$costs_random$b_tc)[[3]])
+        dimnames(object$model_output$costs_random$b_te)[[3]] <- paste0("b.e.time.", dimnames(object$model_output$costs_random$b_te)[[3]])
+        dimnames(object$model_output$costs_random$b_tc)[[3]] <- paste0("b.c.time.", dimnames(object$model_output$costs_random$b_tc)[[3]])
         costs_random <- cbind(as.data.frame(object$model_output$costs_random$b), as.data.frame(object$model_output$costs_random$b_f), 
                               as.data.frame(object$model_output$costs_random$b_te), as.data.frame(object$model_output$costs_random$b_tc))
       }

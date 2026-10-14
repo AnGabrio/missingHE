@@ -7,7 +7,7 @@
 #' Weibull ('weib'), Logistic ('logis'), Poisson ('pois'), Negative Binomial ('negbin') or Bernoulli ('bern').
 #' @param dist_c Distribution assumed for the costs. Current available choices are: Normal ('norm'), Gamma ('gamma') or LogNormal ('lnorm').
 #' @param model_info list containing model and MCMC information to be passed to JAGS. 
-#' @keywords JAGS Bayesian hurdle models 
+#' @keywords internal
 #' @importFrom stats rnorm rbeta rgamma rlnorm rweibull rnbinom rbinom rpois rlogis qlogis rexp
 #' @examples
 #' #Internal function only
@@ -17,9 +17,6 @@
 
 
 run_hurdle <- function(data_model, type, dist_e, dist_c, model_info) {
-  if(!isTRUE(requireNamespace("R2jags", quietly = TRUE))) {
-    stop("You need to install the R package 'R2jags'. Please run in your R terminal:\n install.packages('R2jags')")
-  }
   n <- data_model$n; trt_lev <- names(data_model$n_trt); pe_fixed <- data_model$pe_fixed; pc_fixed <- data_model$pc_fixed
   ze_fixed <- data_model$ze_fixed; zc_fixed <- data_model$zc_fixed; se <- data_model$se; sc <- data_model$sc; sde <- data_model$sde; sdc <- data_model$sdc
   mean_cov_e_fixed <- data_model$mean_cov_e_fixed; mean_cov_c_fixed <- data_model$mean_cov_c_fixed; mean_z_e_fixed <- data_model$mean_z_e_fixed; mean_z_c_fixed <- data_model$mean_z_c_fixed
@@ -72,6 +69,10 @@ run_hurdle <- function(data_model, type, dist_e, dist_c, model_info) {
   pd <- model_info$pd
   n.iter.pd <- model_info$n.iter.pd
   n.adapt <- model_info$n.adapt
+  progress.bar <- model_info$progress.bar
+  refresh <- model_info$refresh
+  RNGname <- model_info$RNGname
+  quiet <- model_info$quiet  
   is_c_random_c <- model_info$is_c_random_c
   is_int_c_random_c <- model_info$is_int_c_random_c
   ind_random <- model_info$ind_random
@@ -187,7 +188,8 @@ run_hurdle <- function(data_model, type, dist_e, dist_c, model_info) {
   model <- R2jags::jags(data = datalist, inits = inits, parameters.to.save = params, 
                         model.file = filein, n.chains = n.chains, n.iter = n.iter, 
                         n.burnin = n.burnin, DIC = DIC, pD = pd, n.thin = n.thin,
-                        n.iter.pd = n.iter.pd, n.adapt = n.adapt)  
+                        n.iter.pd = n.iter.pd, n.adapt = n.adapt, progress.bar = progress.bar,
+                        refresh = refresh, RNGname = RNGname, quiet = quiet)  
   tmu_e <- model$BUGSoutput$sims.list$tmu_e
   tmu_c <- model$BUGSoutput$sims.list$tmu_c
   s_e <- model$BUGSoutput$sims.list$s_e

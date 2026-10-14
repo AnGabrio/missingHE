@@ -18,32 +18,32 @@ jagsresults(
 \item{x}{The \code{rjags}, \code{rjags.parallel}, or \code{mcmc.list} object
 for which results will be printed.}
 
-\item{params}{Character vector or a regular expression pattern. The 
+\item{params}{Character vector or a regular expression pattern. The
 parameters for which results will be printed (unless \code{invert} is
 \code{FALSE}, in which case results for all parameters other than those
 given in \code{params} will be returned). If \code{regex} is \code{FALSE},
-only those parameters that match \code{params} exactly will be returned. If 
-\code{regex} is \code{TRUE}, \code{param} should be a character string 
+only those parameters that match \code{params} exactly will be returned. If
+\code{regex} is \code{TRUE}, \code{param} should be a character string
 giving the regular expression pattern to be matched.}
 
-\item{regex}{If \code{regex} is \code{TRUE}, then \code{param} is 
-expected to be a single string giving a text pattern to be matched. 
-Parameters with names matching the pattern will be returned (unless 
-\code{invert} is \code{TRUE}, which results in all parameters that do not 
-match the pattern being returned). Text pattern matching uses regular 
+\item{regex}{If \code{regex} is \code{TRUE}, then \code{param} is
+expected to be a single string giving a text pattern to be matched.
+Parameters with names matching the pattern will be returned (unless
+\code{invert} is \code{TRUE}, which results in all parameters that do not
+match the pattern being returned). Text pattern matching uses regular
 expressions (\code{\link{regex}}).}
 
 \item{invert}{Logical. If \code{invert} is \code{TRUE}, only those parameters
 that do not match elements of \code{params} will be returned.}
 
-\item{probs}{A numeric vector of probabilities within range [0, 1],
+\item{probs}{A numeric vector of probabilities,
 representing the sample quantiles to be calculated and returned.}
 
-\item{signif}{If supplied, all columns other than \code{n.eff} will have 
+\item{signif}{If supplied, all columns other than \code{n.eff} will have
 their values rounded such that the most extreme value has the specified
 number of significant digits.}
 
-\item{...}{Additional arguments accepted by \code{\link{grep}}, e.g. 
+\item{...}{Additional arguments accepted by \code{\link{grep}}, e.g.
 \code{perl=TRUE}, to allow look-around pattern matching.}
 }
 \description{
@@ -120,6 +120,4 @@ jagsresults(x=jagsfit, param='^(?!beta)', regex=TRUE, perl=TRUE)
 #
 
 }
-\keyword{JAGS}
-\keyword{model}
-\keyword{summary}
+\keyword{internal}
