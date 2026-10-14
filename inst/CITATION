@@ -1,0 +1,10 @@
+citHeader("To cite missingHE in publications use:")
+
+bibentry(
+  bibtype = "Manual",
+  title = "Missing Cost Effectiveness Models (missingHE)",
+  author = "Gabrio, A",
+  year = "2026",
+  url = "https://CRAN.R-project.org/package=missingHE",
+  doi = "10.32614/CRAN.package.missingHE"
+)

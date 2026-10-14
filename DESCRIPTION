@@ -18,7 +18,7 @@ Encoding: UTF-8
 BugReports: https://github.com/AnGabrio/missingHE/issues/
 LazyData: true
 Imports: ggpubr, ggmcmc, ggthemes, BCEA, ggplot2, bayesplot, methods, R2jags, loo, coda, mcmcr
-Config/roxygen2/version: 8.1.0
+Config/roxygen2/version: 8.1.1
 Author: Andrea Gabrio [aut, cre, cph] (ORCID:
     <https://orcid.org/0000-0002-7650-4534>)
 Maintainer: Andrea Gabrio <a.gabrio@maastrichtuniversity.nl>
