@@ -64,7 +64,6 @@ jobs:
       - name: Install JAGS (macOS)
         if: runner.os == 'macOS'
         run : |
-          brew install pkg-config
           brew install jags
 
       - uses: r-lib/actions/setup-r-dependencies@v2
