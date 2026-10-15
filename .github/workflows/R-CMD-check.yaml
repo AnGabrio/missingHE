@@ -39,6 +39,33 @@ jobs:
           r-version: ${{ matrix.config.r }}
           http-user-agent: ${{ matrix.config.http-user-agent }}
 
+      - name: Cache JAGS (Windows)
+        if: runner.os == 'Windows'
+        uses: actions/cache@v3
+        with:
+          path: C:\Program Files\JAGS
+          key: ${{ runner.os }}-jags-4.3.2
+          restore-keys: |
+            ${{ runner.os }}-jags-
+
+      - name: Install JAGS (Windows)
+        if: runner.os == 'Windows'
+        shell: cmd
+        run: |
+          if not exist "C:\Program Files\JAGS\JAGS-4.3.1\bin\jags-terminal.exe" (
+            echo "JAGS not found in cache, downloading and installing..."
+            curl -o jags-installer.exe -L https://sourceforge.net/projects/mcmc-jags/files/JAGS/4.x/Windows/JAGS-4.3.2.exe/download
+            jags-installer.exe /S
+            del jags-installer.exe
+          ) else (
+            echo "JAGS found in cache, skipping installation"
+          )
+
+      - name: Install JAGS (macOS)
+        if: runner.os == 'macOS'
+        run : |
+          brew install jags
+
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           extra-packages: any::rcmdcheck
