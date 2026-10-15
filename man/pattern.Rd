@@ -2,7 +2,7 @@
 % Please edit documentation in R/pattern.R
 \name{pattern}
 \alias{pattern}
-\title{Full Bayesian Models to handle missingness in Economic Evaluations (Pattern Mixture Models)}
+\title{Bayesian Pattern Mixture Models}
 \usage{
 pattern(
   data,

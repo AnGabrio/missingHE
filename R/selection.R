@@ -1,27 +1,27 @@
-#' Full Bayesian Models to handle missingness in Economic Evaluations (Selection Models)
-#' 
-#' Full Bayesian cost-effectiveness models to handle missing data in the outcomes under different missing data 
-#' mechanism assumptions, using alternative parametric distributions for the effect and cost variables and 
-#' using a selection model approach to identify the model. The analysis is performed using the \code{BUGS} language, 
+#' Bayesian Selection Models
+#'
+#' Full Bayesian cost-effectiveness models to handle missing data in the outcomes under different missing data
+#' mechanism assumptions, using alternative parametric distributions for the effect and cost variables and
+#' using a selection model approach to identify the model. The analysis is performed using the \code{BUGS} language,
 #' which is implemented in the software \code{JAGS} using the function \code{\link[R2jags]{jags}} The output is stored in an object of class 'missingHE'.
-#' 
-#' @param data A data frame in which to find the variables supplied in \code{model.eff}, \code{model.cost} (model formulas for effects and costs) 
+#'
+#' @param data A data frame in which to find the variables supplied in \code{model.eff}, \code{model.cost} (model formulas for effects and costs)
 #' and \code{model.me}, \code{model.mc} (model formulas for the missing effect and cost models). Among these,
-#' effectiveness, cost and treatment indicator (only two arms) variables must always be provided and named 'e', 'c' and 'trt', respectively. 
+#' effectiveness, cost and treatment indicator (only two arms) variables must always be provided and named 'e', 'c' and 'trt', respectively.
 #' @param model.eff A formula expression in conventional \code{R} linear modelling syntax. The response must be a health economic
 #' effectiveness outcome ('e') whose name must correspond to that used in \code{data}. Any covariates in the model must be provided on the right-hand side of the formula.
 #' If there are no covariates, \code{1} should be specified on the right hand side of the formula. By default, covariates are placed on the "location" parameter of the distribution through a linear model.
 #' Random effects can also be specified for each model parameter. See details for how these can be specified.
 #' @param model.cost A formula expression in conventional \code{R} linear modelling syntax. The response must be a health economic
 #' cost outcome ('c') whose name must correspond to that used in \code{data}. Any covariates in the model must be provided on the right-hand side of the formula.
-#' If there are no covariates, \code{1} should be specified on the right hand side of the formula. By default, covariates are placed on the "location" parameter of the distribution through a linear model. 
+#' If there are no covariates, \code{1} should be specified on the right hand side of the formula. By default, covariates are placed on the "location" parameter of the distribution through a linear model.
 #' A joint bivariate distribution for effects and costs can be specified by including 'e' on the right-hand side of the formula for the costs model.
 #' Random effects can also be specified for each model parameter. See details for how these can be specified.
-#' @param model.me A formula expression in conventional \code{R} linear modelling syntax. The response must be indicated with the 
-#' term 'me'(missing effects) and any covariates must be provided on the right-hand side of the formula. If there are no covariates, \code{1} should be specified on the right hand side of the formula. 
+#' @param model.me A formula expression in conventional \code{R} linear modelling syntax. The response must be indicated with the
+#' term 'me'(missing effects) and any covariates must be provided on the right-hand side of the formula. If there are no covariates, \code{1} should be specified on the right hand side of the formula.
 #' By default, covariates are placed on the "probability" parameter for the missing effects through a logistic-linear model.
 #' Random effects can also be specified for each model parameter. See details for how these can be specified.
-#' @param model.mc A formula expression in conventional \code{R} linear modelling syntax. The response must be indicated with the term 'mc'(missing costs) and any covariates must be provided on the right-hand side of the formula. 
+#' @param model.mc A formula expression in conventional \code{R} linear modelling syntax. The response must be indicated with the term 'mc'(missing costs) and any covariates must be provided on the right-hand side of the formula.
 #' If there are no covariates, \code{1} should be specified on the right hand side of the formula. By default, covariates are placed on the "probability" parameter for the missing costs through a logistic-linear model.
 #' Random effects can also be specified for each model parameter. See details for how these can be specified.
 #' @param dist_e Distribution assumed for the effects. Current available choices are: Normal ('norm'), Beta ('beta'), Gamma ('gamma'), Exponential ('exp'),
@@ -42,14 +42,14 @@
 #' @param center Logical. If \code{center} is \code{TRUE}, all covariates in both the effect and cost models will be centred.
 #' @param prior A list containing the hyperprior values provided by the user. Each element of this list must be a vector
 #' containing the user-provided prior distribution and parameter values and must be named with the name of the corresponding parameter. For example, the hyperprior
-#' values for the standard deviation parameter for the effects can be provided using the list \code{prior = list('sigma.prior.e' = c("unif", 0, 10))}. For more information about how 
-#' to provide prior hypervalues for different types of parameters and models see details. If \code{prior} is set to 'default', the default values will be used.  
-#' @param ... Additional arguments that can be provided by the user. Examples are the additional arguments that can be provided to the function \code{\link[BCEA]{bcea}} to summarise the health economic evaluation results. 
+#' values for the standard deviation parameter for the effects can be provided using the list \code{prior = list('sigma.prior.e' = c("unif", 0, 10))}. For more information about how
+#' to provide prior hypervalues for different types of parameters and models see details. If \code{prior} is set to 'default', the default values will be used.
+#' @param ... Additional arguments that can be provided by the user. Examples are the additional arguments that can be provided to the function \code{\link[BCEA]{bcea}} to summarise the health economic evaluation results.
 #' @return An object of the class 'missingHE' containing the following elements
 #' \describe{
-#'   \item{data_set}{A list containing the original data set provided in \code{data} (see Arguments). Additional information is also included about, among others, 
+#'   \item{data_set}{A list containing the original data set provided in \code{data} (see Arguments). Additional information is also included about, among others,
 #'   the number of observed and missing individuals, the total number of individuals by treatment arm and the indicator vectors for the missing values}
-#'   \item{model_output}{A list containing the output of a \code{JAGS} model generated from the functions \code{\link[R2jags]{jags}}, and 
+#'   \item{model_output}{A list containing the output of a \code{JAGS} model generated from the functions \code{\link[R2jags]{jags}}, and
 #'   the posterior samples for the main parameters of the model}
 #'   \item{cea}{A list containing the output of the economic evaluation performed using the function \code{\link[BCEA]{bcea}}}
 #'   \item{type}{A character variable that indicate which type of missing value mechanism used to run the model, either \code{MAR} or \code{MNAR} (see details)}
@@ -61,7 +61,7 @@
 #' @details Depending on the distributions specified for the outcome variables in the arguments \code{dist_e} and
 #' \code{dist_c} and the type of missingness mechanism specified in the argument \code{type}, different selection models
 #' are built and run in the background by the function \code{selection}. These models consist in logistic regressions to estimate
-#' the probability of missingness in one or both outcomes. A simple example can be used to show how selection models are specified. 
+#' the probability of missingness in one or both outcomes. A simple example can be used to show how selection models are specified.
 #' Consider a data set comprising a response variable \eqn{y} and a set of covariates \eqn{X_j}, for \eqn{i = j, ..., J}. For each subject in the trial \eqn{i = 1, ..., n}
 #' we define an indicator variable \eqn{m_i} taking value \code{1} if the \eqn{i}-th individual is associated with a missing value and \code{0} otherwise.
 #' This is modelled as:
@@ -73,51 +73,51 @@
 #' \item \eqn{\gamma_j} represents the impact on the probability of a missing value in \eqn{y} of the covariate \eqn{X_j}.
 #' \item \eqn{\delta} represents the impact on the probability of a missing value in \eqn{y} of the outcome values.
 #' }
-#' When \eqn{\delta = 0} the model assumes a 'MAR' mechanism, while when \eqn{\delta != 0} the mechanism is 'MNAR'. For the parameters indexing the missingness model, 
+#' When \eqn{\delta = 0} the model assumes a 'MAR' mechanism, while when \eqn{\delta != 0} the mechanism is 'MNAR'. For the parameters indexing the missingness model,
 #' the default prior distributions assumed are:
 #' \itemize{
 #' \item \eqn{\gamma_j ~ Normal(0, 0.01)}
 #' \item \eqn{\delta ~ Normal(0, 1)}
 #' }
 #' When user-defined hyperprior values are supplied via the argument \code{prior} in the function \code{selection}, the elements of this list (see Arguments)
-#' must be vectors containing the user-provided distribution name and hyperprior values and must take specific names according to the parameters they are associated with. 
+#' must be vectors containing the user-provided distribution name and hyperprior values and must take specific names according to the parameters they are associated with.
 #' Specifically, the names for the parameters indexing the model which are accepted by \strong{missingHE} are the following:
 #' \itemize{
 #' \item auxiliary parameters \eqn{\sigma}: "sigma.prior.e"(effects) and/or "sigma.prior.c"(costs)
 #' \item covariate parameters \eqn{\alpha_j} and \eqn{\beta_j}: "alpha.prior"(effects) and/or "beta.prior"(costs)
 #' \item covariate parameters in the missingness model \eqn{\gamma_j} (if covariate data provided): "gamma.prior.e"(effects) and/or "gamma.prior.c"(costs)
 #' \item mnar parameter \eqn{\delta}: "delta.prior.e"(effects) and/or "delta.prior.c"(costs)
-#' } 
-#' For simplicity, here we have assumed that the set of covariates \eqn{X_j} used in the models for the effects/costs and in the 
+#' }
+#' For simplicity, here we have assumed that the set of covariates \eqn{X_j} used in the models for the effects/costs and in the
 #' model of the missing effect/cost values is the same. However, it is possible to specify different sets of covariates for each model
 #' using the arguments in the function \code{selection} (see Arguments).
-#' 
-#' For each model, random effects can also be specified for each parameter by adding the term + (x | z) to each model formula, 
-#' where x is the fixed regression coefficient for which also the random effects are desired and z is the clustering variable across which 
-#' the random effects are specified (must be the name of a factor variable in the dataset). Multiple random effects can be specified using the 
+#'
+#' For each model, random effects can also be specified for each parameter by adding the term + (x | z) to each model formula,
+#' where x is the fixed regression coefficient for which also the random effects are desired and z is the clustering variable across which
+#' the random effects are specified (must be the name of a factor variable in the dataset). Multiple random effects can be specified using the
 #' notation + (x1 + x2 | site) for each covariate that was included in the fixed effects formula.
-#' 
+#'
 #' @author Andrea Gabrio
-#' @references  
+#' @references
 #' Daniels, MJ. Hogan, JW. \emph{Missing Data in Longitudinal Studies: strategies for Bayesian modelling and sensitivity analysis}, CRC/Chapman Hall.
-#' 
+#'
 #' Baio, G.(2012). \emph{Bayesian Methods in Health Economics}. CRC/Chapman Hall, London.
-#' 
+#'
 #' Gelman, A. Carlin, JB., Stern, HS. Rubin, DB.(2003). \emph{Bayesian Data Analysis, 2nd edition}, CRC Press.
-#' 
+#'
 #' Plummer, M. \emph{JAGS: A program for analysis of Bayesian graphical models using Gibbs sampling.} (2003).
 #' @export
 #'
 #' @examples
 #' # Quick example to run using subset of MenSS dataset
 #' MenSS.subset <- MenSS[50:100, ]
-#' 
+#'
 #' # Run the model using the selection function assuming a SCAR mechanism
 #' # Use only 100 iterations to run a quick check
 #' model.selection <- selection(data = MenSS.subset, model.eff = e ~ trt, model.cost = c ~ trt,
 #'    model.me = me ~ 1, model.mc = mc ~ 1, dist_e = "norm", dist_c = "norm",
 #'    type = "MAR", n.chains = 2, n.iter = 100)
-#' 
+#'
 #' # Print the results of the JAGS model
 #' print(model.selection)
 #' #
@@ -126,11 +126,11 @@
 #' pic.dic <- pic(model.selection, criterion = "dic", cases = "cc")
 #' pic.dic
 #' #
-#' 
+#'
 #' # Extract regression coefficient estimates
 #' coef(model.selection)
 #' #
-#' 
+#'
 #' \dontshow{
 #' # Use waic to assess model fit
 #' pic.waic <- pic(model.selection, criterion = "waic", cases = "cc")
@@ -149,7 +149,7 @@
 #'
 #' # Summarise the CEA information from the model
 #' summary(model.selection)
-#' 
+#'
 #' \donttest{
 #' # Further examples which take longer to run
 #' model.selection <- selection(data = MenSS, model.eff = e ~ trt, model.cost = c ~ trt + e,
@@ -158,36 +158,36 @@
 #' #
 #' # Print results for all imputed values
 #' print(model.selection)
-#' 
+#'
 #' # Use looic to assess model fit
 #' pic.looic <- pic(model.selection, criterion = "looic", cases = "cc")
 #' pic.looic
-#' 
+#'
 #' # Show density plots for mean costs parameters
 #' diag.den <- diagnostic(model.selection, type = "denplot", param = "mu.c")
-#' 
+#'
 #' # Plots of imputations for all data
 #' p1 <- plot(model.selection, class = "scatter", outcome = "both")
-#' 
+#'
 #' # Summarise the CEA results
 #' summary(model.selection)
-#' 
+#'
 #' }
 #' #
 #' #
 
 
-selection <- function(data, model.eff, model.cost, 
-                      model.me = me ~ 1, model.mc = mc ~ 1, 
-                      dist_e, dist_c, type, prob = c(0.025, 0.975), 
-                      n.chains = 2, n.iter = 10000, n.burnin = floor(n.iter / 2), 
-                      inits = NULL, n.thin = 1, save_model = FALSE, 
+selection <- function(data, model.eff, model.cost,
+                      model.me = me ~ 1, model.mc = mc ~ 1,
+                      dist_e, dist_c, type, prob = c(0.025, 0.975),
+                      n.chains = 2, n.iter = 10000, n.burnin = floor(n.iter / 2),
+                      inits = NULL, n.thin = 1, save_model = FALSE,
                       prior = "default", center = FALSE, ...) {
   if(is.data.frame(data) == FALSE) { stop("data must be in data frame format")}
   if(!all(c("e", "c", "trt") %in% names(data)) == TRUE) {
-    stop("Please rename or provide names in the data as 'e', 
+    stop("Please rename or provide names in the data as 'e',
          'c' and 'trt' for the effectiveness, cost and treatment variables")}
-  if(!is.numeric(data$e) | 
+  if(!is.numeric(data$e) |
      !is.numeric(data$c)) { stop("Effectiveness and cost data must be numeric")}
   if(!is.factor(data$trt)) { stop("Please provide treatment `trt` as a factor variable")}
   if(!is.character(type) | !is.character(dist_e) | !is.character(dist_c)) {
@@ -203,12 +203,12 @@ selection <- function(data, model.eff, model.cost,
   if(dist_e %in% c("negative binomial", "negbinom", "nbinom", "negbinomial")) { dist_e <- "negbin"}
   if(dist_c %in% c("normal", "gaussian")) { dist_c <- "norm"}
   if(dist_c %in% c("lognormal", "lognorm", "lnormal")) { dist_c <- "lnorm"}
-  if(!dist_e %in% c("norm", "beta", "exp", "weib", "logis", "bern", "pois", "negbin", "gamma") | 
+  if(!dist_e %in% c("norm", "beta", "exp", "weib", "logis", "bern", "pois", "negbin", "gamma") |
      !dist_c %in% c("norm", "gamma", "lnorm")) {
-    stop("Distributions available are 'norm', 'beta', 'gamma', 'logis', 'exp', 'weib', 'negbin', 'pois', 'bern'  for the effects 
+    stop("Distributions available are 'norm', 'beta', 'gamma', 'logis', 'exp', 'weib', 'negbin', 'pois', 'bern'  for the effects
          and 'norm', 'gamma', 'lnorm' for the costs")}
   type <- toupper(type)
-  if(!type %in% c("MAR", "MNAR")) { stop("Types available are 'MAR' and 'MNAR'")} 
+  if(!type %in% c("MAR", "MNAR")) { stop("Types available are 'MAR' and 'MNAR'")}
   if(!is.vector(prob) | length(prob) != 2 | !is.numeric(prob) | any(prob <= 0 | prob >= 1)) {
     stop("Please provide a lower and an upper quantile for the imputed data distribution")}
   if(!any(c(length(n.chains), length(n.iter), length(n.burnin), length(n.thin)) == 1)) {
@@ -224,7 +224,7 @@ selection <- function(data, model.eff, model.cost,
   trt <- as.name("trt")
   cl <- match.call()
   mf <- match.call(expand.dots = FALSE)
-  m <- match(c("model.eff", "model.cost", "model.me", "model.mc", 
+  m <- match(c("model.eff", "model.cost", "model.me", "model.mc",
                "data", "dist_e", "dist_c", "type", "n.chains",
                "n.iter", "n.burnin", "n.thin"), names(mf), 0L)
   mf <- mf[c(1L, m)]
@@ -240,10 +240,10 @@ selection <- function(data, model.eff, model.cost,
   clusn_me <- clusn_mc <- NULL
   if(!is.null(random_e) & length(random_e) > 1 | !is.null(random_c) & length(random_c) > 1) {
     stop("Random effects can only be included through a single expression within brackets")}
-  if(!all(names(model.frame(fixed_e, data = data)) %in% c("e", names(cov_matrix))) | 
+  if(!all(names(model.frame(fixed_e, data = data)) %in% c("e", names(cov_matrix))) |
      !all(names(model.frame(fixed_c, data = data)) %in% c("c", "e", names(cov_matrix)))) {
     stop("Missing covariates cannot be included in the model")}
-  if(!all(names(model.frame(fixed_e, data = data)) %in% names(data)) | 
+  if(!all(names(model.frame(fixed_e, data = data)) %in% names(data)) |
      !all(names(model.frame(fixed_c, data = data)) %in% names(data))) {
     stop("Please provide names in the formula that correspond to those in the data")}
   if("e" %in% labels(terms(fixed_e)) | "c" %in% labels(terms(fixed_c))) {
@@ -262,10 +262,10 @@ selection <- function(data, model.eff, model.cost,
     stop("Treatment indicator must be provided as covariate in 'model.eff' and/or 'model.cost'")}
   trt_lev <- levels(cov_matrix$trt)
   trt_pos <- which(trt_lev %in% levels(cov_matrix$trt))
-  data_read <- data_read_selection(data = data, model.eff = model.eff, 
+  data_read <- data_read_selection(data = data, model.eff = model.eff,
                                    model.cost = model.cost, model.me = model.me,
-                                   model.mc = model.mc, cov_matrix = cov_matrix, 
-                                   type = type, center = center, 
+                                   model.mc = model.mc, cov_matrix = cov_matrix,
+                                   type = type, center = center,
                                    fixed_e = fixed_e, fixed_c = fixed_c,
                                    random_e = random_e, random_c = random_c,
                                    trt_lev = trt_lev, trt_pos = trt_pos)
@@ -324,28 +324,28 @@ selection <- function(data, model.eff, model.cost,
   cost <- data_read$data_raw$data$c
   m_eff <- data_read$data_raw$data$me
   m_cost <- data_read$data_raw$data$mc
-  if(!is.null(data_read$data_raw$clus_e)){ 
+  if(!is.null(data_read$data_raw$clus_e)){
     clus_e <- data_read$data_raw$clusn_e
     n_clus_e <- length(data_read$data_raw$n_clus_e)
-  } else { 
+  } else {
     clus_e <- NULL
     n_clus_e <- NULL}
-  if(!is.null(data_read$data_raw$clus_c)){ 
+  if(!is.null(data_read$data_raw$clus_c)){
     clus_c <- data_read$data_raw$clusn_c
     n_clus_c <- length(data_read$data_raw$n_clus_c)
-  } else { 
+  } else {
     clus_c <- NULL
     n_clus_c <- NULL}
-  if(!is.null(data_read$data_raw$clus_me)){ 
+  if(!is.null(data_read$data_raw$clus_me)){
     clus_me <- data_read$data_raw$clusn_me
     n_clus_me <- length(data_read$data_raw$n_clus_me)
-  } else { 
+  } else {
     clus_me <- NULL
     n_clus_me <- NULL}
-  if(!is.null(data_read$data_raw$clus_mc)){ 
+  if(!is.null(data_read$data_raw$clus_mc)){
     clus_mc <- data_read$data_raw$clusn_mc
     n_clus_mc <- length(data_read$data_raw$n_clus_mc)
-  } else { 
+  } else {
     clus_mc <- NULL
     n_clus_mc <- NULL}
   formula.me_fixed <- all.vars(data_read$model_formula$mf_model.me_fixed)
@@ -366,17 +366,17 @@ selection <- function(data, model.eff, model.cost,
   X_c_fixed <- data_read$data_raw$x_c_fixed
   mean_cov_e_fixed <- apply(X_e_fixed, 2, mean, na.rm = TRUE)
   mean_cov_c_fixed <- apply(X_c_fixed, 2, mean, na.rm = TRUE)
-  if(length(model_e_random) != 0 & pe_random != 0) { 
+  if(length(model_e_random) != 0 & pe_random != 0) {
     X_e_random <- data_read$data_raw$x_e_random
-    if(pe_random == 1) { 
+    if(pe_random == 1) {
       X_e_random <- as.vector(X_e_random)
       mean_cov_e_random <- mean(X_e_random, na.rm = TRUE)
     } else if(pe_random > 1) {
       mean_cov_e_random <- apply(X_e_random, 2, mean, na.rm = TRUE)}
   } else { X_e_random <- mean_cov_e_random <- NULL}
-  if(length(model_c_random) != 0 & pc_random != 0) { 
+  if(length(model_c_random) != 0 & pc_random != 0) {
     X_c_random <- data_read$data_raw$x_c_random
-    if(pc_random == 1) { 
+    if(pc_random == 1) {
       X_c_random <- as.vector(X_c_random)
       mean_cov_c_random <- mean(X_c_random, na.rm = TRUE)
     } else if(pc_random > 1) {
@@ -384,31 +384,31 @@ selection <- function(data, model.eff, model.cost,
   } else { X_c_random <- mean_cov_c_random <- NULL}
   Z_e_fixed <- data_read$data_raw$z_e_fixed
   Z_c_fixed <- data_read$data_raw$z_c_fixed
-  if(ze_fixed == 1) { 
+  if(ze_fixed == 1) {
     Z_e_fixed <- as.vector(Z_e_fixed)
     mean_z_e_fixed <- mean(Z_e_fixed, na.rm = TRUE)
   } else if(ze_fixed > 1) {
     mean_z_e_fixed <- apply(Z_e_fixed, 2, mean, na.rm = TRUE)
   }
-  if(zc_fixed == 1) { 
+  if(zc_fixed == 1) {
     Z_c_fixed <- as.vector(Z_c_fixed)
     mean_z_c_fixed <- mean(Z_c_fixed, na.rm = TRUE)
   } else if(zc_fixed > 1) {
     mean_z_c_fixed <- apply(Z_c_fixed, 2, mean, na.rm = TRUE)
   }
   corr_assumption_fixed <- model.frame(formula = data_read$model_formula$mf_model.c_fixed, data = data)
-  if("e" %in% names(corr_assumption_fixed)) { 
-    ind_fixed <- FALSE  
+  if("e" %in% names(corr_assumption_fixed)) {
+    ind_fixed <- FALSE
   } else {
-    ind_fixed <- TRUE 
+    ind_fixed <- TRUE
     ind_random <- TRUE}
   if(!ind_fixed & "e" %in% model_c_random) {
     ind_random <- FALSE
   } else if(!ind_fixed & !("e" %in% model_c_random)) {
-    ind_random <- TRUE} 
+    ind_random <- TRUE}
   if(length(model_me_random) != 0 & ze_random != 0) {
     Z_e_random <- data_read$data_raw$z_e_random
-    if(ze_random == 1) { 
+    if(ze_random == 1) {
       Z_e_random <- as.vector(Z_e_random)
       mean_z_e_random <- mean(Z_e_random, na.rm = TRUE)
     } else if(ze_random > 1) {
@@ -416,7 +416,7 @@ selection <- function(data, model.eff, model.cost,
   } else { Z_e_random <- mean_z_e_random <- NULL}
   if(length(model_mc_random) != 0 & zc_random != 0) {
     Z_c_random <- data_read$data_raw$z_c_random
-    if(zc_random == 1) { 
+    if(zc_random == 1) {
       Z_c_random <- as.vector(Z_c_random)
       mean_z_c_random <- mean(Z_c_random, na.rm = TRUE)
     } else if(zc_random > 1) {
@@ -430,10 +430,10 @@ selection <- function(data, model.eff, model.cost,
     list_check_vector <- lapply(prior, is.vector)
     if(!all(as.logical(list_check_vector))) {
       stop("All user-supplied priors should be in list format")}
-    par_prior_fixed <- c("sigma.prior.e", "sigma.prior.c", "gamma.prior.e", "gamma.prior.c", 
+    par_prior_fixed <- c("sigma.prior.e", "sigma.prior.c", "gamma.prior.e", "gamma.prior.c",
                          "alpha.prior", "beta.prior", "delta.prior.e", "delta.prior.c", "beta_f.prior")
-    par_prior_random <- c("mu.g.prior.e", "mu.g.prior.c", "mu.a.prior", "mu.b.prior", 
-                          "mu.d.prior.e", "mu.d.prior.c", "mu.b_f.prior", "s.g.prior.e", "s.g.prior.c", 
+    par_prior_random <- c("mu.g.prior.e", "mu.g.prior.c", "mu.a.prior", "mu.b.prior",
+                          "mu.d.prior.e", "mu.d.prior.c", "mu.b_f.prior", "s.g.prior.e", "s.g.prior.c",
                           "s.a.prior", "s.b.prior", "s.d.prior.e", "s.d.prior.c", "s.b_f.prior")
     stop_mes <- "Please specify priors using required names/values and according to assumed model structure. Type ''help(selection)'' for more details."
     if(!all(names(list_check_vector) %in% c(par_prior_fixed, par_prior_random))) { stop(stop_mes)}
@@ -450,23 +450,23 @@ selection <- function(data, model.eff, model.cost,
       if(any(names(list_check_vector) %in% c("mu.g.prior.c", "s.g.prior.c"))) { stop(stop_mes)}
     }
     if(type == "MAR") {
-      if(any(names(list_check_vector) %in% c("delta.prior.c", "delta.prior.e", "mu.d.prior.c", "s.d.prior.c", 
+      if(any(names(list_check_vector) %in% c("delta.prior.c", "delta.prior.e", "mu.d.prior.c", "s.d.prior.c",
                                                "mu.d.prior.e", "s.d.prior.e"))) { stop(stop_mes)}
-    } 
+    }
     if(type == "MNAR_eff") {
       if(any(names(list_check_vector) %in% c("delta.prior.c", "mu.d.prior.c", "s.d.prior.c"))) { stop(stop_mes)}
-      if(length(model_me_random) == 0 & 
+      if(length(model_me_random) == 0 &
          any(names(list_check_vector) %in% c("mu.d.prior.e", "s.d.prior.e"))) { stop(stop_mes)}
-      if(length(model_me_random) != 0 & !("e" %in% model_me_random) & 
+      if(length(model_me_random) != 0 & !("e" %in% model_me_random) &
          any(names(list_check_vector) %in% c("mu.d.prior.e", "s.d.prior.e"))) { stop(stop_mes)}
-    } 
+    }
     if(type == "MNAR_cost") {
       if(any(names(list_check_vector) %in% c("delta.prior.e", "mu.d.prior.e", "s.d.prior.e"))) { stop(stop_mes)}
-      if(length(model_mc_random) == 0 & 
+      if(length(model_mc_random) == 0 &
          any(names(list_check_vector) %in% c("mu.d.prior.c", "s.d.prior.c"))) { stop(stop_mes)}
-      if(length(model_mc_random) != 0 & !("c" %in% model_mc_random) & 
+      if(length(model_mc_random) != 0 & !("c" %in% model_mc_random) &
          any(names(list_check_vector) %in% c("mu.d.prior.c", "s.d.prior.c"))) { stop(stop_mes)}
-    } 
+    }
     if(ind_fixed) {
       if(any(names(list_check_vector) %in% c("beta_f.prior", "b_f.prior"))) { stop(stop_mes)}
     }
@@ -475,7 +475,7 @@ selection <- function(data, model.eff, model.cost,
     }
   }
   if(length(model_c_random) == 1) {
-    if(model_c_random == "e") { 
+    if(model_c_random == "e") {
       is_c_random_c <- TRUE} else { is_c_random_c <- FALSE}
   } else { is_c_random_c <- FALSE}
   if(length(model_c_random) == 2) {
@@ -519,19 +519,19 @@ selection <- function(data, model.eff, model.cost,
   exArgs <- list(...)
   data_model <- list("n" = n, "eff" = eff, "cost" = cost, "m_eff" = m_eff, "m_cost" = m_cost,
                      "X_e_fixed" = X_e_fixed, "X_c_fixed" = X_c_fixed, "Z_e_fixed" = Z_e_fixed, "Z_c_fixed" = Z_c_fixed,
-                     "mean_cov_e_fixed" = mean_cov_e_fixed, "mean_cov_c_fixed" = mean_cov_c_fixed, 
-                     "mean_z_e_fixed" = mean_z_e_fixed, "mean_z_c_fixed" = mean_z_c_fixed, 
+                     "mean_cov_e_fixed" = mean_cov_e_fixed, "mean_cov_c_fixed" = mean_cov_c_fixed,
+                     "mean_z_e_fixed" = mean_z_e_fixed, "mean_z_c_fixed" = mean_z_c_fixed,
                      "pe_fixed" = pe_fixed, "pc_fixed" = pc_fixed, "ze_fixed" = ze_fixed, "zc_fixed" = zc_fixed,
                      "X_e_random" = X_e_random, "X_c_random" = X_c_random, "mean_cov_e_random" = mean_cov_e_random,
                      "mean_cov_c_random" = mean_cov_c_random, "pe_random" = pe_random, "pc_random" = pc_random,
-                     "clus_e" = clus_e, "clus_c" = clus_c, "n_clus_e" = n_clus_e, "n_clus_c" = n_clus_c, 
-                     "Z_e_random" = Z_e_random, "Z_c_random" = Z_c_random, "mean_z_e_random" = mean_z_e_random, 
+                     "clus_e" = clus_e, "clus_c" = clus_c, "n_clus_e" = n_clus_e, "n_clus_c" = n_clus_c,
+                     "Z_e_random" = Z_e_random, "Z_c_random" = Z_c_random, "mean_z_e_random" = mean_z_e_random,
                      "mean_z_c_random" = mean_z_c_random, "ze_random" = ze_random, "zc_random" = zc_random,
                      "clus_me" = clus_me, "clus_mc" = clus_mc, "n_clus_me" = n_clus_me, "n_clus_mc" = n_clus_mc,
                      "trt_pos_e" = data_read$data_raw$trt_pos_e, "trt_pos_c" = data_read$data_raw$trt_pos_c,
                      "trt_pos_me" = data_read$data_raw$trt_pos_me, "trt_pos_mc" = data_read$data_raw$trt_pos_mc,
                      "n_trt" = data_read$data_raw$n, "trt_index" = data_read$data_raw$trt_index, "trt_lev" = trt_lev,
-                     "efft" = data_read$data_raw$efft, "costt" = data_read$data_raw$costt, 
+                     "efft" = data_read$data_raw$efft, "costt" = data_read$data_raw$costt,
                      "m_efft" = data_read$data_raw$m_efft, "m_costt" = data_read$data_raw$m_costt,
                      "clus_e_lev" = data_read$data_raw$clus_e_lev, "clus_c_lev" = data_read$data_raw$clus_c_lev,
                      "clus_me_lev" = data_read$data_raw$clus_me_lev, "clus_mc_lev" = data_read$data_raw$clus_mc_lev)
@@ -546,29 +546,29 @@ selection <- function(data, model.eff, model.cost,
   if(exists("quiet", where = exArgs)) { quiet = exArgs$quiet} else { quiet = FALSE}
   if(!is.logical(dic)) { stop("Please provide logical value for dic argument")}
   model_info <- list("is_c_random_c" = is_c_random_c, "is_int_c_random_c" = is_int_c_random_c,
-                     "is_me_random_e" = is_me_random_e, "is_mc_random_c" = is_mc_random_c, 
+                     "is_me_random_e" = is_me_random_e, "is_mc_random_c" = is_mc_random_c,
                      "is_int_me_random_e" = is_int_me_random_e, "is_int_mc_random_c" = is_int_mc_random_c,
                      "ind_random" = ind_random, "ind_fixed" = ind_fixed,
                      "model_e_fixed" = model_e_fixed, "model_c_fixed" = model_c_fixed,
-                     "model_e_random" = model_e_random, "model_c_random" = model_c_random, 
-                     "model_me_random" = model_me_random, "model_mc_random" = model_mc_random, 
-                     "dic" = dic, "pd" = pd,  "n.iter.pd" = n.iter.pd, "n.adapt" = n.adapt, 
-                     "inits" = inits, "n.chains" = n.chains, "n.iter" = n.iter, 
-                     "n.burnin" = n.burnin, "n.thin" = n.thin, "prior" = prior, 
-                     "n.mci" = n.mci, "prob" = prob, "progress.bar" = progress.bar, 
+                     "model_e_random" = model_e_random, "model_c_random" = model_c_random,
+                     "model_me_random" = model_me_random, "model_mc_random" = model_mc_random,
+                     "dic" = dic, "pd" = pd,  "n.iter.pd" = n.iter.pd, "n.adapt" = n.adapt,
+                     "inits" = inits, "n.chains" = n.chains, "n.iter" = n.iter,
+                     "n.burnin" = n.burnin, "n.thin" = n.thin, "prior" = prior,
+                     "n.mci" = n.mci, "prob" = prob, "progress.bar" = progress.bar,
                      "refresh" = refresh, "RNGname" = RNGname, "quiet" = quiet)
-  model_output <- run_selection(data_model = data_model, type = type, 
+  model_output <- run_selection(data_model = data_model, type = type,
                                 dist_e = dist_e, dist_c = dist_c, model_info = model_info)
   print_mod_e <- apply(model_output$effects_fixed, 2, mean)
-  if(is.matrix(model_output$costs_fixed)) { 
+  if(is.matrix(model_output$costs_fixed)) {
     print_mod_c <- apply(model_output$costs_fixed, 2, mean)
-    } else if(is.list(model_output$costs_fixed)) { 
-    costs_fixed <- cbind(as.data.frame(model_output$costs_fixed$beta), 
+    } else if(is.list(model_output$costs_fixed)) {
+    costs_fixed <- cbind(as.data.frame(model_output$costs_fixed$beta),
                          as.data.frame(model_output$costs_fixed$beta_f))
     print_mod_c <- apply(costs_fixed, 2, mean)}
   print_mod_p_e <- apply(model_output$mis_effects_fixed, 2, mean)
   print_mod_p_c <- apply(model_output$mis_costs_fixed, 2, mean)
-  print_mod_est <- list("model.eff" = print_mod_e, "model.cost" = print_mod_c, 
+  print_mod_est <- list("model.eff" = print_mod_e, "model.cost" = print_mod_c,
                         "model.me" = print_mod_p_e, "model.mc" = print_mod_p_c)
   if(!save_model) { unlink(model_output$filein)}
   if(exists("ref", where = exArgs)) {
@@ -579,7 +579,7 @@ selection <- function(data, model.eff, model.cost,
   if(exists("Kmax", where = exArgs)) { Kmax = exArgs$Kmax} else { Kmax = 50000}
   if(exists("wtp", where = exArgs)) { wtp = exArgs$wtp} else { wtp = NULL}
   if(exists("plot", where = exArgs)) { plot = exArgs$plot} else { plot = FALSE}
-  cea <- BCEA::bcea(e = model_output$mean_effects, c = model_output$mean_costs, ref = ref, 
+  cea <- BCEA::bcea(e = model_output$mean_effects, c = model_output$mean_costs, ref = ref,
                     interventions = interventions, Kmax = Kmax, k = wtp, plot = plot)
   format <- "wide"
   res <- list(data_set = data_read, model_output = model_output, mod_est = print_mod_est,

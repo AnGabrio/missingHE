@@ -2,7 +2,7 @@
 % Please edit documentation in R/lmdm.R
 \name{lmdm}
 \alias{lmdm}
-\title{Full Bayesian Models to handle missingness in Economic Evaluations (Longitudinal Missing Data Models)}
+\title{Bayesian Longitudinal Missing Data Models}
 \usage{
 lmdm(
   data,

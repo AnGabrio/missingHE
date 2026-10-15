@@ -2,7 +2,7 @@
 % Please edit documentation in R/selection.R
 \name{selection}
 \alias{selection}
-\title{Full Bayesian Models to handle missingness in Economic Evaluations (Selection Models)}
+\title{Bayesian Selection Models}
 \usage{
 selection(
   data,

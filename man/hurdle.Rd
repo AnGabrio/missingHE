@@ -2,7 +2,7 @@
 % Please edit documentation in R/hurdle.R
 \name{hurdle}
 \alias{hurdle}
-\title{Full Bayesian Models to handle missingness in Economic Evaluations (Hurdle Models)}
+\title{Bayesian Hurdle Models}
 \usage{
 hurdle(
   data,
