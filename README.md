@@ -1,10 +1,17 @@
 missingHE: Missing Cost Effectiveness Models
 ================
 
-[![R-CMD-check](https://github.com/AnGabrio/missingHE/actions/workflows/check-standard.yaml/badge.svg?branch=dev)](https://github.com/AnGabrio/missingHE/actions/workflows/check-standard.yaml)
-[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/missingHE)](https://cran.r-project.org/package=missingHE)
+<!-- badges: start -->
+
+[![CRAN
+Status](http://www.r-pkg.org/badges/version/missingHE)](https://cran.r-project.org/package=missingHE/)
+[![R CMD
+Check](https://github.com/AnGabrio/missingHE/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/AnGabrio/missingHE/actions/workflows/R-CMD-check.yaml)
 [![CRAN_Download_Badge](http://cranlogs.r-pkg.org/badges/missingHE)](https://cran.r-project.org/package=missingHE)
 [![CRAN_Download_Badge](https://cranlogs.r-pkg.org:443/badges/grand-total/missingHE?color=orange)](https://cranlogs.r-pkg.org:443/badges/grand-total/missingHE?color=orange)
+[![License: GPL
+(\>=2)](https://img.shields.io/badge/License-GPL%20%28%3E%3D%202%29-blue.svg)](https://choosealicense.com/licenses/gpl-2.0/)
+<!-- badges: end -->
 
 > Fit Bayesian Missing Cost Effectiveness Models in R.
 
