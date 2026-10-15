@@ -61,9 +61,6 @@ jobs:
             echo "JAGS found in cache, skipping installation"
           )
 
-      - name: Install jags (macOS-latest)
-        if: runner.os == 'macOS'
-
       - name: Install JAGS (macOS)
         if: runner.os == 'macOS'
         run : |
