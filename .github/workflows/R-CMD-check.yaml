@@ -61,11 +61,10 @@ jobs:
             echo "JAGS found in cache, skipping installation"
           )
 
-      - name: Install jags (macOS-latest)
+      - name: Install JAGS (macOS)
         if: runner.os == 'macOS'
         run : |
-              rm '/usr/local/bin/gfortran'
-              brew install jags
+          brew install jags
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
