@@ -1,0 +1,230 @@
+# missingHE: Missing Cost Effectiveness Models
+
+> Fit Bayesian Missing Cost Effectiveness Models in R.
+
+🚀 This is the **development version** of the `R` package `missingHE`
+(currently on version 1.6.2.1). The stable version is now release 1.6.2,
+on [CRAN](https://cran.r-project.org/web/packages/missingHE/index.html).
+
+## Contents
+
+- [Overview](#introduction)
+- [Features](#features)
+- [Installation](#installation)
+- [Further details](#further-details)
+
+## Overview
+
+Given a individual-level partially-observed cost-effectiveness outcome
+data in the form of a dataframe, fits different types of Bayesian models
+to handle missing effect and/or cost values under different assumptions
+about the missing data mechanisms, assesses model performance and Markov
+chain Monte Carlo (MCMC) convergence, and summarises statistical and
+economic results based on the posterior distribution of key model
+parameters.
+
+## Features
+
+Main features of `missingHE` include:
+
+- Analysis of partially-observed effects/costs data via Bayesian
+  missingness models
+- Model assessment measures/plots and MCMC convergence checks
+- Posterior summaries for key model parameters and cost-effectiveness
+  measures
+- Standard cost-effectiveness measures/graphs based on model results
+
+## Installation
+
+Install the [released version from
+CRAN](https://cran.r-project.org/package=missingHE) with
+
+``` r
+
+install.packages("missingHE")
+```
+
+The development version (in this repo, which can be updated more quickly
+and more often than the stable one) can be installed using the following
+command
+
+``` r
+
+pkgs <- c("R2jags", "ggplot2", "gridExtra", "BCEA", "ggmcmc", "loo", "Rtools", "devtools", "utils")
+repos <- c("https://cran.rstudio.com") 
+install.packages(pkgs, repos = repos, dependencies = "Depends")
+```
+
+before installing the package using `devtools`:
+
+``` r
+
+devtools::install_github("AnGabrio/missingHE", build_vignettes = TRUE)
+```
+
+The optional argument `build_vignettes = TRUE` allows to install the
+vignettes of the package locally on your computer. These consist in
+brief tutorials to guide the user on how to use and customise the models
+in `missingHE` using different functions of the package. Once the
+package is installed, they can be accessed using the command
+
+``` r
+
+utils::browseVignettes(package = "missingHE")
+```
+
+which shows all the vignettes available for the package. Alternatively,
+you can install the development version using `remotes`, with the
+following command.
+
+``` r
+
+install.packages("remotes")
+remotes::install_github("AnGabrio/missingHE")
+```
+
+**NB**: On Windows machines, you need to install a few dependencies,
+including [Rtools](https://cran.r-project.org/bin/windows/Rtools/)
+first, e.g. by running
+
+``` r
+
+pkgs <- c("MASS", "Rtools", "remotes")
+repos <- "https://cran.rstudio.com"
+install.packages(pkgs, repos = repos, dependencies = "Depends")
+```
+
+before installing the package using `remotes`.
+
+All models implemented in `missingHE` are written in the `BUGS` language
+using the software [JAGS](https://mcmc-jags.sourceforge.io/), which
+needs to be installed from its own repository and instructions for
+installations under different OS can be found online. Once installed,
+the software is called in `missingHE` via the `R` package
+[R2jags](https://cran.r-project.org/package=R2jags). Note that the
+`missingHE` package is currently under active development and therefore
+it is advisable to re-install the package directly from GitHub before
+each use to ensure that you are using the most updated version.
+
+## Further details
+
+More details on `missingHE` are available in our
+[*vignettes*](https://cran.r-project.org/web/packages/missingHE/vignettes/).
+Also, details about the package, including some references and links to
+a pdf presentation and some posts on my own blog) are given
+[here](https://angabrio.github.io/software/missingHE/).
+
+## License
+
+[![License: GPL
+v2](https://img.shields.io/badge/License-GPLv2-blue.svg)](https://www.gnu.org/licenses/gpl-2.0)
+
+## Contributing
+
+Please submit contributions through `Pull Requests`, following the
+[contributing guidelines](https://github.com/AnGabrio/missingHE). To
+report issues and/or seek support, please file a new ticket in the
+[issue](https://github.com/AnGabrio/missingHE/issues) tracker.
+
+Please note that this project is released with a [Contributor Code of
+Conduct](https://github.com/AnGabrio/missingHE). By participating in
+this project you agree to abide by its terms.
+
+# Package index
+
+## All functions
+
+- [`MenSS`](https://angabrio.github.io/missingHE/reference/MenSS.md) :
+  MenSS economic data on STIs
+
+- [`PBS`](https://angabrio.github.io/missingHE/reference/PBS.md) : PBS
+  economic data on intellectual disability and challenging behaviour
+
+- [`coef(`*`<missingHE>`*`)`](https://angabrio.github.io/missingHE/reference/coef.missingHE.md)
+  :
+
+  Extract regression coefficient estimates from objects in the class
+  `missingHE`
+
+- [`diagnostic()`](https://angabrio.github.io/missingHE/reference/diagnostic.md)
+  :
+
+  Diagnostic checks for assessing MCMC convergence of Bayesian models
+  fitted in `JAGS` using the function `selection`, `pattern`, `hurdle`
+  or `lmdm`.
+
+- [`hurdle()`](https://angabrio.github.io/missingHE/reference/hurdle.md)
+  : Bayesian Hurdle Models
+
+- [`lmdm()`](https://angabrio.github.io/missingHE/reference/lmdm.md) :
+  Bayesian Longitudinal Missing Data Models
+
+- [`pattern()`](https://angabrio.github.io/missingHE/reference/pattern.md)
+  : Bayesian Pattern Mixture Models
+
+- [`pic()`](https://angabrio.github.io/missingHE/reference/pic.md) :
+
+  Predictive information criteria for Bayesian models fitted in `JAGS`
+  using the function `selection`, `pattern`, `hurdle` or `lmdm`
+
+- [`plot(`*`<missingHE>`*`)`](https://angabrio.github.io/missingHE/reference/plot.missingHE.md)
+  :
+
+  Plot method for the imputed data contained in the objects of class
+  `missingHE`
+
+- [`postsum()`](https://angabrio.github.io/missingHE/reference/postsum.md)
+  : Postsum method for inspecting summary posterior estimates of a
+  Bayesian model fitted in JAGS
+
+- [`ppc()`](https://angabrio.github.io/missingHE/reference/ppc.md) :
+
+  Posterior predictive checks for assessing the fit to the observed data
+  of Bayesian models implemented in `JAGS` using the function
+  `selection`, `pattern`, `hurdle` or `lmdm`
+
+- [`print(`*`<missingHE>`*`)`](https://angabrio.github.io/missingHE/reference/print.missingHE.md)
+  :
+
+  Print method for objects in the class `missingHE`
+
+- [`selection()`](https://angabrio.github.io/missingHE/reference/selection.md)
+  : Bayesian Selection Models
+
+- [`summary(`*`<missingHE>`*`)`](https://angabrio.github.io/missingHE/reference/summary.missingHE.md)
+  :
+
+  Summary method for objects in the class `missingHE`
+
+# Articles
+
+### All vignettes
+
+- [Fitting MNAR models in
+  missingHE](https://angabrio.github.io/missingHE/articles/Fitting_MNAR_models_in_missingHE.md):
+
+  This tutorial shows few examples of how models in missingHE can be
+  fitted under different types of missing not at random (MNAR)
+  assumptions for the outcome variables in trial-based CEA.
+
+- [Introduction to
+  missingHE](https://angabrio.github.io/missingHE/articles/Introduction_to_missingHE.md):
+
+  Start here if this is your first time using missingHE. You will learn
+  the basic theory behind the package and the most important functions
+  and their arguments, which allow you to fit different types of models
+  to handle missing values in trial-based CEA.
+
+- [Longitudinal models in
+  missingHE](https://angabrio.github.io/missingHE/articles/Longitudinal_models_in_missingHE.md):
+
+  This tutorial shows some examples of how to specify, customise and fit
+  a longitudinal missingness model in missingHE when performing
+  trial-based CEA using longitudinal data.
+
+- [Model and output customisation in
+  missingHE](https://angabrio.github.io/missingHE/articles/Model_customisation_in_missingHE.md):
+
+  This tutorial shows few examples of how different types of models and
+  their output can be customised in missingHE based on the needs of the
+  user when performing trial-based CEA.
