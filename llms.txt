@@ -122,13 +122,14 @@ v2](https://img.shields.io/badge/License-GPLv2-blue.svg)](https://www.gnu.org/li
 ## Contributing
 
 Please submit contributions through `Pull Requests`, following the
-[contributing guidelines](https://github.com/AnGabrio/missingHE). To
-report issues and/or seek support, please file a new ticket in the
+[contributing
+guidelines](https://github.com/AnGabrio/missingHE/blob/master/.github/CONTRIBUTING.md).
+To report issues and/or seek support, please file a new ticket in the
 [issue](https://github.com/AnGabrio/missingHE/issues) tracker.
 
 Please note that this project is released with a [Contributor Code of
-Conduct](https://github.com/AnGabrio/missingHE). By participating in
-this project you agree to abide by its terms.
+Conduct](https://github.com/AnGabrio/missingHE/blob/master/CODE_OF_CONDUCT.md).
+By participating in this project you agree to abide by its terms.
 
 # Package index
 
