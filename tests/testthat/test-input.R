@@ -104,6 +104,30 @@ test_that("input errors", {
     regexp = "`model.eff` and/or `model.cost` must be formula objects")
 
   expect_error(
+    selection(data = MenSS, model.eff = e ~ 0 + trt, dist_e = "norm",
+              model.cost = c ~ trt, dist_c = "norm",
+              type = "MAR"),
+    regexp = "No-intercept models are not allowed. Please remove `0` from `model.eff` and/or `model.cost`")
+
+  expect_error(
+    selection(data = MenSS, model.eff = e ~ trt, dist_e = "norm",
+              model.cost = c ~ 0 + trt, dist_c = "norm",
+              type = "MAR"),
+    regexp = "No-intercept models are not allowed. Please remove `0` from `model.eff` and/or `model.cost`")
+
+  expect_error(
+    selection(data = MenSS, model.eff = e ~ trt, dist_e = "norm",
+              model.cost = c ~ trt, dist_c = "norm", model.me = me ~ 0 + trt,
+              model.mc = mc ~ trt, type = "MAR"),
+    regexp = "No-intercept models are not allowed. Please remove `0` from `model.me` and/or `model.mc`")
+
+  expect_error(
+    selection(data = MenSS, model.eff = e ~ trt, dist_e = "norm",
+              model.cost = c ~ trt, dist_c = "norm", model.me = me ~ trt,
+              model.mc = mc ~ 0 + trt, type = "MAR"),
+    regexp = "No-intercept models are not allowed. Please remove `0` from `model.me` and/or `model.mc`")
+
+  expect_error(
     selection(data = MenSS, model.eff = e ~ trt + e, dist_e = "norm",
               model.cost = c ~ trt, dist_c = "norm",
               type = "MAR"),
@@ -281,6 +305,18 @@ test_that("input errors", {
               model.cost = 1, dist_c = "norm",
               type = "MAR"),
     regexp = "`model.eff` and/or `model.cost` must be formula objects")
+
+  expect_error(
+    pattern(data = MenSS, model.eff = e ~ 0 + trt, dist_e = "norm",
+              model.cost = c ~ trt, dist_c = "norm",
+              type = "MAR"),
+    regexp = "No-intercept models are not allowed. Please remove `0` from `model.eff` and/or `model.cost`")
+
+  expect_error(
+    pattern(data = MenSS, model.eff = e ~ trt, dist_e = "norm",
+              model.cost = c ~ 0 + trt, dist_c = "norm",
+              type = "MAR"),
+    regexp = "No-intercept models are not allowed. Please remove `0` from `model.eff` and/or `model.cost`")
 
   expect_error(
     pattern(data = MenSS, model.eff = e ~ trt + e, dist_e = "norm",
@@ -471,6 +507,34 @@ test_that("input errors", {
            model.se = se ~ 1, model.sc = sc ~ 1, se = 1, sc = 0,
            type = "SCAR"),
     regexp = "`model.eff` and/or `model.cost` must be formula objects")
+
+  expect_error(
+    hurdle(data = MenSS, model.eff = e ~ 0 + trt, dist_e = "norm",
+           model.cost = c ~ trt, dist_c = "norm",
+           model.se = se ~ 1, model.sc = sc ~ 1, se = 1, sc = 0,
+           type = "SCAR"),
+    regexp = "No-intercept models are not allowed. Please remove `0` from `model.eff` and/or `model.cost`")
+
+  expect_error(
+    hurdle(data = MenSS, model.eff = e ~ trt, dist_e = "norm",
+           model.cost = c ~ 0 + trt, dist_c = "norm",
+           model.se = se ~ 1, model.sc = sc ~ 1, se = 1, sc = 0,
+           type = "SCAR"),
+    regexp = "No-intercept models are not allowed. Please remove `0` from `model.eff` and/or `model.cost`")
+
+  expect_error(
+    hurdle(data = MenSS, model.eff = e ~ trt, dist_e = "norm",
+           model.cost = c ~ trt, dist_c = "norm",
+           model.se = se ~ 0 + trt, model.sc = sc ~ 1, se = 1, sc = 0,
+           type = "SCAR"),
+    regexp = "No-intercept models are not allowed. Please remove `0` from `model.se` and/or `model.sc`")
+
+  expect_error(
+    hurdle(data = MenSS, model.eff = e ~ trt, dist_e = "norm",
+           model.cost = c ~ trt, dist_c = "norm",
+           model.se = se ~ trt, model.sc = sc ~ 0 + trt, se = 1, sc = 0,
+           type = "SCAR"),
+    regexp = "No-intercept models are not allowed. Please remove `0` from `model.se` and/or `model.sc`")
 
   expect_error(
     hurdle(data = MenSS, model.eff = e ~ trt + e, dist_e = "norm",
@@ -709,6 +773,30 @@ test_that("input errors", {
     regexp = "`model.eff` and/or `model.cost` must be formula objects")
 
   expect_error(
+    lmdm(data = PBS, model.eff = e ~ 0 + trt, dist_e = "norm",
+              model.cost = c ~ trt, dist_c = "norm",
+              type = "MAR"),
+    regexp = "No-intercept models are not allowed. Please remove `0` from `model.eff` and/or `model.cost`")
+
+  expect_error(
+    lmdm(data = PBS, model.eff = e ~ trt, dist_e = "norm",
+              model.cost = c ~ 0 + trt, dist_c = "norm",
+              type = "MAR"),
+    regexp = "No-intercept models are not allowed. Please remove `0` from `model.eff` and/or `model.cost`")
+
+  expect_error(
+    lmdm(data = PBS, model.eff = e ~ trt, dist_e = "norm",
+              model.cost = c ~ trt, dist_c = "norm", model.me = me ~ 0 + trt,
+              model.mc = mc ~ trt, type = "MAR"),
+    regexp = "No-intercept models are not allowed. Please remove `0` from `model.me` and/or `model.mc`")
+
+  expect_error(
+    lmdm(data = PBS, model.eff = e ~ trt, dist_e = "norm",
+              model.cost = c ~ trt, dist_c = "norm", model.me = me ~ trt,
+              model.mc = mc ~ 0 + trt, type = "MAR"),
+    regexp = "No-intercept models are not allowed. Please remove `0` from `model.me` and/or `model.mc`")
+
+  expect_error(
     lmdm(data = PBS, model.eff = e ~ trt + e, dist_e = "norm",
               model.cost = c ~ trt, dist_c = "norm",
               type = "MAR"),
@@ -811,12 +899,5 @@ test_that("input errors", {
                 "alpha.prior" = c("norm", 2, 1),
                 "alpha.prior" = c("norm", 2, 1))),
     regexp = "You cannot provide multiple priors with the same name")
-
-  expect_error(
-    lmdm(data = PBS, model.eff = e ~ trt, dist_e = "norm",
-         model.cost = c ~ trt, dist_c = "norm",
-         type = "MNAR", time_dep = "none",
-         model.me = me ~ 0 + e, model.mc = mc ~ 1),
-    regexp = "MNAR model specification does not allow non-intercept models.")
 
 })

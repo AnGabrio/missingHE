@@ -223,6 +223,8 @@ lmdm <- function(data, model.eff, model.cost,
     stop("`model.eff` and/or `model.cost` must be formula objects")}
   fixed_e <- nobars_(model.eff)
   fixed_c <- nobars_(model.cost)
+  fixed_me <- nobars_(model.me)
+  fixed_mc <- nobars_(model.mc)
   random_e <- fb(model.eff)
   random_c <- fb(model.cost)
   clusn_e <- clusn_c <- NULL
@@ -235,6 +237,10 @@ lmdm <- function(data, model.eff, model.cost,
   if(!all(names(model.frame(fixed_e, data = data)) %in% names(data)) |
      !all(names(model.frame(fixed_c, data = data)) %in% names(data))) {
     stop("Please provide names in the formula that correspond to those in the data")}
+  if(attr(terms(fixed_e), "intercept") == 0 | attr(terms(fixed_c), "intercept") == 0) {
+    stop("No-intercept models are not allowed. Please remove `0` from `model.eff` and/or `model.cost`")}
+  if(attr(terms(fixed_me), "intercept") == 0 | attr(terms(fixed_mc), "intercept") == 0) {
+    stop("No-intercept models are not allowed. Please remove `0` from `model.me` and/or `model.mc`")}
   if("e" %in% labels(terms(fixed_e)) | "c" %in% labels(terms(fixed_c))) {
     stop("Please remove 'e' from the right-hand side of 'model.eff' and/or 'c' from the right-hand side of 'model.cost'")}
   if(names(model.frame(fixed_e, data = data)[1]) != "e") {
@@ -516,14 +522,6 @@ lmdm <- function(data, model.eff, model.cost,
   if(length(model_me_random) == 2) {
     if(all(model_me_random == c("1", "e"))) { is_int_me_random_e <- TRUE} else { is_int_me_random_e <- FALSE}
   } else { is_int_me_random_e <- FALSE}
-  if("e" %in% names(miss_eff_assumption) & "0 " %in% unlist(c(strsplit(as.character(data_read$model_formula$mf_model.me_fixed)[3], "+", fixed = TRUE)))) {
-    stop("MNAR model specification does not allow non-intercept models.")}
-  if("e" %in% names(miss_eff_assumption) & "0" %in% unlist(c(strsplit(as.character(fb(model.me)), " " , fixed = TRUE)))) {
-    stop("MNAR model specification does not allow non-intercept models.")}
-  if("c" %in% names(miss_eff_assumption) & "0 " %in% unlist(c(strsplit(as.character(data_read$model_formula$mf_model.mc_fixed)[3], "+", fixed = TRUE)))) {
-    stop("MNAR model specification does not allow non-intercept models.")}
-  if("c" %in% names(miss_eff_assumption) & "0" %in% unlist(c(strsplit(as.character(fb(model.mc)), " " , fixed = TRUE)))) {
-    stop("MNAR model specification does not allow non-intercept models.")}
   if(exists("sigma.prior.e", where = prior)) { sigma.prior.e = prior$sigma.prior.e} else { sigma.prior.e = NULL}
   if(exists("sigma.prior.c", where = prior)) { sigma.prior.c = prior$sigma.prior.c} else { sigma.prior.c = NULL}
   if(exists("alpha.prior", where = prior)) { alpha.prior = prior$alpha.prior} else { alpha.prior = NULL}

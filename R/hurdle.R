@@ -246,6 +246,8 @@ hurdle <- function(data, model.eff, model.cost,
     stop("`model.eff` and/or `model.cost` must be formula objects")}
   fixed_e <- nobars_(model.eff)
   fixed_c <- nobars_(model.cost)
+  fixed_se <- nobars_(model.se)
+  fixed_sc <- nobars_(model.sc)
   random_e <- fb(model.eff)
   random_c <- fb(model.cost)
   clusn_e <- clusn_c <- NULL
@@ -258,6 +260,10 @@ hurdle <- function(data, model.eff, model.cost,
   if(!all(names(model.frame(fixed_e, data = data)) %in% names(data)) |
      !all(names(model.frame(fixed_c, data = data)) %in% names(data))) {
     stop("Please provide names in the formula that correspond to those in the data")}
+  if(attr(terms(fixed_e), "intercept") == 0 | attr(terms(fixed_c), "intercept") == 0) {
+    stop("No-intercept models are not allowed. Please remove `0` from `model.eff` and/or `model.cost`")}
+  if(attr(terms(fixed_se), "intercept") == 0 | attr(terms(fixed_sc), "intercept") == 0) {
+    stop("No-intercept models are not allowed. Please remove `0` from `model.se` and/or `model.sc`")}
   if("e" %in% labels(terms(fixed_e)) | "c" %in% labels(terms(fixed_c))) {
     stop("Please remove 'e' from the right-hand side of 'model.eff' and/or 'c' from the right-hand side of 'model.cost'")}
   if(names(model.frame(fixed_e, data = data)[1]) != "e") {
