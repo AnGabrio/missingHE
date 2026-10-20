@@ -225,7 +225,9 @@ hurdle <- function(data, model.eff, model.cost,
     stop("Please provide valid values for 'n.chains', 'n.iter', 'n.burnin', 'n.thin'")}
   if(!any(is.numeric(n.chains), is.numeric(n.iter), is.numeric(n.burnin), is.numeric(n.thin))) {
     stop("Please provide numeric values for 'n.chains', 'n.iter', 'n.burnin', 'n.thin'")}
-  if(!any(c(n.chains, n.iter, n.burnin, n.thin) > 0) | !any(c(n.chains, n.iter, n.burnin, n.thin) %% 1 == 0)) {
+  if(!any(c(n.chains, n.iter, n.burnin, n.thin) > 0) |
+     !all(c(n.chains - round(n.chains), n.iter - round(n.iter),
+            n.burnin - round(n.burnin), n.thin - round(n.thin)) == 0)) {
     stop("Please provide valid integer values for 'n.chains', 'n.iter', 'n.burnin', 'n.thin'")}
   if(!is.logical(save_model) | !is.logical(center)) {
     stop("Please provide 'save_model', 'center' as logical values")}

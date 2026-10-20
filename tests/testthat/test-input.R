@@ -1,0 +1,822 @@
+# test errors in input arguments
+
+test_that("input errors", {
+
+  load(test_path("testdata/MenSS.RData"))
+
+  expect_error(
+    selection(data = MenSS$e, model.eff = e ~ trt, dist_e = "norm",
+              model.cost = c ~ trt, dist_c = "norm",
+              type = "MAR"),
+    regexp = "data must be in data frame format")
+
+  expect_error(
+    selection(data = MenSS[, 1:2], model.eff = e ~ trt, dist_e = "norm",
+              model.cost = c ~ trt, dist_c = "norm",
+              type = "MAR"),
+    regexp = "Please rename or provide names in the data as 'e',
+         'c' and 'trt' for the effectiveness, cost and treatment variables")
+
+  expect_error(
+    selection(data = MenSS, model.eff = e ~ trt, dist_e = "norm",
+              model.cost = c ~ trt, dist_c = "norm",
+              type = 1),
+    regexp = "Please provide valid names for 'type', 'dist_e' and 'dist_c'")
+
+  expect_error(
+    selection(data = MenSS, model.eff = e ~ trt, dist_e = 1,
+              model.cost = c ~ trt, dist_c = "norm",
+              type = "MAR"),
+    regexp = "Please provide valid names for 'type', 'dist_e' and 'dist_c'")
+
+  expect_error(
+    selection(data = MenSS, model.eff = e ~ trt, dist_e = "norm",
+              model.cost = c ~ trt, dist_c = 1,
+              type = "MAR"),
+    regexp = "Please provide valid names for 'type', 'dist_e' and 'dist_c'")
+
+  expect_error(
+    selection(data = MenSS, model.eff = e ~ trt, dist_e = "nrm",
+              model.cost = c ~ trt, dist_c = "norm",
+              type = "MAR"),
+    regexp = "Distributions available are 'norm', 'beta', 'gamma', 'logis', 'exp', 'weib', 'negbin', 'pois', 'bern'  for the effects
+         and 'norm', 'gamma', 'lnorm' for the costs")
+
+  expect_error(
+    selection(data = MenSS, model.eff = e ~ trt, dist_e = "nrm",
+              model.cost = c ~ trt, dist_c = "nrm",
+              type = "MAR"),
+    regexp = "Distributions available are 'norm', 'beta', 'gamma', 'logis', 'exp', 'weib', 'negbin', 'pois', 'bern'  for the effects
+         and 'norm', 'gamma', 'lnorm' for the costs")
+
+  expect_error(
+    selection(data = MenSS, model.eff = e ~ trt, dist_e = "norm",
+              model.cost = c ~ trt, dist_c = "norm",
+              type = "CAR"),
+    regexp = "Types available are 'MAR' and 'MNAR'")
+
+  expect_error(
+    selection(data = MenSS, model.eff = e ~ trt, dist_e = "norm",
+              model.cost = c ~ trt, dist_c = "norm",
+              type = "MAR", prob = c(-0.2, 1)),
+    regexp = "Please provide a lower and an upper quantile for the imputed data distribution")
+
+  expect_error(
+    selection(data = MenSS, model.eff = e ~ trt, dist_e = "norm",
+              model.cost = c ~ trt, dist_c = "norm",
+              type = "MAR", n.chains = 0.2),
+    regexp = "Please provide valid integer values for 'n.chains', 'n.iter', 'n.burnin', 'n.thin'")
+
+  expect_error(
+    selection(data = MenSS, model.eff = e ~ trt, dist_e = "norm",
+              model.cost = c ~ trt, dist_c = "norm",
+              type = "MAR", n.iter = 0.2),
+    regexp = "Please provide valid integer values for 'n.chains', 'n.iter', 'n.burnin', 'n.thin'")
+
+  expect_error(
+    selection(data = MenSS, model.eff = e ~ trt, dist_e = "norm",
+              model.cost = c ~ trt, dist_c = "norm",
+              type = "MAR", n.burnin = 0.2),
+    regexp = "Please provide valid integer values for 'n.chains', 'n.iter', 'n.burnin', 'n.thin'")
+
+  expect_error(
+    selection(data = MenSS, model.eff = e ~ trt, dist_e = "norm",
+              model.cost = c ~ trt, dist_c = "norm",
+              type = "MAR", n.thin = 0.2),
+    regexp = "Please provide valid integer values for 'n.chains', 'n.iter', 'n.burnin', 'n.thin'")
+
+  expect_error(
+    selection(data = MenSS, model.eff = e ~ trt, dist_e = "norm",
+              model.cost = c ~ trt, dist_c = "norm",
+              type = "MAR", save_model = "yes"),
+    regexp = "Please provide 'save_model', 'center' as logical values")
+
+  expect_error(
+    selection(data = MenSS, model.eff = 1, dist_e = "norm",
+              model.cost = c ~ trt, dist_c = "norm",
+              type = "MAR"),
+    regexp = "`model.eff` and/or `model.cost` must be formula objects")
+
+  expect_error(
+    selection(data = MenSS, model.eff = e ~ trt, dist_e = "norm",
+              model.cost = 1, dist_c = "norm",
+              type = "MAR"),
+    regexp = "`model.eff` and/or `model.cost` must be formula objects")
+
+  expect_error(
+    selection(data = MenSS, model.eff = e ~ trt + e, dist_e = "norm",
+              model.cost = c ~ trt, dist_c = "norm",
+              type = "MAR"),
+    regexp = "Please remove 'e' from the right-hand side of 'model.eff' and/or 'c' from the right-hand side of 'model.cost'")
+
+  expect_error(
+    selection(data = MenSS, model.eff = e ~ trt, dist_e = "norm",
+              model.cost = c ~ trt + c, dist_c = "norm",
+              type = "MAR"),
+    regexp = "Please remove 'e' from the right-hand side of 'model.eff' and/or 'c' from the right-hand side of 'model.cost'")
+
+  expect_error(
+    selection(data = MenSS, model.eff = age ~ trt, dist_e = "norm",
+              model.cost = c ~ trt, dist_c = "norm",
+              type = "MAR"),
+    regexp = "Please set 'e' as the response in 'model.eff'")
+
+  expect_error(
+    selection(data = MenSS, model.eff = e ~ trt, dist_e = "norm",
+              model.cost = age ~ trt, dist_c = "norm",
+              type = "MAR"),
+    regexp = "Please set 'c' as the response in 'model.cost'")
+
+  expect_error(
+    selection(data = MenSS, model.eff = e ~ trt, dist_e = "norm",
+              model.cost = c ~ trt + e*age, dist_c = "norm",
+              type = "MAR"),
+    regexp = "No interaction effects for 'e' is allowed")
+
+  expect_error(
+    selection(data = MenSS, model.eff = e ~ age, dist_e = "norm",
+              model.cost = c ~ trt, dist_c = "norm",
+              type = "MAR"),
+    regexp = "Treatment indicator must be provided as covariate in 'model.eff' and/or 'model.cost'")
+
+  expect_error(
+    selection(data = MenSS, model.eff = e ~ trt, dist_e = "norm",
+              model.cost = c ~ age, dist_c = "norm",
+              type = "MAR"),
+    regexp = "Treatment indicator must be provided as covariate in 'model.eff' and/or 'model.cost'")
+
+  expect_error(
+    selection(data = MenSS, model.eff = e ~ trt + (1 | site) + (1 | site), dist_e = "norm",
+              model.cost = c ~ trt, dist_c = "norm",
+              type = "MAR"),
+    regexp = "Random effects can only be included through a single expression within brackets")
+
+  expect_error(
+    selection(data = MenSS, model.eff = e ~ trt + c, dist_e = "norm",
+              model.cost = c ~ trt, dist_c = "norm",
+              type = "MAR"),
+    regexp = "Missing covariates cannot be included in the model")
+
+  expect_error(
+    selection(data = MenSS, model.eff = e ~ trt, dist_e = "norm",
+              model.cost = c ~ trt, dist_c = "norm",
+              type = "MAR", model.me = me ~ e),
+    regexp = "Please remove 'e' and/or 'c' from 'model.me' and/or 'model.mc' if 'MAR' type selected")
+
+  expect_error(
+    selection(data = MenSS, model.eff = e ~ trt, dist_e = "norm",
+              model.cost = c ~ trt, dist_c = "norm",
+              type = "MAR", model.mc = mc ~ c),
+    regexp = "Please remove 'e' and/or 'c' from 'model.me' and/or 'model.mc' if 'MAR' type selected")
+
+  expect_error(
+    selection(data = MenSS, model.eff = e ~ trt, dist_e = "norm",
+              model.cost = c ~ trt, dist_c = "norm",
+              type = "MNAR"),
+    regexp = "Please add 'e' and/or 'c' to 'model.me' and/or 'model.mc' if 'MNAR' type selected")
+
+  expect_error(
+    selection(data = MenSS, model.eff = e ~ trt, dist_e = "norm",
+              model.cost = c ~ trt, dist_c = "norm",
+              type = "MAR", prior = list(
+                "alpha.prior" = c("norm", 2, 1),
+                "alpha.prior" = c("norm", 2, 1))),
+    regexp = "You cannot provide multiple priors with the same name")
+
+  expect_error(
+    pattern(data = MenSS$e, model.eff = e ~ trt, dist_e = "norm",
+              model.cost = c ~ trt, dist_c = "norm",
+              type = "MAR"),
+    regexp = "data must be in data frame format")
+
+  expect_error(
+    pattern(data = MenSS[, 1:2], model.eff = e ~ trt, dist_e = "norm",
+              model.cost = c ~ trt, dist_c = "norm",
+              type = "MAR"),
+    regexp = "Please rename or provide names in the data as 'e',
+         'c' and 'trt' for the effectiveness, cost and treatment variables")
+
+  expect_error(
+    pattern(data = MenSS, model.eff = e ~ trt, dist_e = "norm",
+              model.cost = c ~ trt, dist_c = "norm",
+              type = 1),
+    regexp = "Please provide valid names for 'type', 'dist_e' and 'dist_c'")
+
+  expect_error(
+    pattern(data = MenSS, model.eff = e ~ trt, dist_e = 1,
+              model.cost = c ~ trt, dist_c = "norm",
+              type = "MAR"),
+    regexp = "Please provide valid names for 'type', 'dist_e' and 'dist_c'")
+
+  expect_error(
+    pattern(data = MenSS, model.eff = e ~ trt, dist_e = "norm",
+              model.cost = c ~ trt, dist_c = 1,
+              type = "MAR"),
+    regexp = "Please provide valid names for 'type', 'dist_e' and 'dist_c'")
+
+  expect_error(
+    pattern(data = MenSS, model.eff = e ~ trt, dist_e = "nrm",
+              model.cost = c ~ trt, dist_c = "norm",
+              type = "MAR"),
+    regexp = "Distributions available are 'norm', 'beta', 'gamma', 'logis', 'exp', 'weib', 'negbin', 'pois', 'bern'  for the effects
+         and 'norm', 'gamma', 'lnorm' for the costs")
+
+  expect_error(
+    pattern(data = MenSS, model.eff = e ~ trt, dist_e = "nrm",
+              model.cost = c ~ trt, dist_c = "nrm",
+              type = "MAR"),
+    regexp = "Distributions available are 'norm', 'beta', 'gamma', 'logis', 'exp', 'weib', 'negbin', 'pois', 'bern'  for the effects
+         and 'norm', 'gamma', 'lnorm' for the costs")
+
+  expect_error(
+    pattern(data = MenSS, model.eff = e ~ trt, dist_e = "norm",
+              model.cost = c ~ trt, dist_c = "norm",
+              type = "CAR"),
+    regexp = "Types available are 'MAR' and 'MNAR'")
+
+  expect_error(
+    pattern(data = MenSS, model.eff = e ~ trt, dist_e = "norm",
+              model.cost = c ~ trt, dist_c = "norm",
+              type = "MAR", prob = c(-0.2, 1)),
+    regexp = "Please provide a lower and an upper quantile for the imputed data distribution")
+
+  expect_error(
+    pattern(data = MenSS, model.eff = e ~ trt, dist_e = "norm",
+              model.cost = c ~ trt, dist_c = "norm",
+              type = "MAR", n.chains = 0.2),
+    regexp = "Please provide valid integer values for 'n.chains', 'n.iter', 'n.burnin', 'n.thin'")
+
+  expect_error(
+    pattern(data = MenSS, model.eff = e ~ trt, dist_e = "norm",
+              model.cost = c ~ trt, dist_c = "norm",
+              type = "MAR", n.iter = 0.2),
+    regexp = "Please provide valid integer values for 'n.chains', 'n.iter', 'n.burnin', 'n.thin'")
+
+  expect_error(
+    pattern(data = MenSS, model.eff = e ~ trt, dist_e = "norm",
+              model.cost = c ~ trt, dist_c = "norm",
+              type = "MAR", n.burnin = 0.2),
+    regexp = "Please provide valid integer values for 'n.chains', 'n.iter', 'n.burnin', 'n.thin'")
+
+  expect_error(
+    pattern(data = MenSS, model.eff = e ~ trt, dist_e = "norm",
+              model.cost = c ~ trt, dist_c = "norm",
+              type = "MAR", n.thin = 0.2),
+    regexp = "Please provide valid integer values for 'n.chains', 'n.iter', 'n.burnin', 'n.thin'")
+
+  expect_error(
+    pattern(data = MenSS, model.eff = e ~ trt, dist_e = "norm",
+              model.cost = c ~ trt, dist_c = "norm",
+              type = "MAR", save_model = "yes"),
+    regexp = "Please provide 'save_model', 'center' as logical values")
+
+  expect_error(
+    pattern(data = MenSS, model.eff = 1, dist_e = "norm",
+              model.cost = c ~ trt, dist_c = "norm",
+              type = "MAR"),
+    regexp = "`model.eff` and/or `model.cost` must be formula objects")
+
+  expect_error(
+    pattern(data = MenSS, model.eff = e ~ trt, dist_e = "norm",
+              model.cost = 1, dist_c = "norm",
+              type = "MAR"),
+    regexp = "`model.eff` and/or `model.cost` must be formula objects")
+
+  expect_error(
+    pattern(data = MenSS, model.eff = e ~ trt + e, dist_e = "norm",
+              model.cost = c ~ trt, dist_c = "norm",
+              type = "MAR"),
+    regexp = "Please remove 'e' from the right-hand side of 'model.eff' and/or 'c' from the right-hand side of 'model.cost'")
+
+  expect_error(
+    pattern(data = MenSS, model.eff = e ~ trt, dist_e = "norm",
+              model.cost = c ~ trt + c, dist_c = "norm",
+              type = "MAR"),
+    regexp = "Please remove 'e' from the right-hand side of 'model.eff' and/or 'c' from the right-hand side of 'model.cost'")
+
+  expect_error(
+    pattern(data = MenSS, model.eff = age ~ trt, dist_e = "norm",
+              model.cost = c ~ trt, dist_c = "norm",
+              type = "MAR"),
+    regexp = "Please set 'e' as the response in 'model.eff'")
+
+  expect_error(
+    pattern(data = MenSS, model.eff = e ~ trt, dist_e = "norm",
+              model.cost = age ~ trt, dist_c = "norm",
+              type = "MAR"),
+    regexp = "Please set 'c' as the response in 'model.cost'")
+
+  expect_error(
+    pattern(data = MenSS, model.eff = e ~ trt, dist_e = "norm",
+              model.cost = c ~ trt + e*age, dist_c = "norm",
+              type = "MAR"),
+    regexp = "No interaction effects for 'e' is allowed")
+
+  expect_error(
+    pattern(data = MenSS, model.eff = e ~ age, dist_e = "norm",
+              model.cost = c ~ trt, dist_c = "norm",
+              type = "MAR"),
+    regexp = "Treatment indicator must be provided as covariate in 'model.eff' and/or 'model.cost'")
+
+  expect_error(
+    pattern(data = MenSS, model.eff = e ~ trt, dist_e = "norm",
+              model.cost = c ~ age, dist_c = "norm",
+              type = "MAR"),
+    regexp = "Treatment indicator must be provided as covariate in 'model.eff' and/or 'model.cost'")
+
+  expect_error(
+    pattern(data = MenSS, model.eff = e ~ trt, dist_e = "norm",
+            model.cost = c ~ age, dist_c = "norm", restriction = "AA",
+            type = "MAR"),
+    regexp = "Only 'CC' or 'AC' types of restriction are allowed")
+
+  expect_error(
+    pattern(data = MenSS, model.eff = e ~ trt + (1 | site) + (1 | site), dist_e = "norm",
+              model.cost = c ~ trt, dist_c = "norm",
+              type = "MAR"),
+    regexp = "Random effects can only be included through a single expression within brackets")
+
+  expect_error(
+    pattern(data = MenSS, model.eff = e ~ trt + c, dist_e = "norm",
+              model.cost = c ~ trt, dist_c = "norm",
+              type = "MAR"),
+    regexp = "Missing covariates cannot be included in the model")
+
+  expect_error(
+    pattern(data = MenSS, model.eff = e ~ trt, dist_e = "norm",
+              model.cost = c ~ trt, dist_c = "norm",
+              type = "MAR", prior = list(
+                "alpha.prior" = c("norm", 2, 1),
+                "alpha.prior" = c("norm", 2, 1))),
+    regexp = "You cannot provide multiple priors with the same name")
+
+  expect_error(
+    pattern(data = MenSS, model.eff = e ~ trt, dist_e = "norm",
+            model.cost = c ~ trt, dist_c = "norm", restriction = "AC",
+            type = "MAR"),
+    regexp = "At least some non-complete cases in both outcomes must be observed to fit the model under 'AC' restrictions.")
+
+
+  expect_error(
+    hurdle(data = MenSS$e, model.eff = e ~ trt, dist_e = "norm",
+            model.cost = c ~ trt, dist_c = "norm",
+           model.se = se ~ 1, model.sc = sc ~ 1, se = 1, sc = 0,
+            type = "SCAR"),
+    regexp = "data must be in data frame format")
+
+  expect_error(
+    hurdle(data = MenSS[, 1:2], model.eff = e ~ trt, dist_e = "norm",
+           model.cost = c ~ trt, dist_c = "norm",
+           model.se = se ~ 1, model.sc = sc ~ 1, se = 1, sc = 0,
+           type = "SCAR"),
+    regexp = "Please rename or provide names in the data as 'e',
+         'c' and 'trt' for the effectiveness, cost and treatment variables")
+
+  expect_error(
+    hurdle(data = MenSS, model.eff = e ~ trt, dist_e = "norm",
+           model.cost = c ~ trt, dist_c = "norm",
+           model.se = se ~ 1, model.sc = sc ~ 1, se = 1, sc = 0,
+           type = 1),
+    regexp = "Please provide valid names for 'type', 'dist_e' and 'dist_c'")
+
+  expect_error(
+    hurdle(data = MenSS, model.eff = e ~ trt, dist_e = 1,
+           model.cost = c ~ trt, dist_c = "norm",
+           model.se = se ~ 1, model.sc = sc ~ 1, se = 1, sc = 0,
+           type = "SCAR"),
+    regexp = "Please provide valid names for 'type', 'dist_e' and 'dist_c'")
+
+  expect_error(
+    hurdle(data = MenSS, model.eff = e ~ trt, dist_e = "norm",
+           model.cost = c ~ trt, dist_c = 1,
+           model.se = se ~ 1, model.sc = sc ~ 1, se = 1, sc = 0,
+           type = "SCAR"),
+    regexp = "Please provide valid names for 'type', 'dist_e' and 'dist_c'")
+
+  expect_error(
+    hurdle(data = MenSS, model.eff = e ~ trt, dist_e = "nrm",
+           model.cost = c ~ trt, dist_c = "norm",
+           model.se = se ~ 1, model.sc = sc ~ 1, se = 1, sc = 0,
+           type = "SCAR"),
+    regexp = "Distributions available are 'norm', 'beta', 'gamma', 'logis', 'exp', 'weib', 'negbin', 'pois', 'bern'  for the effects
+         and 'norm', 'gamma', 'lnorm' for the costs")
+
+  expect_error(
+    hurdle(data = MenSS, model.eff = e ~ trt, dist_e = "norm",
+           model.cost = c ~ trt, dist_c = "nrm",
+           model.se = se ~ 1, model.sc = sc ~ 1, se = 1, sc = 0,
+           type = "SCAR"),
+    regexp = "Distributions available are 'norm', 'beta', 'gamma', 'logis', 'exp', 'weib', 'negbin', 'pois', 'bern'  for the effects
+         and 'norm', 'gamma', 'lnorm' for the costs")
+
+  expect_error(
+    hurdle(data = MenSS, model.eff = e ~ trt, dist_e = "norm",
+           model.cost = c ~ trt, dist_c = "norm",
+           model.se = se ~ 1, model.sc = sc ~ 1, se = 1, sc = 0,
+           type = "SCR"),
+    regexp = "Types available are 'SCAR' and 'SAR'")
+
+  expect_error(
+    hurdle(data = MenSS, model.eff = e ~ trt, dist_e = "norm",
+           model.cost = c ~ trt, dist_c = "norm",
+           model.se = se ~ 1, model.sc = sc ~ 1, se = 1, sc = 0,
+           type = "SCAR", prob = c(-0.2, 1)),
+    regexp = "Please provide a lower and an upper quantile for the imputed data distribution")
+
+  expect_error(
+    hurdle(data = MenSS, model.eff = e ~ trt, dist_e = "norm",
+           model.cost = c ~ trt, dist_c = "norm",
+           model.se = se ~ 1, model.sc = sc ~ 1, se = 1, sc = 0,
+           type = "SCAR", n.chains = 0.2),
+    regexp = "Please provide valid integer values for 'n.chains', 'n.iter', 'n.burnin', 'n.thin'")
+
+  expect_error(
+    hurdle(data = MenSS, model.eff = e ~ trt, dist_e = "norm",
+           model.cost = c ~ trt, dist_c = "norm",
+           model.se = se ~ 1, model.sc = sc ~ 1, se = 1, sc = 0,
+           type = "SCAR", n.iter = 0.2),
+    regexp = "Please provide valid integer values for 'n.chains', 'n.iter', 'n.burnin', 'n.thin'")
+
+  expect_error(
+    hurdle(data = MenSS, model.eff = e ~ trt, dist_e = "norm",
+           model.cost = c ~ trt, dist_c = "norm",
+           model.se = se ~ 1, model.sc = sc ~ 1, se = 1, sc = 0,
+           type = "SCAR", n.burnin = 0.2),
+    regexp = "Please provide valid integer values for 'n.chains', 'n.iter', 'n.burnin', 'n.thin'")
+
+  expect_error(
+    hurdle(data = MenSS, model.eff = e ~ trt, dist_e = "norm",
+           model.cost = c ~ trt, dist_c = "norm",
+           model.se = se ~ 1, model.sc = sc ~ 1, se = 1, sc = 0,
+           type = "SCAR", n.thin = 0.2),
+    regexp = "Please provide valid integer values for 'n.chains', 'n.iter', 'n.burnin', 'n.thin'")
+
+  expect_error(
+    hurdle(data = MenSS, model.eff = e ~ trt, dist_e = "norm",
+           model.cost = c ~ trt, dist_c = "norm",
+           model.se = se ~ 1, model.sc = sc ~ 1, se = 1, sc = 0,
+           type = "SCAR", save_model = "yes"),
+    regexp = "Please provide 'save_model', 'center' as logical values")
+
+  expect_error(
+    hurdle(data = MenSS, model.eff = 1, dist_e = "norm",
+           model.cost = c ~ trt, dist_c = "norm",
+           model.se = se ~ 1, model.sc = sc ~ 1, se = 1, sc = 0,
+           type = "SCAR"),
+    regexp = "`model.eff` and/or `model.cost` must be formula objects")
+
+  expect_error(
+    hurdle(data = MenSS, model.eff = e ~ trt, dist_e = "norm",
+           model.cost = 1, dist_c = "norm",
+           model.se = se ~ 1, model.sc = sc ~ 1, se = 1, sc = 0,
+           type = "SCAR"),
+    regexp = "`model.eff` and/or `model.cost` must be formula objects")
+
+  expect_error(
+    hurdle(data = MenSS, model.eff = e ~ trt + e, dist_e = "norm",
+           model.cost = c ~ trt, dist_c = "norm",
+           model.se = se ~ 1, model.sc = sc ~ 1, se = 1, sc = 0,
+           type = "SCAR"),
+    regexp = "Please remove 'e' from the right-hand side of 'model.eff' and/or 'c' from the right-hand side of 'model.cost'")
+
+  expect_error(
+    hurdle(data = MenSS, model.eff = e ~ trt, dist_e = "norm",
+           model.cost = c ~ trt + c, dist_c = "norm",
+           model.se = se ~ 1, model.sc = sc ~ 1, se = 1, sc = 0,
+           type = "SCAR"),
+    regexp = "Please remove 'e' from the right-hand side of 'model.eff' and/or 'c' from the right-hand side of 'model.cost'")
+
+  expect_error(
+    hurdle(data = MenSS, model.eff = age ~ trt, dist_e = "norm",
+           model.cost = c ~ trt, dist_c = "norm",
+           model.se = se ~ 1, model.sc = sc ~ 1, se = 1, sc = 0,
+           type = "SCAR"),
+    regexp = "Please set 'e' as the response in 'model.eff'")
+
+  expect_error(
+    hurdle(data = MenSS, model.eff = e ~ trt, dist_e = "norm",
+           model.cost = age ~ trt, dist_c = "norm",
+           model.se = se ~ 1, model.sc = sc ~ 1, se = 1, sc = 0,
+           type = "SCAR"),
+    regexp = "Please set 'c' as the response in 'model.cost'")
+
+  expect_error(
+    hurdle(data = MenSS, model.eff = e ~ trt, dist_e = "norm",
+           model.cost = c ~ trt + e*age, dist_c = "norm",
+           model.se = se ~ 1, model.sc = sc ~ 1, se = 1, sc = 0,
+           type = "SCAR"),
+    regexp = "No interaction effects for 'e' is allowed")
+
+  expect_error(
+    hurdle(data = MenSS, model.eff = e ~ age, dist_e = "norm",
+           model.cost = c ~ trt, dist_c = "norm",
+           model.se = se ~ 1, model.sc = sc ~ 1, se = 1, sc = 0,
+           type = "SCAR"),
+    regexp = "Treatment indicator must be provided as covariate in 'model.eff' and/or 'model.cost'")
+
+  expect_error(
+    hurdle(data = MenSS, model.eff = e ~ trt, dist_e = "norm",
+           model.cost = c ~ age, dist_c = "norm",
+           model.se = se ~ 1, model.sc = sc ~ 1, se = 1, sc = 0,
+           type = "SCAR"),
+    regexp = "Treatment indicator must be provided as covariate in 'model.eff' and/or 'model.cost'")
+
+
+  expect_error(
+    hurdle(data = MenSS, model.eff = e ~ trt + (1 | site) + (1 | site), dist_e = "norm",
+           model.cost = c ~ trt, dist_c = "norm",
+           model.se = se ~ 1, model.sc = sc ~ 1, se = 1, sc = 0,
+           type = "SCAR"),
+    regexp = "Random effects can only be included through a single expression within brackets")
+
+  expect_error(
+    hurdle(data = MenSS, model.eff = e ~ trt + c, dist_e = "norm",
+           model.cost = c ~ trt, dist_c = "norm",
+           model.se = se ~ 1, model.sc = sc ~ 1, se = 1, sc = 0,
+           type = "SCAR"),
+    regexp = "Missing covariates cannot be included in the model")
+
+  expect_error(
+    hurdle(data = MenSS, model.eff = e ~ trt, dist_e = "norm",
+           model.cost = c ~ trt, dist_c = "norm",
+           model.se = se ~ age, model.sc = sc ~ age, se = 1, sc = 0,
+           type = "SCAR"),
+    regexp = "Please remove covariates from 'model.se' and/or 'mode.sc' if 'SCAR' type selected.")
+
+  expect_error(
+    hurdle(data = MenSS, model.eff = e ~ trt, dist_e = "norm",
+           model.cost = c ~ trt, dist_c = "norm",
+           model.se = se ~ 1, model.sc = sc ~ 1, se = 1, sc = 0,
+           type = "SAR"),
+    regexp = "Please add covariates to 'model.se' and/or 'mode.sc' if 'SAR' type selected.")
+
+  expect_error(
+    hurdle(data = MenSS, model.eff = e ~ trt, dist_e = "norm",
+           model.cost = c ~ trt, dist_c = "norm",
+           model.se = se ~ 1, model.sc = sc ~ 1, se = 1, sc = 0,
+           type = "SCAR", prior = list(
+              "alpha.prior" = c("norm", 2, 1),
+              "alpha.prior" = c("norm", 2, 1))),
+    regexp = "You cannot provide multiple priors with the same name")
+
+
+
+
+
+  expect_error(
+    hurdle(data = MenSS, model.eff = e ~ trt, dist_e = "norm",
+           model.cost = c ~ trt, dist_c = "norm",
+           model.se = se ~ 1, model.sc = sc ~ 1, se = 1, sc = 0,
+           type = "SCAR", se.prior = c(1, 2)),
+    regexp = "single value priors on std for structural values must be provided")
+
+  expect_error(
+    hurdle(data = MenSS, model.eff = e ~ trt, dist_e = "norm",
+           model.cost = c ~ trt, dist_c = "norm",
+           model.se = se ~ 1, model.sc = sc ~ 1, se = 1, sc = 0,
+           type = "SCAR", sc.prior = c(1, 2)),
+    regexp = "single value priors on std for structural values must be provided")
+
+  expect_error(
+    hurdle(data = MenSS, model.eff = e ~ trt, dist_e = "norm",
+           model.cost = c ~ trt, dist_c = "norm",
+           model.se = se ~ 1, model.sc = sc ~ 1, se = 1, sc = 0,
+           type = "SCAR", s_e = c(1, 1)),
+    regexp = "Please provide a valid structural value indicator vector")
+
+  expect_error(
+    hurdle(data = MenSS, model.eff = e ~ trt, dist_e = "norm",
+           model.cost = c ~ trt, dist_c = "norm",
+           model.se = se ~ 1, model.sc = sc ~ 1, se = 1, sc = 0,
+           type = "SCAR", s_c = c(1, 1)),
+    regexp = "Please provide a valid structural value indicator vector")
+
+  expect_error(
+    hurdle(data = MenSS, model.eff = e ~ trt, dist_e = "norm",
+           model.cost = c ~ trt, dist_c = "norm",
+           model.sc = sc ~ 1, se = NULL, sc = 0,
+           type = "SCAR", s_e = MenSS$sti.0),
+    regexp = "No structural values provided in the model formula")
+
+  expect_error(
+    hurdle(data = MenSS, model.eff = e ~ trt, dist_e = "norm",
+           model.cost = c ~ trt, dist_c = "norm",
+           model.sc = se ~ 1, se = 1, sc = NULL,
+           type = "SCAR", s_c = MenSS$sti.0),
+    regexp = "No structural values provided in the model formula")
+
+
+
+  load(test_path("testdata/PBS.RData"))
+
+  expect_error(
+    lmdm(data = PBS$e, model.eff = e ~ trt, dist_e = "norm",
+              model.cost = c ~ trt, dist_c = "norm",
+              type = "MAR"),
+    regexp = "data must be in data frame format")
+
+  expect_error(
+    lmdm(data = PBS[, 1:2], model.eff = e ~ trt, dist_e = "norm",
+              model.cost = c ~ trt, dist_c = "norm",
+              type = "MAR"),
+    regexp = "Please rename or provide names in the data as 'e',
+         'c', 'trt' and 'time' for the effectiveness, cost, treatment and time variables")
+
+  expect_error(
+    lmdm(data = PBS, model.eff = e ~ trt, dist_e = "norm",
+              model.cost = c ~ trt, dist_c = "norm",
+              type = 1),
+    regexp = "Please provide valid names for 'type', 'dist_e' and 'dist_c'")
+
+  expect_error(
+    lmdm(data = PBS, model.eff = e ~ trt, dist_e = 1,
+              model.cost = c ~ trt, dist_c = "norm",
+              type = "MAR"),
+    regexp = "Please provide valid names for 'type', 'dist_e' and 'dist_c'")
+
+  expect_error(
+    lmdm(data = PBS, model.eff = e ~ trt, dist_e = "norm",
+              model.cost = c ~ trt, dist_c = 1,
+              type = "MAR"),
+    regexp = "Please provide valid names for 'type', 'dist_e' and 'dist_c'")
+
+  expect_error(
+    lmdm(data = PBS, model.eff = e ~ trt, dist_e = "nrm",
+              model.cost = c ~ trt, dist_c = "norm",
+              type = "MAR"),
+    regexp = "Distributions available are 'norm', 'beta', 'gamma', 'logis', 'exp', 'weib', 'negbin', 'pois', 'bern'  for the effects
+         and 'norm', 'gamma', 'lnorm' for the costs")
+
+  expect_error(
+    lmdm(data = PBS, model.eff = e ~ trt, dist_e = "nrm",
+              model.cost = c ~ trt, dist_c = "nrm",
+              type = "MAR"),
+    regexp = "Distributions available are 'norm', 'beta', 'gamma', 'logis', 'exp', 'weib', 'negbin', 'pois', 'bern'  for the effects
+         and 'norm', 'gamma', 'lnorm' for the costs")
+
+  expect_error(
+    lmdm(data = PBS, model.eff = e ~ trt, dist_e = "norm",
+              model.cost = c ~ trt, dist_c = "norm",
+              type = "CAR"),
+    regexp = "Types available are 'MAR' and 'MNAR'")
+
+  expect_error(
+    lmdm(data = PBS, model.eff = e ~ trt, dist_e = "norm",
+              model.cost = c ~ trt, dist_c = "norm",
+              type = "MAR", prob = c(-0.2, 1)),
+    regexp = "Please provide a lower and an upper quantile for the imputed data distribution")
+
+  expect_error(
+    lmdm(data = PBS, model.eff = e ~ trt, dist_e = "norm",
+              model.cost = c ~ trt, dist_c = "norm",
+              type = "MAR", n.chains = 0.2),
+    regexp = "Please provide valid integer values for 'n.chains', 'n.iter', 'n.burnin', 'n.thin'")
+
+  expect_error(
+    lmdm(data = PBS, model.eff = e ~ trt, dist_e = "norm",
+              model.cost = c ~ trt, dist_c = "norm",
+              type = "MAR", n.iter = 0.2),
+    regexp = "Please provide valid integer values for 'n.chains', 'n.iter', 'n.burnin', 'n.thin'")
+
+  expect_error(
+    lmdm(data = PBS, model.eff = e ~ trt, dist_e = "norm",
+              model.cost = c ~ trt, dist_c = "norm",
+              type = "MAR", n.burnin = 0.2),
+    regexp = "Please provide valid integer values for 'n.chains', 'n.iter', 'n.burnin', 'n.thin'")
+
+  expect_error(
+    lmdm(data = PBS, model.eff = e ~ trt, dist_e = "norm",
+              model.cost = c ~ trt, dist_c = "norm",
+              type = "MAR", n.thin = 0.2),
+    regexp = "Please provide valid integer values for 'n.chains', 'n.iter', 'n.burnin', 'n.thin'")
+
+  expect_error(
+    lmdm(data = PBS, model.eff = e ~ trt, dist_e = "norm",
+              model.cost = c ~ trt, dist_c = "norm",
+              type = "MAR", save_model = "yes"),
+    regexp = "Please provide 'save_model', 'center' as logical values")
+
+  expect_error(
+    lmdm(data = PBS, model.eff = 1, dist_e = "norm",
+              model.cost = c ~ trt, dist_c = "norm",
+              type = "MAR"),
+    regexp = "`model.eff` and/or `model.cost` must be formula objects")
+
+  expect_error(
+    lmdm(data = PBS, model.eff = e ~ trt, dist_e = "norm",
+              model.cost = 1, dist_c = "norm",
+              type = "MAR"),
+    regexp = "`model.eff` and/or `model.cost` must be formula objects")
+
+  expect_error(
+    lmdm(data = PBS, model.eff = e ~ trt + e, dist_e = "norm",
+              model.cost = c ~ trt, dist_c = "norm",
+              type = "MAR"),
+    regexp = "Please remove 'e' from the right-hand side of 'model.eff' and/or 'c' from the right-hand side of 'model.cost'")
+
+  expect_error(
+    lmdm(data = PBS, model.eff = e ~ trt, dist_e = "norm",
+              model.cost = c ~ trt + c, dist_c = "norm",
+              type = "MAR"),
+    regexp = "Please remove 'e' from the right-hand side of 'model.eff' and/or 'c' from the right-hand side of 'model.cost'")
+
+  expect_error(
+    lmdm(data = PBS, model.eff = age ~ trt, dist_e = "norm",
+              model.cost = c ~ trt, dist_c = "norm",
+              type = "MAR"),
+    regexp = "Please set 'e' as the response in 'model.eff'")
+
+  expect_error(
+    lmdm(data = PBS, model.eff = e ~ trt, dist_e = "norm",
+              model.cost = age ~ trt, dist_c = "norm",
+              type = "MAR"),
+    regexp = "Please set 'c' as the response in 'model.cost'")
+
+  expect_error(
+    lmdm(data = PBS, model.eff = e ~ trt, dist_e = "norm",
+              model.cost = c ~ trt + e*age, dist_c = "norm",
+              type = "MAR"),
+    regexp = "No interaction effects for 'e' is allowed")
+
+  expect_error(
+    lmdm(data = PBS, model.eff = e ~ age, dist_e = "norm",
+              model.cost = c ~ trt, dist_c = "norm",
+              type = "MAR"),
+    regexp = "Treatment indicator must be provided as covariate in 'model.eff' and/or 'model.cost'")
+
+  expect_error(
+    lmdm(data = PBS, model.eff = e ~ trt, dist_e = "norm",
+              model.cost = c ~ age, dist_c = "norm",
+              type = "MAR"),
+    regexp = "Treatment indicator must be provided as covariate in 'model.eff' and/or 'model.cost'")
+
+  expect_error(
+    lmdm(data = PBS, model.eff = e ~ trt, dist_e = "norm",
+         model.cost = c ~ trt, dist_c = "norm", time_dep = "ARR",
+         type = "MAR"),
+    regexp = "Time dependence structures available are 'AR1', 'biv' and 'none'")
+
+  expect_error(
+    lmdm(data = PBS, model.eff = e ~ trt + (1 | site) + (1 | site), dist_e = "norm",
+              model.cost = c ~ trt, dist_c = "norm",
+              type = "MAR"),
+    regexp = "Random effects can only be included through a single expression within brackets")
+
+  expect_error(
+    lmdm(data = PBS, model.eff = e ~ trt + c, dist_e = "norm",
+              model.cost = c ~ trt, dist_c = "norm",
+              type = "MAR"),
+    regexp = "Missing covariates cannot be included in the model")
+
+  expect_error(
+    lmdm(data = PBS, model.eff = e ~ trt, dist_e = "norm",
+              model.cost = c ~ trt, dist_c = "norm",
+              type = "MAR", model.me = me ~ e),
+    regexp = "Please remove 'e' and/or 'c' from 'model.me' and/or 'model.mc' if 'MAR' type selected")
+
+  expect_error(
+    lmdm(data = PBS, model.eff = e ~ trt, dist_e = "norm",
+              model.cost = c ~ trt, dist_c = "norm",
+              type = "MAR", model.mc = mc ~ c),
+    regexp = "Please remove 'e' and/or 'c' from 'model.me' and/or 'model.mc' if 'MAR' type selected")
+
+  expect_error(
+    lmdm(data = PBS, model.eff = e ~ trt, dist_e = "norm",
+              model.cost = c ~ trt, dist_c = "norm",
+              type = "MNAR"),
+    regexp = "Please add 'e' and/or 'c' to 'model.me' and/or 'model.mc' if 'MNAR' type selected")
+
+  expect_error(
+    lmdm(data = PBS, model.eff = e ~ trt, dist_e = "norm",
+         model.cost = c ~ trt + e + (e | marital), dist_c = "norm",
+         type = "MAR", time_dep = "none"),
+    regexp = "Selection of 'none' dependence does not allow inclusion of the effects in the cost model.")
+
+  expect_error(
+    lmdm(data = PBS, model.eff = e ~ trt, dist_e = "norm",
+         model.cost = c ~ trt, dist_c = "norm",
+         type = "MAR", time_dep = "AR1"),
+    regexp = "Exclusion of the effects from the cost model does not allow time dependence.")
+
+  expect_error(
+    lmdm(data = PBS, model.eff = e ~ trt, dist_e = "norm",
+         model.cost = c ~ trt + e + (e | marital), dist_c = "norm",
+         type = "MAR", time_dep = "AR1"),
+    regexp = "Exclusion of the random effects from the effect model does not allow random effects time dependence.")
+
+  expect_error(
+    lmdm(data = PBS, model.eff = e ~ trt, dist_e = "norm",
+              model.cost = c ~ trt, dist_c = "norm",
+              type = "MAR", time_dep = "none", prior = list(
+                "alpha.prior" = c("norm", 2, 1),
+                "alpha.prior" = c("norm", 2, 1))),
+    regexp = "You cannot provide multiple priors with the same name")
+
+  expect_error(
+    lmdm(data = PBS, model.eff = e ~ trt, dist_e = "norm",
+         model.cost = c ~ trt, dist_c = "norm",
+         type = "MNAR", time_dep = "none",
+         model.me = me ~ 0 + e, model.mc = mc ~ 1),
+    regexp = "MNAR model specification does not allow non-intercept models.")
+
+})
