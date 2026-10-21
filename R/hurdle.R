@@ -254,12 +254,12 @@ hurdle <- function(data, model.eff, model.cost,
   clusn_se <- clusn_sc <- NULL
   if(!is.null(random_e) & length(random_e) > 1 | !is.null(random_c) & length(random_c) > 1) {
     stop("Random effects can only be included through a single expression within brackets")}
-  if(!all(names(model.frame(fixed_e, data = data)) %in% c("e", names(cov_matrix))) |
-     !all(names(model.frame(fixed_c, data = data)) %in% c("c", "e", names(cov_matrix)))) {
-    stop("Missing covariates cannot be included in the model")}
-  if(!all(names(model.frame(fixed_e, data = data)) %in% names(data)) |
-     !all(names(model.frame(fixed_c, data = data)) %in% names(data))) {
+  if(!all(all.vars(fixed_e)[-1] %in% names(data)) |
+     !all(all.vars(fixed_c)[-1] %in% names(data))) {
     stop("Please provide names in the formula that correspond to those in the data")}
+  if(!all(all.vars(fixed_e) %in% c("e", names(cov_matrix))) |
+     !all(all.vars(fixed_c) %in% c("c", "e", names(cov_matrix)))) {
+    stop("Missing covariates cannot be included in the model")}
   if(attr(terms(fixed_e), "intercept") == 0 | attr(terms(fixed_c), "intercept") == 0) {
     stop("No-intercept models are not allowed. Please remove `0` from `model.eff` and/or `model.cost`")}
   if(attr(terms(fixed_se), "intercept") == 0 | attr(terms(fixed_sc), "intercept") == 0) {
@@ -493,7 +493,7 @@ hurdle <- function(data, model.eff, model.cost,
     par_prior_random <- c("mu.g.prior.e", "mu.g.prior.c", "mu.a.prior", "mu.b.prior",
                           "mu.b_f.prior", "s.g.prior.e", "s.g.prior.c",
                           "s.a.prior", "s.b.prior", "s.b_f.prior")
-    stop_mes <- "Please specify priors using required names/values and according to assumed model structure. Type ''help(hurdle)'' for more details."
+    stop_mes <- "Please specify priors using required names/values and according to assumed model structure. Type 'help(hurdle)' for more details"
     if(!all(names(list_check_vector) %in% c(par_prior_fixed, par_prior_random))) { stop(stop_mes)}
     if(length(model_e_random) == 0 | pe_random == 0) {
       if(any(names(list_check_vector) %in% c("mu.a.prior", "s.a.prior"))) { stop(stop_mes)}

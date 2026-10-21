@@ -176,6 +176,12 @@ test_that("input errors", {
     regexp = "Random effects can only be included through a single expression within brackets")
 
   expect_error(
+    selection(data = MenSS, model.eff = e ~ trt + ager, dist_e = "norm",
+              model.cost = c ~ trt, dist_c = "norm",
+              type = "MAR"),
+    regexp = "Please provide names in the formula that correspond to those in the data")
+
+  expect_error(
     selection(data = MenSS, model.eff = e ~ trt + c, dist_e = "norm",
               model.cost = c ~ trt, dist_c = "norm",
               type = "MAR"),
@@ -206,6 +212,14 @@ test_that("input errors", {
                 "alpha.prior" = c("norm", 2, 1),
                 "alpha.prior" = c("norm", 2, 1))),
     regexp = "You cannot provide multiple priors with the same name")
+
+  expect_error(
+    selection(data = MenSS, model.eff = e ~ trt, dist_e = "norm",
+              model.cost = c ~ trt, dist_c = "norm",
+              type = "MAR", prior = list(
+                "iotas.prior" = c("norm", 2, 1))),
+    regexp = "Please specify priors using required names/values and according to assumed model structure. Type 'help(selection)' for more details",
+    fixed = TRUE)
 
   expect_error(
     pattern(data = MenSS$e, model.eff = e ~ trt, dist_e = "norm",
@@ -379,12 +393,26 @@ test_that("input errors", {
     regexp = "Missing covariates cannot be included in the model")
 
   expect_error(
+    pattern(data = MenSS, model.eff = e ~ trt + ager, dist_e = "norm",
+              model.cost = c ~ trt, dist_c = "norm",
+              type = "MAR"),
+    regexp = "Please provide names in the formula that correspond to those in the data")
+
+  expect_error(
     pattern(data = MenSS, model.eff = e ~ trt, dist_e = "norm",
               model.cost = c ~ trt, dist_c = "norm",
               type = "MAR", prior = list(
                 "alpha.prior" = c("norm", 2, 1),
                 "alpha.prior" = c("norm", 2, 1))),
     regexp = "You cannot provide multiple priors with the same name")
+
+  expect_error(
+    pattern(data = MenSS, model.eff = e ~ trt, dist_e = "norm",
+            model.cost = c ~ trt, dist_c = "norm",
+            type = "MAR", prior = list(
+              "iotas.prior" = c("norm", 2, 1))),
+    regexp = "Please specify priors using required names/values and according to assumed model structure. Type 'help(pattern)' for more details",
+    fixed = TRUE)
 
   expect_error(
     pattern(data = MenSS, model.eff = e ~ trt, dist_e = "norm",
@@ -585,7 +613,6 @@ test_that("input errors", {
            type = "SCAR"),
     regexp = "Treatment indicator must be provided as covariate in 'model.eff' and/or 'model.cost'")
 
-
   expect_error(
     hurdle(data = MenSS, model.eff = e ~ trt + (1 | site) + (1 | site), dist_e = "norm",
            model.cost = c ~ trt, dist_c = "norm",
@@ -599,6 +626,13 @@ test_that("input errors", {
            model.se = se ~ 1, model.sc = sc ~ 1, se = 1, sc = 0,
            type = "SCAR"),
     regexp = "Missing covariates cannot be included in the model")
+
+  expect_error(
+    hurdle(data = MenSS, model.eff = e ~ trt + ager, dist_e = "norm",
+           model.cost = c ~ trt, dist_c = "norm",
+           model.se = se ~ 1, model.sc = sc ~ 1, se = 1, sc = 0,
+           type = "SCAR"),
+    regexp = "Please provide names in the formula that correspond to those in the data")
 
   expect_error(
     hurdle(data = MenSS, model.eff = e ~ trt, dist_e = "norm",
@@ -623,9 +657,14 @@ test_that("input errors", {
               "alpha.prior" = c("norm", 2, 1))),
     regexp = "You cannot provide multiple priors with the same name")
 
-
-
-
+  expect_error(
+    hurdle(data = MenSS, model.eff = e ~ trt, dist_e = "norm",
+           model.cost = c ~ trt, dist_c = "norm",
+           model.se = se ~ 1, model.sc = sc ~ 1, se = 1, sc = 0,
+           type = "SCAR", prior = list(
+             "iotas.prior" = c("norm", 2, 1))),
+    regexp = "Please specify priors using required names/values and according to assumed model structure. Type 'help(hurdle)' for more details",
+    fixed = TRUE)
 
   expect_error(
     hurdle(data = MenSS, model.eff = e ~ trt, dist_e = "norm",
@@ -857,6 +896,12 @@ test_that("input errors", {
     regexp = "Missing covariates cannot be included in the model")
 
   expect_error(
+    lmdm(data = PBS, model.eff = e ~ trt + ager, dist_e = "norm",
+           model.cost = c ~ trt, dist_c = "norm",
+           type = "MAR"),
+    regexp = "Please provide names in the formula that correspond to those in the data")
+
+  expect_error(
     lmdm(data = PBS, model.eff = e ~ trt, dist_e = "norm",
               model.cost = c ~ trt, dist_c = "norm",
               type = "MAR", model.me = me ~ e),
@@ -899,5 +944,13 @@ test_that("input errors", {
                 "alpha.prior" = c("norm", 2, 1),
                 "alpha.prior" = c("norm", 2, 1))),
     regexp = "You cannot provide multiple priors with the same name")
+
+  expect_error(
+    lmdm(data = PBS, model.eff = e ~ trt, dist_e = "norm",
+         model.cost = c ~ trt, dist_c = "norm",
+         type = "MAR", time_dep = "none", prior = list(
+           "iotas.prior" = c("norm", 2, 1))),
+    regexp = "Please specify priors using required names/values and according to assumed model structure. Type 'help(lmdm)' for more details",
+    fixed = TRUE)
 
 })

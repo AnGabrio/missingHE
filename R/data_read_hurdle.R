@@ -2,30 +2,30 @@
 #'
 #' This internal function imports the data and outputs only those variables that are needed to run the hurdle model
 #' according to the information provided by the user.
-#' @param data A data frame in which to find variables supplied in \code{model.eff}, \code{model.cost} (model formulas for effects and costs) 
+#' @param data A data frame in which to find variables supplied in \code{model.eff}, \code{model.cost} (model formulas for effects and costs)
 #' and \code{model.se}, \code{model.sc} (model formulas for the structural effect and cost models) . Among these,
-#' effectiveness, cost and treatment indicator variables must always be provided and named 'e', 'c' and 'trt' respectively. 
+#' effectiveness, cost and treatment indicator variables must always be provided and named 'e', 'c' and 'trt' respectively.
 #' @param model.eff A formula expression in conventional \code{R} linear modelling syntax. The response must be a health economics
-#'  effectiveness outcome ('e') whose name must correspond to that used in \code{data}, and 
-#'  any covariates are given on the right-hand side. If there are no covariates, specify \code{1} on the right hand side. 
+#'  effectiveness outcome ('e') whose name must correspond to that used in \code{data}, and
+#'  any covariates are given on the right-hand side. If there are no covariates, specify \code{1} on the right hand side.
 #'  Random effects can also be specified for each model parameter.
 #' @param model.cost A formula expression in conventional \code{R} linear modelling syntax. The response must be a health economics
-#'  cost outcome ('c') whose name must correspond to that used in \code{data}, and any covariates are given on the right-hand side. 
-#'  If there are no covariates, specify \code{1} on the right hand side. By default, covariates are placed on the "location" 
+#'  cost outcome ('c') whose name must correspond to that used in \code{data}, and any covariates are given on the right-hand side.
+#'  If there are no covariates, specify \code{1} on the right hand side. By default, covariates are placed on the "location"
 #'  parameter of the distribution through a linear model. Random effects can also be specified for each model parameter.
 #' @param model.se A formula expression in conventional \code{R} linear modelling syntax. The response must be a health economics
-#'  effectiveness outcome ('e') whose name must correspond to that used in \code{data}, and 
+#'  effectiveness outcome ('e') whose name must correspond to that used in \code{data}, and
 #'  any covariates used to estimate the probability of structural effects are given on the right-hand side. If there are no covariates, specify \code{1} on the right hand side.
 #'  By default, covariates are placed on the "probability" parameter for the structural effects through a logistic-linear model. Random effects can also be specified for each model parameter.
 #' @param model.sc A formula expression in conventional \code{R} linear modelling syntax. The response must be a health economics
-#'  cost outcome ('c') whose name must correspond to that used in \code{data}, and 
+#'  cost outcome ('c') whose name must correspond to that used in \code{data}, and
 #'  any covariates used to estimate the probability of structural costs are given on the right-hand side. If there are no covariates, specify \code{1} on the right hand side.
 #'  By default, covariates are placed on the "probability" parameter for the structural costs through a logistic-linear model. Random effects can also be specified for each model parameter.
-#' @param se Structural value to be found in the effect data defined in \code{data}. If set to \code{NULL}, 
+#' @param se Structural value to be found in the effect data defined in \code{data}. If set to \code{NULL},
 #' no structural value is chosen and a standard model for the effects is run.
-#' @param sc Structural value to be found in the cost data defined in \code{data}. If set to \code{NULL}, 
+#' @param sc Structural value to be found in the cost data defined in \code{data}. If set to \code{NULL},
 #' no structural value is chosen and a standard model for the costs is run.
-#' @param cov_matrix Covariance matrix containing all model covariates. 
+#' @param cov_matrix Covariance matrix containing all model covariates.
 #' @param fixed_e Formula of the fixed effects specified in the effectiveness model.
 #' @param fixed_c Formula of the fixed effects specified in the cost model.
 #' @param random_e Formula of the random effects specified in the effectiveness model.
@@ -43,8 +43,8 @@
 #' #
 #' #
 
-data_read_hurdle <- function(data, model.eff, model.cost, 
-                             model.se, model.sc, se, sc, cov_matrix, 
+data_read_hurdle <- function(data, model.eff, model.cost,
+                             model.se, model.sc, se, sc, cov_matrix,
                              type, center, fixed_e, fixed_c, random_e, random_c,
                              trt_lev, trt_pos) {
   data2 <- data
@@ -64,7 +64,7 @@ data_read_hurdle <- function(data, model.eff, model.cost,
   fname_re_e_coeff <- as.formula(paste("e", "0", sep=" ~ "))
   fname_re_c_coeff <- as.formula(paste("c", "0", sep=" ~ "))
   fname_re_se_coeff <- as.formula(paste("se", "0", sep=" ~ "))
-  fname_re_sc_coeff <- as.formula(paste("sc", "0", sep=" ~ "))  
+  fname_re_sc_coeff <- as.formula(paste("sc", "0", sep=" ~ "))
   name_re_e_coeff <- name_re_c_coeff <- NULL
   if(!is.null(random_e)){
     name_re_e_coeff <- sub("\\|.*", "", random_e)
@@ -75,8 +75,8 @@ data_read_hurdle <- function(data, model.eff, model.cost,
     if(!name_clus_e %in% names(cov_matrix)) { stop("Please provide the clustering variable in the dataset")}
     if(strsplit(name_re_e_coeff, "")[[1]][1] == 0) {
       no_random_int_e <- TRUE} else { no_random_int_e <- FALSE}
-    if(no_random_int_e) { 
-      name_re_e_coeff <- sub("[0]", "", name_re_e_coeff) 
+    if(no_random_int_e) {
+      name_re_e_coeff <- sub("[0]", "", name_re_e_coeff)
       name_re_e_coeff <- sub("[+]", "", name_re_e_coeff)}
     if(name_re_e_coeff == "" | name_re_e_coeff == " ") { stop("Please state for which variables random effects are assumed")}
     fname_re_e_coeff <- as.formula(paste("e", name_re_e_coeff, sep = " ~ "))
@@ -102,7 +102,7 @@ data_read_hurdle <- function(data, model.eff, model.cost,
       stop("Please make sure ordered levels of clustering variables have no gaps and start from 1")}
     clusnt_e <- list()
     for(i in trt_lev) { clusnt_e[[i]] <- clusn_e[trt_index[[i]]]}
-  }  
+  }
   if(!is.null(random_c)){
     name_re_c_coeff <- sub("\\|.*", "", random_c)
     if(grepl("0 + 1", name_re_c_coeff, fixed = TRUE)) { stop("Please either remove or add a random intercept")}
@@ -112,8 +112,8 @@ data_read_hurdle <- function(data, model.eff, model.cost,
     if(!name_clus_c %in% names(cov_matrix)) { stop("Please provide the clustering variable in the dataset")}
     if(strsplit(name_re_c_coeff, "")[[1]][1] == 0) {
       no_random_int_c <- TRUE} else {no_random_int_c <- FALSE}
-    if(no_random_int_c) { 
-      name_re_c_coeff <- sub("[0]", "", name_re_c_coeff) 
+    if(no_random_int_c) {
+      name_re_c_coeff <- sub("[0]", "", name_re_c_coeff)
       name_re_c_coeff <- sub("[+]", "", name_re_c_coeff)}
     if(name_re_c_coeff == "" | name_re_c_coeff == " ") { stop("Please state for which variables random effects are assumed")}
     if(gsub(" ", "", name_re_c_coeff) == "e" & !no_random_int_c) { name_re_c_coeff <- "1 + e"}
@@ -124,7 +124,7 @@ data_read_hurdle <- function(data, model.eff, model.cost,
       stop("Please remove 'c' from the random effects of 'model.cost'")}
     if("e" %in% labels(terms(fname_re_c_coeff))) {
       if(length(grep(":e", labels(terms(fname_re_c_coeff)))) != 0 | length(grep("e:", labels(terms(fname_re_c_coeff)))) != 0) {
-        stop("No interaction effects for 'e' are allowed")} 
+        stop("No interaction effects for 'e' are allowed")}
     }
     mf_c_random <- model.frame(formula = fname_re_c_coeff, data = data)
     x_c_random <- model.matrix(attr(mf_c_random, "terms"), data = mf_c_random)
@@ -144,7 +144,7 @@ data_read_hurdle <- function(data, model.eff, model.cost,
       stop("Please make sure ordered levels of clustering variables have no gaps and start from 1")}
     clusnt_c <- list()
     for(i in trt_lev) { clusnt_c[[i]] <- clusn_c[trt_index[[i]]]}
-  }  
+  }
   y_e <- model.response(mf_e_fixed)
   y_c <- model.response(mf_c_fixed)
   y_e[which(is.na(data2$e))] <- NA
@@ -157,13 +157,13 @@ data_read_hurdle <- function(data, model.eff, model.cost,
   m_cost <- ifelse(is.na(data$c), 1, 0)
   data$me <- m_eff
   data$mc <- m_cost
-  if(!is.null(se)) { 
+  if(!is.null(se)) {
     s_eff <- ifelse(data$e == se, 1, 0)
     data$se <- s_eff
   } else {
     s_eff <- NULL
     }
-  if(!is.null(sc)) { 
+  if(!is.null(sc)) {
     s_cost <- ifelse(data$c == sc, 1, 0)
     data$sc <- s_cost
   } else {
@@ -176,7 +176,7 @@ data_read_hurdle <- function(data, model.eff, model.cost,
     x_c_fixed <- subset(x_c_hold_fixed, select = -c(e))
   }
   efft <- costt <- m_efft <- m_costt <- s_efft <- s_costt <- list()
-  n_obs_eff <- n_obs_cost <- setNames(trt_pos, trt_lev) 
+  n_obs_eff <- n_obs_cost <- setNames(trt_pos, trt_lev)
   if(!is.null(se)) { n_ns_eff <- setNames(trt_pos, trt_lev)} else { n_ns_eff <- NULL}
   if(!is.null(sc)) { n_ns_cost <- setNames(trt_pos, trt_lev)} else { n_ns_cost <- NULL}
   for(i in trt_lev) {
@@ -200,7 +200,7 @@ data_read_hurdle <- function(data, model.eff, model.cost,
       s_costt[[i]] <- s_cost[trt_index[[i]]]
       n_ns_cost[i] <- length(na.omit(costt[[i]])[na.omit(costt[[i]]) != sc])
     }
-  }  
+  }
   n_mis_eff <- n - n_obs_eff
   n_mis_cost <- n - n_obs_cost
   if(!is.null(se)) { n_s_eff <- n_obs_eff - n_ns_eff} else { n_s_eff <- NULL}
@@ -218,7 +218,7 @@ data_read_hurdle <- function(data, model.eff, model.cost,
     cov_c_fixed <- cov_c_center_fixed
     mean_cov_e_fixed <- mean_cov_e_center_fixed
     mean_cov_c_fixed <- mean_cov_c_center_fixed
-  }  
+  }
   if(!is.null(random_e)){
     n_clus_e <- setNames(table(clus_e), clus_e_lev)
     cov_e_random <- cov_e_center_random <- list()
@@ -262,16 +262,16 @@ data_read_hurdle <- function(data, model.eff, model.cost,
       cov_c_random <- cov_c_center_random
       mean_cov_c_random <- mean_cov_c_center_random
     }
-  }  
+  }
   data2$e[is.na(data2$e)] <- -999999
   data2$c[is.na(data2$c)] <- -999999
   data2$me <- m_eff
   data2$mc <- m_cost
-  if(!is.null(se)) { 
+  if(!is.null(se)) {
     data2$se <- s_eff
     data2$se[is.na(data2$se)] <- -999999
     }
-  if(!is.null(sc)) { 
+  if(!is.null(sc)) {
     data2$sc <- s_cost
     data2$sc[is.na(data2$sc)] <- -999999
     }
@@ -280,17 +280,17 @@ data_read_hurdle <- function(data, model.eff, model.cost,
   fixed_se <- nobars_(model.se)
   fixed_sc <- nobars_(model.sc)
   if(!is.null(se)) {
-    if(!all(names(model.frame(fixed_se, data = data2)) %in% c("se", "e", names(cov_matrix)))) {
-      stop("Partially-observed covariates cannot be included in the model")}
-    if(!all(names(model.frame(fixed_se, data = data2)) %in% names(data2))) {
+    if(!all(all.vars(fixed_se)[-1] %in% names(data2))) {
       stop("Please provide names in the formula that correspond to those in the data")}
-    if(names(model.frame(fixed_se, data = data2)[1]) != "se") {
+    if(all.vars(fixed_se)[1] != "se") {
       stop("Please set 'se' as the response in `model.se`")}
+    if(!all(all.vars(fixed_se) %in% c("se", "e", names(cov_matrix)))) {
+      stop("Missing covariates cannot be included in the model")}
     if("c" %in% names(model.frame(fixed_se, data = data2))) {
       stop("Please remove 'c' from the right-hand side of 'model.se'")}
     if(!is.null(sc)){
-      if("e" %in% names(model.frame(fixed_sc, data = data2))) {
-        stop("Please remove 'e' from the right-hand side of 'model.sc'")} 
+      if("e" %in% all.vars(fixed_sc)) {
+        stop("Please remove 'e' from the right-hand side of 'model.sc'")}
     }
     if("e" %in% labels(terms(fixed_se))) {
       if(length(grep(":e", labels(terms(fixed_se)))) != 0 | length(grep("e:", labels(terms(fixed_se)))) != 0) {
@@ -298,28 +298,28 @@ data_read_hurdle <- function(data, model.eff, model.cost,
     }
   }
   if(!is.null(sc)) {
-    if(!all(names(model.frame(fixed_sc, data = data2)) %in% c("sc", "c", names(cov_matrix)))) {
-      stop("Partially-observed covariates cannot be included in the model")}
-    if(!all(names(model.frame(fixed_sc, data = data2)) %in% names(data2))) {
+    if(!all(all.vars(fixed_sc)[-1] %in% names(data2))) {
       stop("Please provide names in the formula that correspond to those in the data")}
-    if(names(model.frame(fixed_sc, data = data2)[1]) != "sc") {
+    if(all.vars(fixed_sc)[1] != "sc") {
       stop("Please set 'sc' as the response in `model.sc`")}
+    if(!all(all.vars(fixed_sc) %in% c("sc", "c", names(cov_matrix)))) {
+      stop("Missing covariates cannot be included in the model")}
     if(!is.null(se)){
-      if("c" %in% names(model.frame(fixed_se, data = data2))) {
-        stop("Please remove 'c' from the right-hand side of 'model.se'")} 
+      if("c" %in% all.vars(fixed_se)) {
+        stop("Please remove 'c' from the right-hand side of 'model.se'")}
     }
     if("c" %in% labels(terms(fixed_sc))) {
       if(length(grep(":c", labels(terms(fixed_sc)))) != 0 | length(grep("c:", labels(terms(fixed_sc)))) != 0) {
-        stop("No interaction effects for 'c' are allowed")} 
+        stop("No interaction effects for 'c' are allowed")}
     }
   }
-  if(is.null(se)) { 
+  if(is.null(se)) {
     fixed_se <- se ~ 1
     covz_e_fixed <- mean_covz_e_fixed <- NULL}
   if(is.null(sc)) { fixed_sc <- sc ~ 1
   covz_c_fixed <- mean_covz_c_fixed <- NULL}
-  if(is.null(se) & is.null(sc)) { 
-    stop("Structural values in at least one outcome variable are required, 
+  if(is.null(se) & is.null(sc)) {
+    stop("Structural values in at least one outcome variable are required,
          please provide the structural value to be used in 'se' and/or in 'sc'")}
   random_se <- fb(model.se)
   random_sc <- fb(model.sc)
@@ -328,7 +328,7 @@ data_read_hurdle <- function(data, model.eff, model.cost,
   if(!is.null(random_se) & length(random_se) > 1 | !is.null(random_sc) & length(random_sc) > 1) {
     stop("Random effects can be included in the formula only through a single expression within brackets")}
   name_re_se_coeff <- NULL
-  name_re_sc_coeff <- NULL  
+  name_re_sc_coeff <- NULL
   if(!is.null(random_se)){
     name_re_se_coeff <- sub("\\|.*", "", random_se)
     if(grepl("0 + 1", name_re_se_coeff, fixed = TRUE)) { stop("Either remove or add a random intercept")}
@@ -338,9 +338,9 @@ data_read_hurdle <- function(data, model.eff, model.cost,
     if(!name_clus_se %in% names(cov_matrix)) { stop("Please provide the clustering variable in the dataset")}
     if(strsplit(name_re_se_coeff, "")[[1]][1] == 0) {
       no_random_int_se <- TRUE} else {no_random_int_se <- FALSE}
-    if(no_random_int_se) { 
-      name_re_se_coeff <- sub("[0]", "", name_re_se_coeff) 
-      name_re_se_coeff <- sub("[+]", "", name_re_se_coeff) 
+    if(no_random_int_se) {
+      name_re_se_coeff <- sub("[0]", "", name_re_se_coeff)
+      name_re_se_coeff <- sub("[+]", "", name_re_se_coeff)
     }
     if(name_re_se_coeff == "" | name_re_se_coeff == " ") { stop("Please state for which variables the random effects are assumed")}
     if(gsub(" ", "", name_re_se_coeff) == "e" & !no_random_int_se) {name_re_se_coeff <- "1 + e"}
@@ -351,7 +351,7 @@ data_read_hurdle <- function(data, model.eff, model.cost,
       stop("Please remove 'se' from the random effects of 'model.se'")}
     if("e" %in% labels(terms(fname_re_se_coeff))) {
       if(length(grep(":e", labels(terms(fname_re_se_coeff)))) != 0 | length(grep("e:", labels(terms(fname_re_se_coeff)))) != 0) {
-        stop("No interaction effects for 'e' are allowed")} 
+        stop("No interaction effects for 'e' are allowed")}
     }
     clus_se <- data[, name_clus_se]
     clus_se_lev <- levels(clus_se)
@@ -372,9 +372,9 @@ data_read_hurdle <- function(data, model.eff, model.cost,
     if(!name_clus_sc %in% names(cov_matrix)) { stop("Please provide the clustering variable in the dataset")}
     if(strsplit(name_re_sc_coeff, "")[[1]][1] == 0) {
       no_random_int_sc <- TRUE} else {no_random_int_sc <- FALSE}
-    if(no_random_int_sc) { 
-      name_re_sc_coeff <- sub("[0]", "", name_re_sc_coeff) 
-      name_re_sc_coeff <- sub("[+]", "", name_re_sc_coeff) 
+    if(no_random_int_sc) {
+      name_re_sc_coeff <- sub("[0]", "", name_re_sc_coeff)
+      name_re_sc_coeff <- sub("[+]", "", name_re_sc_coeff)
     }
     if(name_re_sc_coeff == "" | name_re_sc_coeff == " ") { stop("Please state for which variables the random effects are assumed")}
     if(gsub(" ", "", name_re_sc_coeff) == "c" & !no_random_int_sc) {name_re_sc_coeff <- "1 + c"}
@@ -385,7 +385,7 @@ data_read_hurdle <- function(data, model.eff, model.cost,
       stop("Please remove 'sc' from the random effects of 'model.sc'")}
     if("c" %in% labels(terms(fname_re_sc_coeff))) {
       if(length(grep(":c", labels(terms(fname_re_sc_coeff)))) != 0 | length(grep("c:", labels(terms(fname_re_sc_coeff)))) != 0) {
-        stop("No interaction effects for 'c' are allowed")} 
+        stop("No interaction effects for 'c' are allowed")}
     }
     clus_sc <- data[, name_clus_sc]
     clus_sc_lev <- levels(clus_sc)
@@ -397,16 +397,16 @@ data_read_hurdle <- function(data, model.eff, model.cost,
     clusnt_sc <- list()
     for(i in trt_lev) { clusnt_sc[[i]] <- clusn_sc[trt_index[[i]]]}
   }
-  if(!is.null(se)) { 
+  if(!is.null(se)) {
     mf_se_fixed <- model.frame(formula = fixed_se, data = data2)
     z_e_fixed <- model.matrix(attr(mf_se_fixed, "terms"), data = mf_se_fixed)
     } else { mf_se_fixed <- z_e_fixed <- NULL}
-  if(!is.null(sc)) { 
+  if(!is.null(sc)) {
     mf_sc_fixed <- model.frame(formula = fixed_sc, data = data2)
     z_c_fixed <- model.matrix(attr(mf_sc_fixed, "terms"), data = mf_sc_fixed)
   } else { mf_sc_fixed <- z_c_fixed <- NULL}
   if(!is.null(se)) {
-    if(!any(na.omit(s_eff) == 1)) { 
+    if(!any(na.omit(s_eff) == 1)) {
       stop("Please select a structural value in 'se' that is present in the data")}
     if(dim(z_e_fixed)[2] > 1) {
       colnames(z_e_fixed) <- c(colnames(z_e_fixed)[1], names(mf_se_fixed)[-1])}
@@ -419,7 +419,7 @@ data_read_hurdle <- function(data, model.eff, model.cost,
       names(covz_e_fixed[[i]]) <- colnames(z_e_fixed)
       covz_e_center_fixed[[i]] <- as.data.frame(scale(covz_e_fixed[[i]], scale = FALSE))
       covz_e_center_fixed[[i]][, 1] <- rep(1, n[i])
-    }  
+    }
     mean_covz_e_fixed <- lapply(covz_e_fixed, function(m) {
       apply(m, 2, mean, na.rm = TRUE)})
     mean_covz_e_center_fixed <- lapply(covz_e_center_fixed, function(m) {
@@ -460,7 +460,7 @@ data_read_hurdle <- function(data, model.eff, model.cost,
     }
   }
   if(!is.null(sc)) {
-    if(!any(na.omit(s_cost) == 1)) { 
+    if(!any(na.omit(s_cost) == 1)) {
       stop("Please select a structural value in 'sc' that is present in the data")}
     if(dim(z_c_fixed)[2] > 1) {
       colnames(z_c_fixed) <- c(colnames(z_c_fixed)[1], names(mf_sc_fixed)[-1])}
@@ -473,7 +473,7 @@ data_read_hurdle <- function(data, model.eff, model.cost,
       names(covz_c_fixed[[i]]) <- colnames(z_c_fixed)
       covz_c_center_fixed[[i]] <- as.data.frame(scale(covz_c_fixed[[i]], scale = FALSE))
       covz_c_center_fixed[[i]][, 1] <- rep(1, n[i])
-    }  
+    }
     mean_covz_c_fixed <- lapply(covz_c_fixed, function(m) {
       apply(m, 2, mean, na.rm = TRUE)})
     mean_covz_c_center_fixed <- lapply(covz_c_center_fixed, function(m) {
@@ -525,25 +525,25 @@ data_read_hurdle <- function(data, model.eff, model.cost,
   data_raw <- setNames(list(y_e, y_c, m_eff, m_cost, s_eff, s_cost,
                             n_obs_eff, n_obs_cost, n_mis_eff, n_mis_cost,
                             n_ns_eff, n_ns_cost, n_s_eff, n_s_cost,
-                            n, cov_e_fixed, cov_c_fixed, 
+                            n, cov_e_fixed, cov_c_fixed,
                             mean_cov_e_fixed, mean_cov_c_fixed, covz_e_fixed,
                             covz_c_fixed, mean_covz_e_fixed, mean_covz_c_fixed,
-                            cov_e_random, cov_c_random, mean_cov_e_random, 
-                            mean_cov_c_random, covz_e_random, covz_c_random, 
-                            mean_covz_e_random, mean_covz_c_random, 
+                            cov_e_random, cov_c_random, mean_cov_e_random,
+                            mean_cov_c_random, covz_e_random, covz_c_random,
+                            mean_covz_e_random, mean_covz_c_random,
                             clusnt_e, clusnt_c, clusnt_se, clusnt_sc,
                             n_clus_e, n_clus_c, n_clus_se, n_clus_sc, data,
                             trt_name_pos_e, trt_name_pos_c, t_m_names_pos_e, t_m_names_pos_c,
-                            trt_index, efft, costt, m_efft, m_costt, s_efft, s_costt, 
+                            trt_index, efft, costt, m_efft, m_costt, s_efft, s_costt,
                             name_clus_e, name_clus_c,
                             name_clus_se, name_clus_sc, x_e_fixed, x_c_fixed,
                             x_e_random, x_c_random, z_e_fixed, z_c_fixed,
                             z_e_random, z_c_random, clusn_e, clusn_c, clusn_se, clusn_sc,
-                            clus_e_lev, clus_c_lev, clus_se_lev, clus_sc_lev), 
-                       c("e", "c", "me", "mc", "se", "sc", "n_obs_e", "n_obs_c", 
-                         "n_mis_e", "n_mis_c", "n_ns_eff", "n_ns_cost", 
-                         "n_s_eff", "n_s_cost", "n", "cov_fixed_e", 
-                         "cov_fixed_c", "avg_cov_fixed_e", "avg_cov_fixed_c", 
+                            clus_e_lev, clus_c_lev, clus_se_lev, clus_sc_lev),
+                       c("e", "c", "me", "mc", "se", "sc", "n_obs_e", "n_obs_c",
+                         "n_mis_e", "n_mis_c", "n_ns_eff", "n_ns_cost",
+                         "n_s_eff", "n_s_cost", "n", "cov_fixed_e",
+                         "cov_fixed_c", "avg_cov_fixed_e", "avg_cov_fixed_c",
                          "cov_fixed_se", "cov_fixed_sc", "avg_cov_fixed_se",
                          "avg_cov_fixed_sc", "cov_random_e", "cov_random_c",
                          "avg_cov_random_e", "avg_cov_random_c", "cov_random_se",
@@ -551,16 +551,16 @@ data_read_hurdle <- function(data, model.eff, model.cost,
                          "clus_e", "clus_c", "clus_se", "clus_sc",
                          "n_clus_e", "n_clus_c", "n_clus_se", "n_clus_sc", "data",
                          "trt_pos_e", "trt_pos_c", "trt_pos_se", "trt_pos_sc", "trt_index",
-                         "efft", "costt", "m_efft", "m_costt", "s_efft", "s_costt", 
+                         "efft", "costt", "m_efft", "m_costt", "s_efft", "s_costt",
                          "name_clus_e", "name_clus_c",
                          "name_clus_se", "name_clus_sc", "x_e_fixed", "x_c_fixed",
                          "x_e_random", "x_c_random", "z_e_fixed", "z_c_fixed",
                          "z_e_random", "z_c_random", "clusn_e", "clusn_c", "clusn_se", "clusn_sc",
                          "clus_e_lev", "clus_c_lev", "clus_se_lev", "clus_sc_lev"))
-  model_formula <- list("mf_model.e_fixed" = fixed_e, "mf_model.c_fixed" = fixed_c, 
+  model_formula <- list("mf_model.e_fixed" = fixed_e, "mf_model.c_fixed" = fixed_c,
                         "mf_model.se_fixed" = fixed_se, "mf_model.sc_fixed" = fixed_sc,
-                        "mf_model.e_random" = fname_re_e_coeff, "mf_model.c_random" = fname_re_c_coeff, 
+                        "mf_model.e_random" = fname_re_e_coeff, "mf_model.c_random" = fname_re_c_coeff,
                         "mf_model.se_random" = fname_re_se_coeff, "mf_model.sc_random" = fname_re_sc_coeff)
-  data_list <- list("data_raw" = data_raw, "model_formula" = model_formula)  
-  return(data_list) 
+  data_list <- list("data_raw" = data_raw, "model_formula" = model_formula)
+  return(data_list)
 }

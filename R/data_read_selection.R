@@ -3,22 +3,22 @@
 #' This internal function imports the data and outputs only those variables that are needed to run the model
 #' according to the information provided by the user.
 #' @param data A data frame in which to find variables supplied in \code{model.eff} and \code{model.cost}. Among these,
-#' effectiveness, cost and treatment indicator variables must always be provided and named 'e', 'c' and 'trt' respectively. 
+#' effectiveness, cost and treatment indicator variables must always be provided and named 'e', 'c' and 'trt' respectively.
 #' @param model.eff A formula expression in conventional \code{R} linear modelling syntax. The response must be a health economics
-#'  effectiveness outcome ('e') whose name must correspond to that used in \code{data}, and 
+#'  effectiveness outcome ('e') whose name must correspond to that used in \code{data}, and
 #'  any covariates are given on the right-hand side. If there are no covariates, specify \code{1} on the right hand side.
 #'  By default, covariates are placed on the "location" parameter of the distribution through a linear model.
 #'  Random effects can also be specified for each model parameter.
 #' @param model.cost A formula expression in conventional \code{R} linear modelling syntax. The response must be a health economics
 #'  cost outcome ('c') whose name must correspond to that used in \code{data}, and any covariates are given on the right-hand side.
-#'  If there are no covariates, specify \code{1} on the right hand side. By default, covariates are placed on the "location" 
+#'  If there are no covariates, specify \code{1} on the right hand side. By default, covariates are placed on the "location"
 #'  parameter of the distribution through a linear model. Random effects can also be specified for each model parameter.
-#' @param model.me A formula expression in conventional \code{R} linear modelling syntax.  The response must be indicated with the 
-#' term 'me'(missing effects) and any covariates used to estimate the probability of missing effects are given on the right-hand side. 
+#' @param model.me A formula expression in conventional \code{R} linear modelling syntax.  The response must be indicated with the
+#' term 'me'(missing effects) and any covariates used to estimate the probability of missing effects are given on the right-hand side.
 #' If there are no covariates, specify \code{1} on the right hand side. By default, covariates are placed on the "probability" parameter for the missing effects through a logistic-linear model.
 #' Random effects can also be specified for each model parameter.
-#' @param model.mc A formula expression in conventional R linear modelling syntax. The response must be indicated with the 
-#' term 'mc'(missing costs) and any covariates used to estimate the probability of missing costs should be given on the right-hand side. 
+#' @param model.mc A formula expression in conventional R linear modelling syntax. The response must be indicated with the
+#' term 'mc'(missing costs) and any covariates used to estimate the probability of missing costs should be given on the right-hand side.
 #' If there are no covariates, specify \code{1} on the right hand side. By default, covariates are placed on the "probability" parameter for the missing costs through a logistic-linear model.
 #' Random effects can also be specified for each model parameter.
 #' @param cov_matrix Data frame containing the covariate matrix of the model.
@@ -39,8 +39,8 @@
 #' #
 #' #
 
-data_read_selection <- function(data, model.eff, model.cost, 
-                                model.me, model.mc, cov_matrix, 
+data_read_selection <- function(data, model.eff, model.cost,
+                                model.me, model.mc, cov_matrix,
                                 type, center, fixed_e, fixed_c, random_e, random_c,
                                 trt_lev, trt_pos) {
   data2 <- data
@@ -64,15 +64,15 @@ data_read_selection <- function(data, model.eff, model.cost,
   name_re_e_coeff <- name_re_c_coeff <- NULL
   if(!is.null(random_e)){
     name_re_e_coeff <- sub("\\|.*", "", random_e)
-    if(grepl("0 + 1", name_re_e_coeff, fixed = TRUE)) { stop("Please either remove or add a random intercept")}
+    if(grepl("0 + 1", name_re_e_coeff, fixed = TRUE)) { stop("Please add a random intercept to `model.eff`")}
     name_clus_e <- sub('.*\\|', '', random_e)
     if(lengths(strsplit(name_clus_e, " ")) > 2) { stop("Please provide a single clustering variable for each model")}
     name_clus_e <- gsub(" ", "", name_clus_e, fixed = TRUE)
-    if(!name_clus_e %in% names(cov_matrix)) { stop("Please provide the clustering variable in the dataset")}
+    if(!name_clus_e %in% names(cov_matrix)) { stop("Please provide a valid clustering variable in `model.eff`")}
     if(strsplit(name_re_e_coeff, "")[[1]][1] == 0) {
     no_random_int_e <- TRUE} else { no_random_int_e <- FALSE}
-    if(no_random_int_e) { 
-      name_re_e_coeff <- sub("[0]", "", name_re_e_coeff) 
+    if(no_random_int_e) {
+      name_re_e_coeff <- sub("[0]", "", name_re_e_coeff)
       name_re_e_coeff <- sub("[+]", "", name_re_e_coeff)}
     if(name_re_e_coeff == "" | name_re_e_coeff == " ") { stop("Please state for which variables random effects are assumed")}
     fname_re_e_coeff <- as.formula(paste("e", name_re_e_coeff, sep = " ~ "))
@@ -101,15 +101,15 @@ data_read_selection <- function(data, model.eff, model.cost,
   }
   if(!is.null(random_c)){
     name_re_c_coeff <- sub("\\|.*", "", random_c)
-    if(grepl("0 + 1", name_re_c_coeff, fixed = TRUE)) { stop("Please either remove or add a random intercept")}
+    if(grepl("0 + 1", name_re_c_coeff, fixed = TRUE)) { stop("Please add a random intercept to `model.cost`")}
     name_clus_c <- sub('.*\\|', '', random_c)
     if(lengths(strsplit(name_clus_c, " ")) > 2) { stop("Please provide a single clustering variable for each model")}
     name_clus_c <- gsub(" ", "", name_clus_c, fixed = TRUE)
-    if(!name_clus_c %in% names(cov_matrix)) { stop("Please provide the clustering variable in the dataset")}
+    if(!name_clus_c %in% names(cov_matrix)) { stop("Please provide a valid clustering variable in `model.cost`")}
     if(strsplit(name_re_c_coeff, "")[[1]][1] == 0) {
       no_random_int_c <- TRUE} else {no_random_int_c <- FALSE}
-    if(no_random_int_c) { 
-      name_re_c_coeff <- sub("[0]", "", name_re_c_coeff) 
+    if(no_random_int_c) {
+      name_re_c_coeff <- sub("[0]", "", name_re_c_coeff)
       name_re_c_coeff <- sub("[+]", "", name_re_c_coeff)}
     if(name_re_c_coeff == "" | name_re_c_coeff == " ") { stop("Please state for which variables random effects are assumed")}
     if(gsub(" ", "", name_re_c_coeff) == "e" & !no_random_int_c) { name_re_c_coeff <- "1 + e"}
@@ -120,7 +120,7 @@ data_read_selection <- function(data, model.eff, model.cost,
       stop("Please remove 'c' from the random effects of 'model.cost'")}
     if("e" %in% labels(terms(fname_re_c_coeff))) {
       if(length(grep(":e", labels(terms(fname_re_c_coeff)))) != 0 | length(grep("e:", labels(terms(fname_re_c_coeff)))) != 0) {
-        stop("No interaction effects for 'e' are allowed")} 
+        stop("No interaction effects for 'e' are allowed")}
     }
     mf_c_random <- model.frame(formula = fname_re_c_coeff, data = data)
     x_c_random <- model.matrix(attr(mf_c_random, "terms"), data = mf_c_random)
@@ -164,8 +164,8 @@ data_read_selection <- function(data, model.eff, model.cost,
   for(i in trt_lev) {
     efft[[i]] <- y_e[trt_index[[i]]]
     costt[[i]] <- y_c[trt_index[[i]]]
-    cov_e_fixed[[i]] <- as.data.frame(x_e_fixed[trt_index[[i]], ])
-    cov_c_fixed[[i]] <- as.data.frame(x_c_fixed[trt_index[[i]], ])
+    cov_e_fixed[[i]] <- as.data.frame(x_e_fixed[trt_index[[i]], , drop = FALSE])
+    cov_c_fixed[[i]] <- as.data.frame(x_c_fixed[trt_index[[i]], , drop = FALSE])
     cov_e_center_fixed[[i]] <- as.data.frame(scale(cov_e_fixed[[i]], scale = FALSE))
     cov_c_center_fixed[[i]] <- as.data.frame(scale(cov_c_fixed[[i]], scale = FALSE))
     cov_e_center_fixed[[i]][, 1] <- rep(1, n[i])
@@ -247,40 +247,38 @@ data_read_selection <- function(data, model.eff, model.cost,
   random_mc <- fb(model.mc)
   if(!is.null(random_me) & length(random_me) > 1 | !is.null(random_mc) & length(random_mc) > 1) {
     stop("Random effects can be included in the formula only through a single expression within brackets")}
-  if(!all(names(model.frame(fixed_me, data = data2)) %in% c("me", "e", names(cov_matrix))) | 
-     !all(names(model.frame(fixed_mc, data = data2)) %in% c("mc", "c", names(cov_matrix)))) {
-    stop("Partially-observed covariates cannot be included in the model")}
-  if(!all(names(model.frame(fixed_me, data = data2)) %in% names(data2)) | 
-     !all(names(model.frame(fixed_mc, data = data2)) %in% names(data2))) {
+  if(!all(all.vars(fixed_me)[-1] %in% names(data2)) |
+     !all(all.vars(fixed_mc)[-1] %in% names(data2))) {
     stop("Please provide names in the formula that correspond to those in the data")}
-  if(names(model.frame(fixed_me, data = data2)[1]) != "me") {
+  if(all.vars(fixed_me)[1] != "me") {
     stop("Please set 'me' as the response in `model.me`")}
-  if(names(model.frame(fixed_mc, data = data2)[1]) != "mc") {
+  if(all.vars(fixed_mc)[1] != "mc") {
     stop("Please set 'mc' as the response in `model.mc`")}
-  if("c" %in% names(model.frame(fixed_me, data = data2)) | "e" %in% names(model.frame(fixed_mc, data = data2))) {
-    stop("Please remove 'e'/'c' from the right-hand side of 'model.me' and/or 'c'/'e' from the right-hand side of 'model.mc'")}
+  if(!all(all.vars(fixed_me) %in% c("me", "e", names(cov_matrix))) |
+     !all(all.vars(fixed_mc) %in% c("mc", "c", names(cov_matrix)))) {
+    stop("Missing covariates cannot be included in the model")}
   if("e" %in% labels(terms(fixed_me))) {
     if(length(grep(":e", labels(terms(fixed_me)))) != 0 | length(grep("e:", labels(terms(fixed_me)))) != 0) {
       stop("No interaction effects for 'e' are allowed")}
   }
   if("c" %in% labels(terms(fixed_mc))) {
     if(length(grep(":c", labels(terms(fixed_mc)))) != 0 | length(grep("c:", labels(terms(fixed_mc)))) != 0) {
-      stop("No interaction effects for 'c' are allowed")} 
+      stop("No interaction effects for 'c' are allowed")}
   }
   name_re_me_coeff <- NULL
   name_re_mc_coeff <- NULL
   if(!is.null(random_me)){
     name_re_me_coeff <- sub("\\|.*", "", random_me)
-    if(grepl("0 + 1", name_re_me_coeff, fixed = TRUE)) { stop("Either remove or add a random intercept")}
+    if(grepl("0 + 1", name_re_me_coeff, fixed = TRUE)) { stop("Please add a random intercept to `model.me`")}
     name_clus_me <- sub('.*\\|', '', random_me)
     if(lengths(strsplit(name_clus_me, " ")) > 2) {stop("Please provide a single clustering variable for each model")}
     name_clus_me <- gsub(" ", "", name_clus_me, fixed = TRUE)
-    if(!name_clus_me %in% names(cov_matrix)) { stop("Please provide the clustering variable in the dataset")}
+    if(!name_clus_me %in% names(cov_matrix)) { stop("Please provide a valid clustering variable in `model.me`")}
     if(strsplit(name_re_me_coeff, "")[[1]][1] == 0) {
       no_random_int_me <- TRUE} else {no_random_int_me <- FALSE}
-    if(no_random_int_me) { 
-      name_re_me_coeff <- sub("[0]", "", name_re_me_coeff) 
-      name_re_me_coeff <- sub("[+]", "", name_re_me_coeff) 
+    if(no_random_int_me) {
+      name_re_me_coeff <- sub("[0]", "", name_re_me_coeff)
+      name_re_me_coeff <- sub("[+]", "", name_re_me_coeff)
       }
     if(name_re_me_coeff == "" | name_re_me_coeff == " ") { stop("Please state for which variables the random effects are assumed")}
     if(gsub(" ", "", name_re_me_coeff) == "e" & !no_random_int_me) {name_re_me_coeff <- "1 + e"}
@@ -291,7 +289,7 @@ data_read_selection <- function(data, model.eff, model.cost,
       stop("Please remove 'me' from the random effects of 'model.me'")}
     if("e" %in% labels(terms(fname_re_me_coeff))) {
       if(length(grep(":e", labels(terms(fname_re_me_coeff)))) != 0 | length(grep("e:", labels(terms(fname_re_me_coeff)))) != 0) {
-        stop("No interaction effects for 'e' are allowed")} 
+        stop("No interaction effects for 'e' are allowed")}
     }
     clus_me <- data[, name_clus_me]
     clus_me_lev <- levels(clus_me)
@@ -305,16 +303,16 @@ data_read_selection <- function(data, model.eff, model.cost,
   }
   if(!is.null(random_mc)){
     name_re_mc_coeff <- sub("\\|.*", "", random_mc)
-    if(grepl("0 + 1", name_re_mc_coeff, fixed = TRUE)) { stop("Either remove or add a random intercept")}
+    if(grepl("0 + 1", name_re_mc_coeff, fixed = TRUE)) { stop("Please add a random intercept to `model.mc`")}
     name_clus_mc <- sub('.*\\|', '', random_mc)
     if(lengths(strsplit(name_clus_mc, " ")) > 2) {stop("Please provide a single clustering variable for each model")}
     name_clus_mc <- gsub(" ", "", name_clus_mc, fixed = TRUE)
-    if(!name_clus_mc %in% names(cov_matrix)) { stop("Please provide the clustering variable in the dataset")}
+    if(!name_clus_mc %in% names(cov_matrix)) { stop("Please provide a valid clustering variable in `model.mc`")}
     if(strsplit(name_re_mc_coeff, "")[[1]][1] == 0) {
       no_random_int_mc <- TRUE} else {no_random_int_mc <- FALSE}
-    if(no_random_int_mc) { 
-      name_re_mc_coeff <- sub("[0]", "", name_re_mc_coeff) 
-      name_re_mc_coeff <- sub("[+]", "", name_re_mc_coeff) 
+    if(no_random_int_mc) {
+      name_re_mc_coeff <- sub("[0]", "", name_re_mc_coeff)
+      name_re_mc_coeff <- sub("[+]", "", name_re_mc_coeff)
       }
     if(name_re_mc_coeff == "" | name_re_mc_coeff == " ") { stop("Please state for which variables the random effects are assumed")}
     if(gsub(" ", "", name_re_mc_coeff) == "c" & !no_random_int_mc) {name_re_mc_coeff <- "1 + c"}
@@ -325,7 +323,7 @@ data_read_selection <- function(data, model.eff, model.cost,
       stop("Please remove 'mc' from the random effects of 'model.mc'")}
     if("c" %in% labels(terms(fname_re_mc_coeff))) {
       if(length(grep(":c", labels(terms(fname_re_mc_coeff)))) != 0 | length(grep("c:", labels(terms(fname_re_mc_coeff)))) != 0) {
-        stop("No interaction effects for 'c' are allowed")} 
+        stop("No interaction effects for 'c' are allowed")}
       }
     clus_mc <- data[, name_clus_mc]
     clus_mc_lev <- levels(clus_mc)
@@ -446,14 +444,14 @@ data_read_selection <- function(data, model.eff, model.cost,
     clusnt_e <- n_clus_e <- name_clus_e <- clusn_e <- clus_e <- clus_e_lev <- NULL}
   if(is.null(random_me)) { covz_e_random <- mean_covz_e_random <- z_e_random <- NULL
     clusnt_me <- n_clus_me <- name_clus_me <- clusn_me <- clus_me <- clus_me_lev <- NULL}
-  data_raw <- setNames(list(y_e, y_c, m_eff, m_cost, 
+  data_raw <- setNames(list(y_e, y_c, m_eff, m_cost,
                             n_obs_eff, n_obs_cost, n_mis_eff, n_mis_cost,
-                            n, cov_e_fixed, cov_c_fixed, 
+                            n, cov_e_fixed, cov_c_fixed,
                             mean_cov_e_fixed, mean_cov_c_fixed, covz_e_fixed,
                             covz_c_fixed, mean_covz_e_fixed, mean_covz_c_fixed,
-                            cov_e_random, cov_c_random, mean_cov_e_random, 
-                            mean_cov_c_random, covz_e_random, covz_c_random, 
-                            mean_covz_e_random, mean_covz_c_random, 
+                            cov_e_random, cov_c_random, mean_cov_e_random,
+                            mean_cov_c_random, covz_e_random, covz_c_random,
+                            mean_covz_e_random, mean_covz_c_random,
                             clusnt_e, clusnt_c, clusnt_me, clusnt_mc,
                             n_clus_e, n_clus_c, n_clus_me, n_clus_mc, data,
                             trt_name_pos_e, trt_name_pos_c, t_m_names_pos_e, t_m_names_pos_c,
@@ -461,10 +459,10 @@ data_read_selection <- function(data, model.eff, model.cost,
                             name_clus_me, name_clus_mc, x_e_fixed, x_c_fixed,
                             x_e_random, x_c_random, z_e_fixed, z_c_fixed,
                             z_e_random, z_c_random, clusn_e, clusn_c, clusn_me, clusn_mc,
-                            clus_e_lev, clus_c_lev, clus_me_lev, clus_mc_lev), 
-                       c("e", "c", "me", "mc", "n_obs_e", "n_obs_c", 
-                         "n_mis_e", "n_mis_c", "n", "cov_fixed_e", 
-                         "cov_fixed_c", "avg_cov_fixed_e", "avg_cov_fixed_c", 
+                            clus_e_lev, clus_c_lev, clus_me_lev, clus_mc_lev),
+                       c("e", "c", "me", "mc", "n_obs_e", "n_obs_c",
+                         "n_mis_e", "n_mis_c", "n", "cov_fixed_e",
+                         "cov_fixed_c", "avg_cov_fixed_e", "avg_cov_fixed_c",
                          "cov_fixed_me", "cov_fixed_mc", "avg_cov_fixed_me",
                          "avg_cov_fixed_mc", "cov_random_e", "cov_random_c",
                          "avg_cov_random_e", "avg_cov_random_c", "cov_random_me",
@@ -477,10 +475,10 @@ data_read_selection <- function(data, model.eff, model.cost,
                          "x_e_random", "x_c_random", "z_e_fixed", "z_c_fixed",
                          "z_e_random", "z_c_random", "clusn_e", "clusn_c", "clusn_me", "clusn_mc",
                          "clus_e_lev", "clus_c_lev", "clus_me_lev", "clus_mc_lev"))
-  model_formula <- list("mf_model.e_fixed" = fixed_e, "mf_model.c_fixed" = fixed_c, 
+  model_formula <- list("mf_model.e_fixed" = fixed_e, "mf_model.c_fixed" = fixed_c,
                         "mf_model.me_fixed" = fixed_me, "mf_model.mc_fixed" = fixed_mc,
-                        "mf_model.e_random" = fname_re_e_coeff, "mf_model.c_random" = fname_re_c_coeff, 
+                        "mf_model.e_random" = fname_re_e_coeff, "mf_model.c_random" = fname_re_c_coeff,
                         "mf_model.me_random" = fname_re_me_coeff, "mf_model.mc_random" = fname_re_mc_coeff)
   data_list <- list("data_raw" = data_raw, "model_formula" = model_formula)
-  return(data_list) 
+  return(data_list)
 }
