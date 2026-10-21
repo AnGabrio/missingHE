@@ -113,11 +113,11 @@ data_read_lmdm <- function(data, model.eff, model.cost,
   name_re_e_coeff <- name_re_c_coeff <- NULL
   if(!is.null(random_e)){
     name_re_e_coeff <- sub("\\|.*", "", random_e)
-    if(grepl("0 + 1", name_re_e_coeff, fixed = TRUE)) { stop("Please either remove or add a random intercept")}
+    if(grepl("0 + 1", name_re_e_coeff, fixed = TRUE)) { stop("Please add a random intercept to `model.eff`")}
     name_clus_e <- sub('.*\\|', '', random_e)
     if(lengths(strsplit(name_clus_e, " ")) > 2) { stop("Please provide a single clustering variable for each model")}
     name_clus_e <- gsub(" ", "", name_clus_e, fixed = TRUE)
-    if(!name_clus_e %in% names(cov_matrix)) { stop("Please provide the clustering variable in the dataset")}
+    if(!name_clus_e %in% names(cov_matrix)) { stop("Please provide a valid clustering variable in `model.eff`")}
     if(strsplit(name_re_e_coeff, "")[[1]][1] == 0) {
       no_random_int_e <- TRUE} else { no_random_int_e <- FALSE}
     if(no_random_int_e) {
@@ -150,11 +150,11 @@ data_read_lmdm <- function(data, model.eff, model.cost,
   }
   if(!is.null(random_c)){
     name_re_c_coeff <- sub("\\|.*", "", random_c)
-    if(grepl("0 + 1", name_re_c_coeff, fixed = TRUE)) { stop("Please either remove or add a random intercept")}
+    if(grepl("0 + 1", name_re_c_coeff, fixed = TRUE)) { stop("Please add a random intercept to `model.cost`")}
     name_clus_c <- sub('.*\\|', '', random_c)
     if(lengths(strsplit(name_clus_c, " ")) > 2) { stop("Please provide a single clustering variable for each model")}
     name_clus_c <- gsub(" ", "", name_clus_c, fixed = TRUE)
-    if(!name_clus_c %in% names(cov_matrix)) { stop("Please provide the clustering variable in the dataset")}
+    if(!name_clus_c %in% names(cov_matrix)) { stop("Please provide a valid clustering variable in `model.cost`")}
     if(strsplit(name_re_c_coeff, "")[[1]][1] == 0) {
       no_random_int_c <- TRUE} else {no_random_int_c <- FALSE}
     if(no_random_int_c) {
@@ -268,8 +268,8 @@ data_read_lmdm <- function(data, model.eff, model.cost,
     efft[[i]] <- data$e[trt_index_long[[i]]]
     costt[[i]] <- data$c[trt_index_long[[i]]]
     timet[[i]] <- data$time[trt_index_long[[i]]]
-    cov_e_fixed[[i]] <- as.data.frame(x_e_fixed[trt_index[[i]], ])
-    cov_c_fixed[[i]] <- as.data.frame(x_c_fixed[trt_index[[i]], ])
+    cov_e_fixed[[i]] <- as.data.frame(x_e_fixed[trt_index[[i]], , drop = FALSE])
+    cov_c_fixed[[i]] <- as.data.frame(x_c_fixed[trt_index[[i]], , drop = FALSE])
     cov_e_center_fixed[[i]] <- as.data.frame(scale(cov_e_fixed[[i]], scale = FALSE))
     cov_c_center_fixed[[i]] <- as.data.frame(scale(cov_c_fixed[[i]], scale = FALSE))
     cov_e_center_fixed[[i]][, 1] <- rep(1, n[i])
@@ -406,11 +406,11 @@ data_read_lmdm <- function(data, model.eff, model.cost,
   name_re_mc_coeff <- NULL
   if(!is.null(random_me)){
     name_re_me_coeff <- sub("\\|.*", "", random_me)
-    if(grepl("0 + 1", name_re_me_coeff, fixed = TRUE)) { stop("Either remove or add a random intercept")}
+    if(grepl("0 + 1", name_re_me_coeff, fixed = TRUE)) { stop("Please add a random intercept to `model.me`")}
     name_clus_me <- sub('.*\\|', '', random_me)
     if(lengths(strsplit(name_clus_me, " ")) > 2) {stop("Please provide a single clustering variable for each model")}
     name_clus_me <- gsub(" ", "", name_clus_me, fixed = TRUE)
-    if(!name_clus_me %in% names(cov_matrix)) { stop("Please provide the clustering variable in the dataset")}
+    if(!name_clus_me %in% names(cov_matrix)) { stop("Please provide a valid clustering variable in `model.me`")}
     if(strsplit(name_re_me_coeff, "")[[1]][1] == 0) {
       no_random_int_me <- TRUE} else {no_random_int_me <- FALSE}
     if(no_random_int_me) {
@@ -440,11 +440,11 @@ data_read_lmdm <- function(data, model.eff, model.cost,
   }
   if(!is.null(random_mc)){
     name_re_mc_coeff <- sub("\\|.*", "", random_mc)
-    if(grepl("0 + 1", name_re_mc_coeff, fixed = TRUE)) { stop("Either remove or add a random intercept")}
+    if(grepl("0 + 1", name_re_mc_coeff, fixed = TRUE)) { stop("Please add a random intercept to `model.mc`")}
     name_clus_mc <- sub('.*\\|', '', random_mc)
     if(lengths(strsplit(name_clus_mc, " ")) > 2) {stop("Please provide a single clustering variable for each model")}
     name_clus_mc <- gsub(" ", "", name_clus_mc, fixed = TRUE)
-    if(!name_clus_mc %in% names(cov_matrix)) { stop("Please provide the clustering variable in the dataset")}
+    if(!name_clus_mc %in% names(cov_matrix)) { stop("Please provide a valid clustering variable in `model.mc`")}
     if(strsplit(name_re_mc_coeff, "")[[1]][1] == 0) {
       no_random_int_mc <- TRUE} else {no_random_int_mc <- FALSE}
     if(no_random_int_mc) {
