@@ -28,9 +28,23 @@ jobs:
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       R_KEEP_PKG_SOURCE: yes
+      # Append these two lines underneath your existing setup:
+      DYLD_LIBRARY_PATH: ${{ matrix.config.os == 'macos-latest' && '/opt/homebrew/lib:/usr/local/lib' || '' }}
+      JAGS_HOME: ${{ matrix.config.os == 'macos-latest' && '/opt/homebrew' || '' }}
 
     steps:
       - uses: actions/checkout@v6
+
+      - name: Install JAGS (macOS)
+        if: matrix.config.os == 'macos-latest'
+        run: |
+          brew install pkg-config jags
+
+          # Map the hardcoded dylib to the active Homebrew path
+          BREW_JAGS_DIR=$(brew --prefix jags)/lib
+          sudo mkdir -p /usr/local/lib
+          sudo ln -sf "$BREW_JAGS_DIR/libjags.dylib" /usr/local/lib/libjags.4.dylib
+          sudo ln -sf "$BREW_JAGS_DIR/libjags.dylib" /usr/local/lib/libjags.dylib
 
       - uses: r-lib/actions/setup-pandoc@v2
 
@@ -61,19 +75,10 @@ jobs:
             echo "JAGS found in cache, skipping installation"
           )
 
-      - name: Install JAGS (macOS)
-        if: runner.os == 'macOS'
-        run: |
-          brew install pkg-config jags
-
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           extra-packages: any::rcmdcheck
           needs: check
-        env:
-          # Fix: Forces rjags to build cleanly from source code against the Homebrew library paths
-          INSTALL_opts: >-
-            ${{ runner.os == 'macOS' && '--configure-args="--with-jags-include=/opt/homebrew/opt/jags/include/JAGS --with-jags-lib=/opt/homebrew/opt/jags/lib" --no-binary=rjags' || '' }}
 
       - uses: r-lib/actions/check-r-package@v2
         with:
