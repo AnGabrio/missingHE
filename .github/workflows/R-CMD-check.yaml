@@ -64,20 +64,16 @@ jobs:
       - name: Install JAGS (macOS)
         if: runner.os == 'macOS'
         run: |
-          brew install jags
-
-          # 1. Dynamically locate where Homebrew just installed libjags
-          BREW_JAGS_DIR=$(brew --prefix jags)/lib
-
-          # 2. Map the hardcoded 'libjags.4.dylib' target to the actual library file
-          sudo mkdir -p /usr/local/lib
-          sudo ln -sf "$BREW_JAGS_DIR/libjags.dylib" /usr/local/lib/libjags.4.dylib
-          sudo ln -sf "$BREW_JAGS_DIR/libjags.dylib" /usr/local/lib/libjags.dylib
+          brew install pkg-config jags
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           extra-packages: any::rcmdcheck
           needs: check
+        env:
+          # Fix: Forces rjags to build cleanly from source code against the Homebrew library paths
+          INSTALL_opts: >-
+            ${{ runner.os == 'macOS' && '--configure-args="--with-jags-include=/opt/homebrew/opt/jags/include/JAGS --with-jags-lib=/opt/homebrew/opt/jags/lib" --no-binary=rjags' || '' }}
 
       - uses: r-lib/actions/check-r-package@v2
         with:
