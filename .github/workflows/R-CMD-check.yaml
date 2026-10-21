@@ -63,24 +63,18 @@ jobs:
 
       - name: Install JAGS (macOS)
         if: runner.os == 'macOS'
-        run : |
-          brew install pkg-config jags
+        run: |
+          brew install jags
+
+          # Fix: Symlink the ARM64 homebrew library so the R binary finds it at /usr/local/lib
+          sudo mkdir -p /usr/local/lib
+          sudo ln -s /opt/homebrew/lib/libjags.4.dylib /usr/local/lib/libjags.4.dylib
+          sudo ln -s /opt/homebrew/lib/libjags.dylib /usr/local/lib/libjags.dylib
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           extra-packages: any::rcmdcheck
           needs: check
-
-     # Fix: Provide explicit configuration arguments telling R exactly where Homebrew JAGS lives
-      - name: Install rjags (macOS custom build paths)
-        if: runner.os == 'macOS'
-        run: |
-          Rscript -e 'install.packages("rjags", type = "source", configure.args = "--with-jags-include=/opt/homebrew/opt/jags/include/JAGS --with-jags-lib=/opt/homebrew/opt/jags/lib")'
-
-      # Fallback for non-macOS runners if rjags is not already covered by setup-r-dependencies
-      - name: Install rjags (Non-macOS)
-        if: runner.os != 'macOS'
-        run: Rscript -e 'if (!requireNamespace("rjags", quietly = TRUE)) install.packages("rjags")'
 
       - uses: r-lib/actions/check-r-package@v2
         with:
