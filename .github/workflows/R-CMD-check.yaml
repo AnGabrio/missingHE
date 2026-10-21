@@ -66,10 +66,13 @@ jobs:
         run: |
           brew install jags
 
-          # Fix: Symlink the ARM64 homebrew library so the R binary finds it at /usr/local/lib
+          # 1. Dynamically locate where Homebrew just installed libjags
+          BREW_JAGS_DIR=$(brew --prefix jags)/lib
+
+          # 2. Map the hardcoded 'libjags.4.dylib' target to the actual library file
           sudo mkdir -p /usr/local/lib
-          sudo ln -s /opt/homebrew/lib/libjags.4.dylib /usr/local/lib/libjags.4.dylib
-          sudo ln -s /opt/homebrew/lib/libjags.dylib /usr/local/lib/libjags.dylib
+          sudo ln -sf "$BREW_JAGS_DIR/libjags.dylib" /usr/local/lib/libjags.4.dylib
+          sudo ln -sf "$BREW_JAGS_DIR/libjags.dylib" /usr/local/lib/libjags.dylib
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
