@@ -81,11 +81,7 @@ jobs:
 
       - name: Install rjags from source
         run: |
-          Rscript -e 'if (Sys.info()["sysname"] == "Darwin") { \
-            install.packages("rjags", type = "source", configure.args = "--with-jags-include=/opt/homebrew/include --with-jags-lib=/opt/homebrew/lib") \
-          } else { \
-            install.packages("rjags", type = "source") \
-          }'
+          Rscript -e 'if (Sys.info()["sysname"] == "Darwin") { install.packages("rjags", type = "source", configure.args = "--with-jags-include=/opt/homebrew/include --with-jags-lib=/opt/homebrew/lib") } else { install.packages("rjags", type = "source") }'
 
       - uses: r-lib/actions/check-r-package@v2
         with:
