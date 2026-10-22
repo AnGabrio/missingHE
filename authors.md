@@ -2,7 +2,7 @@
 
 ## Authors
 
-- **Andrea Gabrio**. Author, maintainer.
+- **Andrea Gabrio**. Author, maintainer, copyright holder.
 
 ## Citation
 
