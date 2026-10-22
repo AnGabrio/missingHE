@@ -4,7 +4,7 @@
 
 🚀 This is the **development version** of the `R` package `missingHE`
 (currently on version 1.6.2.1). The stable version is now release 1.6.2,
-on [CRAN](https://cran.r-project.org/web/packages/missingHE/index.html).
+on [CRAN](https://CRAN.R-project.org/package=missingHE).
 
 ## Contents
 
