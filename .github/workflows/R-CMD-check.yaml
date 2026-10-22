@@ -28,9 +28,22 @@ jobs:
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       R_KEEP_PKG_SOURCE: yes
+      DYLD_LIBRARY_PATH: ${{ matrix.config.os == 'macos-latest' && '/opt/homebrew/lib:/usr/local/lib' || '' }}
+      JAGS_HOME: ${{ matrix.config.os == 'macos-latest' && '/opt/homebrew' || '' }}
 
     steps:
       - uses: actions/checkout@v6
+
+      - name: Install JAGS (macOS)
+        if: matrix.config.os == 'macos-latest'
+        run: |
+          brew install pkg-config jags
+
+          # Map the hardcoded dylib to the active Homebrew path
+          BREW_JAGS_DIR=$(brew --prefix jags)/lib
+          sudo mkdir -p /usr/local/lib
+          sudo ln -sf "$BREW_JAGS_DIR/libjags.dylib" /usr/local/lib/libjags.4.dylib
+          sudo ln -sf "$BREW_JAGS_DIR/libjags.dylib" /usr/local/lib/libjags.dylib
 
       - uses: r-lib/actions/setup-pandoc@v2
 
@@ -38,6 +51,11 @@ jobs:
         with:
           r-version: ${{ matrix.config.r }}
           http-user-agent: ${{ matrix.config.http-user-agent }}
+
+      - name: Configure and compile rjags from source (macOS)
+        if: matrix.config.os == 'macos-latest'
+        run: |
+          Rscript -e 'install.packages("rjags", type = "source", configure.args = "--with-jags-include=/opt/homebrew/include --with-jags-lib=/opt/homebrew/lib")'
 
       - name: Cache JAGS (Windows)
         if: runner.os == 'Windows'
@@ -60,11 +78,6 @@ jobs:
           ) else (
             echo "JAGS found in cache, skipping installation"
           )
-
-      - name: Install JAGS (macOS)
-        if: runner.os == 'macOS'
-        run : |
-          brew install pkg-config jags
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
