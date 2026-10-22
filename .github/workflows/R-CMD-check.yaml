@@ -87,4 +87,4 @@ jobs:
           upload-snapshots: true
           # FIXED: Pass the environmental skip string to both checking phases
           args: 'c("--no-manual", "${{ env.VIGNETTE_ARGS }}")'
-          build_args: 'c("--no-manual","--compact-vignettes=gs+qpdf")'
+          build_args: 'c("--no-manual", "--compact-vignettes=gs+qpdf", Sys.getenv("VIGNETTE_ARGS"))'
