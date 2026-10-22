@@ -14,7 +14,7 @@ vignette: >
 
 ```{r, echo = FALSE, message = FALSE}
 knitr::opts_chunk$set(prompt = TRUE, highlight = F, background = '#FFFFFF',
-                      collapse = T, comment = "#>")
+                      collapse = T, comment = "#>", error = TRUE)
 library(missingHE)
 library(bookdown)
 library(ggplot2)
@@ -69,7 +69,7 @@ Three different selection models are fitted using the function `selection` to co
 
 Prior to fitting the model, the data are pre-processed by: replacing the default levels for the factor variable `trt` ($1$ and $2$) with the actual treatment names (`"SoC"` and `"MenSS"`); add/subtract to the cost/QALY data a small constant of $0.01$ to allow estimation of Gamma and Beta distributions, whose support does not include $0$ and $1$, respectively.
 
-```{r seldist, echo=TRUE, eval=TRUE, message=FALSE, warning=FALSE, error=FALSE, results='hide'}
+```{r seldist, echo=TRUE, eval=TRUE, message=FALSE, warning=FALSE, results='hide'}
 #rename trt levels
 MenSS$trt <- factor(MenSS$trt)
 levels(MenSS$trt) <- c("SoC", "MenSS")
@@ -98,7 +98,7 @@ Before looking at the results, it is generally a good idea to assess the fit of 
 
 The following code shows how the results of any model fitted in `missingHE` may be passed to the argument `x` of `pic` to compute the desired criterion. In particular, we pass the model objects into `pic` as a list and select `"looic"` as value for `criterion` to indicate that we want the LOOIC criterion to be computed for all models. Finally, we store the results into a new list object called `looic_m123` and print out the computed criteria for each model by accessing the inner object  `looic_m123$pic`.
 
-```{r selpic, echo=TRUE, eval=TRUE, message=FALSE, warning=FALSE, error=FALSE}
+```{r selpic, echo=TRUE, eval=TRUE, message=FALSE, warning=FALSE}
 #estimate looic for all models based on complete cases
 looic_m123 <- pic(x = list(sm1_nn, sm1_ng, sm1_bg),
             criterion = "looic", cases = "cc")
@@ -110,7 +110,7 @@ The printed estimates suggest a generally better fit for model 3 compared to mod
 
 Depending on the type of criteria, `pic` provides additional output related to the computation of the quantity. The object `looic_m123` is a list which stores several elements that were used in the computation of LOOIC (`pic`) for each model, such as estimates for the *effective number of parameters* (`peff`) as well as standard error estimates of `pic_se` and `peff_se`. These elements can be accessed in a similar way to what shown for the main LOOIC quantities. For instance, the following command can be used to access `peff` estimates used in the calculation of LOOIC for each model.
 
-```{r selpeff, echo=TRUE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r selpeff, echo=TRUE, eval=FALSE, message=FALSE, warning=FALSE}
 #print peff values
 looic_m123$peff
 ```
@@ -124,7 +124,7 @@ As an example, the following commands generate posterior density plots for a tot
   - `ndisplay` indicates the number of data replications to be generated to compute the desired plot/measure.
   - `trt` indicates the treatment(s). Accepted values are: a numeric value or factor level denoting the ordered position or name of the arm of interest, a character name for all arms (`"all"`) or a character name for all data pulled across arms (`"none"`). 
   
-```{r selppc, echo=TRUE, eval=TRUE, message=FALSE, warning=FALSE, error=FALSE}
+```{r selppc, echo=TRUE, eval=TRUE, message=FALSE, warning=FALSE}
 #compare densities of observed vs replicated outcome data under each model
 ppc_dens_m1 <- ppc(x = sm1_nn, type = "dens_overlay", outcome = "both",
              ndisplay = 20, trt = "none")
@@ -134,15 +134,15 @@ ppc_dens_m3 <- ppc(x = sm1_bg, type = "dens_overlay", outcome = "effects",
              ndisplay = 20, trt = "none")
 ```
 
-```{r figplotppc1, echo=FALSE, eval=TRUE, tidy=TRUE, error=FALSE, warning=FALSE, dpi=300, fig.show='hold',fig.cap="Posterior densities of 20 replicated data under model 1 compared to the empirical density of the original data.", out.width='100%', fig.pos='h', out.extra=''}
+```{r figplotppc1, echo=FALSE, eval=TRUE, tidy=TRUE, warning=FALSE, dpi=300, fig.show='hold',fig.cap="Posterior densities of 20 replicated data under model 1 compared to the empirical density of the original data.", out.width='100%', fig.pos='h', out.extra=''}
 ppc_dens_m1
 ```
 
-```{r figplotppc2, echo=FALSE, eval=TRUE, tidy=TRUE, error=FALSE, warning=FALSE, dpi=300, fig.show='hold',fig.cap="Posterior densities of 20 replicated data under model 2 compared to the empirical density of the original data.", out.width='100%', fig.pos='h', out.extra=''}
+```{r figplotppc2, echo=FALSE, eval=TRUE, tidy=TRUE, warning=FALSE, dpi=300, fig.show='hold',fig.cap="Posterior densities of 20 replicated data under model 2 compared to the empirical density of the original data.", out.width='100%', fig.pos='h', out.extra=''}
 ppc_dens_m2
 ```
 
-```{r figplotppc3, echo=FALSE, eval=TRUE, tidy=TRUE, error=FALSE, warning=FALSE, dpi=300, fig.show='hold',fig.cap="Posterior densities of 20 replicated data under model 3 compared to the empirical density of the original data.", out.width='100%', fig.pos='h', out.extra=''}
+```{r figplotppc3, echo=FALSE, eval=TRUE, tidy=TRUE, warning=FALSE, dpi=300, fig.show='hold',fig.cap="Posterior densities of 20 replicated data under model 3 compared to the empirical density of the original data.", out.width='100%', fig.pos='h', out.extra=''}
 ppc_dens_m3
 ```
 
@@ -156,7 +156,7 @@ Choice of the missingness mechanism for the outcomes is very difficult unless st
 
 The following code shows how estimation of selection models can be extended to include additional observed variables as predictors inside the missingness models to make the MAR assumption more plausible. As an example, and for ease of presentation, we consider here only model 1 and include as possible predictors into `model.me` and `model.mc` the baseline utilities (`u.0`) and age (`age`) variables. 
 
-```{r selmar, echo=TRUE, eval=TRUE, message=FALSE, warning=FALSE, error=FALSE, results='hide'}
+```{r selmar, echo=TRUE, eval=TRUE, message=FALSE, warning=FALSE, results='hide'}
 #fit selection model 1 (Normal-Normal) under MAR conditional on u.0 and age
 sm1_nn_mar <- selection(data = MenSS, dist_e = "norm", dist_c = "norm",
             model.eff = e ~ trt, model.cost = c ~ trt + e,
@@ -183,7 +183,7 @@ The output shows for each parameter a selection of posterior summaries obtained 
 
 Posterior distributions for each of these quantities may be extracted from the `sm1_nn_mar` by accessing the inner `JAGS` output `model`. For example, if different types of summaries or a visual inspection of the full posterior sample of a specific parameter is desired, e.g., `p_e`, we may access its posterior samples by typing
 
-```{r selpe, echo=TRUE, eval=TRUE, message=FALSE, warning=FALSE, error=FALSE}
+```{r selpe, echo=TRUE, eval=TRUE, message=FALSE, warning=FALSE}
 #store posterior samples of p_e and compute some custom summaries
 p_e <- sm1_nn_mar$model_output$model$BUGSoutput$sims.list$p_e
 summary(c(p_e))
@@ -191,7 +191,7 @@ summary(c(p_e))
 
 The function `coef` allows to compute and display key posterior summaries for only the regression coefficients in `model.eff` and `model.cost`, following standard convention for reporting coefficient estimates of regression models. The arguments `random` and `digits` may be used to indicate whether coefficient estimates of "random effects" (if present) in the outcome models should be displayed instead, and the number of digits to be displayed for all estimates. 
 
-```{r selcoef, echo=TRUE, eval=TRUE, message=FALSE, warning=FALSE, error=FALSE}
+```{r selcoef, echo=TRUE, eval=TRUE, message=FALSE, warning=FALSE}
 #print coefficient estimates from model.eff and model.cost
 coef(sm1_nn_mar, random = FALSE, digits = 2)
 ```
@@ -202,7 +202,7 @@ The output produced is split into two parts: one related to the coefficient esti
 
 Assumptions about the modelling structure of the effectiveness and cost models can be specified across all model fitting functions through the arguments `model.eff` and `model.cost`, respectively. The arguments require a formula object which mimics standard linear regression specification `e = trt + ` and `c = trt + `, where `e` and `c` and `trt` denote the outcome and treatment specific variable names accepted by `missingHE`, which must always be included. A generalised linear regression approach is used to specify the models at the location level of the outcomes, with default link functions automatically selected according to the distributions specified via `dist_e` and `dist_c`, e.g., identity for Normal, logarithmic for Gamma and Weibull, and logit for Beta or Bernoulli. Any fully-observed variable in the data frame passed to `data` may be specified as an additional covariate into the outcome models using a `+` sign. For example, the following code shows how to customise Model 1 (under MAR) to include different groups of covariates into the effectiveness and cost outcome and missingness models.
 
-```{r selcov, echo=TRUE, eval=TRUE, message=FALSE, warning=FALSE, error=FALSE, results='hide'}
+```{r selcov, echo=TRUE, eval=TRUE, message=FALSE, warning=FALSE, results='hide'}
 #fit selection model 1 (Normal-Normal) with covariates into both outcome and missingness models
 sm1_nn_cov <- selection(data = MenSS, dist_e = "norm", dist_c = "norm",
             model.eff = e ~ trt + u.0 + age, 
@@ -213,7 +213,7 @@ sm1_nn_cov <- selection(data = MenSS, dist_e = "norm", dist_c = "norm",
 
 `missingHE` allows the user to further customise the model structure to account for possible clustering (e.g., across different centres) through a formula notation inspired by the `lme4` package. More specifically, standard "random effects" parameters may be incorporated into each model by adding `+ (x | z)` to the usual "fixed effects" component of the model formula, where `x` denotes a linear specification for the random effects variable names to be added to the model (only if `x` already included as fixed effects) and `z` denotes the clustering variable name. For example, the following code shows how random intercepts (`1`) based on `site` may be included into both outcome selection models fitted to `MenSS`.
 
-```{r selcovre, echo=TRUE, eval=TRUE, message=FALSE, warning=FALSE, error=FALSE, results='hide'}
+```{r selcovre, echo=TRUE, eval=TRUE, message=FALSE, warning=FALSE, results='hide'}
 #fit selection model 1 (Normal-Normal) with covariates and random intercepts
 #into the model
 sm1_nn_cov_re <- selection(data = MenSS, dist_e = "norm", dist_c = "norm",
@@ -225,7 +225,7 @@ sm1_nn_cov_re <- selection(data = MenSS, dist_e = "norm", dist_c = "norm",
 
 As per usual, functions such as `postsum`, `print` and `coef` may be used to summarise posterior estimates for all relevant model parameters. When interest is in assessing MCMC convergence of a given model, the function `diagnostic` may be used to inspect graphical diagnostics for each family of model parameters. For example, the following code shows how autocorrelation plots for all regression coefficients in `model.eff` may be obtained based on the model in `sm1_nn_cov`.
 
-```{r figplotdiag, echo=FALSE, eval=TRUE, tidy=TRUE, error=FALSE, warning=FALSE, dpi=300, fig.show='hold',fig.cap="Checking convergence using the diagnostic function for a family of model parameters estimated in missingHE, for example through inspection of the autocorrelation plots.", out.width='100%', fig.pos='h', out.extra=''}
+```{r figplotdiag, echo=FALSE, eval=TRUE, tidy=TRUE, warning=FALSE, dpi=300, fig.show='hold',fig.cap="Checking convergence using the diagnostic function for a family of model parameters estimated in missingHE, for example through inspection of the autocorrelation plots.", out.width='100%', fig.pos='h', out.extra=''}
 diagnostic(x = sm1_nn_cov, type = "acf", param = "alpha")
 ```
 
@@ -246,7 +246,7 @@ The accepted names for the family of parameters (`param`) are defined so to matc
 
 `missingHE` fits each approach under weakly-informative prior distribution choices for all model parameters assuming a general lack of prior knowledge. Examples include Normal distributions centred at $0$ with generally low precision values (i.e., $1\times10^{6}$) for all regression coefficients, and Half-Cauchy distributions with a scale value of $2.5$. However, when desired and if prior information on some parameters is available, the user may overwrite default prior choices using the argument `prior` in each function. It is important that user-specific priors are passed to `prior` in a list form containing information about the desired parameters according to the type of model under consideration. For example, the following command may be used to update the priors about the effectiveness and cost regression coefficients and standard deviations when fitting a selection model using `selection`.
 
-```{r selprior, echo=TRUE, eval=TRUE, message=FALSE, warning=FALSE, error=FALSE, results='hide'}
+```{r selprior, echo=TRUE, eval=TRUE, message=FALSE, warning=FALSE, results='hide'}
 #update priors on outcome regression coefficients and standard deviations
 myprior <- list("beta.prior" = c("norm", 0, 0.01), 
          "beta_f.prior" = c("norm", 0, 0.001),

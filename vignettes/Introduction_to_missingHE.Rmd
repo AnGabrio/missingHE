@@ -15,7 +15,7 @@ vignette: >
 
 ```{r, echo = FALSE, message = FALSE}
 knitr::opts_chunk$set(prompt = TRUE, highlight = F, background = '#FFFFFF',
-                      collapse = T, comment = "#>")
+                      collapse = T, comment = "#>", error = TRUE)
 library(missingHE)
 library(bookdown)
 library(ggplot2)
@@ -174,7 +174,7 @@ In the following, we use data from a real clinical study as a running example to
 
 After loading the package `missingHE`, for example by typing `library(missingHE)`, the MenSS dataset (`MenSS`) is directly imported into the `R` workspace and can be inspected using the command
 
-```{r menss, echo=FALSE, eval=TRUE, message=FALSE, warning=FALSE, error=FALSE}
+```{r menss, echo=FALSE, eval=TRUE, message=FALSE, warning=FALSE}
 MenSS$u.0 <- round(MenSS$u.0, digits = 3)
 n <- nrow(MenSS)
 n1 <- nrow(MenSS[MenSS$trt=="1",])
@@ -202,13 +202,13 @@ hist_c <- ggplot(MenSS_outcomes, aes(x=c, fill=trt)) + geom_histogram(color="bla
 axis.line = element_line(colour = "black"), plot.title = element_text(hjust = 0.5))+ ylab("Frequency") + xlab("Tcosts") + scale_x_continuous(breaks=seq(0,1000,1000))
 ```
 
-```{r tbl1-hide, echo=TRUE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE}
+```{r tbl1-hide, echo=TRUE, eval=FALSE, message=FALSE, warning=FALSE}
 rbind(head(MenSS), tail(MenSS))
 ```
 
 to show the first and last few rows:
 
-```{r tbl1, echo=FALSE, eval=TRUE, message=FALSE, warning=FALSE, error=FALSE}
+```{r tbl1, echo=FALSE, eval=TRUE, message=FALSE, warning=FALSE}
 print(rbind(head(MenSS), tail(MenSS)), row.names = FALSE)
 ```
 
@@ -216,11 +216,11 @@ The dataset consists of $`r n`$ individuals grouped in two arms, where `trt` $=1
 
 Key health economic variables are `u.0`, `e` and `c`, which denote the baseline utility score, QALY and Total cost outcomes, respectively. All baseline variables are fully-observed, whereas all outcome variables are partially-observed in both treatment arms. A total of `r n_ec_cc` (`r round(n_ec_cc/n,2)*100`$\%$) individuals has observed QALYs and Total costs, of which `r n1_ec_cc` in the SoC and `r n2_ec_cc` in the MenSS arm, while the remaining `r n-n_ec_cc` individuals have both `e` and `c` missing. Figure \@ref(fig:fig1e) and Figure \@ref(fig:fig1c) show histograms of the observed distributions for the QALY and Total cost variables in `MenSS`, separately by treatment arm. We note that, among the observed cases, `r n_e_ones` (`r round(n_e_ones/n_ec_cc,2)*100`$\%$) individuals are associated with structural values of perfect health ($s^e=1$), while `r n_c_zeros` (`r round(n_c_zeros/n_ec_cc,2)*100`$\%$) individuals have structural values of no service use ($s^c = 0$).
 
-```{r fig1e, echo=FALSE, eval=TRUE, tidy=TRUE, error=FALSE, warning=FALSE, dpi=300, fig.show='hold',fig.cap="Histograms of the observed data distributions for the QALYs in the SoC and MenSS arm.", out.width='100%', fig.pos='h', out.extra=''}
+```{r fig1e, echo=FALSE, eval=TRUE, tidy=TRUE, warning=FALSE, dpi=300, fig.show='hold',fig.cap="Histograms of the observed data distributions for the QALYs in the SoC and MenSS arm.", out.width='100%', fig.pos='h', out.extra=''}
 hist_e
 ```
 
-```{r fig1c, echo=FALSE, eval=TRUE, tidy=TRUE, error=FALSE, warning=FALSE, dpi=300, fig.show='hold',fig.cap="Histograms of the observed data distributions for the Total costs in the SoC and MenSS arm.", out.width='100%', fig.pos='h', out.extra=''}
+```{r fig1c, echo=FALSE, eval=TRUE, tidy=TRUE, warning=FALSE, dpi=300, fig.show='hold',fig.cap="Histograms of the observed data distributions for the Total costs in the SoC and MenSS arm.", out.width='100%', fig.pos='h', out.extra=''}
 hist_c
 ```
 
@@ -264,7 +264,7 @@ Note that the list and its elements containing the custom prior specification ne
 
 We consider the following common model specification for $p(e_i)p(c_i\mid e_i)$: `e` and `c` are both normally distributed; `u.0` is included as a covariate in the effectiveness model; a MAR mechanism is assumed for both outcomes. The model is first implemented using a selection approach through the function `selection` under a MAR assumption for `e` (conditional on `u.0`) and `c` using the following command.
 
-```{r sel1, echo=FALSE, eval=TRUE, message=FALSE, warning=FALSE, error=FALSE, results='hide'}
+```{r sel1, echo=FALSE, eval=TRUE, message=FALSE, warning=FALSE, results='hide'}
 sm1_mar <- selection(data = MenSS, dist_e = "norm", dist_c = "norm",
          model.eff = e ~ trt + u.0, model.cost = c ~ trt + e,
          model.me = me ~ u.0, model.mc = mc ~ 1, 
@@ -275,7 +275,7 @@ The arguments `model.me` and `model.mc` are specific to `selection` and denote t
 
 Next, we specify the same outcome model under a pattern mixture approach, but assuming a logistic distribution for `e`. The model is implemented through the function `pattern`, imposing CC restrictions to identify the model under MAR, using the following command.
 
-```{r pat1, echo=FALSE, eval=TRUE, message=FALSE, warning=FALSE, error=FALSE, results='hide'}
+```{r pat1, echo=FALSE, eval=TRUE, message=FALSE, warning=FALSE, results='hide'}
 pm1_mar <- pattern(data = MenSS, dist_e = "logis", dist_c = "norm", 
          model.eff = e ~ trt + u.0, model.cost = c ~ trt + e, 
          type = "MAR", restriction = "CC", n.iter = 1000, ref = 2)
@@ -285,7 +285,7 @@ The argument `restriction` is specific to `pattern` and denotes the type of rest
 
 Finally, the model is specified under a hurdle approach but assuming a Beta and Gamma distribution for `e` and `c`, respectively. In particular, individuals with $e_i=1$ and $c_i=0$ are assigned to a structural component in the QALY and Total cost model, respectively. The model is implemented through the function `hurdle`, under a SCAR assumption about the structural value mechanism, using the following command.
 
-```{r hur1, echo=FALSE, eval=TRUE, message=FALSE, warning=FALSE, error=FALSE, results='hide'}
+```{r hur1, echo=FALSE, eval=TRUE, message=FALSE, warning=FALSE, results='hide'}
 hm1_mar <- hurdle(data = MenSS, dist_e = "beta", dist_c = "gamma", 
          model.eff = e ~ trt + u.0, model.cost = c ~ trt + e, 
          model.se = se ~ 1, model.sc = sc ~ 1, 
@@ -312,13 +312,13 @@ Each of these functions accepts as main argument an `R` object of class `"missin
 
 The function `diagnostic` provides a range of standard diagnostic plots for assessing convergence based on the posterior distribution of model parameters. Consider the output of the selection model fitted in Section \@ref(sec-marmodel) and stored in the object `sm1_mar`; we may use the command
 
-```{r diag1, echo=TRUE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE, tidy=TRUE}
+```{r diag1, echo=TRUE, eval=FALSE, message=FALSE, warning=FALSE, tidy=TRUE}
 diagnostic(x = sm1_mar, type = "traceplot", param = "sd.e")
 ```
 
 to produce “traceplots” for the standard deviation effectiveness parameter estimates from the model. In this case, as displayed in Figure \@ref(fig:fig2), no major issues in convergence are identified with the traceplots showing acceptable mixing in the two chains.
 
-```{r fig2, echo=FALSE, eval=TRUE, tidy=TRUE, error=FALSE, warning=FALSE, dpi=300, fig.show='hold',fig.cap="Checking convergence using the diagnostic function for a model fitted in missingHE, for example through inspection of the traceplots.", out.width='100%', fig.pos='h', out.extra=''}
+```{r fig2, echo=FALSE, eval=TRUE, tidy=TRUE, warning=FALSE, dpi=300, fig.show='hold',fig.cap="Checking convergence using the diagnostic function for a model fitted in missingHE, for example through inspection of the traceplots.", out.width='100%', fig.pos='h', out.extra=''}
 diagnostic(x = sm1_mar, type = "traceplot", param = "sd.e")
 ```
 
@@ -334,13 +334,13 @@ Note that most of the output produced by `diagnostic` is effectively a `ggplot2`
 
 The function `ppc` provides a range of graphical posterior predictive checks for assessing the fit of a model. Consider again the output of the selection model stored in the `sm1_mar`; we may use the command
 
-```{r ppc1, echo=TRUE, eval=FALSE, message=FALSE, warning=FALSE, error=FALSE, tidy=TRUE}
+```{r ppc1, echo=TRUE, eval=FALSE, message=FALSE, warning=FALSE, tidy=TRUE}
 ppc(x = sm1_mar, type = "dens_overlay", outcome = "effects", ndisplay = 20)
 ```
 
 to plot the densities of `ndisplay` $=20$ replications of the effectiveness data (light blue lines) with respect to the density of the observed data (dark blue line), separately in the Soc (`trt = 1`) and MenSS (`trt = 2`) arm. In this case, as displayed in Figure \@ref(fig:fig3), some discrepancies between the replicated and observed data densities occur. This suggests a relatively poor fit of the current model (i.e., the normality assumption of `e`) to the observed data in both arms.
 
-```{r fig3, echo=FALSE, eval=TRUE, tidy=TRUE, error=FALSE, warning=FALSE, dpi=300, fig.show='hold',fig.cap="Posterior predictive graphical checks using the ppc function for a model fitted in missingHE, for example through inspection of overlayed densities.", out.width='100%', fig.pos='h', out.extra=''}
+```{r fig3, echo=FALSE, eval=TRUE, tidy=TRUE, warning=FALSE, dpi=300, fig.show='hold',fig.cap="Posterior predictive graphical checks using the ppc function for a model fitted in missingHE, for example through inspection of overlayed densities.", out.width='100%', fig.pos='h', out.extra=''}
 ppc(x = sm1_mar, type = "dens_overlay", outcome = "effects", ndisplay = 20)
 ```
 
@@ -356,7 +356,7 @@ A full description of the choices for each argument in `ppc`, including the avai
 
 The function `pic` allows to assess the relative predictive accuracy of models by computing three alternative Bayesian information criteria: *Deviance Information Criterion* or **DIC**; *Widely Applicable Information Criterion* or **WAIC**; and *Leave-One-Out Information Criterion* or **LOOIC**. As an example, consider again the model results stored in `sm1_mar`; we may use the command
 
-```{r pic1, echo=TRUE, eval=TRUE, message=FALSE, warning=FALSE, error=FALSE, results='hide'}
+```{r pic1, echo=TRUE, eval=TRUE, message=FALSE, warning=FALSE, results='hide'}
 pic_sm1_mar <- pic(x = sm1_mar, criterion = "waic", cases = "cc")
 ```
 
@@ -384,7 +384,7 @@ names(sm1_mar)
 
 displays the names of the different elements in the list.
 
-```{r namesshow, echo=FALSE, eval=TRUE, warning=FALSE, error=FALSE}
+```{r namesshow, echo=FALSE, eval=TRUE, warning=FALSE}
 names(sm1_mar)
 ```
 
@@ -463,13 +463,13 @@ The regression output is separately reported by outcome. Based on the results st
 
 The function `plot` allows to visually inspect how missing outcome data have been imputed, using `ggplot2` as the graphical engine. For example, the command
 
-```{r plot1, echo=TRUE, eval=FALSE, tidy=TRUE, error=FALSE, warning=FALSE}
+```{r plot1, echo=TRUE, eval=FALSE, tidy=TRUE, warning=FALSE}
 plot(sm1_mar, class = "scatter", outcome = "effects", trt = "MenSS")
 ```
 
 displays scatter plots of the observed (black dots) and imputed (red dots and lines) effectiveness variables in the `"SoC"` (`trt = 1`) and `"MenSS"` (`trt = 2`) arm based on the model results stored in `sm1_mar`, as shown in Figure \@ref(fig:figplot). Imputed values are represented in terms of posterior mean values, and their uncertainty by means of corresponding credible intervals. The arguments `class = "scatter"`, `outcome = "effects"` and `trt = "MenSS"` instruct `missingHE` to display scatter plots for the effectiveness outcome in the MenSS arm.
 
-```{r figplot, echo=FALSE, eval=TRUE, tidy=TRUE, error=FALSE, warning=FALSE, dpi=300, fig.show='hold',fig.cap="Scatter plots of observed and imputed effectiveness data in the MenSS arm under normal distributions using a selection model.", out.width='100%', fig.pos='h', out.extra=''}
+```{r figplot, echo=FALSE, eval=TRUE, tidy=TRUE, warning=FALSE, dpi=300, fig.show='hold',fig.cap="Scatter plots of observed and imputed effectiveness data in the MenSS arm under normal distributions using a selection model.", out.width='100%', fig.pos='h', out.extra=''}
 plot(sm1_mar, class = "scatter", outcome = "effects", trt = "MenSS")
 ```
 
@@ -525,7 +525,7 @@ BCEA::ceac.plot(sm1_mar$cea, graph = "ggplot2")
 
 generate Figure \@ref(fig:figplotcea1) and Figure \@ref(fig:figplotcea2), which show the cost-effectiveness plane and acceptability curve plots obtained from the PSA results stored in `sm1_mar$cea`.
 
-```{r figplotcea1, echo=FALSE, eval=TRUE, tidy=FALSE, error=FALSE, warning=FALSE, dpi=300, fig.show='hold',fig.cap="Inspecting probabilistic sensitivity analysis using BCEA built-in functions, for example in terms of cost-effectiveness plane.",out.width='100%', fig.pos='h', out.extra=''}
+```{r figplotcea1, echo=FALSE, eval=TRUE, tidy=FALSE, warning=FALSE, dpi=300, fig.show='hold',fig.cap="Inspecting probabilistic sensitivity analysis using BCEA built-in functions, for example in terms of cost-effectiveness plane.",out.width='100%', fig.pos='h', out.extra=''}
 cep_sm1_mar <- BCEA::ceplane.plot(sm1_mar$cea, 
             graph = "ggplot2") + ggplot2::ggtitle("")
 ceac_sm1_mar <- BCEA::ceac.plot(sm1_mar$cea, 
@@ -533,7 +533,7 @@ ceac_sm1_mar <- BCEA::ceac.plot(sm1_mar$cea,
 cep_sm1_mar
 ```
 
-```{r figplotcea2, echo=FALSE, eval=TRUE, tidy=FALSE, error=FALSE, warning=FALSE, dpi=300, fig.show='hold',fig.cap="Inspecting probabilistic sensitivity analysis using BCEA built-in functions, for example in terms of cost-effectiveness acceptability curve.",out.width='100%', fig.pos='h', out.extra=''}
+```{r figplotcea2, echo=FALSE, eval=TRUE, tidy=FALSE, warning=FALSE, dpi=300, fig.show='hold',fig.cap="Inspecting probabilistic sensitivity analysis using BCEA built-in functions, for example in terms of cost-effectiveness acceptability curve.",out.width='100%', fig.pos='h', out.extra=''}
 ceac_sm1_mar
 ```
 
