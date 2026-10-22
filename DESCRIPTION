@@ -3,7 +3,7 @@ Type: Package
 Title: Missing Cost Effectiveness Models 
 Version: 1.6.2.1
 Description: Performs Bayesian cost-effectiveness analysis with missing outcome data. Three classes of models can be fitted under a variety of missing data assumptions: selection models, pattern mixture models and hurdle models. The package allows to assess model convergence and summarise the statistical and economic results using different types of measures and graphs. The methods implemented are described in Mason (2018) <doi:10.1002/hec.3793>, Molenberghs (2000) <doi:10.1007/978-1-4419-0300-6_18> and Gabrio (2019) <doi:10.1002/sim.8045>.
-Authors@R: person("Andrea", "Gabrio", email = "a.gabrio@maastrichtuniversity.nl", role = c("aut", "cre", "cph"))
+Authors@R: person("Andrea", "Gabrio", email = "a.gabrio@maastrichtuniversity.nl", role = c("aut", "cre", "cph"), comment = c(ORCID = "0000-0002-7650-4534"))
 Depends: R (>= 4.1.0)
 Suggests: 
     knitr,
@@ -19,8 +19,6 @@ BugReports: https://github.com/AnGabrio/missingHE/issues/
 LazyData: true
 Imports: ggpubr, ggmcmc, ggthemes, BCEA, ggplot2, bayesplot, methods, R2jags, loo, coda, mcmcr
 Config/roxygen2/version: 8.1.1
-Author: Andrea Gabrio [aut, cre, cph] (ORCID:
-    <https://orcid.org/0000-0002-7650-4534>)
 Maintainer: Andrea Gabrio <a.gabrio@maastrichtuniversity.nl>
 Repository: CRAN
 Roxygen: list(markdown = TRUE)

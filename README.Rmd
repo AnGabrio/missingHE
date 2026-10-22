@@ -20,7 +20,7 @@ output: github_document
 
 > Fit Bayesian Missing Cost Effectiveness Models in R.
 
-:rocket: This is the **development version** of the `R` package `missingHE` (currently on version `r packageDescription("missingHE")$Version`). The stable version is now release `r utils::available.packages(filters = "CRAN")["missingHE",2]`, on [CRAN](https://cran.r-project.org/web/packages/missingHE/index.html).
+:rocket: This is the **development version** of the `R` package `missingHE` (currently on version `r packageDescription("missingHE")$Version`). The stable version is now release `r utils::available.packages(filters = "CRAN")["missingHE",2]`, on [CRAN](https://CRAN.R-project.org/package=missingHE).
 
 ## Contents
 
