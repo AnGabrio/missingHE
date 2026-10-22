@@ -85,6 +85,5 @@ jobs:
       - uses: r-lib/actions/check-r-package@v2
         with:
           upload-snapshots: true
-          # FIXED: Pass the environmental skip string to both checking phases
-          args: 'c("--no-manual", "${{ env.VIGNETTE_ARGS }}")'
-          build_args: 'c("--no-manual", "--compact-vignettes=gs+qpdf", Sys.getenv("VIGNETTE_ARGS"))'
+          args: 'if (Sys.info()["sysname"] == "Darwin") c("--no-manual", "--no-vignettes") else "--no-manual"'
+          build_args: 'if (Sys.info()["sysname"] == "Darwin") c("--no-manual", "--compact-vignettes=gs+qpdf", "--no-build-vignettes") else c("--no-manual", "--compact-vignettes=gs+qpdf")'
