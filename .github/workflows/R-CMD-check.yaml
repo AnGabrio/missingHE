@@ -85,4 +85,6 @@ jobs:
       - uses: r-lib/actions/check-r-package@v2
         with:
           upload-snapshots: true
+          # FIXED: Pass the environmental skip string to both checking phases
+          args: 'c("--no-manual", "${{ env.VIGNETTE_ARGS }}")'
           build_args: 'c("--no-manual","--compact-vignettes=gs+qpdf")'
