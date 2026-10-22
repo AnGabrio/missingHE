@@ -264,6 +264,7 @@ sum(mys_e == 1, na.rm = T)
 The number of individuals associated with $e=1$ has considerably increased with respect to the observed data alone. We can now proceed to fit the hurdle model by replacing the original structural indicator variable of $e$ with the newly created one using the argument `s_e = mys_e`. 
 
 ```{r mnar-hm2-hide, echo=FALSE, eval=TRUE, message=FALSE, warning=FALSE, error=FALSE, results='hide'}
+set.seed(1014)
 NN.hur2 <- hurdle(data = MenSS, model.eff = e ~ trt + u.0, 
          model.cost = c ~ trt, model.se = se ~ 1, 
          model.sc = sc ~ 1, type = "SCAR", s_e = mys_e,
