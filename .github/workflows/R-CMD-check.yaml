@@ -30,10 +30,18 @@ jobs:
       R_KEEP_PKG_SOURCE: yes
       DYLD_LIBRARY_PATH: ${{ matrix.config.os == 'macos-latest' && '/opt/homebrew/lib:/usr/local/lib' || '' }}
       JAGS_HOME: ${{ matrix.config.os == 'macos-latest' && '/opt/homebrew' || '' }}
-      VIGNETTE_ARGS: ${{ matrix.config.os == 'macos-latest' && '--no-build-vignettes --no-vignettes' || '' }}
+      # Dynamic environment variables to strip vignettes completely on macOS
+      R_CMD_CHECK_ARGS: ${{ matrix.config.os == 'macos-latest' && '--no-manual --no-vignettes' || '--no-manual' }}
+      _R_CHECK_BUILD_VIGNETTES_: ${{ matrix.config.os == 'macos-latest' && 'false' || 'true' }}
 
     steps:
       - uses: actions/checkout@v6
+
+      - name: Install JAGS (Ubuntu)
+        if: matrix.config.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jags pkg-config
 
       - name: Install JAGS (macOS)
         if: matrix.config.os == 'macos-latest'
@@ -89,5 +97,3 @@ jobs:
         with:
           upload-snapshots: true
           error-on: 'warning'
-          args: 'if (Sys.info()["sysname"] == "Darwin") c("--no-manual", "--no-vignettes") else "--no-manual"'
-          build_args: 'if (Sys.info()["sysname"] == "Darwin") c("--no-manual", "--compact-vignettes=gs+qpdf", "--no-build-vignettes") else c("--no-manual", "--compact-vignettes=gs+qpdf")'
