@@ -79,9 +79,16 @@ jobs:
           extra-packages: any::rcmdcheck
           needs: check
 
-      - name: Install rjags from source
+      - name: Install rjags from source (macOS)
+        if: matrix.config.os == 'macos-latest'
         run: |
-          Rscript -e 'if (Sys.info()["sysname"] == "Darwin") { install.packages("rjags", type = "source", configure.args = "--with-jags-include=/opt/homebrew/include --with-jags-lib=/opt/homebrew/lib") } else { install.packages("rjags", type = "source") }'
+          export PKG_CONFIG_PATH="/opt/homebrew/lib/pkgconfig:$PKG_CONFIG_PATH"
+          Rscript -e 'install.packages("rjags", type = "source", repos = "https://r-project.org")'
+
+      - name: Install rjags (Windows and Linux)
+        if: matrix.config.os != 'macos-latest'
+        run: |
+          Rscript -e 'install.packages("rjags", type = "source", repos = "https://r-project.org")'
 
       - uses: r-lib/actions/check-r-package@v2
         with:
