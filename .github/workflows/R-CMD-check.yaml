@@ -92,4 +92,4 @@ jobs:
           upload-snapshots: true
           args: 'if (Sys.info()["sysname"] == "Darwin") c("--no-manual", "--no-vignettes") else "--no-manual"'
           build_args: 'if (Sys.info()["sysname"] == "Darwin") c("--no-manual", "--compact-vignettes=gs+qpdf", "--no-build-vignettes") else c("--no-manual", "--compact-vignettes=gs+qpdf")'
-          error-on: '${{ matrix.config.os == ''macos-latest'' && ''error'' || ''warning'' }}'
+          error-on: 'error'
