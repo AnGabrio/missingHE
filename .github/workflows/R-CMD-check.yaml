@@ -79,16 +79,11 @@ jobs:
           extra-packages: any::rcmdcheck
           needs: check
 
-      - name: Install rjags from source (macOS)
-        if: matrix.config.os == 'macos-latest'
+      - name: Force rebuild rjags from source code (All Platforms)
         run: |
-          export PKG_CONFIG_PATH="/opt/homebrew/lib/pkgconfig:$PKG_CONFIG_PATH"
-          Rscript -e 'install.packages("rjags", type = "source", repos = "https://r-project.org")'
-
-      - name: Install rjags (Windows and Linux)
-        if: matrix.config.os != 'macos-latest'
-        run: |
-          Rscript -e 'install.packages("rjags", type = "source", repos = "https://r-project.org")'
+          Rscript -e 'if ("rjags" %in% rownames(installed.packages())) remove.packages("rjags")'
+          Rscript -e 'install.packages("rjags", type = "source", repos = "https://cloud.r-project.org")'
+        shell: bash
 
       - uses: r-lib/actions/check-r-package@v2
         with:
