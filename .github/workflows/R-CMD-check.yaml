@@ -53,12 +53,10 @@ jobs:
           r-version: ${{ matrix.config.r }}
           http-user-agent: ${{ matrix.config.http-user-agent }}
 
-      # --- START OF FIX: FORCE RJAGS SOURCE COMPILATION ON MAC ---
       - name: Configure and compile rjags from source (macOS)
         if: matrix.config.os == 'macos-latest'
         run: |
           Rscript -e 'install.packages("rjags", type = "source", configure.args = "--with-jags-include=/opt/homebrew/include --with-jags-lib=/opt/homebrew/lib")'
-      # --- END OF FIX ---
 
       - name: Cache JAGS (Windows)
         if: runner.os == 'Windows'
@@ -87,22 +85,9 @@ jobs:
           extra-packages: any::rcmdcheck
           needs: check
 
-      # --- DYNAMICALLY ASSIGN ARGUMENTS AT THE WORKFLOW MATRIX LEVEL ---
-      - name: Set dynamic check arguments based on OS
-        id: set-args
-        shell: bash
-        run: |
-          if [ "${{ matrix.config.os }}" = "macos-latest" ]; then
-            echo "args=--no-manual --no-vignettes" >> $GITHUB_OUTPUT
-            echo "build_args=--no-manual --compact-vignettes=gs+qpdf --no-build-vignettes" >> $GITHUB_OUTPUT
-          else
-            echo "args=--no-manual" >> $GITHUB_OUTPUT
-            echo "build_args=--no-manual --compact-vignettes=gs+qpdf" >> $GITHUB_OUTPUT
-          fi
-
       - uses: r-lib/actions/check-r-package@v2
         with:
           upload-snapshots: true
-          args: ${{ steps.set-args.outputs.args }}
-          build_args: ${{ steps.set-args.outputs.build_args }}
           error-on: 'warning'
+          args: 'if (Sys.info()["sysname"] == "Darwin") c("--no-manual", "--no-vignettes") else "--no-manual"'
+          build_args: 'if (Sys.info()["sysname"] == "Darwin") c("--no-manual", "--compact-vignettes=gs+qpdf", "--no-build-vignettes") else c("--no-manual", "--compact-vignettes=gs+qpdf")'
