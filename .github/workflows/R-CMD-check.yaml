@@ -28,31 +28,9 @@ jobs:
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       R_KEEP_PKG_SOURCE: yes
-      DYLD_LIBRARY_PATH: ${{ matrix.config.os == 'macos-latest' && '/opt/homebrew/lib:/usr/local/lib' || '' }}
-      JAGS_HOME: ${{ matrix.config.os == 'macos-latest' && '/opt/homebrew' || '' }}
-      # Dynamic environment variables to strip vignettes completely on macOS
-      R_CMD_CHECK_ARGS: ${{ matrix.config.os == 'macos-latest' && '--no-manual --no-vignettes' || '--no-manual' }}
-      _R_CHECK_BUILD_VIGNETTES_: ${{ matrix.config.os == 'macos-latest' && 'false' || 'true' }}
 
     steps:
       - uses: actions/checkout@v6
-
-      - name: Install JAGS (Ubuntu)
-        if: matrix.config.os == 'ubuntu-latest'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y jags pkg-config
-
-      - name: Install JAGS (macOS)
-        if: matrix.config.os == 'macos-latest'
-        run: |
-          brew install pkg-config jags
-
-          # Map the hardcoded dylib to the active Homebrew path
-          BREW_JAGS_DIR=$(brew --prefix jags)/lib
-          sudo mkdir -p /usr/local/lib
-          sudo ln -sf "$BREW_JAGS_DIR/libjags.dylib" /usr/local/lib/libjags.4.dylib
-          sudo ln -sf "$BREW_JAGS_DIR/libjags.dylib" /usr/local/lib/libjags.dylib
 
       - uses: r-lib/actions/setup-pandoc@v2
 
@@ -60,11 +38,6 @@ jobs:
         with:
           r-version: ${{ matrix.config.r }}
           http-user-agent: ${{ matrix.config.http-user-agent }}
-
-      - name: Configure and compile rjags from source (macOS)
-        if: matrix.config.os == 'macos-latest'
-        run: |
-          Rscript -e 'install.packages("rjags", type = "source", configure.args = "--with-jags-include=/opt/homebrew/include --with-jags-lib=/opt/homebrew/lib")'
 
       - name: Cache JAGS (Windows)
         if: runner.os == 'Windows'
@@ -88,12 +61,20 @@ jobs:
             echo "JAGS found in cache, skipping installation"
           )
 
+      - name: Install JAGS (macOS)
+        if: runner.os == 'macOS'
+        run : |
+          brew install pkg-config jags
+
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           extra-packages: any::rcmdcheck
           needs: check
 
+      - name: Install rjags
+        run: Rscript -e 'install.packages("rjags", type = "source")'
+
       - uses: r-lib/actions/check-r-package@v2
         with:
           upload-snapshots: true
-          error-on: 'warning'
+          build_args: 'c("--no-manual","--compact-vignettes=gs+qpdf")'
