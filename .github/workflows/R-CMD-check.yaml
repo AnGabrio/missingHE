@@ -31,6 +31,8 @@ jobs:
       # Append these two lines underneath your existing setup:
       DYLD_LIBRARY_PATH: ${{ matrix.config.os == 'macos-latest' && '/opt/homebrew/lib:/usr/local/lib' || '' }}
       JAGS_HOME: ${{ matrix.config.os == 'macos-latest' && '/opt/homebrew' || '' }}
+      # Dynamic flag to skip vignettes ONLY on macOS
+      VIGNETTE_ARGS: ${{ matrix.config.os == 'macos-latest' && '--no-build-vignettes --no-vignettes' || '' }}
 
     steps:
       - uses: actions/checkout@v6
