@@ -11,6 +11,8 @@ Check](https://github.com/AnGabrio/missingHE/actions/workflows/R-CMD-check.yaml/
 [![CRAN_Download_Badge](https://cranlogs.r-pkg.org:443/badges/grand-total/missingHE?color=orange)](https://cranlogs.r-pkg.org:443/badges/grand-total/missingHE?color=orange)
 [![License: GPL
 (\>=2)](https://img.shields.io/badge/License-GPL%20%28%3E%3D%202%29-blue.svg)](https://choosealicense.com/licenses/gpl-2.0/)
+[![Codecov test
+coverage](https://codecov.io/gh/AnGabrio/missingHE/graph/badge.svg)](https://app.codecov.io/gh/AnGabrio/missingHE)
 <!-- badges: end -->
 
 > Fit Bayesian Missing Cost Effectiveness Models in R.
