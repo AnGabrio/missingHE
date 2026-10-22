@@ -92,5 +92,4 @@ jobs:
           upload-snapshots: true
           args: 'if (Sys.info()["sysname"] == "Darwin") c("--no-manual", "--no-vignettes") else "--no-manual"'
           build_args: 'if (Sys.info()["sysname"] == "Darwin") c("--no-manual", "--compact-vignettes=gs+qpdf", "--no-build-vignettes") else c("--no-manual", "--compact-vignettes=gs+qpdf")'
-          # FIXED: Prevent intentional vignette index warnings from failing the macOS check run
-          error-on: '${{ matrix.config.os == "macos-latest" && "error" || "warning" }}'
+          error-on: '${{ matrix.config.os == ''macos-latest'' && ''error'' || ''warning'' }}'
