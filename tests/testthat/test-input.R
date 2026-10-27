@@ -1,6 +1,6 @@
-# test errors in input arguments
+# test errors in input arguments of main functions of the package
 
-test_that("input errors", {
+test_that("input errors of main functions", {
 
   load(test_path("testdata/MenSS.RData"))
 

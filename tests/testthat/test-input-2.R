@@ -1,4 +1,4 @@
-# test errors in input arguments
+# test errors in input arguments of data_read internal functions
 
 test_that("input errors check within inner functions", {
 
@@ -203,16 +203,6 @@ test_that("input errors check within inner functions", {
                         fixed_c = c ~ trt + e, random_e = NULL, random_c = NULL,
                         trt_lev = c(1, 2), trt_pos = c(1, 2)),
     regexp = "Please define clustering variables as factors")
-
-
-
-
-
-
-
-
-
-
 
   expect_error(
     data_read_hurdle(data = MenSS, model.eff = e ~ trt + u.0, model.cost = c ~ trt,
@@ -671,5 +661,5 @@ test_that("input errors check within inner functions", {
                    trt_lev = c(1, 2), trt_pos = c(1, 2)),
     regexp = "Please define clustering variables as factors")
 
-
 })
+
