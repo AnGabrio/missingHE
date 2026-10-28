@@ -1,4 +1,4 @@
-test_that("check output from main functions", {
+test_that("check output from selection function", {
 
   load(test_path("testdata/MenSS.RData"))
 
@@ -7,7 +7,7 @@ test_that("check output from main functions", {
   type <- "MAR"
   dist_e <- "norm"
   dist_c <- "norm"
-  n.iter <- 20
+  n.iter <- 10
   n.trt <- length(unique(MenSS$trt))
   n.trt.names <- unique(MenSS$trt)
   n.ind <- nrow(MenSS)
@@ -145,7 +145,6 @@ test_that("check output from main functions", {
   expect_equal(sm$data_set$model_formula$mf_model.c_random, c ~ 0, ignore_attr = TRUE)
   expect_equal(sm$data_set$model_formula$mf_model.me_random, me ~ 0, ignore_attr = TRUE)
   expect_equal(sm$data_set$model_formula$mf_model.mc_random, mc ~ 0, ignore_attr = TRUE)
-  expect_equal(sm$data_set$model_formula$mf_model.me_random, me ~ 0, ignore_attr = TRUE)
 
   expect_length(sm$model_output, 26)
   expect_type(sm$model_output, "list")

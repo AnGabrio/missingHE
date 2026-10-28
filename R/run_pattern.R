@@ -7,7 +7,7 @@
 #' @param dist_e distribution assumed for the effects. Current available choices are: Normal ('norm'), Beta ('beta'), Gamma ('gamma'), Exponential ('exp'),
 #' Weibull ('weib'), Logistic ('logis'), Poisson ('pois'), Negative Binomial ('negbin') or Bernoulli ('bern').
 #' @param dist_c Distribution assumed for the costs. Current available choices are: Normal ('norm'), Gamma ('gamma') or LogNormal ('lnorm').
-#' @param model_info list containing model and MCMC information to be passed to JAGS. 
+#' @param model_info list containing model and MCMC information to be passed to JAGS.
 #' @keywords internal
 #' @importFrom stats rnorm rbeta rgamma rlnorm rweibull rnbinom rbinom rpois rlogis rexp
 #' @examples
@@ -28,7 +28,7 @@ run_pattern <- function(data_model, type, dist_e, dist_c, model_info) {
   X_e_random <- data_model$X_e_random; X_c_random <- data_model$X_c_random
   if(pe_random == 1) { X_e_random <- as.vector(unlist(data_model$X_e_random))}
   if(pc_random == 1) { X_c_random <- as.vector(unlist(data_model$X_c_random))}
-  if(pe_random > 1) { X_e_random <- as.matrix(data_model$X_e_random)} 
+  if(pe_random > 1) { X_e_random <- as.matrix(data_model$X_e_random)}
   if(pc_random > 1) { X_c_random <- as.matrix(data_model$X_c_random)}
   clus_e <- data_model$clus_e; clus_c <- data_model$clus_c
   pp <- rep(1, n_patterns); d_mod <- d_or
@@ -40,15 +40,15 @@ run_pattern <- function(data_model, type, dist_e, dist_c, model_info) {
   if(all(unique(d_or) %in% c(1, 2, 4)) & n_patterns == 3) { d_mod[d_mod == 4] <- 3}
   if(all(unique(d_or) %in% c(1, 3, 4)) & n_patterns == 3) { d_mod[d_mod == 3] <- 2; d_mod[d_mod == 4] <- 3}
   if(all(unique(d_or) %in% c(2, 3, 4)) & n_patterns == 4) { d_mod[d_mod == 2] <- 1; d_mod[d_mod == 3] <- 2; d_mod[d_mod == 4] <- 3}
-  datalist <- list("n"= n, "eff" = eff, "cost" = cost, 
+  datalist <- list("n"= n, "eff" = eff, "cost" = cost,
                    "X_e_fixed" = X_e_fixed, "X_c_fixed" = X_c_fixed, "n_patterns" = n_patterns,
-                   "mean_cov_e_fixed" = mean_cov_e_fixed, "mean_cov_c_fixed" = mean_cov_c_fixed, 
+                   "mean_cov_e_fixed" = mean_cov_e_fixed, "mean_cov_c_fixed" = mean_cov_c_fixed,
                    "pe_fixed" = pe_fixed, "pc_fixed" = pc_fixed, "pp" = pp, "d_mod" = d_mod,
-                   "X_e_random" = X_e_random, "mean_cov_e_random" = mean_cov_e_random, "pe_random" = pe_random, 
-                   "clus_e" = clus_e, "n_clus_e" = n_clus_e, "X_c_random" = X_c_random, "mean_cov_c_random" = mean_cov_c_random, "pc_random" = pc_random, 
+                   "X_e_random" = X_e_random, "mean_cov_e_random" = mean_cov_e_random, "pe_random" = pe_random,
+                   "clus_e" = clus_e, "n_clus_e" = n_clus_e, "X_c_random" = X_c_random, "mean_cov_c_random" = mean_cov_c_random, "pc_random" = pc_random,
                    "clus_c"= clus_c, "n_clus_c" = n_clus_c)
   e_random_list <- c("X_e_random","mean_cov_e_random", "pe_random", "clus_e", "n_clus_e")
-  c_random_list <- c("X_c_random","mean_cov_c_random", "pc_random", "clus_c", "n_clus_c")  
+  c_random_list <- c("X_c_random","mean_cov_c_random", "pc_random", "clus_c", "n_clus_c")
   inits <- model_info$inits
   n.chains <- model_info$n.chains
   n.iter <- model_info$n.iter
@@ -61,16 +61,16 @@ run_pattern <- function(data_model, type, dist_e, dist_c, model_info) {
   progress.bar <- model_info$progress.bar
   refresh <- model_info$refresh
   RNGname <- model_info$RNGname
-  quiet <- model_info$quiet  
+  quiet <- model_info$quiet
   is_c_random_c <- model_info$is_c_random_c
   is_int_c_random_c <- model_info$is_int_c_random_c
   ind_random <- model_info$ind_random
   ind_fixed <- model_info$ind_fixed
   if(length(model_info$model_e_random) != 0) {
-    if(pe_random == 1) { 
+    if(pe_random == 1) {
       pe_random_index <- match("pe_random", names(datalist))
       datalist <- datalist[-pe_random_index]}
-  } else if(length(model_info$model_e_random) == 0) { 
+  } else if(length(model_info$model_e_random) == 0) {
     e_random_index <- match(e_random_list, names(datalist))
     datalist <- datalist[-e_random_index]
   }
@@ -80,8 +80,8 @@ run_pattern <- function(data_model, type, dist_e, dist_c, model_info) {
       datalist <- datalist[-pc_random_index]}
   } else if(length(model_info$model_c_random) != 0 & is_c_random_c) {
     c_random_index <- match(c_random_list[1:3], names(datalist))
-    datalist <- datalist[-c_random_index] 
-  } else if(length(model_info$model_c_random) == 0) { 
+    datalist <- datalist[-c_random_index]
+  } else if(length(model_info$model_c_random) == 0) {
     c_random_index <- match(c_random_list, names(datalist))
     datalist <- datalist[-c_random_index]
   }
@@ -89,30 +89,30 @@ run_pattern <- function(data_model, type, dist_e, dist_c, model_info) {
     pp_index <- match("pp", names(datalist))
     datalist <- datalist[-pp_index]
   }
-  params <- c("eff", "cost", "tmu_e", "tmu_c", "s_e_p", "s_c_p", "p_prob", 
+  params <- c("eff", "cost", "tmu_e", "tmu_c", "s_e_p", "s_c_p", "p_prob",
               "beta_p", "alpha_p", "delta_e", "delta_c")
   params <- c(params, "loglik_e", "loglik_c", "loglik_d")
   if(!ind_fixed) { params <- c(params, "beta_f_p")}
   if(length(model_info$model_e_random) != 0){ params <- c(params, "a")}
   if(length(model_info$model_c_random) != 0 & !is_c_random_c){ params <- c(params, "b")}
-  if(length(model_info$model_c_random) != 0 & !ind_random) { params <- c(params, "b_f")} 
+  if(length(model_info$model_c_random) != 0 & !ind_random) { params <- c(params, "b_f")}
   if(type %in% c("MNAR_cost", "MAR")) {
     deltae_index <- match("delta_e", params)
-    params <- params[-deltae_index] 
+    params <- params[-deltae_index]
   }
   if(type %in% c("MNAR_eff", "MAR")) {
     deltac_index <- match("delta_c", params)
     params <- params[-deltac_index]
   }
   if(dist_e %in% c("norm", "negbin", "logis")) {
-    mci_e_params <- c("cmu_e", "tau_e_p") 
+    mci_e_params <- c("cmu_e", "tau_e_p")
   } else if(dist_e %in% c("beta", "gamma", "weib")) {
     mci_e_params <- c("cmu_e", "ctau_e")
   } else if(dist_e %in% c("exp", "bern", "pois")) {
     mci_e_params <- c("cmu_e")
-  } 
+  }
   if(dist_c == "norm") {
-    mci_c_params <- c("cmu_c", "tau_c_p") 
+    mci_c_params <- c("cmu_c", "tau_c_p")
   } else if(dist_c == "gamma") {
     mci_c_params <- c("cmu_c", "ctau_c")
   } else if(dist_c == "lnorm") {
@@ -121,13 +121,13 @@ run_pattern <- function(data_model, type, dist_e, dist_c, model_info) {
   params <- c(params, mci_e_params, mci_c_params)
   model_txt_info <- list("pe_fixed" = pe_fixed, "pc_fixed" = pc_fixed, "n_patterns" = n_patterns,
                          "ind_fixed" = ind_fixed, "pe_random" = pe_random, "pc_random" = pc_random,
-                         "ind_random" = ind_random, "model_e_random" = model_info$model_e_random, 
-                         "model_c_random" = model_info$model_c_random, "is_c_random_c" = is_c_random_c, 
-                         "is_int_c_random_c" = is_int_c_random_c, "prior" = model_info$prior, 
+                         "ind_random" = ind_random, "model_e_random" = model_info$model_e_random,
+                         "model_c_random" = model_info$model_c_random, "is_c_random_c" = is_c_random_c,
+                         "is_int_c_random_c" = is_int_c_random_c, "prior" = model_info$prior,
                          "restriction" = model_info$restriction, "d_or" = unique(d_or))
   filein <- write_pattern(type = type , dist_e = dist_e, dist_c = dist_c, model_txt_info = model_txt_info)
-  model <- R2jags::jags(data = datalist, inits = inits, parameters.to.save = params, 
-                        model.file = filein, n.chains = n.chains, n.iter = n.iter, 
+  model <- R2jags::jags(data = datalist, inits = inits, parameters.to.save = params,
+                        model.file = filein, n.chains = n.chains, n.iter = n.iter,
                         n.burnin = n.burnin, DIC = DIC, pD = pd, n.thin = n.thin,
                         n.iter.pd = n.iter.pd, n.adapt = n.adapt, progress.bar = progress.bar,
                         refresh = refresh, RNGname = RNGname, quiet = quiet)
@@ -139,7 +139,7 @@ run_pattern <- function(data_model, type, dist_e, dist_c, model_info) {
   beta <- model$BUGSoutput$sims.list$beta_p
   p_prob <- model$BUGSoutput$sims.list$p_prob
   colnames(s_c) <- paste0("s_c_p", 1:model_txt_info$n_patterns)
-  colnames(s_e) <- paste0("s_e_p", 1:model_txt_info$n_patterns)    
+  colnames(s_e) <- paste0("s_e_p", 1:model_txt_info$n_patterns)
   dimnames(alpha) <- list(NULL, colnames(as.data.frame(X_e_fixed)), 1:model_txt_info$n_patterns)
   dimnames(beta) <- list(NULL, colnames(as.data.frame(X_c_fixed)), 1:model_txt_info$n_patterns)
   colnames(p_prob) <- paste0("p", 1:model_txt_info$n_patterns)
@@ -151,7 +151,7 @@ run_pattern <- function(data_model, type, dist_e, dist_c, model_info) {
     ctau_e <- model$BUGSoutput$sims.list$ctau_e
   } else if(dist_e %in% c("exp", "bern", "pois")) {
     cmu_e <- model$BUGSoutput$sims.list$cmu_e
-  } 
+  }
   if(dist_c == "norm") {
     cmu_c <- model$BUGSoutput$sims.list$cmu_c
     tau_c <- model$BUGSoutput$sims.list$tau_c_p
@@ -159,16 +159,16 @@ run_pattern <- function(data_model, type, dist_e, dist_c, model_info) {
     cmu_c <- model$BUGSoutput$sims.list$cmu_c
     ctau_c <- model$BUGSoutput$sims.list$ctau_c
   } else if(dist_c == "lnorm") {
-    clmu_c <- model$BUGSoutput$sims.list$clmu_c      
+    clmu_c <- model$BUGSoutput$sims.list$clmu_c
     ltau_c <- model$BUGSoutput$sims.list$ltau_c_p
-  } 
+  }
   S <- model_info$n.mci
-  if(S != n.iter) { 
+  if(S != n.iter) {
   S <- n.iter
   warning("Value for 'n.mci' set equal to the number of MCMC iterations to compute average estimates across patterns.")}
   trt_index <- c(data_model$trt_index)
   p_index <- lapply(1:data_model$n_patterns, function(target) which(d_mod == target))
-  mu_ep <- mu_cp <- array(NA, dim = c(S, length(data_model$n_trt), data_model$n_patterns), 
+  mu_ep <- mu_cp <- array(NA, dim = c(S, length(data_model$n_trt), data_model$n_patterns),
                           dimnames = list(NULL, data_model$trt_lev, 1:data_model$n_patterns))
   for(i in 1:n.iter) {
     for(trt in 1:length(data_model$n_trt)) {
@@ -178,16 +178,16 @@ run_pattern <- function(data_model, type, dist_e, dist_c, model_info) {
         }
         if(dist_e == "negbin") {
           mu_ep[i, trt, p] <- mean(rnbinom(S, prob = tau_e[i]/(tau_e[i] + cmu_e[i, intersect(unlist(data_model$trt_index[trt]), unlist(p_index[p]))]), size = tau_e[i, p]), na.rm = TRUE)
-        }  
+        }
         if(dist_e == "logis") {
           mu_ep[i, trt, p] <- mean(rlogis(S, location = cmu_e[i, intersect(unlist(data_model$trt_index[trt]), unlist(p_index[p]))], scale = 1 / tau_e[i, p]), na.rm = TRUE)
         }
         if(dist_e == "beta") {
-          mu_ep[i, trt, p] <- mean(rbeta(S, shape1 = cmu_e[i, intersect(unlist(data_model$trt_index[trt]), unlist(p_index[p]))] * ctau_e[i, intersect(unlist(data_model$trt_index[trt]), unlist(p_index[p]))], 
+          mu_ep[i, trt, p] <- mean(rbeta(S, shape1 = cmu_e[i, intersect(unlist(data_model$trt_index[trt]), unlist(p_index[p]))] * ctau_e[i, intersect(unlist(data_model$trt_index[trt]), unlist(p_index[p]))],
                                      shape2 = (1 - cmu_e[i, intersect(unlist(data_model$trt_index[trt]), unlist(p_index[p]))]) * ctau_e[i, intersect(unlist(data_model$trt_index[trt]), unlist(p_index[p]))]), na.rm = TRUE)
         }
         if(dist_e == "gamma") {
-          mu_ep[i, trt, p] <- mean(rgamma(S, shape = cmu_e[i, intersect(unlist(data_model$trt_index[trt]), unlist(p_index[p]))] * ctau_e[i, intersect(unlist(data_model$trt_index[trt]), unlist(p_index[p]))], 
+          mu_ep[i, trt, p] <- mean(rgamma(S, shape = cmu_e[i, intersect(unlist(data_model$trt_index[trt]), unlist(p_index[p]))] * ctau_e[i, intersect(unlist(data_model$trt_index[trt]), unlist(p_index[p]))],
                                       rate = ctau_e[i, intersect(unlist(data_model$trt_index[trt]), unlist(p_index[p]))]), na.rm = TRUE)
         }
         if(dist_e == "weib") {
@@ -206,7 +206,7 @@ run_pattern <- function(data_model, type, dist_e, dist_c, model_info) {
           mu_cp[i, trt, p] <- mean(rnorm(S, mean = cmu_c[i, unlist(data_model$trt_index[trt])], sd = s_c[i, p]), na.rm = TRUE)
         }
         if(dist_c == "gamma") {
-          mu_cp[i, trt, p] <- mean(rgamma(S, shape = cmu_c[i, intersect(unlist(data_model$trt_index[trt]), unlist(p_index[p]))] * ctau_c[i, intersect(unlist(data_model$trt_index[trt]), unlist(p_index[p]))], 
+          mu_cp[i, trt, p] <- mean(rgamma(S, shape = cmu_c[i, intersect(unlist(data_model$trt_index[trt]), unlist(p_index[p]))] * ctau_c[i, intersect(unlist(data_model$trt_index[trt]), unlist(p_index[p]))],
                                       rate = ctau_c[i, intersect(unlist(data_model$trt_index[trt]), unlist(p_index[p]))]), na.rm = TRUE)
         }
         if(dist_c == "lnorm") {
@@ -214,7 +214,7 @@ run_pattern <- function(data_model, type, dist_e, dist_c, model_info) {
         }
       }
     }
-  } 
+  }
   mu_e <- mu_c <- matrix(NA, nrow = S, ncol = length(data_model$n_trt), dimnames = list(NULL, data_model$trt_lev))
   delta_ep <- matrix(0, nrow = S, ncol = dim(mu_ep)[3], dimnames = list(NULL, 1:dim(mu_ep)[3]))
   delta_cp <- matrix(0, nrow = S, ncol = dim(mu_cp)[3], dimnames = list(NULL, 1:dim(mu_cp)[3]))
@@ -264,13 +264,13 @@ run_pattern <- function(data_model, type, dist_e, dist_c, model_info) {
     if(all(unique(d_or) %in% c(2, 3, 4)) & n_patterns == 3) { delta_cp[, 1] <- rep(0, dim(delta_ep)[1])}
     if(all(unique(d_or) %in% c(1, 2, 3, 4)) & n_patterns == 4) { delta_cp[, c(1, 2)] <- rep(0, dim(delta_ep)[1])}
     colnames(delta_c) <- "delta_c"
-  } 
+  }
   for(trt in 1:length(data_model$n_trt)) {
     mu_e[, trt] <-  rowSums(mu_ep[, trt, ] * p_prob[, ] + delta_ep)
     mu_c[, trt] <-  rowSums(mu_cp[, trt, ] * p_prob[, ] + delta_cp)
   }
   a <- b <- NULL
-  if(length(model_info$model_e_random) != 0) { 
+  if(length(model_info$model_e_random) != 0) {
     a <- model$BUGSoutput$sims.list$a
     if(is.vector(X_e_random)) {
       colnames(a) <- paste("(Intercept).", data_model$clus_e_lev, sep = "")
@@ -281,7 +281,7 @@ run_pattern <- function(data_model, type, dist_e, dist_c, model_info) {
       dimnames(a)[[3]] <- data_model$clus_e_lev
     }
   }
-  if(length(model_info$model_c_random) != 0 & !is_c_random_c) { 
+  if(length(model_info$model_c_random) != 0 & !is_c_random_c) {
     b <- model$BUGSoutput$sims.list$b
     if(is.vector(X_c_random)) {
       colnames(b) <- paste("(Intercept).", data_model$clus_c_lev, sep = "")
@@ -291,15 +291,15 @@ run_pattern <- function(data_model, type, dist_e, dist_c, model_info) {
       dimnames(b)[[2]] <- colnames(as.data.frame(X_c_random))
       dimnames(b)[[3]] <- data_model$clus_c_lev
     }
-  }  
-  eff_pos <- model$BUGSoutput$sims.list$eff 
-  cost_pos <- model$BUGSoutput$sims.list$cost 
-  eff_pos_imp_avg <- apply(model$BUGSoutput$sims.list$eff, 2, mean, na.rm = T)[is.na(data_model$eff)] 
-  cost_pos_imp_avg <- apply(model$BUGSoutput$sims.list$cost, 2, mean, na.rm = T)[is.na(data_model$cost)] 
-  eff_pos_imp_ql <- apply(model$BUGSoutput$sims.list$eff, 2, quantile, prob = model_info$prob[1], na.rm = T)[is.na(data_model$eff)] 
-  eff_pos_imp_qu <- apply(model$BUGSoutput$sims.list$eff, 2, quantile, prob = model_info$prob[2], na.rm = T)[is.na(data_model$eff)] 
-  cost_pos_imp_ql <- apply(model$BUGSoutput$sims.list$cost, 2, quantile, prob = model_info$prob[1], na.rm = T)[is.na(data_model$cost)] 
-  cost_pos_imp_qu <- apply(model$BUGSoutput$sims.list$cost, 2, quantile, prob = model_info$prob[2], na.rm = T)[is.na(data_model$cost)]   
+  }
+  eff_pos <- model$BUGSoutput$sims.list$eff
+  cost_pos <- model$BUGSoutput$sims.list$cost
+  eff_pos_imp_avg <- apply(model$BUGSoutput$sims.list$eff, 2, mean, na.rm = T)[is.na(data_model$eff)]
+  cost_pos_imp_avg <- apply(model$BUGSoutput$sims.list$cost, 2, mean, na.rm = T)[is.na(data_model$cost)]
+  eff_pos_imp_ql <- apply(model$BUGSoutput$sims.list$eff, 2, quantile, prob = model_info$prob[1], na.rm = T)[is.na(data_model$eff)]
+  eff_pos_imp_qu <- apply(model$BUGSoutput$sims.list$eff, 2, quantile, prob = model_info$prob[2], na.rm = T)[is.na(data_model$eff)]
+  cost_pos_imp_ql <- apply(model$BUGSoutput$sims.list$cost, 2, quantile, prob = model_info$prob[1], na.rm = T)[is.na(data_model$cost)]
+  cost_pos_imp_qu <- apply(model$BUGSoutput$sims.list$cost, 2, quantile, prob = model_info$prob[2], na.rm = T)[is.na(data_model$cost)]
   efft_pos <- costt_pos <- list()
   efft_pos_imp_avg <- efft_pos_imp_ql <- efft_pos_imp_qu <- list()
   costt_pos_imp_avg <- costt_pos_imp_ql <- costt_pos_imp_qu <- list()
@@ -324,7 +324,7 @@ run_pattern <- function(data_model, type, dist_e, dist_c, model_info) {
     b_f <- model$BUGSoutput$sims.list$b_f
     colnames(b_f) <- paste("e", data_model$clus_c_lev, sep = ".")
     if(length(model_info$model_c_random) != 0 & "e" %in% model_info$model_c_random & is_c_random_c) {
-      b <- list("b_f" = b_f) 
+      b <- list("b_f" = b_f)
     } else if(length(model_info$model_c_random) != 0 & "e" %in% model_info$model_c_random & !is_c_random_c) {
       b <- list("b" = b, "b_f" = b_f)
     }
@@ -335,42 +335,42 @@ run_pattern <- function(data_model, type, dist_e, dist_c, model_info) {
     if(dist_c %in% c("gamma")) { param_jags_show <- c(param_jags_show, "ctau_c")}
     if(dist_c %in% c("lnorm")) { param_jags_show <- c(param_jags_show, "clmu_c")}
     model_sum <- round(jagsresults(x = model, params = param_jags_show, invert = TRUE), digits = 3)
-  } else{ model_sum <- NULL}  
+  } else{ model_sum <- NULL}
   loglik <- list("effects" = loglik_e, "costs" = loglik_c, "pattern indicators" = loglik_d)
   imputed_e <- list("avg" = eff_pos_imp_avg, "ql" = eff_pos_imp_ql, "qu" = eff_pos_imp_qu, "index" = which(is.na(data_model$eff)))
   imputed_c <- list("avg" = cost_pos_imp_avg, "ql" = cost_pos_imp_ql, "qu" = cost_pos_imp_qu, "index" = which(is.na(data_model$cost)))
   imputed_et <- list("avg" = efft_pos_imp_avg, "ql" = efft_pos_imp_ql, "qu" = efft_pos_imp_avg, "index" = lapply(data_model$m_efft, function(x) which(x == 1)))
   imputed_ct <- list("avg" = costt_pos_imp_avg, "ql" = costt_pos_imp_ql, "qu" = costt_pos_imp_avg, "index" = lapply(data_model$m_costt, function(x) which(x == 1)))
   imputed <- list("effects" = imputed_e, "costs" = imputed_c)
-  imputedt <- list("effects" = imputed_et, "costs" = imputed_ct)  
+  imputedt <- list("effects" = imputed_et, "costs" = imputed_ct)
   if(type == "MAR") {
-    model_output_jags <- list("summary" = model_sum, "model" = model, "mean_effects" = mu_e, "mean_costs" = mu_c, 
-                              "sd_effects" = s_e, "sd_costs" = s_c, "effects_fixed" = alpha, "costs_fixed" = beta, 
-                              "p_pattern" = p_prob, "effects_random" = a, "costs_random" = b, 
-                              "imputed" = imputed, "imputed_trt" = imputedt, "loglik" = loglik, "type" = "MAR", "method" = "PATTERN", 
+    model_output_jags <- list("summary" = model_sum, "model" = model, "mean_effects" = mu_e, "mean_costs" = mu_c,
+                              "sd_effects" = s_e, "sd_costs" = s_c, "effects_fixed" = alpha, "costs_fixed" = beta,
+                              "p_pattern" = p_prob, "effects_random" = a, "costs_random" = b,
+                              "imputed" = imputed, "imputed_trt" = imputedt, "loglik" = loglik, "type" = "MAR", "method" = "PATTERN",
                               "ind_fixed" = ind_fixed, "ind_random" = ind_random, "dist_e" = dist_e, "dist_c" = dist_c, "filein" = filein, "d_mod" = d_mod)
   } else if(type == "MNAR") {
-    model_output_jags <- list("summary" = model_sum, "model" = model, "mean_effects" = mu_e, "mean_costs" = mu_c, 
-                              "sd_effects" = s_e, "sd_costs" = s_c, "effects_fixed" = alpha, "costs_fixed" = beta, 
+    model_output_jags <- list("summary" = model_sum, "model" = model, "mean_effects" = mu_e, "mean_costs" = mu_c,
+                              "sd_effects" = s_e, "sd_costs" = s_c, "effects_fixed" = alpha, "costs_fixed" = beta,
                               "p_pattern" = p_prob, "effects_sens_par" = delta_e, "costs_sens_par" = delta_c,
-                              "effects_random" = a, "costs_random" = b, "imputed" = imputed, "imputed_trt" = imputedt, "loglik" = loglik, 
-                              "type" = "MNAR", "method" = "PATTERN", "ind_fixed" = ind_fixed, "ind_random" = ind_random, 
+                              "effects_random" = a, "costs_random" = b, "imputed" = imputed, "imputed_trt" = imputedt, "loglik" = loglik,
+                              "type" = "MNAR", "method" = "PATTERN", "ind_fixed" = ind_fixed, "ind_random" = ind_random,
                               "dist_e" = dist_e, "dist_c" = dist_c, "filein" = filein, "d_mod" = d_mod)
   } else if(type == "MNAR_eff") {
-    model_output_jags <- list("summary" = model_sum, "model" = model, "mean_effects" = mu_e, "mean_costs" = mu_c, 
-                              "sd_effects" = s_e, "sd_costs" = s_c, "effects_fixed" = alpha, "costs_fixed" = beta, 
+    model_output_jags <- list("summary" = model_sum, "model" = model, "mean_effects" = mu_e, "mean_costs" = mu_c,
+                              "sd_effects" = s_e, "sd_costs" = s_c, "effects_fixed" = alpha, "costs_fixed" = beta,
                               "p_pattern" = p_prob, "effects_sens_par" = delta_e, "effects_random" = a, "costs_random" = b,
-                              "imputed" = imputed, "imputed_trt" = imputedt, "loglik" = loglik, 
-                              "type" = "MNAR_eff", "method" = "PATTERN", "ind_fixed" = ind_fixed, "ind_random" = ind_random, 
+                              "imputed" = imputed, "imputed_trt" = imputedt, "loglik" = loglik,
+                              "type" = "MNAR_eff", "method" = "PATTERN", "ind_fixed" = ind_fixed, "ind_random" = ind_random,
                               "dist_e" = dist_e, "dist_c" = dist_c, "filein" = filein, "d_mod" = d_mod)
   } else if(type == "MNAR_cost") {
-    model_output_jags <- list("summary" = model_sum, "model" = model, "mean_effects" = mu_e, "mean_costs" = mu_c, 
-                              "sd_effects" = s_e, "sd_costs" = s_c, "effects_fixed" = alpha, "costs_fixed" = beta, 
-                              "p_pattern" = p_prob, "costs_sens_par" = delta_c, "effects_random" = a, "costs_random" = b, 
-                              "imputed" = imputed, "imputed_trt" = imputedt, "loglik" = loglik, 
-                              "type" = "MNAR_cost", "method" = "PATTERN", "ind_fixed" = ind_fixed, "ind_random" = ind_random, 
+    model_output_jags <- list("summary" = model_sum, "model" = model, "mean_effects" = mu_e, "mean_costs" = mu_c,
+                              "sd_effects" = s_e, "sd_costs" = s_c, "effects_fixed" = alpha, "costs_fixed" = beta,
+                              "p_pattern" = p_prob, "costs_sens_par" = delta_c, "effects_random" = a, "costs_random" = b,
+                              "imputed" = imputed, "imputed_trt" = imputedt, "loglik" = loglik,
+                              "type" = "MNAR_cost", "method" = "PATTERN", "ind_fixed" = ind_fixed, "ind_random" = ind_random,
                               "dist_e" = dist_e, "dist_c" = dist_c, "filein" = filein, "d_mod" = d_mod)
-  }  
+  }
   if(n.chains == 1) {model_output_jags <- model_output_jags[-1] }
   return(model_output_jags = model_output_jags)
 }

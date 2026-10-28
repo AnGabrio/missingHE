@@ -634,8 +634,10 @@ lmdm <- function(data, model.eff, model.cost,
     dimnames(mis_costs_fixed)[[3]] <- paste0("r.", dimnames(mis_costs_fixed)[[3]])
   }
   if(time_dep %in% "AR1") {
-    dimnames(mis_effects_fixed)[[4]] <- paste0("r.", dimnames(mis_effects_fixed)[[4]])
-    dimnames(mis_costs_fixed)[[4]] <- paste0("r.", dimnames(mis_costs_fixed)[[4]])
+    if(length(dim(mis_effects_fixed)) == 4) {
+    dimnames(mis_effects_fixed)[[4]] <- paste0("r.", dimnames(mis_effects_fixed)[[4]])}
+    if(length(dim(mis_costs_fixed)) == 4) {
+    dimnames(mis_costs_fixed)[[4]] <- paste0("r.", dimnames(mis_costs_fixed)[[4]])}
   }
   mis_effects_fixed <- cbind.data.frame(mis_effects_fixed)
   mis_costs_fixed <- cbind.data.frame(mis_costs_fixed)

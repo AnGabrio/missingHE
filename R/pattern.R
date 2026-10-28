@@ -465,7 +465,7 @@ pattern <- function(data, model.eff, model.cost,
                     interventions = interventions, Kmax = Kmax, k = wtp, plot = plot)
   format <- "wide"
   res <- list(data_set = data_read, model_output = model_output, mod_est = print_mod_est,
-              cea = cea, type = type, data_format = format, call = mf)
+              cea = cea, type = type, data_format = format, restriction = restriction, call = mf)
   class(res) <- "missingHE"
   return(res)
 }
