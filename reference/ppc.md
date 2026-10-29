@@ -1,19 +1,22 @@
-# Posterior predictive checks for assessing the fit to the observed data of Bayesian models implemented in `JAGS` using the function [`selection`](https://angabrio.github.io/missingHE/reference/selection.md), [`pattern`](https://angabrio.github.io/missingHE/reference/pattern.md), [`hurdle`](https://angabrio.github.io/missingHE/reference/hurdle.md) or [`lmdm`](https://angabrio.github.io/missingHE/reference/lmdm.md)
+# Posterior predictive checks for assessing the fit to the observed data of a Bayesian model
 
 The focus is restricted to full Bayesian models in cost-effectiveness
 analyses based on the function
-[`selection`](https://angabrio.github.io/missingHE/reference/selection.md),
-[`pattern`](https://angabrio.github.io/missingHE/reference/pattern.md),
-[`hurdle`](https://angabrio.github.io/missingHE/reference/hurdle.md) or
-[`lmdm`](https://angabrio.github.io/missingHE/reference/lmdm.md) with
-the fit to the observed data being assessed through graphical checks
-based on the posterior replications generated from the model. Examples
-include the comparison of histograms, density plots, intervals, test
-statistics, evaluated using both the observed and replicated data.
+[`selection()`](https://angabrio.github.io/missingHE/reference/selection.md),
+[`pattern()`](https://angabrio.github.io/missingHE/reference/pattern.md),
+[`hurdle()`](https://angabrio.github.io/missingHE/reference/hurdle.md)
+or [`lmdm()`](https://angabrio.github.io/missingHE/reference/lmdm.md)
+with the fit to the observed data being assessed through graphical
+checks based on the posterior replications generated from the model.
+Examples include the comparison of histograms, density plots, intervals,
+test statistics, evaluated using both the observed and replicated data.
 Different types of posterior predictive checks are implemented to assess
-model fit using functions contained in the package **bayesplot**.
+model fit using functions contained in the package
+[bayesplot](https://mc-stan.org/bayesplot/reference/bayesplot-package.html).
 Graphics and plots are managed using functions contained in the package
-**ggplot2** and **ggthemes**.
+[ggplot2](https://ggplot2.tidyverse.org/reference/ggplot2-package.html)
+and
+[ggthemes](https://jrnold.github.io/ggthemes/reference/ggthemes-package.html).
 
 ## Usage
 
@@ -34,23 +37,24 @@ ppc(
 
 - x:
 
-  An object of class "missingHE" containing the posterior results of a
+  An object of class `missingHE` containing the posterior results of a
   full Bayesian model implemented using the function
-  [`selection`](https://angabrio.github.io/missingHE/reference/selection.md),
-  [`pattern`](https://angabrio.github.io/missingHE/reference/pattern.md),
-  [`hurdle`](https://angabrio.github.io/missingHE/reference/hurdle.md)
-  or [`lmdm`](https://angabrio.github.io/missingHE/reference/lmdm.md).
+  [`selection()`](https://angabrio.github.io/missingHE/reference/selection.md),
+  [`pattern()`](https://angabrio.github.io/missingHE/reference/pattern.md),
+  [`hurdle()`](https://angabrio.github.io/missingHE/reference/hurdle.md)
+  or [`lmdm()`](https://angabrio.github.io/missingHE/reference/lmdm.md).
 
 - type:
 
   Type of posterior predictive check among some pre-defined types,
-  mostly taken from the package **bayesplot**. For a full list of
-  available options see details.
+  mostly taken from the package
+  [bayesplot](https://mc-stan.org/bayesplot/reference/bayesplot-package.html).
+  For a full list of available options see details.
 
 - outcome:
 
-  The outcome variables that should be displayed. Options are: 'both'
-  (default) for both effects and costs; 'effects' or 'costs' for the
+  The outcome variables that should be displayed. Options are: `both`
+  (default) for both effects and costs; `effects` or `costs` for the
   effects or costs separately.
 
 - ndisplay:
@@ -60,26 +64,29 @@ ppc(
 - trt:
 
   treatment group for which plots should be displayed. Choices include:
-  'all' (default) for all groups; 'none' for results across all groups;
+  `all` (default) for all groups; `none` for results across all groups;
   any character or numeric value denoting the treatment group name or
   index associated with the treatment variable in the original data set.
 
 - theme:
 
   Type of ggplot theme among some pre-defined themes, mostly taken from
-  the package **ggthemes**. For a full list of available themes see
-  details.
+  the package
+  [ggthemes](https://jrnold.github.io/ggthemes/reference/ggthemes-package.html).
+  For a full list of available themes see details.
 
 - scheme_set:
 
   Type of scheme sets among some pre-defined schemes, mostly taken from
-  the package **bayesplot**. For a full list of available themes see
-  details.
+  the package
+  [bayesplot](https://mc-stan.org/bayesplot/reference/bayesplot-package.html).
+  For a full list of available themes see details.
 
 - ...:
 
   Additional parameters that can be provided to manage the output of
-  `ppc`. For more details see **bayesplot**.
+  `ppc`. For more details see
+  [bayesplot](https://mc-stan.org/bayesplot/reference/bayesplot-package.html).
 
 ## Value
 
@@ -90,21 +97,27 @@ A `ggplot` object containing the plots specified in the argument `type`.
 The function produces different types of graphical posterior predictive
 checks using the estimates from a Bayesian cost-effectiveness model
 implemented with the function
-[`selection`](https://angabrio.github.io/missingHE/reference/selection.md),
-[`pattern`](https://angabrio.github.io/missingHE/reference/pattern.md),
-[`hurdle`](https://angabrio.github.io/missingHE/reference/hurdle.md) or
-[`lmdm`](https://angabrio.github.io/missingHE/reference/lmdm.md). The
-purpose of these checks is to visually compare the distribution (or some
-relevant quantity) of the observed data with respect to that from the
-replicated data for both effectiveness and cost outcomes in each
+[`selection()`](https://angabrio.github.io/missingHE/reference/selection.md),
+[`pattern()`](https://angabrio.github.io/missingHE/reference/pattern.md),
+[`hurdle()`](https://angabrio.github.io/missingHE/reference/hurdle.md)
+or [`lmdm()`](https://angabrio.github.io/missingHE/reference/lmdm.md).
+The purpose of these checks is to visually compare the distribution (or
+some relevant quantity) of the observed data with respect to that from
+the replicated data for both effectiveness and cost outcomes in each
 treatment arm. Since predictive checks are meaningful only with respect
 to the observed data, only the observed outcome values are used to
 assess the fit of the model. The arguments `theme` and `scheme_set`
 allow to customise the graphical aspect of the plots generated by `ppc`
 and allow to choose among a set of possible pre-defined themes and
-scheme sets taken form the package **ggtheme** and `bayesplot`. For a
-complete list of the available character names for each theme and scheme
-set, see **ggthemes** and **bayesplot**.
+scheme sets taken form the package
+[ggthemes](https://jrnold.github.io/ggthemes/reference/ggthemes-package.html)
+and
+[bayesplot](https://mc-stan.org/bayesplot/reference/bayesplot-package.html).
+For a complete list of the available character names for each theme and
+scheme set, see
+[ggthemes](https://jrnold.github.io/ggthemes/reference/ggthemes-package.html)
+and
+[bayesplot](https://mc-stan.org/bayesplot/reference/bayesplot-package.html).
 
 ## References
 
@@ -113,11 +126,11 @@ Analysis, 2nd edition*, CRC Press.
 
 ## See also
 
-[`selection`](https://angabrio.github.io/missingHE/reference/selection.md)
-[`pattern`](https://angabrio.github.io/missingHE/reference/pattern.md)
-[`hurdle`](https://angabrio.github.io/missingHE/reference/hurdle.md)
-[`lmdm`](https://angabrio.github.io/missingHE/reference/lmdm.md)
-[`diagnostic`](https://angabrio.github.io/missingHE/reference/diagnostic.md)
+[`selection()`](https://angabrio.github.io/missingHE/reference/selection.md)
+[`pattern()`](https://angabrio.github.io/missingHE/reference/pattern.md)
+[`hurdle()`](https://angabrio.github.io/missingHE/reference/hurdle.md)
+[`lmdm()`](https://angabrio.github.io/missingHE/reference/lmdm.md)
+[`diagnostic()`](https://angabrio.github.io/missingHE/reference/diagnostic.md)
 
 ## Author
 
@@ -126,7 +139,6 @@ Andrea Gabrio
 ## Examples
 
 ``` r
-# For examples see the function \code{\link{selection}}, \code{\link{pattern}}, 
-# \code{\link{hurdle}} or \code{\link{lmdm}}
+# For examples see the function [selection()], [pattern()], [hurdle()] or [lmdm()].
 #
 ```

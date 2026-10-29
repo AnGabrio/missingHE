@@ -2,14 +2,14 @@
 
 Longitudinal data from a cluster RCT trial (The PBS trial) on people
 suffering from intellectual disability and challenging behaviour. A
-total of 244 individuals across 23 sites were enrolled in the trial: 136
-in the control (t=1) and 108 in the active intervention (t=2). Health
-economic outcome data were collected via self-reported questionnaires at
-three time points throughout the study: baseline (time=1), 6 months
-(time=2) and 12 months (time=3) follow-up, and included utility scores
-related to quality of life and costs. Baseline data are available for
-age, gender, ethnicity, living status, type of carer, marital status,
-and disability level variables.
+total of `244` individuals across `23` sites were enrolled in the trial:
+`136` in the control (`t = 1`) and `108` in the active intervention
+(`t = 2`). Health economic outcome data were collected via self-reported
+questionnaires at three time points throughout the study: baseline
+(`time = 1`), `6` months (`time = 2`) and `12` months (`time = 3`)
+follow-up, and included utility scores related to quality of life and
+costs. Baseline data are available for age, gender, ethnicity, living
+status, type of carer, marital status, and disability level variables.
 
 ## Usage
 
@@ -19,62 +19,38 @@ data(PBS)
 
 ## Format
 
-A data frame with 732 rows and 16 variables
+A data frame with `732` rows and `16` variables
 
 ## Details
 
-- id:
+- **id**: id number.
 
-  id number
+- **time**: time indicator.
 
-- time:
+- **e**: Health-Related Quality of Life (HRQoL) utilities.
 
-  time indicator
+- **c**: Costs in pounds.
 
-- e:
+- **age**: Age in years.
 
-  HRQoL utilities
+- **gender**: binary: male (`1`) and female (`0`).
 
-- c:
+- **ethnicity**: binary: white (`1`) and other (`0`).
 
-  costs (in pounds)
+- **trt**: Treatment arm indicator for the control (`t = 1`) and the
+  active intervention (`t = 2`).
 
-- trt:
+- **carer**: binary: paid carer (`1`) and family carer (`0`).
 
-  Treatment arm indicator for the control (t=1) and the active
-  intervention (t=2)
+- **marital**: binary: single (`1`) and married (`0`).
 
-- age:
+- **living**: categorical: alone (`1`), with partner (`2`) and with
+  parents (`3`).
 
-  age in years
+- **disability**: categorical: mild (`1`), moderate (`2`) and severe
+  (`3`).
 
-- gender:
-
-  binary: male (1) and female (0)
-
-- ethnicity:
-
-  binary: white (1) and other (0)
-
-- carer:
-
-  binary: paid carer (1) and family carer (0)
-
-- marital:
-
-  binary: single (1) and married (0)
-
-- living:
-
-  categorical: alone (1), with partner (2) and with parents (3)
-
-- disability:
-
-  categorical: mild (1), moderate (2) and severe (3)
-
-- site:
-
-  site number
+- **site**: site number.
 
 ## References
 

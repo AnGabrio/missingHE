@@ -211,11 +211,13 @@ An object of the class `missingHE` containing the following elements:
 
 - **se_prior**: A numeric value that indicates the value assumed for the
   standard deviation associated with the degenerate structural effects
-  prior distribution to implement the model in `JAGS`.
+  prior distribution to implement the model in `JAGS` (deafult =
+  0.00001).
 
 - **sc_prior**: A numeric value that indicates the value assumed for the
   standard deviation associated with the degenerate structural costs
-  prior distribution to implement the model in `JAGS`.
+  prior distribution to implement the model in `JAGS` (deafult =
+  0.00001).
 
 - **call**: The matched call.
 
@@ -405,7 +407,6 @@ diag.hist <- diagnostic(model.hurdle, type = "histogram", param = "mu.e")
 # Compare observed effect data with imputations from the model
 # using plots (posterior means and credible intervals)
 p1 <- plot(model.hurdle, class = "scatter", outcome = "effects")
-#> Loading required namespace: ggthemes
 #
 
 # Summarise the CEA information from the model

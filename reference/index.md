@@ -15,11 +15,7 @@
   `missingHE`
 
 - [`diagnostic()`](https://angabrio.github.io/missingHE/reference/diagnostic.md)
-  :
-
-  Diagnostic checks for assessing MCMC convergence of Bayesian models
-  fitted in `JAGS` using the function `selection`, `pattern`, `hurdle`
-  or `lmdm`.
+  : Diagnostic checks for assessing MCMC convergence of a Bayesian model
 
 - [`hurdle()`](https://angabrio.github.io/missingHE/reference/hurdle.md)
   : Bayesian Hurdle Models
@@ -31,25 +27,18 @@
   : Bayesian Pattern Mixture Models
 
 - [`pic()`](https://angabrio.github.io/missingHE/reference/pic.md) :
-
-  Predictive information criteria for Bayesian models fitted in `JAGS`
-  using the function `selection`, `pattern`, `hurdle` or `lmdm`
+  Predictive information criteria for a Bayesian model
 
 - [`plot(`*`<missingHE>`*`)`](https://angabrio.github.io/missingHE/reference/plot.missingHE.md)
-  :
-
-  Plot method for the imputed data contained in the objects of class
-  `missingHE`
+  : Plot method for the imputed data
 
 - [`postsum()`](https://angabrio.github.io/missingHE/reference/postsum.md)
   : Postsum method for inspecting summary posterior estimates of a
-  Bayesian model fitted in JAGS
+  Bayesian model
 
 - [`ppc()`](https://angabrio.github.io/missingHE/reference/ppc.md) :
-
   Posterior predictive checks for assessing the fit to the observed data
-  of Bayesian models implemented in `JAGS` using the function
-  `selection`, `pattern`, `hurdle` or `lmdm`
+  of a Bayesian model
 
 - [`print(`*`<missingHE>`*`)`](https://angabrio.github.io/missingHE/reference/print.missingHE.md)
   :

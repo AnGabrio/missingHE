@@ -1,7 +1,7 @@
-# An internal function to detect the random effects component from an object of class formula
+# A function to detect the random effects component from an object of class formula
 
-An internal function to detect the random effects component from an
-object of class formula
+A function to detect the random effects component from an object of
+class formula
 
 ## Usage
 

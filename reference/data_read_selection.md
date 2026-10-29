@@ -31,13 +31,13 @@ data_read_selection(
 
   A data frame in which to find variables supplied in `model.eff` and
   `model.cost`. Among these, effectiveness, cost and treatment indicator
-  variables must always be provided and named 'e', 'c' and 'trt'
+  variables must always be provided and named `e`, `c` and `trt`
   respectively.
 
 - model.eff:
 
   A formula expression in conventional `R` linear modelling syntax. The
-  response must be a health economics effectiveness outcome ('e') whose
+  response must be a health economics effectiveness outcome (`e`) whose
   name must correspond to that used in `data`, and any covariates are
   given on the right-hand side. If there are no covariates, specify `1`
   on the right hand side. By default, covariates are placed on the
@@ -47,7 +47,7 @@ data_read_selection(
 - model.cost:
 
   A formula expression in conventional `R` linear modelling syntax. The
-  response must be a health economics cost outcome ('c') whose name must
+  response must be a health economics cost outcome (`c`) whose name must
   correspond to that used in `data`, and any covariates are given on the
   right-hand side. If there are no covariates, specify `1` on the right
   hand side. By default, covariates are placed on the "location"
@@ -57,8 +57,8 @@ data_read_selection(
 - model.me:
 
   A formula expression in conventional `R` linear modelling syntax. The
-  response must be indicated with the term 'me'(missing effects) and any
-  covariates used to estimate the probability of missing effects are
+  response must be indicated with the term `me` (missing effects) and
+  any covariates used to estimate the probability of missing effects are
   given on the right-hand side. If there are no covariates, specify `1`
   on the right hand side. By default, covariates are placed on the
   "probability" parameter for the missing effects through a
@@ -67,8 +67,8 @@ data_read_selection(
 
 - model.mc:
 
-  A formula expression in conventional R linear modelling syntax. The
-  response must be indicated with the term 'mc'(missing costs) and any
+  A formula expression in conventional `R` linear modelling syntax. The
+  response must be indicated with the term `mc` (missing costs) and any
   covariates used to estimate the probability of missing costs should be
   given on the right-hand side. If there are no covariates, specify `1`
   on the right hand side. By default, covariates are placed on the
@@ -83,7 +83,7 @@ data_read_selection(
 - type:
 
   Type of missingness mechanism assumed. Choices are Missing At Random
-  (MAR) and Missing Not At Random (MNAR).
+  (`MAR`) and Missing Not At Random (`MNAR`).
 
 - center:
 

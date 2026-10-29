@@ -1,7 +1,7 @@
-# An internal function to summarise results from BUGS model
+# A function to summarise results from a fitted model
 
 This function hides missing data distribution from summary results of
-BUGS models
+`BUGS` models
 
 ## Usage
 
@@ -40,8 +40,7 @@ jagsresults(
   giving a text pattern to be matched. Parameters with names matching
   the pattern will be returned (unless `invert` is `TRUE`, which results
   in all parameters that do not match the pattern being returned). Text
-  pattern matching uses regular expressions
-  ([`regex`](https://rdrr.io/r/base/regex.html)).
+  pattern matching uses regular expressions (`regex`).
 
 - invert:
 
@@ -61,8 +60,7 @@ jagsresults(
 
 - ...:
 
-  Additional arguments accepted by
-  [`grep`](https://rdrr.io/r/base/grep.html), e.g. `perl=TRUE`, to allow
+  Additional arguments accepted by `grep`, e.g. `perl = TRUE`, to allow
   look-around pattern matching.
 
 ## Examples
@@ -100,9 +98,9 @@ M <- function() {
 }
 
 ## Fit model
-jagsfit <- jags(dat, inits=NULL, 
-                parameters.to.save=c('a', 'beta.temp', 'beta.rain', 
-                                     'beta.wind', 'sd', 'resid'), 
+jagsfit <- jags(dat, inits=NULL,
+                parameters.to.save=c('a', 'beta.temp', 'beta.rain',
+                                     'beta.wind', 'sd', 'resid'),
                 model.file=M, n.iter=10000)
 
 ## Output
@@ -114,7 +112,7 @@ jagsresults(x=jagsfit, param='beta.rain')
 
 # Results for 'a' and 'sd' only
 jagsresults(x=jagsfit, param=c('a', 'sd'))
-jagsresults(x=jagsfit, param=c('a', 'sd'), 
+jagsresults(x=jagsfit, param=c('a', 'sd'),
             probs=c(0.01, 0.025, 0.1, 0.25, 0.5, 0.75, 0.9, 0.975))
 
 # Results for all parameters including the string 'beta'

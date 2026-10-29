@@ -71,12 +71,12 @@ according to the information provided by the user.</p>
 
 <dl><dt id="arg-data">data<a class="anchor" aria-label="anchor" href="#arg-data"></a></dt>
 <dd><p>A data frame in which to find variables supplied in <code>model.eff</code> and <code>model.cost</code>. Among these,
-effectiveness, cost and treatment indicator variables must always be provided and named 'e', 'c' and 'trt' respectively.</p></dd>
+effectiveness, cost and treatment indicator variables must always be provided and named <code>e</code>, <code>c</code> and <code>trt</code> respectively.</p></dd>
 
 
 <dt id="arg-model-eff">model.eff<a class="anchor" aria-label="anchor" href="#arg-model-eff"></a></dt>
 <dd><p>A formula expression in conventional <code>R</code> linear modelling syntax. The response must be a health economics
-effectiveness outcome ('e') whose name must correspond to that used in <code>data</code>, and
+effectiveness outcome (<code>e</code>) whose name must correspond to that used in <code>data</code>, and
 any covariates are given on the right-hand side. If there are no covariates, specify <code>1</code> on the right hand side.
 By default, covariates are placed on the "location" parameter of the distribution through a linear model.
 Random effects can also be specified for each model parameter.</p></dd>
@@ -84,7 +84,7 @@ Random effects can also be specified for each model parameter.</p></dd>
 
 <dt id="arg-model-cost">model.cost<a class="anchor" aria-label="anchor" href="#arg-model-cost"></a></dt>
 <dd><p>A formula expression in conventional <code>R</code> linear modelling syntax. The response must be a health economics
-cost outcome ('c') whose name must correspond to that used in <code>data</code>, and any covariates are given on the right-hand side.
+cost outcome (<code>c</code>) whose name must correspond to that used in <code>data</code>, and any covariates are given on the right-hand side.
 If there are no covariates, specify <code>1</code> on the right hand side. By default, covariates are placed on the "location"
 parameter of the distribution through a linear model. Random effects can also be specified for each model parameter.</p></dd>
 
@@ -94,7 +94,7 @@ parameter of the distribution through a linear model. Random effects can also be
 
 
 <dt id="arg-type">type<a class="anchor" aria-label="anchor" href="#arg-type"></a></dt>
-<dd><p>Type of missingness mechanism assumed. Choices are Missing At Random (MAR) and Missing Not At Random (MNAR).</p></dd>
+<dd><p>Type of missingness mechanism assumed. Choices are Missing At Random (<code>MAR</code>) and Missing Not At Random (<code>MNAR</code>).</p></dd>
 
 
 <dt id="arg-center">center<a class="anchor" aria-label="anchor" href="#arg-center"></a></dt>

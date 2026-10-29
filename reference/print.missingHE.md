@@ -4,10 +4,10 @@ Produces a printout of the (posterior mean) estimate for each regression
 coefficient included in the outcome and missingness/structural value
 models based on the health economic evaluation probabilistic model run
 using the function
-[`selection`](https://angabrio.github.io/missingHE/reference/selection.md),
-[`pattern`](https://angabrio.github.io/missingHE/reference/pattern.md),
-[`hurdle`](https://angabrio.github.io/missingHE/reference/hurdle.md) or
-[`lmdm`](https://angabrio.github.io/missingHE/reference/lmdm.md).
+[`selection()`](https://angabrio.github.io/missingHE/reference/selection.md),
+[`pattern()`](https://angabrio.github.io/missingHE/reference/pattern.md),
+[`hurdle()`](https://angabrio.github.io/missingHE/reference/hurdle.md)
+or [`lmdm()`](https://angabrio.github.io/missingHE/reference/lmdm.md).
 
 ## Usage
 
@@ -35,8 +35,11 @@ print(x, digits = 3, ...)
 ## Value
 
 Prints all fixed regression coefficients based on the type of model
-fitted using the function `selection`, `pattern`, `hurdle` or
-[`lmdm`](https://angabrio.github.io/missingHE/reference/lmdm.md).
+fitted using the function
+[`selection()`](https://angabrio.github.io/missingHE/reference/selection.md),
+[`pattern()`](https://angabrio.github.io/missingHE/reference/pattern.md),
+[`hurdle()`](https://angabrio.github.io/missingHE/reference/hurdle.md)
+or [`lmdm()`](https://angabrio.github.io/missingHE/reference/lmdm.md).
 Summary estimates based on posterior means of each fixed regression
 coefficient included into the fitted models are provided.
 
@@ -47,12 +50,12 @@ Hall, London.
 
 ## See also
 
-[`selection`](https://angabrio.github.io/missingHE/reference/selection.md)
-[`pattern`](https://angabrio.github.io/missingHE/reference/pattern.md)
-[`hurdle`](https://angabrio.github.io/missingHE/reference/hurdle.md)
-[`lmdm`](https://angabrio.github.io/missingHE/reference/lmdm.md)
-[`diagnostic`](https://angabrio.github.io/missingHE/reference/diagnostic.md)
-[`plot.missingHE`](https://angabrio.github.io/missingHE/reference/plot.missingHE.md)
+[`selection()`](https://angabrio.github.io/missingHE/reference/selection.md)
+[`pattern()`](https://angabrio.github.io/missingHE/reference/pattern.md)
+[`hurdle()`](https://angabrio.github.io/missingHE/reference/hurdle.md)
+[`lmdm()`](https://angabrio.github.io/missingHE/reference/lmdm.md)
+[`diagnostic()`](https://angabrio.github.io/missingHE/reference/diagnostic.md)
+`print.missingHE()`
 
 ## Author
 
@@ -61,8 +64,7 @@ Andrea Gabrio
 ## Examples
 
 ``` r
-# For examples see the function \code{\link{selection}}, \code{\link{pattern}}, 
-# \code{\link{hurdle}} or \code{\link{lmdm}}
+# For examples see the function [selection()], [pattern()], [hurdle()] or [lmdm()].
 #
 #
 ```

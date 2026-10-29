@@ -35,12 +35,12 @@ data_read_hurdle(
   `model.cost` (model formulas for effects and costs) and `model.se`,
   `model.sc` (model formulas for the structural effect and cost models)
   . Among these, effectiveness, cost and treatment indicator variables
-  must always be provided and named 'e', 'c' and 'trt' respectively.
+  must always be provided and named `e`, `c` and `trt` respectively.
 
 - model.eff:
 
   A formula expression in conventional `R` linear modelling syntax. The
-  response must be a health economics effectiveness outcome ('e') whose
+  response must be a health economics effectiveness outcome (`e`) whose
   name must correspond to that used in `data`, and any covariates are
   given on the right-hand side. If there are no covariates, specify `1`
   on the right hand side. Random effects can also be specified for each
@@ -49,7 +49,7 @@ data_read_hurdle(
 - model.cost:
 
   A formula expression in conventional `R` linear modelling syntax. The
-  response must be a health economics cost outcome ('c') whose name must
+  response must be a health economics cost outcome (`c`) whose name must
   correspond to that used in `data`, and any covariates are given on the
   right-hand side. If there are no covariates, specify `1` on the right
   hand side. By default, covariates are placed on the "location"
@@ -59,24 +59,24 @@ data_read_hurdle(
 - model.se:
 
   A formula expression in conventional `R` linear modelling syntax. The
-  response must be a health economics effectiveness outcome ('e') whose
-  name must correspond to that used in `data`, and any covariates used
-  to estimate the probability of structural effects are given on the
-  right-hand side. If there are no covariates, specify `1` on the right
-  hand side. By default, covariates are placed on the "probability"
-  parameter for the structural effects through a logistic-linear model.
-  Random effects can also be specified for each model parameter.
+  response must be indicated with the term `se` (structural effects) and
+  any covariates used to estimate the probability of structural effects
+  are given on the right-hand side. If there are no covariates, specify
+  `1` on the right hand side. By default, covariates are placed on the
+  "probability" parameter for the structural effects through a
+  logistic-linear model. Random effects can also be specified for each
+  model parameter.
 
 - model.sc:
 
   A formula expression in conventional `R` linear modelling syntax. The
-  response must be a health economics cost outcome ('c') whose name must
-  correspond to that used in `data`, and any covariates used to estimate
-  the probability of structural costs are given on the right-hand side.
-  If there are no covariates, specify `1` on the right hand side. By
-  default, covariates are placed on the "probability" parameter for the
-  structural costs through a logistic-linear model. Random effects can
-  also be specified for each model parameter.
+  response must be indicated with the term `sc` (structural costs) and
+  any covariates used to estimate the probability of structural costs
+  should be given on the right-hand side. If there are no covariates,
+  specify `1` on the right hand side. By default, covariates are placed
+  on the "probability" parameter for the structural costs through a
+  logistic-linear model. Random effects can also be specified for each
+  model parameter.
 
 - se:
 
@@ -96,8 +96,8 @@ data_read_hurdle(
 
 - type:
 
-  Type of structural value mechanism assumed, either 'SCAR' (Structural
-  Completely At Random) or 'SAR' (Strcutural At Random).
+  Type of structural value mechanism assumed, either `SCAR` (Structural
+  Completely At Random) or `SAR` (Structural At Random).
 
 - center:
 
