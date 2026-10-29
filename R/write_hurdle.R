@@ -1,15 +1,15 @@
-#'An internal function to select which type of hurdle model to execute. 
+#'A function to write the code for a hurdle model
 
 #'Alternatives vary depending on the type of distribution assumed for the effect and cost variables,
 #'type of structural value mechanism assumed and independence or joint modelling
 
 #' This function selects which type of model to execute.
 #' @keywords internal
-#' @param dist_e Distribution assumed for the effects. Current available choices are: Normal ('norm'), Beta ('beta'), Gamma ('gamma'), Exponential ('exp'),
-#' Weibull ('weib'), Logistic ('logis'), Poisson ('pois'), Negative Binomial ('negbin') or Bernoulli ('bern')
-#' @param dist_c Distribution assumed for the costs. Current available choices are: Normal ('norm'), Gamma ('gamma') or LogNormal ('lnorm')
-#' @param type Type of structural value mechanism assumed. Choices are Structural Completely At Random (SCAR) and Structural At Random (SAR).
-#' @param model_txt_info list containing model specification information used to write the txt file of the JAGS model.
+#' @param dist_e Distribution assumed for the effects. Current available choices are: Normal (`norm`), Beta (`beta`), Gamma (`gamma`), Exponential (`exp`),
+#' Weibull (`weib`), Logistic (`logis`), Poisson (`pois`), Negative Binomial (`negbin`) or Bernoulli (`bern`).
+#' @param dist_c Distribution assumed for the costs. Current available choices are: Normal (`norm`), Gamma (`gamma`) or LogNormal (`lnorm`).
+#' @param type Type of structural value mechanism assumed. Choices are Structural Completely At Random (`SCAR`) and Structural At Random (`SAR`).
+#' @param model_txt_info list containing model specification information used to write the `txt` file of the `JAGS` model.
 #' @examples
 #' #Internal function only
 #' #No examples
@@ -26,7 +26,7 @@ write_hurdle <- function(dist_e , dist_c, type, model_txt_info) {
   #costs and effects model
   cost[i] ~ dnorm(cmu_c[i], tau_c[s_cost[i] + 1])
   eff[i] ~ dnorm(cmu_e[i], tau_e[s_eff[i] + 1])
-  
+
   #derive mean and std effects
   #derive mean and std costs
 
@@ -46,13 +46,13 @@ write_hurdle <- function(dist_e , dist_c, type, model_txt_info) {
   loglik_se[i] <- logdensity.bern(s_eff[i], pq[i])
   loglik_sc[i] <- logdensity.bern(s_cost[i], pc[i])
   }
-  
+
   #transformation of parameters
   for (s in 1:2) {#begin transformation costs
   tau_c[s] <- 1 / ss_c[s]
   ss_c[s] <- s_c[s] * s_c[s]
   }#end transformation costs
-  #std for lnorm 
+  #std for lnorm
   #mean for lnorm
   for (s in 1:2) {#begin transformation effects
   tau_e[s] <- 1 / ss_e[s]
@@ -69,22 +69,22 @@ write_hurdle <- function(dist_e , dist_c, type, model_txt_info) {
   ss_g_c_hat[j] <- s_g_c_hat[j] * s_g_c_hat[j] }
   for(j in 1:ze_random) {tau_g_e_hat[j] <- 1 / ss_g_e_hat[j]
   ss_g_e_hat[j] <- s_g_e_hat[j] * s_g_e_hat[j] }
-  #end transformation of random effects 
+  #end transformation of random effects
 
   #calculate means at mean of covariates for non-structural values
-  tmu_ns_c <- inprod(mean_cov_c_fixed[], beta[, 1]) + inprod(mean_cov_c_random[], mu_b_hat[]) 
-  tmu_ns_e <- inprod(mean_cov_e_fixed[], alpha[, 1]) + inprod(mean_cov_e_random[], mu_a_hat[]) 
-  
+  tmu_ns_c <- inprod(mean_cov_c_fixed[], beta[, 1]) + inprod(mean_cov_c_random[], mu_b_hat[])
+  tmu_ns_e <- inprod(mean_cov_e_fixed[], alpha[, 1]) + inprod(mean_cov_e_random[], mu_a_hat[])
+
   #weighted mean parameters
   tmu_e <- tmu_ns_e * (1 - p_e) + se * p_e
   tmu_c <- tmu_ns_c * (1 - p_c) + sc * p_c
-  
+
   #structural values probability
   p_c <- ilogit(inprod(mean_z_c_fixed[], gamma_c[]) + inprod(mean_z_c_random[], mu_g_c_hat[]))
   p_e <- ilogit(inprod(mean_z_e_fixed[], gamma_e[]) + inprod(mean_z_e_random[], mu_g_e_hat[]))
 
   #priors
-  
+
   #priors for mean regression coefficients
   for (j in 2:pe_fixed) {#begin alpha priors effects
   alpha[j, 1] ~ dnorm(0, 0.001)
@@ -108,7 +108,7 @@ write_hurdle <- function(dist_e , dist_c, type, model_txt_info) {
   for (j in 1:pc_random) {#begin b priors costs
   for(s in 1:n_clus_c) {b[j, s] ~ dnorm(mu_b_hat[j], tau_b_hat[j]) }
   }#end b priors costs
-  
+
   #standard deviation priors
   s_c[1] ~ dt(0, pow(2.5, -2), 1)T(0,)
   s_e[1] ~ dt(0, pow(2.5, -2), 1)T(0,)
@@ -118,7 +118,7 @@ write_hurdle <- function(dist_e , dist_c, type, model_txt_info) {
   #correlation
   beta_f[1] ~ dnorm(0, 0.001)
   beta_f[2] <- 0
-  
+
   # mean and sd mean regression random coefficients priors
   for(j in 1:pc_random) {mu_b_hat[j] ~ dnorm(0, 0.001)
   s_b_hat[j] ~ dunif(0, 100) }
@@ -135,16 +135,16 @@ write_hurdle <- function(dist_e , dist_c, type, model_txt_info) {
   tau_b_f_hat <- 1 / ss_b_f_hat
   ss_b_f_hat <- s_b_f_hat * s_b_f_hat
   s_b_f_hat ~ dunif(0, 100)
-  
+
   #priors on structural values mechanism
   for (j in 1:ze_fixed) {#begin gamma priors effects
   gamma_e[j] ~ dnorm(0, 0.01)
   }#end gamma priors effects
-  
+
   for (j in 1:zc_fixed) {#begin gamma priors costs
   gamma_c[j] ~ dnorm(0, 0.01)
   }#end gamma priors costs
-  
+
   #priors on random effects structural values mechanism
   for (j in 1:ze_random) {#begin g_e priors effects
   for(s in 1:n_clus_se) {g_e[j, s] ~ dnorm(mu_g_e_hat[j], tau_g_e_hat[j]) }
@@ -153,7 +153,7 @@ write_hurdle <- function(dist_e , dist_c, type, model_txt_info) {
   for (j in 1:zc_random) {#begin g_c priors costs
   for(s in 1:n_clus_sc) {g_c[j, s] ~ dnorm(mu_g_c_hat[j], tau_g_c_hat[j]) }
   }#end g_c priors costs
-  
+
   }
   "
 if(is.null(model_txt_info$se) & !is.null(model_txt_info$sc)) {
@@ -165,7 +165,7 @@ if(is.null(model_txt_info$se) & !is.null(model_txt_info$sc)) {
   model_string_jags <- gsub("ss_e[s] <- s_e[s] * s_e[s]", "ss_e <- s_e * s_e", model_string_jags, fixed = TRUE)
   model_string_jags <- gsub("for (s in 1:2) {#begin transformation effects", "#begin transformation effects", model_string_jags, fixed = TRUE)
   model_string_jags <- gsub("}#end transformation effects", "#end transformation effects", model_string_jags, fixed = TRUE)
-  model_string_jags <- gsub("tmu_ns_e <- inprod(mean_cov_e_fixed[], alpha[, 1]) + inprod(mean_cov_e_random[], mu_a_hat[])", 
+  model_string_jags <- gsub("tmu_ns_e <- inprod(mean_cov_e_fixed[], alpha[, 1]) + inprod(mean_cov_e_random[], mu_a_hat[])",
                             "tmu_ns_e <- inprod(mean_cov_e_fixed[], alpha[]) + inprod(mean_cov_e_random[], mu_a_hat[])", model_string_jags, fixed = TRUE)
   model_string_jags <- gsub("tmu_e <- tmu_ns_e * (1 - p_e) + se * p_e", "tmu_e <- tmu_ns_e", model_string_jags, fixed = TRUE)
   model_string_jags <- gsub("p_e <- ilogit(inprod(mean_z_e_fixed[], gamma_e[]) + inprod(mean_z_e_random[], mu_g_e_hat[]))", "", model_string_jags, fixed = TRUE)
@@ -174,7 +174,7 @@ if(is.null(model_txt_info$se) & !is.null(model_txt_info$sc)) {
   model_string_jags <- gsub("alpha[1, 1] ~ dnorm(0, 0.001)", "alpha[1] ~ dnorm(0, 0.001)", model_string_jags, fixed = TRUE)
   model_string_jags <- gsub("alpha[1, 2] <- se", "", model_string_jags, fixed = TRUE)
   model_string_jags <- gsub("s_e[1] ~ dt(0, pow(2.5, -2), 1)T(0,)", "s_e ~ dt(0, pow(2.5, -2), 1)T(0,)", model_string_jags, fixed = TRUE)
-  model_string_jags <- gsub("s_e[2] <- sde", "", model_string_jags, fixed = TRUE)  
+  model_string_jags <- gsub("s_e[2] <- sde", "", model_string_jags, fixed = TRUE)
   model_string_jags <- gsub("for (j in 1:ze_fixed) {#begin gamma priors effects", "", model_string_jags, fixed = TRUE)
   model_string_jags <- gsub("gamma_e[j] ~ dnorm(0, 0.01)", "", model_string_jags, fixed = TRUE)
   model_string_jags <- gsub("}#end gamma priors effects", "", model_string_jags, fixed = TRUE)
@@ -252,7 +252,7 @@ if(length(model_txt_info$model_c_random) == 0) {
   model_string_jags <- gsub("s_b_f_hat ~ dunif(0, 100)", "", model_string_jags, fixed = TRUE)
   model_string_jags <- gsub("# correlation random effects", "", model_string_jags, fixed = TRUE)
   if(length(model_txt_info$model_e_random) == 0) { model_string_jags <- gsub("#priors for mean regression random coefficients", "", model_string_jags, fixed = TRUE)}
-} 
+}
 if(length(model_txt_info$model_se_random) == 0) {
   if(!is.null(model_txt_info$se) & !is.null(model_txt_info$sc)) {
   model_string_jags <- gsub(" + inprod(Z_e_random[i, ], g_e[, clus_se[i]])", "", model_string_jags, fixed = TRUE)
@@ -276,17 +276,17 @@ if(length(model_txt_info$model_se_random) == 0) {
   model_string_jags <- gsub("}#end g_e priors effects", "", model_string_jags, fixed = TRUE)
   model_string_jags <- gsub("for(j in 1:ze_random) {mu_g_e_hat[j] ~ dnorm(0, 0.001)", "", model_string_jags, fixed = TRUE)
   model_string_jags <- gsub("s_g_e_hat[j] ~ dunif(0, 100) }", "", model_string_jags, fixed = TRUE)
-  if(length(model_txt_info$model_sc_random) == 0) { 
-    model_string_jags <- gsub("#priors on random effects structural values mechanism", "", model_string_jags, fixed = TRUE) 
-    if(length(model_txt_info$model_c_random) == 0 & length(model_txt_info$model_e_random) == 0 | 
-       length(model_txt_info$model_e_random) == 0 & model_txt_info$pc_random == 0) { 
-      model_string_jags <- gsub("# mean and sd mean regression random coefficients priors", "", model_string_jags, fixed = TRUE) 
-      model_string_jags <- gsub("# end mean and sd mean regression random coefficients priors", "", model_string_jags, fixed = TRUE) 
-      model_string_jags <- gsub("#transformation of random effects parameters", "", model_string_jags, fixed = TRUE) 
-      model_string_jags <- gsub("# begin transformation random effects", "", model_string_jags, fixed = TRUE) 
-      model_string_jags <- gsub("#end transformation of random effects", "", model_string_jags, fixed = TRUE) 
+  if(length(model_txt_info$model_sc_random) == 0) {
+    model_string_jags <- gsub("#priors on random effects structural values mechanism", "", model_string_jags, fixed = TRUE)
+    if(length(model_txt_info$model_c_random) == 0 & length(model_txt_info$model_e_random) == 0 |
+       length(model_txt_info$model_e_random) == 0 & model_txt_info$pc_random == 0) {
+      model_string_jags <- gsub("# mean and sd mean regression random coefficients priors", "", model_string_jags, fixed = TRUE)
+      model_string_jags <- gsub("# end mean and sd mean regression random coefficients priors", "", model_string_jags, fixed = TRUE)
+      model_string_jags <- gsub("#transformation of random effects parameters", "", model_string_jags, fixed = TRUE)
+      model_string_jags <- gsub("# begin transformation random effects", "", model_string_jags, fixed = TRUE)
+      model_string_jags <- gsub("#end transformation of random effects", "", model_string_jags, fixed = TRUE)
     }
-   }    
+   }
   }
 }
 if(length(model_txt_info$model_sc_random) == 0) {
@@ -300,18 +300,18 @@ if(length(model_txt_info$model_sc_random) == 0) {
   model_string_jags <- gsub("}#end g_c priors costs", "", model_string_jags, fixed = TRUE)
   model_string_jags <- gsub("for(j in 1:zc_random) {mu_g_c_hat[j] ~ dnorm(0, 0.001)", "", model_string_jags, fixed = TRUE)
   model_string_jags <- gsub("s_g_c_hat[j] ~ dunif(0, 100) }", "", model_string_jags, fixed = TRUE)
-  if(length(model_txt_info$model_se_random) == 0) { 
-    model_string_jags <- gsub("#priors on random effects structural values mechanism", "", model_string_jags, fixed = TRUE) 
-    if(length(model_txt_info$model_c_random) == 0 & length(model_txt_info$model_e_random) == 0 | 
-       length(model_txt_info$model_e_random) == 0 & model_txt_info$pc_random == 0) { 
-      model_string_jags <- gsub("# mean and sd mean regression random coefficients priors", "", model_string_jags, fixed = TRUE) 
-      model_string_jags <- gsub("# end mean and sd mean regression random coefficients priors", "", model_string_jags, fixed = TRUE) 
-      model_string_jags <- gsub("#transformation of random effects parameters", "", model_string_jags, fixed = TRUE) 
-      model_string_jags <- gsub("# begin transformation random effects", "", model_string_jags, fixed = TRUE) 
-      model_string_jags <- gsub("#end transformation of random effects", "", model_string_jags, fixed = TRUE) 
+  if(length(model_txt_info$model_se_random) == 0) {
+    model_string_jags <- gsub("#priors on random effects structural values mechanism", "", model_string_jags, fixed = TRUE)
+    if(length(model_txt_info$model_c_random) == 0 & length(model_txt_info$model_e_random) == 0 |
+       length(model_txt_info$model_e_random) == 0 & model_txt_info$pc_random == 0) {
+      model_string_jags <- gsub("# mean and sd mean regression random coefficients priors", "", model_string_jags, fixed = TRUE)
+      model_string_jags <- gsub("# end mean and sd mean regression random coefficients priors", "", model_string_jags, fixed = TRUE)
+      model_string_jags <- gsub("#transformation of random effects parameters", "", model_string_jags, fixed = TRUE)
+      model_string_jags <- gsub("# begin transformation random effects", "", model_string_jags, fixed = TRUE)
+      model_string_jags <- gsub("#end transformation of random effects", "", model_string_jags, fixed = TRUE)
     }
-   } 
-  } 
+   }
+  }
   if(is.null(model_txt_info$se) & !is.null(model_txt_info$sc)) {
     model_string_jags <- gsub(" + inprod(Z_c_random[i, ], g_c[, clus_sc[i]])", "", model_string_jags, fixed = TRUE)
     model_string_jags <- gsub("for(j in 1:zc_random) {tau_g_c_hat[j] <- 1 / ss_g_c_hat[j]", "", model_string_jags, fixed = TRUE)
@@ -322,15 +322,15 @@ if(length(model_txt_info$model_sc_random) == 0) {
     model_string_jags <- gsub("}#end g_c priors costs", "", model_string_jags, fixed = TRUE)
     model_string_jags <- gsub("for(j in 1:zc_random) {mu_g_c_hat[j] ~ dnorm(0, 0.001)", "", model_string_jags, fixed = TRUE)
     model_string_jags <- gsub("s_g_c_hat[j] ~ dunif(0, 100) }", "", model_string_jags, fixed = TRUE)
-    model_string_jags <- gsub("#priors on random effects structural values mechanism", "", model_string_jags, fixed = TRUE) 
-    if(length(model_txt_info$model_c_random) == 0 & length(model_txt_info$model_e_random) == 0 | 
-       length(model_txt_info$model_e_random) == 0 & model_txt_info$pc_random == 0) { 
-      model_string_jags <- gsub("# mean and sd mean regression random coefficients priors", "", model_string_jags, fixed = TRUE) 
-      model_string_jags <- gsub("# end mean and sd mean regression random coefficients priors", "", model_string_jags, fixed = TRUE) 
-      model_string_jags <- gsub("#transformation of random effects parameters", "", model_string_jags, fixed = TRUE) 
-      model_string_jags <- gsub("# begin transformation random effects", "", model_string_jags, fixed = TRUE) 
-      model_string_jags <- gsub("#end transformation of random effects", "", model_string_jags, fixed = TRUE) 
-    }  
+    model_string_jags <- gsub("#priors on random effects structural values mechanism", "", model_string_jags, fixed = TRUE)
+    if(length(model_txt_info$model_c_random) == 0 & length(model_txt_info$model_e_random) == 0 |
+       length(model_txt_info$model_e_random) == 0 & model_txt_info$pc_random == 0) {
+      model_string_jags <- gsub("# mean and sd mean regression random coefficients priors", "", model_string_jags, fixed = TRUE)
+      model_string_jags <- gsub("# end mean and sd mean regression random coefficients priors", "", model_string_jags, fixed = TRUE)
+      model_string_jags <- gsub("#transformation of random effects parameters", "", model_string_jags, fixed = TRUE)
+      model_string_jags <- gsub("# begin transformation random effects", "", model_string_jags, fixed = TRUE)
+      model_string_jags <- gsub("#end transformation of random effects", "", model_string_jags, fixed = TRUE)
+    }
   }
 }
 if(model_txt_info$ind_random) {
@@ -350,7 +350,7 @@ if(model_txt_info$ind_random) {
     model_string_jags <- gsub("tau_b_f_hat <- 1 / ss_b_f_hat", "", model_string_jags, fixed = TRUE)
     model_string_jags <- gsub("ss_b_f_hat <- s_b_f_hat * s_b_f_hat", "", model_string_jags, fixed = TRUE)
     model_string_jags <- gsub("s_b_f_hat ~ dunif(0, 100)", "", model_string_jags, fixed = TRUE)
-    model_string_jags <- gsub("# correlation random effects", "", model_string_jags, fixed = TRUE)   
+    model_string_jags <- gsub("# correlation random effects", "", model_string_jags, fixed = TRUE)
   }
   if(!is.null(model_txt_info$se) & is.null(model_txt_info$sc)) {
     model_string_jags <- gsub("+ b_f[clus_c[i]] * (eff[i] - tmu_e)", "", model_string_jags, fixed = TRUE)
@@ -359,14 +359,14 @@ if(model_txt_info$ind_random) {
     model_string_jags <- gsub("tau_b_f_hat <- 1 / ss_b_f_hat", "", model_string_jags, fixed = TRUE)
     model_string_jags <- gsub("ss_b_f_hat <- s_b_f_hat * s_b_f_hat", "", model_string_jags, fixed = TRUE)
     model_string_jags <- gsub("s_b_f_hat ~ dunif(0, 100) }", "", model_string_jags, fixed = TRUE)
-    model_string_jags <- gsub("# correlation random effects", "", model_string_jags, fixed = TRUE)  
+    model_string_jags <- gsub("# correlation random effects", "", model_string_jags, fixed = TRUE)
   }
 }
 if(dist_c == "norm") {
   model_string_jags <- gsub("#derive mean and std costs", "", model_string_jags, fixed = TRUE)
   model_string_jags <- gsub("#mean for lnorm", "", model_string_jags, fixed = TRUE)
   model_string_jags <- gsub("#std for lnorm", "", model_string_jags, fixed = TRUE)
-} 
+}
 if(dist_c == "gamma") {
   if(!is.null(model_txt_info$sc)) {
   model_string_jags <- gsub("cost[i] ~ dnorm(cmu_c[i], tau_c[s_cost[i] + 1])", "cost[i] ~ dgamma(cmu_c[i] * ctau_c[i], ctau_c[i])", model_string_jags, fixed = TRUE)
@@ -441,7 +441,7 @@ if(dist_c == "lnorm") {
       }
       if(length(model_txt_info$model_c_random) != 0) {
         model_string_jags <- gsub("tmu_ns_c <- inprod(mean_cov_c_fixed[], beta[]) + inprod(mean_cov_c_random[], mu_b_hat[])", "ltmu_ns_c <- inprod(mean_cov_c_fixed[], beta[]) + inprod(mean_cov_c_random[], mu_b_hat[])", model_string_jags, fixed = TRUE)
-      }    
+      }
     }
 }
 if(dist_e == "norm") {
@@ -482,7 +482,7 @@ if(dist_e == "beta") {
     }
     if(length(model_txt_info$model_e_random) != 0) {
       model_string_jags <- gsub("tmu_ns_e <- inprod(mean_cov_e_fixed[], alpha[]) + inprod(mean_cov_e_random[], mu_a_hat[])", "tmu_ns_e <- ilogit(inprod(mean_cov_e_fixed[], alpha[]) + inprod(mean_cov_e_random[], mu_a_hat[]))", model_string_jags, fixed = TRUE)
-    }    
+    }
   }
 }
 if(dist_e == "gamma") {
@@ -520,9 +520,9 @@ if(dist_e == "gamma") {
     }
     if(length(model_txt_info$model_e_random) != 0) {
       model_string_jags <- gsub("tmu_ns_e <- inprod(mean_cov_e_fixed[], alpha[]) + inprod(mean_cov_e_random[], mu_a_hat[])", "tmu_ns_e <- exp(inprod(mean_cov_e_fixed[], alpha[]) + inprod(mean_cov_e_random[], mu_a_hat[]))", model_string_jags, fixed = TRUE)
-    }  
+    }
   }
-} 
+}
 if(dist_e == "exp") {
   if(!is.null(model_txt_info$se)) {
     model_string_jags <- gsub("eff[i] ~ dnorm(cmu_e[i], tau_e[s_eff[i] + 1])", "eff[i] ~ dexp(1 / cmu_e[i])", model_string_jags, fixed = TRUE)
@@ -558,7 +558,7 @@ if(dist_e == "exp") {
     }
     if(length(model_txt_info$model_e_random) != 0) {
       model_string_jags <- gsub("tmu_ns_e <- inprod(mean_cov_e_fixed[], alpha[]) + inprod(mean_cov_e_random[], mu_a_hat[])", "tmu_ns_e <- exp(inprod(mean_cov_e_fixed[], alpha[]) + inprod(mean_cov_e_random[], mu_a_hat[]))", model_string_jags, fixed = TRUE)
-    }  
+    }
   }
 }
 if(dist_e == "weib") {
@@ -596,7 +596,7 @@ if(dist_e == "weib") {
     }
     if(length(model_txt_info$model_e_random) != 0) {
       model_string_jags <- gsub("tmu_ns_e <- inprod(mean_cov_e_fixed[], alpha[]) + inprod(mean_cov_e_random[], mu_a_hat[])", "tmu_ns_e <- exp(inprod(mean_cov_e_fixed[], alpha[]) + inprod(mean_cov_e_random[], mu_a_hat[]))", model_string_jags, fixed = TRUE)
-    }  
+    }
   }
 }
 if(dist_e == "logis") {
@@ -650,7 +650,7 @@ if(dist_e == "bern") {
     }
     if(length(model_txt_info$model_e_random) != 0) {
       model_string_jags <- gsub("tmu_ns_e <- inprod(mean_cov_e_fixed[], alpha[]) + inprod(mean_cov_e_random[], mu_a_hat[])", "tmu_ns_e <- ilogit(inprod(mean_cov_e_fixed[], alpha[]) + inprod(mean_cov_e_random[], mu_a_hat[]))", model_string_jags, fixed = TRUE)
-    }    
+    }
   }
 }
 if(dist_e == "pois") {
@@ -688,7 +688,7 @@ if(dist_e == "pois") {
     }
     if(length(model_txt_info$model_e_random) != 0) {
       model_string_jags <- gsub("tmu_ns_e <- inprod(mean_cov_e_fixed[], alpha[]) + inprod(mean_cov_e_random[], mu_a_hat[])", "tmu_ns_e <- exp(inprod(mean_cov_e_fixed[], alpha[]) + inprod(mean_cov_e_random[], mu_a_hat[]))", model_string_jags, fixed = TRUE)
-    }  
+    }
   }
 }
 if(dist_e == "negbin") {
@@ -784,7 +784,7 @@ if(length(model_txt_info$model_e_random) != 0 & model_txt_info$pe_random == 1) {
     model_string_jags <- gsub("for(j in 1:pe_random) {tau_a_hat[j] <- 1 / ss_a_hat[j]", "tau_a_hat <- 1 / ss_a_hat", model_string_jags, fixed = TRUE)
     model_string_jags <- gsub("ss_a_hat[j] <- s_a_hat[j] * s_a_hat[j] }", "ss_a_hat <- s_a_hat * s_a_hat", model_string_jags, fixed = TRUE)
   }
-}  
+}
 if(length(model_txt_info$model_c_random) != 0 & model_txt_info$pc_random == 1) {
   if(!is.null(model_txt_info$sc)) {
     model_string_jags <- gsub("inprod(X_c_random[i, ], b[, clus_c[i]]) * ((s_cost[i] - 1) * -1)", "X_c_random[i] * b[clus_c[i]] * ((s_cost[i] - 1) * -1)", model_string_jags, fixed = TRUE)
@@ -832,7 +832,7 @@ if(!is.null(model_txt_info$se) & !is.null(model_txt_info$sc)) {
     model_string_jags <- gsub("}#end g_e priors effects", "#end g_e priors effects", model_string_jags, fixed = TRUE)
     model_string_jags <- gsub("for(j in 1:ze_random) {mu_g_e_hat[j] ~ dnorm(0, 0.001)", "mu_g_e_hat ~ dnorm(0, 0.001)", model_string_jags, fixed = TRUE)
     model_string_jags <- gsub("s_g_e_hat[j] ~ dunif(0, 100) }", "s_g_e_hat ~ dunif(0, 100)", model_string_jags, fixed = TRUE)
-  }  
+  }
    if(model_txt_info$zc_fixed == 1) {
       inprod_c <- "Z_c_fixed[i] * gamma_c"
       inprod_mean_c <- "mean_z_c_fixed * gamma_c"
@@ -919,7 +919,7 @@ if(model_txt_info$ind_fixed) {
     model_string_jags <- gsub("#correlation", "", model_string_jags, fixed = TRUE)
   }
 }
-model_string_jags <- prior_hurdle(type = type, dist_e = dist_e, dist_c = dist_c, 
+model_string_jags <- prior_hurdle(type = type, dist_e = dist_e, dist_c = dist_c,
           model_txt_info = model_txt_info, model_string_jags = model_string_jags)
 writeLines(model_string_jags, "hurdle.txt")
 model_string <- "hurdle.txt"

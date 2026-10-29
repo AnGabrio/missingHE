@@ -2,7 +2,7 @@
 % Please edit documentation in R/write_lmdm.R
 \name{write_lmdm}
 \alias{write_lmdm}
-\title{An internal function to select which type of longitudinal missing data model to execute.
+\title{A function to write the code for a longitudinal missing data model
 Alternatives vary depending on the type of distribution assumed for the effect and cost variables,
 type of missingness mechanism assumed and independence or joint modelling
 This function selects which type of model to execute.}
@@ -10,18 +10,18 @@ This function selects which type of model to execute.}
 write_lmdm(dist_e, dist_c, type, model_txt_info)
 }
 \arguments{
-\item{dist_e}{Distribution assumed for the effects. Current available choices are: Normal ('norm'), Beta ('beta'), Gamma ('gamma'), Exponential ('exp'),
-Weibull ('weib'), Logistic ('logis'), Poisson ('pois'), Negative Binomial ('negbin') or Bernoulli ('bern')}
+\item{dist_e}{Distribution assumed for the effects. Current available choices are: Normal (\code{norm}), Beta (\code{beta}), Gamma (\code{gamma}), Exponential (\code{exp}),
+Weibull (\code{weib}), Logistic (\code{logis}), Poisson (\code{pois}), Negative Binomial (\code{negbin}) or Bernoulli (\code{bern}).}
 
-\item{dist_c}{Distribution assumed for the costs. Current available choices are: Normal ('norm'), Gamma ('gamma') or LogNormal ('lnorm')}
+\item{dist_c}{Distribution assumed for the costs. Current available choices are: Normal (\code{norm}), Gamma (\code{gamma}) or LogNormal (\code{lnorm}).}
 
-\item{type}{Type of missingness mechanism assumed. Choices are Missing At Random (MAR), Missing Not At Random for the effects (MNAR_eff),
-Missing Not At Random for the costs (MNAR_cost), and Missing Not At Random for both (MNAR)}
+\item{type}{Type of missingness mechanism assumed. Choices are Missing At Random (\code{MAR}), Missing Not At Random for the effects (\code{MNAR_eff}),
+Missing Not At Random for the costs (\code{MNAR_cost}), and Missing Not At Random for both (\code{MNAR})}
 
-\item{model_txt_info}{list containing model specification information used to write the txt file of the JAGS model.}
+\item{model_txt_info}{list containing model specification information used to write the \code{txt} file of the \code{JAGS} model.}
 }
 \description{
-An internal function to select which type of longitudinal missing data model to execute.
+A function to write the code for a longitudinal missing data model
 Alternatives vary depending on the type of distribution assumed for the effect and cost variables,
 type of missingness mechanism assumed and independence or joint modelling
 This function selects which type of model to execute.

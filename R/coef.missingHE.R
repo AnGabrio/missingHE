@@ -1,27 +1,26 @@
-#' Extract regression coefficient estimates from objects in the class \code{missingHE}
+#' Extract regression coefficient estimates from objects in the class `missingHE`
 #'
 #' Produces a table printout with summary statistics for the regression coefficients of the health economic evaluation probabilistic model
-#' run using the function \code{\link{selection}}, \code{\link{pattern}},  \code{\link{hurdle}} or \code{\link{lmdm}}.
-#' @param object A \code{missingHE} object containing the results of the Bayesian modelling and the economic evaluation
-#' @param prob A numeric vector of probabilities within the range (0,1), representing the upper and lower
+#' run using the function [selection()], [pattern()], [hurdle()] or [lmdm()].
+#' @param object A `missingHE` object containing the results of the Bayesian modelling and the economic evaluation
+#' @param prob A numeric vector of probabilities within the range `(0,1)`, representing the upper and lower
 #' CI sample quantiles to be calculated and returned for the estimates.
-#' @param random Logical. If \code{random} is \code{TRUE}, the estimates of the random effects parameters are printed, when available.
+#' @param random Logical. If `random` is `TRUE`, the estimates of the random effects parameters are printed, when available.
 #' @param digits Integer indicating the number of decimal places to be used for rounding (default = 3).
-#' @param ... Additional arguments affecting the summary produced.
+#' @param \dots Additional arguments affecting the summary produced.
 #' @return Prints a table with some summary statistics, including posterior mean, standard deviation and lower and upper quantiles based on the
-#' values specified in \code{prob}, for the posterior distributions of the regression coefficients of the effects and costs models run using the 
-#' function \code{selection}, \code{pattern}, \code{hurdle} or \code{\link{lmdm}}. 
-#' @seealso \code{\link{selection}} \code{\link{pattern}} \code{\link{hurdle}} \code{\link{lmdm}} \code{\link{diagnostic}} \code{\link{plot.missingHE}}
+#' values specified in `prob`, for the posterior distributions of the regression coefficients of the effects and costs models run using the
+#' function [selection()], [pattern()], [hurdle()] or [lmdm()].
+#' @seealso [selection()] [pattern()] [hurdle()] [lmdm()] [diagnostic()] [plot.missingHE()]
 #' @author Andrea Gabrio
 #' @importFrom stats quantile
 #' @export
-#' @examples  
-#' # For examples see the function \code{\link{selection}}, \code{\link{pattern}}, 
-#' # \code{\link{hurdle}} or \code{\link{lmdm}}
-#' # 
-#' # 
+#' @examples
+#' # For examples see the function [selection()], [pattern()], [hurdle()] or [lmdm()].
+#' #
+#' #
 
-coef.missingHE <- function(object, prob = c(0.025, 0.975), 
+coef.missingHE <- function(object, prob = c(0.025, 0.975),
                            random = FALSE, digits = 3, ...) {
    exArgs <- list(...)
    if(!inherits(object,"missingHE")) {
@@ -44,7 +43,7 @@ coef.missingHE <- function(object, prob = c(0.025, 0.975),
        sd_cov_e_fixed <- c(t(apply(object$model_output$effects_fixed, 2:3 , sd)))
        ql_cov_e_fixed <- c(t(apply(object$model_output$effects_fixed, 2:3 , quantile, prob = prob[1])))
        qu_cov_e_fixed <- c(t(apply(object$model_output$effects_fixed, 2:3 , quantile, prob = prob[2])))
-     }     
+     }
     if(object$model_output$ind_fixed) {
       if(length(dim(object$model_output$costs_fixed)) == 2) {
         cov_c_fixed_name <- colnames(object$model_output$costs_fixed)
@@ -61,7 +60,7 @@ coef.missingHE <- function(object, prob = c(0.025, 0.975),
         sd_cov_c_fixed <- c(t(apply(object$model_output$costs_fixed, 2:3 , sd)))
         ql_cov_c_fixed <- c(t(apply(object$model_output$costs_fixed, 2:3 , quantile, prob = prob[1])))
         qu_cov_c_fixed <- c(t(apply(object$model_output$costs_fixed, 2:3 , quantile, prob = prob[2])))
-      }       
+      }
     }
     if(!object$model_output$ind_fixed) {
       costs_fixed <- cbind.data.frame(object$model_output$costs_fixed$beta, object$model_output$costs_fixed$beta_f)
@@ -90,7 +89,7 @@ coef.missingHE <- function(object, prob = c(0.025, 0.975),
        sd_cov_e_random <- c(t(apply(object$model_output$effects_random, 2:3 , sd)))
        ql_cov_e_random <- c(t(apply(object$model_output$effects_random, 2:3 , quantile, prob = prob[1])))
        qu_cov_e_random <- c(t(apply(object$model_output$effects_random, 2:3 , quantile, prob = prob[2])))
-     } 
+     }
    }
    cov_c_random_name <- NULL
    p_c_random <- 0
@@ -111,7 +110,7 @@ coef.missingHE <- function(object, prob = c(0.025, 0.975),
         sd_cov_c_random <- c(t(apply(object$model_output$costs_random, 2:3 , sd)))
         ql_cov_c_random <- c(t(apply(object$model_output$costs_random, 2:3 , quantile, prob = prob[1])))
         qu_cov_c_random <- c(t(apply(object$model_output$costs_random, 2:3 , quantile, prob = prob[2])))
-      }      
+      }
     }
     if(!object$model_output$ind_random) {
       if(length(object$model_output$costs_random) == 2) {
@@ -143,8 +142,8 @@ coef.missingHE <- function(object, prob = c(0.025, 0.975),
     if(!all(c("alpha_te", "alpha_tc") %in% names(object$model_output$effects_fixed))) {
       effects_fixed <- as.data.frame(object$model_output$effects_fixed$alpha)
     }
-    if(all(c("alpha_te", "alpha_tc") %in% names(object$model_output$effects_fixed))) { 
-      effects_fixed <- cbind(as.data.frame(object$model_output$effects_fixed$alpha), as.data.frame(object$model_output$effects_fixed$alpha_te), 
+    if(all(c("alpha_te", "alpha_tc") %in% names(object$model_output$effects_fixed))) {
+      effects_fixed <- cbind(as.data.frame(object$model_output$effects_fixed$alpha), as.data.frame(object$model_output$effects_fixed$alpha_te),
                              as.data.frame(object$model_output$effects_fixed$alpha_tc))
     }
   }
@@ -165,12 +164,12 @@ coef.missingHE <- function(object, prob = c(0.025, 0.975),
       costs_fixed <- cbind(as.data.frame(object$model_output$costs_fixed$beta), as.data.frame(object$model_output$costs_fixed$beta_f))
     }
     if(all(c("beta_te", "beta_tc") %in% names(object$model_output$costs_fixed)) & !"beta_f" %in% names(object$model_output$costs_fixed)) {
-      costs_fixed <- cbind(as.data.frame(object$model_output$costs_fixed$beta), 
+      costs_fixed <- cbind(as.data.frame(object$model_output$costs_fixed$beta),
                            as.data.frame(object$model_output$costs_fixed$beta_te),
                            as.data.frame(object$model_output$costs_fixed$beta_tc))
     }
     if(all(c("beta_f", "beta_te", "beta_tc") %in% names(object$model_output$costs_fixed))) {
-      costs_fixed <- cbind(as.data.frame(object$model_output$costs_fixed$beta), 
+      costs_fixed <- cbind(as.data.frame(object$model_output$costs_fixed$beta),
                            as.data.frame(object$model_output$costs_fixed$beta_f),
                            as.data.frame(object$model_output$costs_fixed$beta_te),
                            as.data.frame(object$model_output$costs_fixed$beta_tc))
@@ -195,22 +194,22 @@ coef.missingHE <- function(object, prob = c(0.025, 0.975),
     if(all(c("a_te", "a_tc") %in% names(object$model_output$effects_random)) & !"a" %in% names(object$model_output$effects_random)) {
       dimnames(object$model_output$effects_random$a_te)[[3]] <- paste0("a.e.time.", dimnames(object$model_output$effects_random$a_te)[[3]])
       dimnames(object$model_output$effects_random$a_tc)[[3]] <- paste0("a.c.time.", dimnames(object$model_output$effects_random$a_tc)[[3]])
-      effects_random <- cbind(as.data.frame(object$model_output$effects_random$a_te), 
+      effects_random <- cbind(as.data.frame(object$model_output$effects_random$a_te),
                               as.data.frame(object$model_output$effects_random$a_tc))
     }
-    if(all(c("a", "a_te", "a_tc") %in% names(object$model_output$effects_random))) { 
+    if(all(c("a", "a_te", "a_tc") %in% names(object$model_output$effects_random))) {
       dimnames(object$model_output$effects_random$a_te)[[3]] <- paste0("a.e.time.", dimnames(object$model_output$effects_random$a_te)[[3]])
       dimnames(object$model_output$effects_random$a_tc)[[3]] <- paste0("a.c.time.", dimnames(object$model_output$effects_random$a_tc)[[3]])
-      effects_random <- cbind(as.data.frame(object$model_output$effects_random$a), as.data.frame(object$model_output$effects_random$a_te), 
+      effects_random <- cbind(as.data.frame(object$model_output$effects_random$a), as.data.frame(object$model_output$effects_random$a_te),
                              as.data.frame(object$model_output$effects_random$a_tc))
     }
-  }    
+  }
    cov_e_random_name <- colnames(effects_random)
    p_e_random <- length(cov_e_random_name)
    mean_cov_e_random <- apply(effects_random, 2 , mean)
    sd_cov_e_random <- apply(effects_random, 2 , sd)
    ql_cov_e_random <- apply(effects_random, 2 , quantile, prob = prob[1])
-   qu_cov_e_random <- apply(effects_random, 2 , quantile, prob = prob[2])    
+   qu_cov_e_random <- apply(effects_random, 2 , quantile, prob = prob[2])
   }
   cov_c_random_name <- NULL
   p_c_random <- 0
@@ -228,36 +227,36 @@ coef.missingHE <- function(object, prob = c(0.025, 0.975),
       if(all(c("b_te", "b_tc") %in% names(object$model_output$costs_random)) & !all(c("b", "b_f") %in% names(object$model_output$costs_random))) {
         dimnames(object$model_output$costs_random$b_te)[[3]] <- paste0("b.e.time.", dimnames(object$model_output$costs_random$b_te)[[3]])
         dimnames(object$model_output$costs_random$b_tc)[[3]] <- paste0("b.c.time.", dimnames(object$model_output$costs_random$b_tc)[[3]])
-        costs_random <- cbind(as.data.frame(object$model_output$costs_random$b_te), 
+        costs_random <- cbind(as.data.frame(object$model_output$costs_random$b_te),
                                 as.data.frame(object$model_output$costs_random$b_tc))
       }
       if(all(c("b_te", "b_tc", "b_f") %in% names(object$model_output$costs_random)) & !"b" %in% names(object$model_output$costs_random)) {
         dimnames(object$model_output$costs_random$b_te)[[3]] <- paste0("b.e.time.", dimnames(object$model_output$costs_random$b_te)[[3]])
         dimnames(object$model_output$costs_random$b_tc)[[3]] <- paste0("b.c.time.", dimnames(object$model_output$costs_random$b_tc)[[3]])
-        costs_random <- cbind(as.data.frame(object$model_output$costs_random$b_te), 
+        costs_random <- cbind(as.data.frame(object$model_output$costs_random$b_te),
                               as.data.frame(object$model_output$costs_random$b_tc))
       }
-      if(all(c("b", "b_te", "b_tc") %in% names(object$model_output$costs_random)) & !"b_f" %in% names(object$model_output$costs_random)) { 
+      if(all(c("b", "b_te", "b_tc") %in% names(object$model_output$costs_random)) & !"b_f" %in% names(object$model_output$costs_random)) {
         dimnames(object$model_output$costs_random$b_te)[[3]] <- paste0("b.e.time.", dimnames(object$model_output$costs_random$b_te)[[3]])
         dimnames(object$model_output$costs_random$b_tc)[[3]] <- paste0("b.c.time.", dimnames(object$model_output$costs_random$b_tc)[[3]])
-        costs_random <- cbind(as.data.frame(object$model_output$costs_random$b), as.data.frame(object$model_output$costs_random$b_te), 
+        costs_random <- cbind(as.data.frame(object$model_output$costs_random$b), as.data.frame(object$model_output$costs_random$b_te),
                               as.data.frame(object$model_output$costs_random$b_tc))
       }
-      if(all(c("b", "b_te", "b_tc", "b_f") %in% names(object$model_output$costs_random))) { 
+      if(all(c("b", "b_te", "b_tc", "b_f") %in% names(object$model_output$costs_random))) {
         dimnames(object$model_output$costs_random$b_te)[[3]] <- paste0("b.e.time.", dimnames(object$model_output$costs_random$b_te)[[3]])
         dimnames(object$model_output$costs_random$b_tc)[[3]] <- paste0("b.c.time.", dimnames(object$model_output$costs_random$b_tc)[[3]])
-        costs_random <- cbind(as.data.frame(object$model_output$costs_random$b), as.data.frame(object$model_output$costs_random$b_f), 
+        costs_random <- cbind(as.data.frame(object$model_output$costs_random$b), as.data.frame(object$model_output$costs_random$b_f),
                               as.data.frame(object$model_output$costs_random$b_te), as.data.frame(object$model_output$costs_random$b_tc))
       }
-    }    
+    }
     cov_c_random_name <- colnames(costs_random)
     p_c_random <- length(cov_c_random_name)
     mean_cov_c_random <- apply(costs_random, 2 , mean)
     sd_cov_c_random <- apply(costs_random, 2 , sd)
     ql_cov_c_random <- apply(costs_random, 2 , quantile, prob = prob[1])
-    qu_cov_c_random <- apply(costs_random, 2 , quantile, prob = prob[2])    
+    qu_cov_c_random <- apply(costs_random, 2 , quantile, prob = prob[2])
   }
- } 
+ }
    tbl_colname <- c("Mean", "SD", "QL", "QU")
    table_e_fixed <- matrix(NA, nrow = p_e_fixed, ncol = 4)
    rownames(table_e_fixed) <- cov_e_fixed_name
@@ -309,7 +308,7 @@ coef.missingHE <- function(object, prob = c(0.025, 0.975),
   table_list_fixed <- list("Effects" = table_e_fixed, "Costs" = table_c_fixed)
   table_list_random <- list("Effects" = table_e_random, "Costs" = table_c_random)
   if(random & p_c_random == 0 & p_e_random == 0) {
-     stop("No random effects estimates found")}   
+     stop("No random effects estimates found")}
  if(!random) { print(table_list_fixed)}
  if(random) { print(table_list_random)}
 }

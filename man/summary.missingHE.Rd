@@ -9,25 +9,25 @@
 \arguments{
 \item{object}{A \code{missingHE} object containing the results of the Bayesian modelling and the economic evaluation}
 
-\item{incremental}{Logical. If \code{incremental} is \code{TRUE}, incremental CE results are printed.}
+\item{incremental}{Logical. If \code{incremental = TRUE}, incremental CE results are printed.}
 
-\item{prob}{A numeric vector of probabilities within the range (0, 1), representing the upper and lower
+\item{prob}{A numeric vector of probabilities within the range \verb{(0, 1)}, representing the upper and lower
 CI quantiles to be calculated and returned for the posterior estimates.}
 
 \item{digits}{Integer indicating the number of decimal places to be used for rounding (default = 3).}
 
-\item{...}{Additional arguments affecting the summary produced.}
+\item{\dots}{Additional arguments affecting the summary produced.}
 }
 \value{
-Prints tables with information on the CE results based on a model fitted using the function \code{selection}, \code{pattern} or \code{hurdle}.
+Prints tables with information on the CE results based on a model fitted using the function \code{\link[=selection]{selection()}}, \code{\link[=pattern]{pattern()}}, \code{\link[=hurdle]{hurdle()}} or \code{\link[=lmdm]{lmdm()}}.
 Summary information on the main parameters of interests is provided.
 }
 \description{
 Produces a table printout with some summary results of the health economic evaluation probabilistic model
-run using the function \code{\link{selection}}, \code{\link{pattern}}, \code{\link{hurdle}} or \code{\link{lmdm}}.
+run using the function \code{\link[=selection]{selection()}}, \code{\link[=pattern]{pattern()}}, \code{\link[=hurdle]{hurdle()}} or \code{\link[=lmdm]{lmdm()}}.
 }
 \examples{
-# For examples see the function selection, pattern or hurdle
+# For examples see the function [selection()], [pattern()], [hurdle()] or [lmdm()].
 #
 #
 }
@@ -35,7 +35,7 @@ run using the function \code{\link{selection}}, \code{\link{pattern}}, \code{\li
 Baio, G.(2012). \emph{Bayesian Methods in Health Economcis}. CRC/Chapman Hall, London.
 }
 \seealso{
-\code{\link{selection}} \code{\link{pattern}} \code{\link{hurdle}} \code{\link{lmdm}} \code{\link{diagnostic}} \code{\link{plot.missingHE}}
+\code{\link[=selection]{selection()}} \code{\link[=pattern]{pattern()}} \code{\link[=hurdle]{hurdle()}} \code{\link[=lmdm]{lmdm()}} \code{\link[=diagnostic]{diagnostic()}} \code{\link[=plot.missingHE]{plot.missingHE()}}
 }
 \author{
 Andrea Gabrio

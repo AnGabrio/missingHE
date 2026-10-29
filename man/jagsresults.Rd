@@ -2,7 +2,7 @@
 % Please edit documentation in R/jagsresults.R
 \name{jagsresults}
 \alias{jagsresults}
-\title{An internal function to summarise results from BUGS model}
+\title{A function to summarise results from a fitted model}
 \usage{
 jagsresults(
   x,
@@ -31,7 +31,7 @@ expected to be a single string giving a text pattern to be matched.
 Parameters with names matching the pattern will be returned (unless
 \code{invert} is \code{TRUE}, which results in all parameters that do not
 match the pattern being returned). Text pattern matching uses regular
-expressions (\code{\link{regex}}).}
+expressions (\code{regex}).}
 
 \item{invert}{Logical. If \code{invert} is \code{TRUE}, only those parameters
 that do not match elements of \code{params} will be returned.}
@@ -43,11 +43,11 @@ representing the sample quantiles to be calculated and returned.}
 their values rounded such that the most extreme value has the specified
 number of significant digits.}
 
-\item{...}{Additional arguments accepted by \code{\link{grep}}, e.g.
-\code{perl=TRUE}, to allow look-around pattern matching.}
+\item{\dots}{Additional arguments accepted by \code{grep}, e.g.
+\code{perl = TRUE}, to allow look-around pattern matching.}
 }
 \description{
-This function hides missing data distribution from summary results of BUGS models
+This function hides missing data distribution from summary results of \code{BUGS} models
 }
 \examples{
 \dontrun{
@@ -82,9 +82,9 @@ M <- function() {
 }
 
 ## Fit model
-jagsfit <- jags(dat, inits=NULL, 
-                parameters.to.save=c('a', 'beta.temp', 'beta.rain', 
-                                     'beta.wind', 'sd', 'resid'), 
+jagsfit <- jags(dat, inits=NULL,
+                parameters.to.save=c('a', 'beta.temp', 'beta.rain',
+                                     'beta.wind', 'sd', 'resid'),
                 model.file=M, n.iter=10000)
 
 ## Output
@@ -96,7 +96,7 @@ jagsresults(x=jagsfit, param='beta.rain')
 
 # Results for 'a' and 'sd' only
 jagsresults(x=jagsfit, param=c('a', 'sd'))
-jagsresults(x=jagsfit, param=c('a', 'sd'), 
+jagsresults(x=jagsfit, param=c('a', 'sd'),
             probs=c(0.01, 0.025, 0.1, 0.25, 0.5, 0.75, 0.9, 0.975))
 
 # Results for all parameters including the string 'beta'

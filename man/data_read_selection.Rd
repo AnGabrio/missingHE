@@ -23,32 +23,32 @@ data_read_selection(
 }
 \arguments{
 \item{data}{A data frame in which to find variables supplied in \code{model.eff} and \code{model.cost}. Among these,
-effectiveness, cost and treatment indicator variables must always be provided and named 'e', 'c' and 'trt' respectively.}
+effectiveness, cost and treatment indicator variables must always be provided and named \code{e}, \code{c} and \code{trt} respectively.}
 
 \item{model.eff}{A formula expression in conventional \code{R} linear modelling syntax. The response must be a health economics
-effectiveness outcome ('e') whose name must correspond to that used in \code{data}, and
+effectiveness outcome (\code{e}) whose name must correspond to that used in \code{data}, and
 any covariates are given on the right-hand side. If there are no covariates, specify \code{1} on the right hand side.
 By default, covariates are placed on the "location" parameter of the distribution through a linear model.
 Random effects can also be specified for each model parameter.}
 
 \item{model.cost}{A formula expression in conventional \code{R} linear modelling syntax. The response must be a health economics
-cost outcome ('c') whose name must correspond to that used in \code{data}, and any covariates are given on the right-hand side.
+cost outcome (\code{c}) whose name must correspond to that used in \code{data}, and any covariates are given on the right-hand side.
 If there are no covariates, specify \code{1} on the right hand side. By default, covariates are placed on the "location"
 parameter of the distribution through a linear model. Random effects can also be specified for each model parameter.}
 
 \item{model.me}{A formula expression in conventional \code{R} linear modelling syntax.  The response must be indicated with the
-term 'me'(missing effects) and any covariates used to estimate the probability of missing effects are given on the right-hand side.
+term \code{me} (missing effects) and any covariates used to estimate the probability of missing effects are given on the right-hand side.
 If there are no covariates, specify \code{1} on the right hand side. By default, covariates are placed on the "probability" parameter for the missing effects through a logistic-linear model.
 Random effects can also be specified for each model parameter.}
 
-\item{model.mc}{A formula expression in conventional R linear modelling syntax. The response must be indicated with the
-term 'mc'(missing costs) and any covariates used to estimate the probability of missing costs should be given on the right-hand side.
+\item{model.mc}{A formula expression in conventional \code{R} linear modelling syntax. The response must be indicated with the
+term \code{mc} (missing costs) and any covariates used to estimate the probability of missing costs should be given on the right-hand side.
 If there are no covariates, specify \code{1} on the right hand side. By default, covariates are placed on the "probability" parameter for the missing costs through a logistic-linear model.
 Random effects can also be specified for each model parameter.}
 
 \item{cov_matrix}{Data frame containing the covariate matrix of the model.}
 
-\item{type}{Type of missingness mechanism assumed. Choices are Missing At Random (MAR) and Missing Not At Random (MNAR).}
+\item{type}{Type of missingness mechanism assumed. Choices are Missing At Random (\code{MAR}) and Missing Not At Random (\code{MNAR}).}
 
 \item{center}{Logical. If \code{center} is \code{TRUE} all the covariates in the model are centered.}
 

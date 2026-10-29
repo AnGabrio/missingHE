@@ -5,33 +5,33 @@
 \alias{PBS}
 \title{PBS economic data on intellectual disability and challenging behaviour}
 \format{
-A data frame with 732 rows and 16 variables
+A data frame with \code{732} rows and \code{16} variables
 }
 \usage{
 data(PBS)
 }
 \description{
 Longitudinal data from a cluster RCT trial (The PBS trial) on people suffering from intellectual disability and challenging behaviour.
-A total of 244 individuals across 23 sites were enrolled in the trial: 136 in the control (t=1) and 108 in the active intervention (t=2).
-Health economic outcome data were collected via self-reported questionnaires at three time points throughout the study: baseline (time=1),
-6 months (time=2) and 12 months (time=3) follow-up, and included utility scores related to quality of life and costs.
+A total of \code{244} individuals across \code{23} sites were enrolled in the trial: \code{136} in the control (\code{t = 1}) and \code{108} in the active intervention (\code{t = 2}).
+Health economic outcome data were collected via self-reported questionnaires at three time points throughout the study: baseline (\code{time = 1}),
+\code{6} months (\code{time = 2}) and \code{12} months (\code{time = 3}) follow-up, and included utility scores related to quality of life and costs.
 Baseline data are available for age, gender, ethnicity, living status, type of carer, marital status, and disability level variables.
 }
 \details{
-\describe{
-\item{id}{id number}
-\item{time}{time indicator}
-\item{e}{HRQoL utilities}
-\item{c}{costs (in pounds)}
-\item{trt}{Treatment arm indicator for the control (t=1) and the active intervention (t=2)}
-\item{age}{age in years}
-\item{gender}{binary: male (1) and female (0)}
-\item{ethnicity}{binary: white (1) and other (0)}
-\item{carer}{binary: paid carer (1) and family carer (0)}
-\item{marital}{binary: single (1) and married (0)}
-\item{living}{categorical: alone (1), with partner (2) and with parents (3)}
-\item{disability}{categorical: mild (1), moderate (2) and severe (3)}
-\item{site}{site number}
+\itemize{
+\item \strong{id}: id number.
+\item \strong{time}: time indicator.
+\item \strong{e}: Health-Related Quality of Life (HRQoL) utilities.
+\item \strong{c}: Costs in pounds.
+\item \strong{age}: Age in years.
+\item \strong{gender}: binary: male (\code{1}) and female (\code{0}).
+\item \strong{ethnicity}: binary: white (\code{1}) and other (\code{0}).
+\item \strong{trt}: Treatment arm indicator for the control (\code{t = 1}) and the active intervention (\code{t = 2}).
+\item \strong{carer}: binary: paid carer (\code{1}) and family carer (\code{0}).
+\item \strong{marital}: binary: single (\code{1}) and married (\code{0}).
+\item \strong{living}: categorical: alone (\code{1}), with partner (\code{2}) and with parents (\code{3}).
+\item \strong{disability}: categorical: mild (\code{1}), moderate (\code{2}) and severe (\code{3}).
+\item \strong{site}: site number.
 }
 }
 \examples{

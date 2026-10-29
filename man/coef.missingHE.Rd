@@ -9,33 +9,31 @@
 \arguments{
 \item{object}{A \code{missingHE} object containing the results of the Bayesian modelling and the economic evaluation}
 
-\item{prob}{A numeric vector of probabilities within the range (0,1), representing the upper and lower
+\item{prob}{A numeric vector of probabilities within the range \verb{(0,1)}, representing the upper and lower
 CI sample quantiles to be calculated and returned for the estimates.}
 
 \item{random}{Logical. If \code{random} is \code{TRUE}, the estimates of the random effects parameters are printed, when available.}
 
 \item{digits}{Integer indicating the number of decimal places to be used for rounding (default = 3).}
 
-\item{...}{Additional arguments affecting the summary produced.}
+\item{\dots}{Additional arguments affecting the summary produced.}
 }
 \value{
 Prints a table with some summary statistics, including posterior mean, standard deviation and lower and upper quantiles based on the
 values specified in \code{prob}, for the posterior distributions of the regression coefficients of the effects and costs models run using the
-function \code{selection}, \code{pattern}, \code{hurdle} or \code{\link{lmdm}}.
+function \code{\link[=selection]{selection()}}, \code{\link[=pattern]{pattern()}}, \code{\link[=hurdle]{hurdle()}} or \code{\link[=lmdm]{lmdm()}}.
 }
 \description{
 Produces a table printout with summary statistics for the regression coefficients of the health economic evaluation probabilistic model
-run using the function \code{\link{selection}}, \code{\link{pattern}},  \code{\link{hurdle}} or \code{\link{lmdm}}.
+run using the function \code{\link[=selection]{selection()}}, \code{\link[=pattern]{pattern()}}, \code{\link[=hurdle]{hurdle()}} or \code{\link[=lmdm]{lmdm()}}.
 }
 \examples{
- 
-# For examples see the function \code{\link{selection}}, \code{\link{pattern}}, 
-# \code{\link{hurdle}} or \code{\link{lmdm}}
-# 
-# 
+# For examples see the function [selection()], [pattern()], [hurdle()] or [lmdm()].
+#
+#
 }
 \seealso{
-\code{\link{selection}} \code{\link{pattern}} \code{\link{hurdle}} \code{\link{lmdm}} \code{\link{diagnostic}} \code{\link{plot.missingHE}}
+\code{\link[=selection]{selection()}} \code{\link[=pattern]{pattern()}} \code{\link[=hurdle]{hurdle()}} \code{\link[=lmdm]{lmdm()}} \code{\link[=diagnostic]{diagnostic()}} \code{\link[=plot.missingHE]{plot.missingHE()}}
 }
 \author{
 Andrea Gabrio

@@ -2,7 +2,7 @@
 % Please edit documentation in R/isBar.R
 \name{isBar}
 \alias{isBar}
-\title{An internal function to detect the random effects component from an object of class formula}
+\title{A function to detect the random effects component from an object of class formula}
 \usage{
 isBar(term)
 }
@@ -10,7 +10,7 @@ isBar(term)
 \item{term}{formula to be processed}
 }
 \description{
-An internal function to detect the random effects component from an object of class formula
+A function to detect the random effects component from an object of class formula
 }
 \examples{
 #Internal function only

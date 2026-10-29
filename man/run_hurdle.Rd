@@ -2,24 +2,24 @@
 % Please edit documentation in R/run_hurdle.R
 \name{run_hurdle}
 \alias{run_hurdle}
-\title{An internal function to execute a JAGS hurdle model and get posterior results}
+\title{A function to execute a hurdle model and get posterior results}
 \usage{
 run_hurdle(data_model, type, dist_e, dist_c, model_info)
 }
 \arguments{
-\item{data_model}{list containing the data for the model to be passed to JAGS.}
+\item{data_model}{list containing the data for the model to be passed to \code{JAGS}.}
 
-\item{type}{Type of structural value mechanism assumed. Choices are Structural Completely At Random (SCAR), Structural At Random (SAR),}
+\item{type}{Type of structural value mechanism assumed. Choices are Structural Completely At Random (\code{SCAR}), Structural At Random (\code{SAR}),}
 
-\item{dist_e}{distribution assumed for the effects. Current available choices are: Normal ('norm'), Beta ('beta'), Gamma ('gamma'), Exponential ('exp'),
-Weibull ('weib'), Logistic ('logis'), Poisson ('pois'), Negative Binomial ('negbin') or Bernoulli ('bern').}
+\item{dist_e}{distribution assumed for the effects. Current available choices are: Normal (\code{norm}), Beta (\code{beta}), Gamma (\code{gamma}), Exponential (\code{exp}),
+Weibull (\code{weib}), Logistic (\code{logis}), Poisson (\code{pois}), Negative Binomial (\code{negbin}) or Bernoulli (\code{bern}).}
 
-\item{dist_c}{Distribution assumed for the costs. Current available choices are: Normal ('norm'), Gamma ('gamma') or LogNormal ('lnorm').}
+\item{dist_c}{Distribution assumed for the costs. Current available choices are: Normal (\code{norm}), Gamma (\code{gamma}) or LogNormal (\code{lnorm}).}
 
-\item{model_info}{list containing model and MCMC information to be passed to JAGS.}
+\item{model_info}{list containing model and MCMC information to be passed to \code{JAGS}.}
 }
 \description{
-This function fits a JAGS using the \code{\link[R2jags]{jags}} function and obtain posterior inferences.
+This function fits a \code{JAGS} using the \code{\link[R2jags:jags]{R2jags::jags()}} function and obtain posterior inferences.
 }
 \examples{
 #Internal function only

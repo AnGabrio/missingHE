@@ -1,13 +1,13 @@
-#' An internal function to execute a JAGS pattern mixture model and get posterior results
+#' A function to execute a pattern mixture model and get posterior results
 #'
-#' This function fits a JAGS using the \code{\link[R2jags]{jags}} function and obtain posterior inferences.
-#' @param data_model list containing the data for the model to be passed to JAGS.
-#' @param type Type of missingness mechanism assumed. Choices are Missing At Random (MAR), Missing Not At Random for the effects (MNAR_eff),
-#' Missing Not At Random for the costs (MNAR_cost), and Missing Not At Random for both (MNAR).
-#' @param dist_e distribution assumed for the effects. Current available choices are: Normal ('norm'), Beta ('beta'), Gamma ('gamma'), Exponential ('exp'),
-#' Weibull ('weib'), Logistic ('logis'), Poisson ('pois'), Negative Binomial ('negbin') or Bernoulli ('bern').
-#' @param dist_c Distribution assumed for the costs. Current available choices are: Normal ('norm'), Gamma ('gamma') or LogNormal ('lnorm').
-#' @param model_info list containing model and MCMC information to be passed to JAGS.
+#' This function fits a `JAGS` using the [R2jags::jags()] function and obtain posterior inferences.
+#' @param data_model list containing the data for the model to be passed to `JAGS`.
+#' @param type Type of missingness mechanism assumed. Choices are Missing At Random (`MAR`), Missing Not At Random for the effects (`MNAR_eff`),
+#' Missing Not At Random for the costs (`MNAR_cost`), and Missing Not At Random for both (`MNAR`).
+#' @param dist_e distribution assumed for the effects. Current available choices are: Normal (`norm`), Beta (`beta`), Gamma (`gamma`), Exponential (`exp`),
+#' Weibull (`weib`), Logistic (`logis`), Poisson (`pois`), Negative Binomial (`negbin`) or Bernoulli (`bern`).
+#' @param dist_c Distribution assumed for the costs. Current available choices are: Normal (`norm`), Gamma (`gamma`) or LogNormal (`lnorm`).
+#' @param model_info list containing model and MCMC information to be passed to `JAGS`.
 #' @keywords internal
 #' @importFrom stats rnorm rbeta rgamma rlnorm rweibull rnbinom rbinom rpois rlogis rexp
 #' @examples

@@ -2,7 +2,7 @@
 % Please edit documentation in R/write_hurdle.R
 \name{write_hurdle}
 \alias{write_hurdle}
-\title{An internal function to select which type of hurdle model to execute.
+\title{A function to write the code for a hurdle model
 Alternatives vary depending on the type of distribution assumed for the effect and cost variables,
 type of structural value mechanism assumed and independence or joint modelling
 This function selects which type of model to execute.}
@@ -10,17 +10,17 @@ This function selects which type of model to execute.}
 write_hurdle(dist_e, dist_c, type, model_txt_info)
 }
 \arguments{
-\item{dist_e}{Distribution assumed for the effects. Current available choices are: Normal ('norm'), Beta ('beta'), Gamma ('gamma'), Exponential ('exp'),
-Weibull ('weib'), Logistic ('logis'), Poisson ('pois'), Negative Binomial ('negbin') or Bernoulli ('bern')}
+\item{dist_e}{Distribution assumed for the effects. Current available choices are: Normal (\code{norm}), Beta (\code{beta}), Gamma (\code{gamma}), Exponential (\code{exp}),
+Weibull (\code{weib}), Logistic (\code{logis}), Poisson (\code{pois}), Negative Binomial (\code{negbin}) or Bernoulli (\code{bern}).}
 
-\item{dist_c}{Distribution assumed for the costs. Current available choices are: Normal ('norm'), Gamma ('gamma') or LogNormal ('lnorm')}
+\item{dist_c}{Distribution assumed for the costs. Current available choices are: Normal (\code{norm}), Gamma (\code{gamma}) or LogNormal (\code{lnorm}).}
 
-\item{type}{Type of structural value mechanism assumed. Choices are Structural Completely At Random (SCAR) and Structural At Random (SAR).}
+\item{type}{Type of structural value mechanism assumed. Choices are Structural Completely At Random (\code{SCAR}) and Structural At Random (\code{SAR}).}
 
-\item{model_txt_info}{list containing model specification information used to write the txt file of the JAGS model.}
+\item{model_txt_info}{list containing model specification information used to write the \code{txt} file of the \code{JAGS} model.}
 }
 \description{
-An internal function to select which type of hurdle model to execute.
+A function to write the code for a hurdle model
 Alternatives vary depending on the type of distribution assumed for the effect and cost variables,
 type of structural value mechanism assumed and independence or joint modelling
 This function selects which type of model to execute.

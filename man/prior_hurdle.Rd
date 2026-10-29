@@ -2,21 +2,20 @@
 % Please edit documentation in R/prior_hurdle.R
 \name{prior_hurdle}
 \alias{prior_hurdle}
-\title{An internal function to change the hyperprior parameters in the hurdle model provided by the user depending on the type of
-structural value mechanism and outcome distributions assumed}
+\title{A function to change the hyperprior parameters in a hurdle model}
 \usage{
 prior_hurdle(type, dist_e, dist_c, model_txt_info, model_string_jags)
 }
 \arguments{
-\item{type}{Type of structural value mechanism assumed. Choices are Structural Completely At Random (SCAR) and Structural At Random (SAR).
+\item{type}{Type of structural value mechanism assumed. Choices are Structural Completely At Random (\code{SCAR}) and Structural At Random (\code{SAR}).
 For a complete list of all available hyper parameters and types of models see the manual.}
 
-\item{dist_e}{distribution assumed for the effects. Current available choices are: Normal ('norm'), Beta ('beta'), Gamma ('gamma'), Exponential ('exp'),
-Weibull ('weibull'), Logistic ('logis'), Poisson ('pois'), Negative Binomial ('nbinom') or Bernoulli ('bern')}
+\item{dist_e}{distribution assumed for the effects. Current available choices are: Normal (\code{norm}), Beta (\code{beta}), Gamma (\code{gamma}), Exponential (\code{exp}),
+Weibull (\code{weib}), Logistic (\code{logis}), Poisson (\code{pois}), Negative Binomial (\code{negbin}) or Bernoulli (\code{bern})}
 
-\item{dist_c}{Distribution assumed for the costs. Current available choices are: Normal ('norm'), Gamma ('gamma') or LogNormal ('lnorm')}
+\item{dist_c}{Distribution assumed for the costs. Current available choices are: Normal (\code{norm}), Gamma (\code{gamma}) or LogNormal (\code{lnorm})}
 
-\item{model_txt_info}{list containing model specification information used to write the txt file of the JAGS model.}
+\item{model_txt_info}{list containing model specification information used to write the \code{txt} file of the \code{JAGS} model.}
 
 \item{model_string_jags}{text file of the model.}
 }

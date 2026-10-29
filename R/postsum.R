@@ -1,7 +1,7 @@
-#' Postsum method for inspecting summary posterior estimates of a Bayesian model fitted in JAGS
-#' 
-#' @param x object containing the results of the Bayesian model fitted in JAGS.
-#' @param ... additional arguments affecting the output produced.
+#' Postsum method for inspecting summary posterior estimates of a Bayesian model
+#'
+#' @param x object containing the results of the Bayesian model fitted in `JAGS`.
+#' @param \dots additional arguments affecting the output produced.
 #' @author Andrea Gabrio
 #' @export
 
@@ -10,17 +10,16 @@ postsum <- function(x, ...){
 }
 
 
-#'  Postsum method for the posterior results contained in the objects of class \code{missingHE}
-#' 
+#'  Postsum method for the posterior results contained in the objects of class `missingHE`
+#'
 #' Prints the summary table for the model fitted, with the estimate of the parameters and/or missing values.
-#' @keywords print JAGS missing data  
-#' @param x A \code{missingHE} object containing the results of the Bayesian model run using the function \code{\link{selection}}, \code{\link{pattern}},
-#' \code{\link{hurdle}} or \code{\link{lmdm}}.
-#' @param display Set of parameters for which posterior summaries are displayed. Choices are: fixed effects ('fixed'), random effects ('random'),
-#' individual log likelihood values ('loglik'), individual conditional parameter values ('conditional') and individual imputed values ('mis').
+#' @keywords print JAGS missing data
+#' @param x A \code{missingHE} object containing the results of the Bayesian model run using the function [selection()], [pattern()], [hurdle()] or [lmdm()].
+#' @param display Set of parameters for which posterior summaries are displayed. Choices are: fixed effects (`fixed`), random effects (`random`),
+#' individual log likelihood values (`loglik`), individual conditional parameter values (`conditional`) and individual imputed values (`mis`).
 #' @param digits Integer indicating the number of decimal places to be used for rounding (default = 3).
-#' @param ... additional arguments affecting the output produced. For example: \code{param = } JAGS name assigned to the specific model parameters. 
-#' to be shown in the printed table. 
+#' @param \dots additional arguments affecting the output produced. For example: `param = ` `JAGS` name assigned to the specific model parameters.
+#' to be shown in the printed table.
 #' @author Andrea Gabrio
 #' @rdname postsum
 #' @export
@@ -29,18 +28,18 @@ postsum.missingHE <- function(x, display = "fixed", digits = 3, ...) {
   exArgs <- list(...)
   if(!display %in% c("fixed", "random", "loglik", "conditional", "mis")) {
     stop("Please select a valid input for 'display' argument")}
-  if(!inherits(x, "missingHE")) { 
+  if(!inherits(x, "missingHE")) {
     stop("Only objects of class 'missingHE' can be used")}
   if(x$model_output$model$BUGSoutput$n.chains == 1){
     stop("Output is not available when 'n.chain' = 1")}
   stat_display_name <- c("mean", "sd", "2.5%", "50%", "97.5%", "Rhat", "n.eff")
-  if(x$model_output$method == "SELECTION") { params_print <- c("alpha", "beta", "beta_f", 
+  if(x$model_output$method == "SELECTION") { params_print <- c("alpha", "beta", "beta_f",
                                                                "gamma_e", "gamma_c", "delta_e", "delta_c", "s_c", "s_e",
                                                                "p_e", "p_c", "tau_e", "tau_c", "tmu_e", "tmu_c", "ls_c", "ltau_c")}
-  if(x$model_output$method == "HURDLE") { params_print <- c("alpha", "beta", "beta_f", 
+  if(x$model_output$method == "HURDLE") { params_print <- c("alpha", "beta", "beta_f",
                                                             "gamma_e", "gamma_c", "p_e", "p_c", "s_c", "s_e",
                                                             "tau_e", "tau_c", "tmu_e", "tmu_c", "ls_c", "ltau_c")}
-  if(x$model_output$method == "PATTERN") { params_print <- c("alpha_p", "bet_pa", "beta_f_p", 
+  if(x$model_output$method == "PATTERN") { params_print <- c("alpha_p", "bet_pa", "beta_f_p",
                                                             "delta_e", "delta_c", "s_c_p", "s_e_p",
                                                             "p_prob", "tau_e_p", "tau_c_p", "tmu_e", "tmu_c", "ls_c_p", "ltau_c_p")}
   if(x$model_output$method == "LMDM") { params_print <- c("alpha", "beta", "beta_f", "alpha_te", "alpha_tc", "beta_te", "beta_tc",
@@ -60,13 +59,13 @@ postsum.missingHE <- function(x, display = "fixed", digits = 3, ...) {
       params_print_re <- c("a", "b", "b_f", "g_e", "g_c")
       print_sum_random <- jagsresults(x = x$model_output$model, params = params_print_re, invert = FALSE)
     } else {print_sum_random <- print_sum_fixed}
-  }  
+  }
   if(x$model_output$method == "PATTERN") {
     if(!is.null(x$model_output$effects_random) | !is.null(x$model_output$costs_random)) {
       params_print_re <- c("a", "b", "b_f")
       print_sum_random <- jagsresults(x = x$model_output$model, params = params_print_re, invert = FALSE)
     } else {print_sum_random <- print_sum_fixed}
-  }  
+  }
   if(x$model_output$method == "LMDM") {
     if(!is.null(x$model_output$effects_random) | !is.null(x$model_output$costs_random) |
        !is.null(x$model_output$mis_effects_random) | !is.null(x$model_output$mis_costs_random)) {

@@ -2,7 +2,7 @@
 % Please edit documentation in R/ppc.R
 \name{ppc}
 \alias{ppc}
-\title{Posterior predictive checks for assessing the fit to the observed data of Bayesian models implemented in \code{JAGS} using the function \code{\link{selection}}, \code{\link{pattern}}, \code{\link{hurdle}} or \code{\link{lmdm}}}
+\title{Posterior predictive checks for assessing the fit to the observed data of a Bayesian model}
 \usage{
 ppc(
   x,
@@ -16,53 +16,51 @@ ppc(
 )
 }
 \arguments{
-\item{x}{An object of class "missingHE" containing the posterior results of a full Bayesian model implemented using the function \code{\link{selection}},
-\code{\link{pattern}}, \code{\link{hurdle}} or \code{\link{lmdm}}.}
+\item{x}{An object of class \code{missingHE} containing the posterior results of a full Bayesian model implemented using the function \code{\link[=selection]{selection()}}, \code{\link[=pattern]{pattern()}}, \code{\link[=hurdle]{hurdle()}} or \code{\link[=lmdm]{lmdm()}}.}
 
-\item{type}{Type of posterior predictive check among some pre-defined types, mostly taken from the package \strong{bayesplot}. For a full list of available options see details.}
+\item{type}{Type of posterior predictive check among some pre-defined types, mostly taken from the package \link[bayesplot:bayesplot]{bayesplot}. For a full list of available options see details.}
 
-\item{outcome}{The outcome variables that should be displayed. Options are: 'both' (default) for both effects and costs; 'effects' or 'costs' for the effects
+\item{outcome}{The outcome variables that should be displayed. Options are: \code{both} (default) for both effects and costs; \code{effects} or \code{costs} for the effects
 or costs separately.}
 
 \item{ndisplay}{Number of posterior replications to be used to generate the plots.}
 
-\item{trt}{treatment group for which plots should be displayed. Choices include: 'all' (default) for all groups; 'none' for results across all groups; any
+\item{trt}{treatment group for which plots should be displayed. Choices include: \code{all} (default) for all groups; \code{none} for results across all groups; any
 character or numeric value denoting the treatment group name or index associated with the treatment variable in the original data set.}
 
-\item{theme}{Type of ggplot theme among some pre-defined themes, mostly taken from the package \strong{ggthemes}. For a full list of available themes see details.}
+\item{theme}{Type of ggplot theme among some pre-defined themes, mostly taken from the package \link[ggthemes:ggthemes]{ggthemes}. For a full list of available themes see details.}
 
-\item{scheme_set}{Type of scheme sets among some pre-defined schemes, mostly taken from the package \strong{bayesplot}. For a full list of available themes see details.}
+\item{scheme_set}{Type of scheme sets among some pre-defined schemes, mostly taken from the package \link[bayesplot:bayesplot]{bayesplot}. For a full list of available themes see details.}
 
-\item{...}{Additional parameters that can be provided to manage the output of \code{ppc}. For more details see \strong{bayesplot}.}
+\item{\dots}{Additional parameters that can be provided to manage the output of \code{ppc}. For more details see \link[bayesplot:bayesplot]{bayesplot}.}
 }
 \value{
 A \code{ggplot} object containing the plots specified in the argument \code{type}.
 }
 \description{
-The focus is restricted to full Bayesian models in cost-effectiveness analyses based on the function \code{\link{selection}}, \code{\link{pattern}},
-\code{\link{hurdle}} or \code{\link{lmdm}} with the fit to the observed data being assessed through graphical checks based on the posterior replications generated from the model.
+The focus is restricted to full Bayesian models in cost-effectiveness analyses based on the function \code{\link[=selection]{selection()}}, \code{\link[=pattern]{pattern()}}, \code{\link[=hurdle]{hurdle()}} or \code{\link[=lmdm]{lmdm()}}
+with the fit to the observed data being assessed through graphical checks based on the posterior replications generated from the model.
 Examples include the comparison of histograms, density plots, intervals, test statistics, evaluated using both the observed and replicated data.
-Different types of posterior predictive checks are implemented to assess model fit using functions contained in the package \strong{bayesplot}.
-Graphics and plots are managed using functions contained in the package \strong{ggplot2} and \strong{ggthemes}.
+Different types of posterior predictive checks are implemented to assess model fit using functions contained in the package \link[bayesplot:bayesplot]{bayesplot}.
+Graphics and plots are managed using functions contained in the package \link[ggplot2:ggplot2]{ggplot2} and \link[ggthemes:ggthemes]{ggthemes}.
 }
 \details{
 The function produces different types of graphical posterior predictive checks using the estimates from a Bayesian cost-effectiveness model implemented
-with the function \code{\link{selection}}, \code{\link{pattern}}, \code{\link{hurdle}} or \code{\link{lmdm}}. The purpose of these checks is to visually compare the distribution (or some relevant quantity)
+with the function \code{\link[=selection]{selection()}}, \code{\link[=pattern]{pattern()}}, \code{\link[=hurdle]{hurdle()}} or \code{\link[=lmdm]{lmdm()}}. The purpose of these checks is to visually compare the distribution (or some relevant quantity)
 of the observed data with respect to that from the replicated data for both effectiveness and cost outcomes in each treatment arm. Since predictive checks are meaningful
 only with respect to the observed data, only the observed outcome values are used to assess the fit of the model.
 The arguments \code{theme} and \code{scheme_set} allow to customise the graphical aspect of the plots generated by \code{ppc} and allow to choose among a set of possible
-pre-defined themes and scheme sets taken form the package \strong{ggtheme} and \code{bayesplot}. For a complete list of the available character names for each theme and scheme set, see \strong{ggthemes} and \strong{bayesplot}.
+pre-defined themes and scheme sets taken form the package \link[ggthemes:ggthemes]{ggthemes} and \link[bayesplot:bayesplot]{bayesplot}. For a complete list of the available character names for each theme and scheme set, see \link[ggthemes:ggthemes]{ggthemes} and \link[bayesplot:bayesplot]{bayesplot}.
 }
 \examples{
-# For examples see the function \code{\link{selection}}, \code{\link{pattern}}, 
-# \code{\link{hurdle}} or \code{\link{lmdm}}
+# For examples see the function [selection()], [pattern()], [hurdle()] or [lmdm()].
 #
 }
 \references{
 Gelman, A. Carlin, JB., Stern, HS. Rubin, DB.(2003). \emph{Bayesian Data Analysis, 2nd edition}, CRC Press.
 }
 \seealso{
-\code{\link{selection}} \code{\link{pattern}} \code{\link{hurdle}} \code{\link{lmdm}} \code{\link{diagnostic}}
+\code{\link[=selection]{selection()}} \code{\link[=pattern]{pattern()}} \code{\link[=hurdle]{hurdle()}} \code{\link[=lmdm]{lmdm()}} \code{\link[=diagnostic]{diagnostic()}}
 }
 \author{
 Andrea Gabrio

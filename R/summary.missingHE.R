@@ -1,23 +1,23 @@
-#' Summary method for objects in the class \code{missingHE}
+#' Summary method for objects in the class `missingHE`
 #'
 #' Produces a table printout with some summary results of the health economic evaluation probabilistic model
-#' run using the function \code{\link{selection}}, \code{\link{pattern}}, \code{\link{hurdle}} or \code{\link{lmdm}}.
+#' run using the function [selection()], [pattern()], [hurdle()] or [lmdm()].
 #' @param object A \code{missingHE} object containing the results of the Bayesian modelling and the economic evaluation
-#' @param incremental Logical. If \code{incremental} is \code{TRUE}, incremental CE results are printed.
-#' @param prob A numeric vector of probabilities within the range (0, 1), representing the upper and lower
+#' @param incremental Logical. If `incremental = TRUE`, incremental CE results are printed.
+#' @param prob A numeric vector of probabilities within the range `(0, 1)`, representing the upper and lower
 #'  CI quantiles to be calculated and returned for the posterior estimates.
 #' @param digits Integer indicating the number of decimal places to be used for rounding (default = 3).
-#' @param ... Additional arguments affecting the summary produced.
-#' @return Prints tables with information on the CE results based on a model fitted using the function \code{selection}, \code{pattern} or \code{hurdle}. 
+#' @param \dots Additional arguments affecting the summary produced.
+#' @return Prints tables with information on the CE results based on a model fitted using the function [selection()], [pattern()], [hurdle()] or [lmdm()].
 #' Summary information on the main parameters of interests is provided.
-#' @seealso \code{\link{selection}} \code{\link{pattern}} \code{\link{hurdle}} \code{\link{lmdm}} \code{\link{diagnostic}} \code{\link{plot.missingHE}}
+#' @seealso [selection()] [pattern()] [hurdle()] [lmdm()] [diagnostic()] [plot.missingHE()]
 #' @author Andrea Gabrio
-#' @references 
-#' Baio, G.(2012). \emph{Bayesian Methods in Health Economcis}. CRC/Chapman Hall, London.
+#' @references
+#' Baio, G.(2012). *Bayesian Methods in Health Economcis*. CRC/Chapman Hall, London.
 #' @importFrom stats quantile
 #' @export
-#' @examples 
-#' # For examples see the function selection, pattern or hurdle
+#' @examples
+#' # For examples see the function [selection()], [pattern()], [hurdle()] or [lmdm()].
 #' #
 #' #
 

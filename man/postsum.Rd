@@ -3,21 +3,20 @@
 \name{postsum}
 \alias{postsum}
 \alias{postsum.missingHE}
-\title{Postsum method for inspecting summary posterior estimates of a Bayesian model fitted in JAGS}
+\title{Postsum method for inspecting summary posterior estimates of a Bayesian model}
 \usage{
 postsum(x, ...)
 
 \method{postsum}{missingHE}(x, display = "fixed", digits = 3, ...)
 }
 \arguments{
-\item{x}{A \code{missingHE} object containing the results of the Bayesian model run using the function \code{\link{selection}}, \code{\link{pattern}},
-\code{\link{hurdle}} or \code{\link{lmdm}}.}
+\item{x}{A \code{missingHE} object containing the results of the Bayesian model run using the function \code{\link[=selection]{selection()}}, \code{\link[=pattern]{pattern()}}, \code{\link[=hurdle]{hurdle()}} or \code{\link[=lmdm]{lmdm()}}.}
 
-\item{...}{additional arguments affecting the output produced. For example: \code{param = } JAGS name assigned to the specific model parameters.
+\item{\dots}{additional arguments affecting the output produced. For example: \verb{param = } \code{JAGS} name assigned to the specific model parameters.
 to be shown in the printed table.}
 
-\item{display}{Set of parameters for which posterior summaries are displayed. Choices are: fixed effects ('fixed'), random effects ('random'),
-individual log likelihood values ('loglik'), individual conditional parameter values ('conditional') and individual imputed values ('mis').}
+\item{display}{Set of parameters for which posterior summaries are displayed. Choices are: fixed effects (\code{fixed}), random effects (\code{random}),
+individual log likelihood values (\code{loglik}), individual conditional parameter values (\code{conditional}) and individual imputed values (\code{mis}).}
 
 \item{digits}{Integer indicating the number of decimal places to be used for rounding (default = 3).}
 }

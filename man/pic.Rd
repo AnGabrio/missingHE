@@ -2,82 +2,76 @@
 % Please edit documentation in R/pic.R
 \name{pic}
 \alias{pic}
-\title{Predictive information criteria for Bayesian models fitted in \code{JAGS} using the function \code{\link{selection}}, \code{\link{pattern}}, \code{\link{hurdle}} or \code{\link{lmdm}}}
+\title{Predictive information criteria for a Bayesian model}
 \usage{
 pic(x, criterion = "dic", cases = "cc", ...)
 }
 \arguments{
-\item{x}{A \code{missingHE} object containing the results of a Bayesian model fitted in cost-effectiveness analysis using the function \code{\link{selection}}, \code{\link{pattern}},
-\code{\link{hurdle}} or \code{\link{lmdm}}.}
+\item{x}{A \code{missingHE} object containing the results of a Bayesian model fitted in cost-effectiveness analysis using the function \code{\link[=selection]{selection()}}, \code{\link[=pattern]{pattern()}}, \code{\link[=hurdle]{hurdle()}} or \code{\link[=lmdm]{lmdm()}}.}
 
-\item{criterion}{type of information criteria to be produced. Available choices are \code{'dic'} for the Deviance Information Criterion,
-\code{'waic'} for the Widely Applicable Information Criterion, and \code{'looic'} for the Leave-One-Out Information Criterion.}
+\item{criterion}{type of information criteria to be produced. Available choices are \code{dic} for the Deviance Information Criterion,
+\code{waic} for the Widely Applicable Information Criterion, and \code{looic} for the Leave-One-Out Information Criterion.}
 
-\item{cases}{group of cases for which information criteria should be computed for: either \code{'all'} for all cases, \code{'cc'} for complete cases,
-\code{'ac_e'} and \code{'ac_c'} for only the observed effect and cost cases, respectively.}
+\item{cases}{group of cases for which information criteria should be computed for: either \code{all} for all cases, \code{cc} for complete cases,
+\code{ac_e} and \code{ac_c} for only the observed effect and cost cases, respectively.}
 
-\item{...}{Additional parameters that can be provided to manage the output of \code{pic} when \code{'looic'} is selected. For more details see \strong{bayesplot}.}
+\item{\dots}{Additional parameters that can be provided to manage the output of \code{pic} when \code{looic} is selected. For more details see \link[bayesplot:bayesplot]{bayesplot}.}
 }
 \value{
 A named list containing different predictive information criteria results and quantities according to the value of \code{criterion}. In all cases, the measures are
-computed on the observed data for the specific modules of the model selected in \code{module}.
-\describe{
-\item{d_bar}{Posterior mean deviance (only if \code{criterion} is \code{'dic'}).}
-\item{pD}{Effective number of parameters calculated with the formula used by \code{JAGS} (only if \code{criterion} is \code{'dic'})}.
-\item{dic}{Deviance Information Criterion calculated with the formula used by \code{JAGS} (only if \code{criterion} is \code{'dic'})}.
-\item{d_hat}{Deviance evaluated at the posterior mean of the parameters and calculated with the formula used by \code{JAGS} (only if \code{criterion} is \code{'dic'})}
-\item{elpd, elpd_se}{Expected log pointwise predictive density and standard error calculated on the observed data for the model nodes indicated in \code{module}
-(only if \code{criterion} is \code{'waic'} or \code{'looic'}).}
-\item{p, p_se}{Effective number of parameters and standard error calculated on the cases indicated in \code{cases}.
-(only if \code{criterion} is \code{'waic'} or \code{'looic'}).}
-\item{looic, looic_se}{The leave-one-out information criterion and standard error calculated on the cases indicated in \code{cases}.
-(only if \code{criterion} is \code{'looic'}).}
-\item{waic, waic_se}{The widely applicable information criterion and standard error calculated on the cases indicated in \code{cases}.
-(only if \code{criterion} is \code{'waic'}).}
-\item{pointwise}{A matrix containing the pointwise contributions of each of the above measures calculated on the cases indicated in \code{cases}.
-(only if \code{criterion} is \code{'waic'} or \code{'looic'}).}
-\item{diagnostics}{A named list containing additional diagnostic measures (only if \code{criterion} is \code{'looic'}).
-See \code{\link[loo]{loo}} for details about interpreting the list elements.}
-\item{psis_object}{A named list containing the matrix of (smoothed) log weights (only if \code{criterion} is \code{'looic'} with the optional argument \code{'save_psis'} is set to \code{TRUE}).
-See \code{\link[loo]{loo}} for details about interpreting the list elements.}'
+computed on the observed data for the specific value selected in \code{cases}. The elements contained include:
+\itemize{
+\item \strong{d_bar}: Posterior mean deviance (only if \code{criterion = "dic"}).
+\item \strong{pD}: Effective number of parameters calculated with the formula used by \code{JAGS} (only if \code{criterion = "dic"}).
+\item \strong{dic}: Deviance Information Criterion calculated with the formula used by \code{JAGS} (only if \code{criterion = "dic"}).
+\item \strong{d_hat}: Deviance evaluated at the posterior mean of the parameters and calculated with the formula used by \code{JAGS} (only if \code{criterion = "dic"}).
+\item \strong{elpd}: Expected log pointwise predictive density calculated on the selected cases (only if \code{criterion = "waic"} or \code{criterion = "looic"}).
+\item \strong{elpd_se}: \code{elpd} standard error calculated on the selected cases (only if \code{criterion = "waic"} or \code{criterion = "looic"}).
+\item \strong{p}: Effective number of parameters calculated on the selected cases (only if \code{criterion = "waic"} or \code{criterion = "looic"}).
+\item \strong{p_se}: \code{p} standard error calculated on the selected cases (only if \code{criterion = "waic"} or \code{criterion = "looic"}).
+\item \strong{looic}: The leave-one-out information criterion calculated on the selected cases (only if \code{criterion = "looic"}).
+\item \strong{looic_se}: The \code{looic} standard error calculated on the selected cases (only if \code{criterion = "looic"}).
+\item \strong{waic}: The widely applicable information criterion calculated on the selected cases (only if \code{criterion = "waic"}).
+\item \strong{waic_se}: The \code{waic} standard error calculated on the selected cases (only if \code{criterion = "waic"}).
+\item \strong{pointwise}: A matrix containing the pointwise contributions of each of the above measures calculated on the selected cases (only if \code{criterion = "waic"} or \code{criterion = "looic"}).
+\item \strong{diagnostics}: A named list containing additional diagnostic measures (only if \code{criterion = "looic"}). See \code{\link[loo:loo]{loo::loo()}} for details about interpreting the list elements.
+\item \strong{psis_object}: A named list containing the matrix of (smoothed) log weights (only if \code{criterion = "looic"} and \code{save_psis = TRUE}).
 }
 }
 \description{
-Efficient approximate leave-one-out cross validation (LOO), deviance information criterion (DIC) and widely applicable information criterion (WAIC) for Bayesian models,
+Efficient approximate leave-one-out cross validation (\code{LOO}), deviance information criterion (\code{DIC}) and widely applicable information criterion (\code{WAIC}) for Bayesian models,
 calculated on the observed data.
 }
 \details{
-The Deviance Information Criterion (DIC), Leave-One-Out Information Criterion (LOOIC) and the Widely Applicable Information Criterion (WAIC) are methods for estimating
+The Deviance Information Criterion (\code{DIC}), Leave-One-Out Information Criterion (\code{LOOIC}) and the Widely Applicable Information Criterion (\code{WAIC}) are methods for estimating
 out-of-sample predictive accuracy from a Bayesian model using the log-likelihood evaluated at the posterior simulations of the parameters.
-DIC is computationally simple to calculate but it is known to have some problems, arising in part from it not being fully Bayesian in that it is based on a point estimate.
-LOOIC can be computationally expensive but can be easily approximated using importance weights that are smoothed by fitting a generalised Pareto distribution to the upper tail
+\code{DIC} is computationally simple to calculate but it is known to have some problems, arising in part from it not being fully Bayesian in that it is based on a point estimate.
+\code{LOOIC} can be computationally expensive but can be easily approximated using importance weights that are smoothed by fitting a generalised Pareto distribution to the upper tail
 of the distribution of the importance weights.
-WAIC is fully Bayesian and closely approximates Bayesian cross-validation. Unlike DIC, WAIC is invariant to parameterisation and also works for singular models.
-In finite cases, WAIC and LOOIC give similar estimates, but for influential observations WAIC underestimates the effect of leaving out one observation.
+\code{WAIC} is fully Bayesian and closely approximates Bayesian cross-validation. Unlike \code{DIC}, \code{WAIC} is invariant to parameterisation and also works for singular models.
+In finite cases, \code{WAIC} and \code{LOOIC} give similar estimates, but for influential observations \code{WAIC} underestimates the effect of leaving out one observation.
 }
 \examples{
- 
-# For examples see the function \code{\link{selection}}, \code{\link{pattern}}, 
-# \code{\link{hurdle}} or \code{\link{lmdm}}
-# 
-# 
+# For examples see the function [selection()], [pattern()], [hurdle()] or [lmdm()].
+#
+#
 }
 \references{
-Plummer, M. \emph{JAGS: A program for analysis of Bayesian graphical models using Gibbs sampling.} (2003).
+Plummer, M. \emph{JAGS: A program for analysis of Bayesian graphical models using Gibbs sampling}. (2003).
 
-Vehtari, A. Gelman, A. Gabry, J. (2016a) Practical Bayesian model evaluation using leave-one-out cross-validation and WAIC.
-\emph{Statistics and Computing}. Advance online publication.
+Vehtari, A. Gelman, A. Gabry, J. (2016a) \emph{Practical Bayesian model evaluation using leave-one-out cross-validation and WAIC}.
+Statistics and Computing. Advance online publication.
 
-Vehtari, A. Gelman, A. Gabry, J. (2016b) Pareto smoothed importance sampling. \emph{ArXiv} preprint.
+Vehtari, A. Gelman, A. Gabry, J. (2016b) \emph{Pareto smoothed importance sampling}. ArXiv preprint.
 
-Gelman, A. Hwang, J. Vehtari, A. (2014) Understanding predictive information criteria for Bayesian models.
-\emph{Statistics and Computing} 24, 997-1016.
+Gelman, A. Hwang, J. Vehtari, A. (2014) \emph{Understanding predictive information criteria for Bayesian models}.
+Statistics and Computing 24, 997-1016.
 
-Watanable, S. (2010). Asymptotic equivalence of Bayes cross validation and widely application information
-criterion in singular learning theory. \emph{Journal of Machine Learning Research} 11, 3571-3594.
+Watanable, S. (2010). \emph{Asymptotic equivalence of Bayes cross validation and widely application information criterion in singular learning theory}.
+Journal of Machine Learning Research 11, 3571-3594.
 }
 \seealso{
-\code{\link[R2jags]{jags}}, \code{\link[loo]{loo}}, \code{\link[loo]{waic}}
+\code{\link[R2jags:jags]{R2jags::jags()}}, \code{\link[loo:loo]{loo::loo()}}, \code{\link[loo:waic]{loo::waic()}}
 }
 \author{
 Andrea Gabrio

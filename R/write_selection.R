@@ -1,16 +1,16 @@
-#'An internal function to select which type of selection model to execute. 
+#'A function to write the code for a selection model
 
 #'Alternatives vary depending on the type of distribution assumed for the effect and cost variables,
 #'type of missingness mechanism assumed and independence or joint modelling
 
 #' This function selects which type of model to execute.
 #' @keywords internal
-#' @param dist_e Distribution assumed for the effects. Current available choices are: Normal ('norm'), Beta ('beta'), Gamma ('gamma'), Exponential ('exp'),
-#' Weibull ('weib'), Logistic ('logis'), Poisson ('pois'), Negative Binomial ('negbin') or Bernoulli ('bern')
-#' @param dist_c Distribution assumed for the costs. Current available choices are: Normal ('norm'), Gamma ('gamma') or LogNormal ('lnorm')
-#' @param type Type of missingness mechanism assumed. Choices are Missing At Random (MAR), Missing Not At Random for the effects (MNAR_eff),
-#' Missing Not At Random for the costs (MNAR_cost), and Missing Not At Random for both (MNAR)
-#' @param model_txt_info list containing model specification information used to write the txt file of the JAGS model.
+#' @param dist_e Distribution assumed for the effects. Current available choices are: Normal (`norm`), Beta (`beta`), Gamma (`gamma`), Exponential (`exp`),
+#' Weibull (`weib`), Logistic (`logis`), Poisson (`pois`), Negative Binomial (`negbin`) or Bernoulli (`bern`).
+#' @param dist_c Distribution assumed for the costs. Current available choices are: Normal (`norm`), Gamma (`gamma`) or LogNormal (`lnorm`).
+#' @param type Type of missingness mechanism assumed. Choices are Missing At Random (`MAR`), Missing Not At Random for the effects (`MNAR_eff`),
+#' Missing Not At Random for the costs (`MNAR_cost`), and Missing Not At Random for both (`MNAR`)
+#' @param model_txt_info list containing model specification information used to write the `txt` file of the `JAGS` model.
 #' @examples
 #' #Internal function only
 #' #No examples
@@ -28,12 +28,12 @@ write_selection <- function(dist_e , dist_c, type, model_txt_info) {
   cost[i] ~ dnorm(cmu_c[i], tau_c)
   eff[i] ~ dnorm(cmu_e[i], tau_e)
 
-  #derive mean and std effects 
+  #derive mean and std effects
   #derive mean and std costs
 
   #mean regression
   cmu_c[i] <- inprod(X_c_fixed[i, ], beta[]) + beta_f * (eff[i] - tmu_e) + inprod(X_c_random[i, ], b[, clus_c[i]]) + b_f[clus_c[i]] * (eff[i] - tmu_e)
-  cmu_e[i] <- inprod(X_e_fixed[i, ], alpha[]) + inprod(X_e_random[i, ], a[, clus_e[i]])   
+  cmu_e[i] <- inprod(X_e_fixed[i, ], alpha[]) + inprod(X_e_random[i, ], a[, clus_e[i]])
 
   #missing data mechanism
   m_eff[i] ~ dbern(pq[i])
@@ -47,17 +47,17 @@ write_selection <- function(dist_e , dist_c, type, model_txt_info) {
   loglik_me[i] <- logdensity.bern(m_eff[i], pq[i])
   loglik_mc[i] <- logdensity.bern(m_cost[i], pc[i])
   }
-  
+
   #transformation of parameters
   #begin transformation
   tau_c <- 1 / ss_c
   ss_c <- s_c * s_c
-  #std for lnorm 
+  #std for lnorm
   #mean for lnorm
   tau_e <- 1 / ss_e
   ss_e <- s_e * s_e
   # end transformation
-  
+
   #transformation of random effects parameters
   # begin transformation random effects
   for(j in 1:pc_random) {tau_b_hat[j] <- 1 / ss_b_hat[j]
@@ -72,18 +72,18 @@ write_selection <- function(dist_e , dist_c, type, model_txt_info) {
   ss_d_c_hat <- s_d_c_hat * s_d_c_hat
   tau_d_e_hat <- 1 / ss_d_e_hat
   ss_d_e_hat <- s_d_e_hat * s_d_e_hat
-  #end transformation of random effects 
-  
+  #end transformation of random effects
+
   #missingness probability
   p_c <- ilogit(inprod(mean_z_c_fixed[], gamma_c[]) + delta_c * mean(cost[]) + inprod(mean_z_c_random[], mu_g_c_hat[]) + mu_d_c_hat * mean(cost[]))
   p_e <- ilogit(inprod(mean_z_e_fixed[], gamma_e[]) + delta_e * mean(eff[]) + inprod(mean_z_e_random[], mu_g_e_hat[]) + mu_d_e_hat * mean(eff[]))
 
   #calculate means at mean of covariates
-  tmu_c <- inprod(mean_cov_c_fixed[], beta[]) + inprod(mean_cov_c_random[], mu_b_hat[]) 
+  tmu_c <- inprod(mean_cov_c_fixed[], beta[]) + inprod(mean_cov_c_random[], mu_b_hat[])
   tmu_e <- inprod(mean_cov_e_fixed[], alpha[]) + inprod(mean_cov_e_random[], mu_a_hat[])
 
   #priors
-  
+
   #priors for mean regression coefficients
   for (j in 1:pe_fixed) {#begin alpha priors effects
   alpha[j] ~ dnorm(0, 0.001)
@@ -101,14 +101,14 @@ write_selection <- function(dist_e , dist_c, type, model_txt_info) {
   for (j in 1:pc_random) {#begin b priors costs
   for(s in 1:n_clus_c) {b[j, s] ~ dnorm(mu_b_hat[j], tau_b_hat[j]) }
   }#end b priors costs
-  
+
   #standard deviation priors
   s_c ~ dt(0, pow(2.5, -2), 1)T(0,)
   s_e ~ dt(0, pow(2.5, -2), 1)T(0,)
 
   #correlation
   beta_f ~ dnorm(0, 0.001)
-  
+
   # mean and sd mean regression random coefficients priors
   for(j in 1:pc_random) {mu_b_hat[j] ~ dnorm(0, 0.001)
   s_b_hat[j] ~ dunif(0, 100) }
@@ -118,14 +118,14 @@ write_selection <- function(dist_e , dist_c, type, model_txt_info) {
   s_g_c_hat[j] ~ dunif(0, 100) }
   for(j in 1:ze_random) {mu_g_e_hat[j] ~ dnorm(0, 0.001)
   s_g_e_hat[j] ~ dunif(0, 100) }
-  
+
   # correlation random effects
   for(s in 1:n_clus_c) {b_f[s] ~ dnorm(mu_b_f_hat, tau_b_f_hat) }
   mu_b_f_hat ~ dnorm(0, 0.001)
   tau_b_f_hat <- 1 / ss_b_f_hat
   ss_b_f_hat <- s_b_f_hat * s_b_f_hat
   s_b_f_hat ~ dunif(0, 100)
-  
+
   #priors on missing data mechanism
   for (j in 1:ze_fixed) {#begin gamma priors effects
   gamma_e[j] ~ dnorm(0, 0.01)
@@ -143,7 +143,7 @@ write_selection <- function(dist_e , dist_c, type, model_txt_info) {
   for (j in 1:zc_random) {#begin g_c priors costs
   for(s in 1:n_clus_mc) {g_c[j, s] ~ dnorm(mu_g_c_hat[j], tau_g_c_hat[j]) }
   }#end g_c priors costs
-  
+
   #mnar parameters
   # begin mnar priors
   delta_e ~ dnorm(0, 1)
@@ -159,7 +159,7 @@ write_selection <- function(dist_e , dist_c, type, model_txt_info) {
   mu_d_e_hat ~ dnorm(0, 1)
   mu_d_c_hat ~ dnorm(0, 1)
   s_d_e_hat ~ dunif(0, 1)
-  s_d_c_hat ~ dunif(0, 1) 
+  s_d_c_hat ~ dunif(0, 1)
   # end mnar random effects priors
 
   }
@@ -222,17 +222,17 @@ write_selection <- function(dist_e , dist_c, type, model_txt_info) {
   model_string_jags <- gsub("mu_d_e_hat ~ dnorm(0, 1)", "", model_string_jags, fixed = TRUE)
   model_string_jags <- gsub("s_d_e_hat ~ dunif(0, 1)", "", model_string_jags, fixed = TRUE)
   model_string_jags <- gsub("for(s in 1:n_clus_me) {d_e[s] ~ dnorm(mu_d_e_hat, tau_d_e_hat) }", "", model_string_jags, fixed = TRUE)
-  if(length(model_txt_info$model_mc_random) == 0) { 
-    model_string_jags <- gsub("#priors on random effects missing data mechanism", "", model_string_jags, fixed = TRUE) 
-    model_string_jags <- gsub("#mnar random effects priors", "", model_string_jags, fixed = TRUE) 
-    model_string_jags <- gsub("# mean and sd mean mnar random effects priors", "", model_string_jags, fixed = TRUE) 
-    model_string_jags <- gsub("#begin mnar random effects priors", "", model_string_jags, fixed = TRUE) 
-    model_string_jags <- gsub("# end mnar random effects priors", "", model_string_jags, fixed = TRUE) 
-    if(length(model_txt_info$model_c_random) == 0 & length(model_txt_info$model_e_random) == 0 | length(model_txt_info$model_e_random) == 0 & model_txt_info$pc_random == 0) { 
-      model_string_jags <- gsub("# mean and sd mean regression random coefficients priors", "", model_string_jags, fixed = TRUE) 
-      model_string_jags <- gsub("#transformation of random effects parameters", "", model_string_jags, fixed = TRUE) 
-      model_string_jags <- gsub("# begin transformation random effects", "", model_string_jags, fixed = TRUE) 
-      model_string_jags <- gsub("#end transformation of random effects", "", model_string_jags, fixed = TRUE) 
+  if(length(model_txt_info$model_mc_random) == 0) {
+    model_string_jags <- gsub("#priors on random effects missing data mechanism", "", model_string_jags, fixed = TRUE)
+    model_string_jags <- gsub("#mnar random effects priors", "", model_string_jags, fixed = TRUE)
+    model_string_jags <- gsub("# mean and sd mean mnar random effects priors", "", model_string_jags, fixed = TRUE)
+    model_string_jags <- gsub("#begin mnar random effects priors", "", model_string_jags, fixed = TRUE)
+    model_string_jags <- gsub("# end mnar random effects priors", "", model_string_jags, fixed = TRUE)
+    if(length(model_txt_info$model_c_random) == 0 & length(model_txt_info$model_e_random) == 0 | length(model_txt_info$model_e_random) == 0 & model_txt_info$pc_random == 0) {
+      model_string_jags <- gsub("# mean and sd mean regression random coefficients priors", "", model_string_jags, fixed = TRUE)
+      model_string_jags <- gsub("#transformation of random effects parameters", "", model_string_jags, fixed = TRUE)
+      model_string_jags <- gsub("# begin transformation random effects", "", model_string_jags, fixed = TRUE)
+      model_string_jags <- gsub("#end transformation of random effects", "", model_string_jags, fixed = TRUE)
     }
    }
   } else if(length(model_txt_info$model_me_random) != 0 & model_txt_info$is_me_random_e & !model_txt_info$is_int_me_random_e) {
@@ -263,17 +263,17 @@ write_selection <- function(dist_e , dist_c, type, model_txt_info) {
   model_string_jags <- gsub("mu_d_c_hat ~ dnorm(0, 1)", "", model_string_jags, fixed = TRUE)
   model_string_jags <- gsub("s_d_c_hat ~ dunif(0, 1)", "", model_string_jags, fixed = TRUE)
   model_string_jags <- gsub("for(s in 1:n_clus_mc) {d_c[s] ~ dnorm(mu_d_c_hat, tau_d_c_hat) }", "", model_string_jags, fixed = TRUE)
-  if(length(model_txt_info$model_me_random) == 0) { 
-    model_string_jags <- gsub("#priors on random effects missing data mechanism", "", model_string_jags, fixed = TRUE) 
-    model_string_jags <- gsub("#mnar random effects priors", "", model_string_jags, fixed = TRUE) 
-    model_string_jags <- gsub("# mean and sd mean mnar random effects priors", "", model_string_jags, fixed = TRUE) 
-    model_string_jags <- gsub("#begin mnar random effects priors", "", model_string_jags, fixed = TRUE) 
-    model_string_jags <- gsub("# end mnar random effects priors", "", model_string_jags, fixed = TRUE) 
-    if(length(model_txt_info$model_e_random) == 0 & length(model_txt_info$model_c_random) == 0 | length(model_txt_info$model_e_random) == 0 & model_txt_info$pc_random == 0) { 
-      model_string_jags <- gsub("# mean and sd mean regression random coefficients priors", "", model_string_jags, fixed = TRUE) 
-      model_string_jags <- gsub("#transformation of random effects parameters", "", model_string_jags, fixed = TRUE) 
-      model_string_jags <- gsub("# begin transformation random effects", "", model_string_jags, fixed = TRUE) 
-      model_string_jags <- gsub("}#end transformation of random effects", "", model_string_jags, fixed = TRUE) 
+  if(length(model_txt_info$model_me_random) == 0) {
+    model_string_jags <- gsub("#priors on random effects missing data mechanism", "", model_string_jags, fixed = TRUE)
+    model_string_jags <- gsub("#mnar random effects priors", "", model_string_jags, fixed = TRUE)
+    model_string_jags <- gsub("# mean and sd mean mnar random effects priors", "", model_string_jags, fixed = TRUE)
+    model_string_jags <- gsub("#begin mnar random effects priors", "", model_string_jags, fixed = TRUE)
+    model_string_jags <- gsub("# end mnar random effects priors", "", model_string_jags, fixed = TRUE)
+    if(length(model_txt_info$model_e_random) == 0 & length(model_txt_info$model_c_random) == 0 | length(model_txt_info$model_e_random) == 0 & model_txt_info$pc_random == 0) {
+      model_string_jags <- gsub("# mean and sd mean regression random coefficients priors", "", model_string_jags, fixed = TRUE)
+      model_string_jags <- gsub("#transformation of random effects parameters", "", model_string_jags, fixed = TRUE)
+      model_string_jags <- gsub("# begin transformation random effects", "", model_string_jags, fixed = TRUE)
+      model_string_jags <- gsub("}#end transformation of random effects", "", model_string_jags, fixed = TRUE)
     }
    }
   } else if(length(model_txt_info$model_mc_random) != 0 & model_txt_info$is_mc_random_c & !model_txt_info$is_int_mc_random_c) {
@@ -340,14 +340,14 @@ write_selection <- function(dist_e , dist_c, type, model_txt_info) {
     model_string_jags <- gsub("mu_d_e_hat ~ dnorm(0, 1)", "", model_string_jags, fixed = TRUE)
     model_string_jags <- gsub("s_d_e_hat ~ dunif(0, 1)", "", model_string_jags, fixed = TRUE)
     model_string_jags <- gsub("for(s in 1:n_clus_me) {d_e[s] ~ dnorm(mu_d_e_hat, tau_d_e_hat) }", "", model_string_jags, fixed = TRUE)
-    } 
+    }
     if(length(model_txt_info$model_mc_random) != 0 & !("c" %in% model_txt_info$model_mc_random) & length(model_txt_info$model_me_random) != 0 & !("e" %in% model_txt_info$model_me_random)) {
-    model_string_jags <- gsub("#priors on random effects missing data mechanism", "", model_string_jags, fixed = TRUE) 
-    model_string_jags <- gsub("#mnar random effects priors", "", model_string_jags, fixed = TRUE) 
-    model_string_jags <- gsub("# mean and sd mean mnar random effects priors", "", model_string_jags, fixed = TRUE) 
-    model_string_jags <- gsub("#begin mnar random effects priors", "", model_string_jags, fixed = TRUE) 
+    model_string_jags <- gsub("#priors on random effects missing data mechanism", "", model_string_jags, fixed = TRUE)
+    model_string_jags <- gsub("#mnar random effects priors", "", model_string_jags, fixed = TRUE)
+    model_string_jags <- gsub("# mean and sd mean mnar random effects priors", "", model_string_jags, fixed = TRUE)
+    model_string_jags <- gsub("#begin mnar random effects priors", "", model_string_jags, fixed = TRUE)
     model_string_jags <- gsub("# end mnar random effects priors", "", model_string_jags, fixed = TRUE)
-    } 
+    }
   } else if(type == "MNAR_cost") {
   model_string_jags <- gsub(" + delta_e * mean(eff[])", "", model_string_jags, fixed = TRUE)
   model_string_jags <- gsub(" + delta_e * eff[i]", "", model_string_jags, fixed = TRUE)
@@ -369,14 +369,14 @@ write_selection <- function(dist_e , dist_c, type, model_txt_info) {
     model_string_jags <- gsub("mu_d_c_hat ~ dnorm(0, 1)", "", model_string_jags, fixed = TRUE)
     model_string_jags <- gsub("s_d_c_hat ~ dunif(0, 1)", "", model_string_jags, fixed = TRUE)
     model_string_jags <- gsub("for(s in 1:n_clus_mc) {d_c[s] ~ dnorm(mu_d_c_hat, tau_d_c_hat) }", "", model_string_jags, fixed = TRUE)
-    } 
+    }
     if(length(model_txt_info$model_mc_random) != 0 & !("c" %in% model_txt_info$model_mc_random) & length(model_txt_info$model_me_random) != 0 & !("e" %in% model_txt_info$model_me_random)) {
-      model_string_jags <- gsub("#priors on random effects missing data mechanism", "", model_string_jags, fixed = TRUE) 
-      model_string_jags <- gsub("#mnar random effects priors", "", model_string_jags, fixed = TRUE) 
-      model_string_jags <- gsub("# mean and sd mean mnar random effects priors", "", model_string_jags, fixed = TRUE) 
-      model_string_jags <- gsub("#begin mnar random effects priors", "", model_string_jags, fixed = TRUE) 
+      model_string_jags <- gsub("#priors on random effects missing data mechanism", "", model_string_jags, fixed = TRUE)
+      model_string_jags <- gsub("#mnar random effects priors", "", model_string_jags, fixed = TRUE)
+      model_string_jags <- gsub("# mean and sd mean mnar random effects priors", "", model_string_jags, fixed = TRUE)
+      model_string_jags <- gsub("#begin mnar random effects priors", "", model_string_jags, fixed = TRUE)
       model_string_jags <- gsub("# end mnar random effects priors", "", model_string_jags, fixed = TRUE)
-    } 
+    }
   } else if(type == "MNAR") {
     if(length(model_txt_info$model_me_random) != 0 & !("e" %in% model_txt_info$model_me_random)) {
       model_string_jags <- gsub("+ d_e[clus_me[i]] * eff[i]", "", model_string_jags, fixed = TRUE)
@@ -386,7 +386,7 @@ write_selection <- function(dist_e , dist_c, type, model_txt_info) {
       model_string_jags <- gsub("mu_d_e_hat ~ dnorm(0, 1)", "", model_string_jags, fixed = TRUE)
       model_string_jags <- gsub("s_d_e_hat ~ dunif(0, 1)", "", model_string_jags, fixed = TRUE)
       model_string_jags <- gsub("for(s in 1:n_clus_me) {d_e[s] ~ dnorm(mu_d_e_hat, tau_d_e_hat) }", "", model_string_jags, fixed = TRUE)
-    } 
+    }
     if(length(model_txt_info$model_mc_random) != 0 & !("c" %in% model_txt_info$model_mc_random)) {
       model_string_jags <- gsub("+ d_c[clus_mc[i]] * cost[i]", "", model_string_jags, fixed = TRUE)
       model_string_jags <- gsub("+ mu_d_c_hat * mean(cost[])", "", model_string_jags, fixed = TRUE)
@@ -395,14 +395,14 @@ write_selection <- function(dist_e , dist_c, type, model_txt_info) {
       model_string_jags <- gsub("mu_d_c_hat ~ dnorm(0, 1)", "", model_string_jags, fixed = TRUE)
       model_string_jags <- gsub("s_d_c_hat ~ dunif(0, 1)", "", model_string_jags, fixed = TRUE)
       model_string_jags <- gsub("for(s in 1:n_clus_mc) {d_c[s] ~ dnorm(mu_d_c_hat, tau_d_c_hat) }", "", model_string_jags, fixed = TRUE)
-    } 
+    }
     if(length(model_txt_info$model_mc_random) != 0 & !("c" %in% model_txt_info$model_mc_random) & length(model_txt_info$model_me_random) != 0 & !("e" %in% model_txt_info$model_me_random)) {
-      model_string_jags <- gsub("#priors on random effects missing data mechanism", "", model_string_jags, fixed = TRUE) 
-      model_string_jags <- gsub("#mnar random effects priors", "", model_string_jags, fixed = TRUE) 
-      model_string_jags <- gsub("# mean and sd mean mnar random effects priors", "", model_string_jags, fixed = TRUE) 
-      model_string_jags <- gsub("#begin mnar random effects priors", "", model_string_jags, fixed = TRUE) 
+      model_string_jags <- gsub("#priors on random effects missing data mechanism", "", model_string_jags, fixed = TRUE)
+      model_string_jags <- gsub("#mnar random effects priors", "", model_string_jags, fixed = TRUE)
+      model_string_jags <- gsub("# mean and sd mean mnar random effects priors", "", model_string_jags, fixed = TRUE)
+      model_string_jags <- gsub("#begin mnar random effects priors", "", model_string_jags, fixed = TRUE)
       model_string_jags <- gsub("# end mnar random effects priors", "", model_string_jags, fixed = TRUE)
-    } 
+    }
   }
   if(model_txt_info$ind_random) {
   model_string_jags <- gsub("+ b_f[clus_c[i]] * (eff[i] - tmu_e)", "", model_string_jags, fixed = TRUE)
@@ -412,12 +412,12 @@ write_selection <- function(dist_e , dist_c, type, model_txt_info) {
   model_string_jags <- gsub("ss_b_f_hat <- s_b_f_hat * s_b_f_hat", "", model_string_jags, fixed = TRUE)
   model_string_jags <- gsub("s_b_f_hat ~ dunif(0, 100)", "", model_string_jags, fixed = TRUE)
   model_string_jags <- gsub("# correlation random effects", "", model_string_jags, fixed = TRUE)
-  } 
+  }
   if(model_txt_info$ind_fixed) {
   model_string_jags <- gsub(" + beta_f * (eff[i] - tmu_e)", "", model_string_jags, fixed = TRUE)
   model_string_jags <- gsub("beta_f ~ dnorm(0, 0.001)", "", model_string_jags, fixed = TRUE)
   model_string_jags <- gsub("#correlation", "", model_string_jags, fixed = TRUE)
-  } 
+  }
   if(dist_c == "norm") {
   model_string_jags <- gsub("#derive mean and std costs", "", model_string_jags, fixed = TRUE)
   model_string_jags <- gsub("#mean for lnorm", "", model_string_jags, fixed = TRUE)
@@ -574,7 +574,7 @@ write_selection <- function(dist_e , dist_c, type, model_txt_info) {
        model_string_jags <- gsub("inprod(X_e_random[i, ], a[, clus_e[i]])", "X_e_random[i] * a[clus_e[i]]", model_string_jags, fixed = TRUE)
        model_string_jags <- gsub("inprod(mean_cov_e_random[], mu_a_hat[])", "mean_cov_e_random * mu_a_hat", model_string_jags, fixed = TRUE)
        model_string_jags <- gsub("for (j in 1:pe_random) {#begin a priors effects", "#begin a priors effects", model_string_jags, fixed = TRUE)
-       model_string_jags <- gsub("for(s in 1:n_clus_e) {a[j, s] ~ dnorm(mu_a_hat[j], tau_a_hat[j]) }", 
+       model_string_jags <- gsub("for(s in 1:n_clus_e) {a[j, s] ~ dnorm(mu_a_hat[j], tau_a_hat[j]) }",
                                  "for(s in 1:n_clus_e) {a[s] ~ dnorm(mu_a_hat, tau_a_hat) }", model_string_jags, fixed = TRUE)
        model_string_jags <- gsub("}#end a priors effects", "#end a priors effects", model_string_jags, fixed = TRUE)
        model_string_jags <- gsub("for(j in 1:pe_random) {mu_a_hat[j] ~ dnorm(0, 0.001)", "mu_a_hat ~ dnorm(0, 0.001)", model_string_jags, fixed = TRUE)
@@ -586,7 +586,7 @@ write_selection <- function(dist_e , dist_c, type, model_txt_info) {
    model_string_jags <- gsub("inprod(X_c_random[i, ], b[, clus_c[i]])", "X_c_random[i] * b[clus_c[i]]", model_string_jags, fixed = TRUE)
    model_string_jags <- gsub("inprod(mean_cov_c_random[], mu_b_hat[])", "mean_cov_c_random * mu_b_hat", model_string_jags, fixed = TRUE)
    model_string_jags <- gsub("for (j in 1:pc_random) {#begin b priors costs", "#begin b priors costs", model_string_jags, fixed = TRUE)
-   model_string_jags <- gsub("for(s in 1:n_clus_c) {b[j, s] ~ dnorm(mu_b_hat[j], tau_b_hat[j]) }", 
+   model_string_jags <- gsub("for(s in 1:n_clus_c) {b[j, s] ~ dnorm(mu_b_hat[j], tau_b_hat[j]) }",
                              "for(s in 1:n_clus_c) {b[s] ~ dnorm(mu_b_hat, tau_b_hat) }", model_string_jags, fixed = TRUE)
    model_string_jags <- gsub("}#end b priors costs", "#end b priors costs", model_string_jags, fixed = TRUE)
    model_string_jags <- gsub("for(j in 1:pc_random) {mu_b_hat[j] ~ dnorm(0, 0.001)", "mu_b_hat ~ dnorm(0, 0.001)", model_string_jags, fixed = TRUE)
@@ -598,12 +598,12 @@ write_selection <- function(dist_e , dist_c, type, model_txt_info) {
    inprod_e <- "Z_e_fixed[i] * gamma_e"
      if(type %in% c("MAR", "MNAR_cost")) {
      inprod_mean_e <- "mean_z_e_fixed * gamma_e"
-     model_string_jags <- gsub("inprod(mean_z_e_fixed[], gamma_e[])", 
+     model_string_jags <- gsub("inprod(mean_z_e_fixed[], gamma_e[])",
                                inprod_mean_e, model_string_jags, fixed = TRUE)
      }
      if(type %in% c("MNAR_eff", "MNAR")) {
      inprod_mean_e <- "mean_z_e_fixed * gamma_e + delta_e * mean(eff[])"
-     model_string_jags <- gsub("inprod(mean_z_e_fixed[], gamma_e[]) + delta_e * mean(eff[])", 
+     model_string_jags <- gsub("inprod(mean_z_e_fixed[], gamma_e[]) + delta_e * mean(eff[])",
                                inprod_mean_e, model_string_jags, fixed = TRUE)
      }
    begin_prior_gamma <- "#begin gamma priors effects"
@@ -613,14 +613,14 @@ write_selection <- function(dist_e , dist_c, type, model_txt_info) {
    model_string_jags <- gsub("for (j in 1:ze_fixed) {#begin gamma priors effects", begin_prior_gamma, model_string_jags, fixed = TRUE)
    model_string_jags <- gsub("gamma_e[j] ~ dnorm(0, 0.01)", prior_gamma_e, model_string_jags, fixed = TRUE)
    model_string_jags <- gsub("}#end gamma priors effects", end_prior_gamma, model_string_jags, fixed = TRUE)
-   } 
+   }
    if(model_txt_info$ze_random == 1 & length(model_txt_info$model_me_random) != 0) {
       if(type %in% c("MAR", "MNAR_cost")) {
-      model_string_jags <- gsub("inprod(mean_z_e_random[], mu_g_e_hat[])", "mean_z_e_random * mu_g_e_hat", 
+      model_string_jags <- gsub("inprod(mean_z_e_random[], mu_g_e_hat[])", "mean_z_e_random * mu_g_e_hat",
                                 model_string_jags, fixed = TRUE)
       }
       if(type %in% c("MNAR_eff", "MNAR")) {
-      model_string_jags <- gsub("inprod(mean_z_e_random[], mu_g_e_hat[]) + mu_d_e_hat * mean(eff[])", "mean_z_e_random * mu_g_e_hat + mu_d_e_hat * mean(eff[])", 
+      model_string_jags <- gsub("inprod(mean_z_e_random[], mu_g_e_hat[]) + mu_d_e_hat * mean(eff[])", "mean_z_e_random * mu_g_e_hat + mu_d_e_hat * mean(eff[])",
                                 model_string_jags, fixed = TRUE)
       }
       model_string_jags <- gsub("inprod(Z_e_random[i, ], g_e[, clus_me[i]])", "Z_e_random[i] * g_e[clus_me[i]]", model_string_jags, fixed = TRUE)
@@ -628,12 +628,12 @@ write_selection <- function(dist_e , dist_c, type, model_txt_info) {
       model_string_jags <- gsub("ss_g_e_hat[j] <- s_g_e_hat[j] * s_g_e_hat[j] }", "ss_g_e_hat <- s_g_e_hat * s_g_e_hat", model_string_jags, fixed = TRUE)
       model_string_jags <- gsub("inprod(mean_z_e_random[], mu_g_e_hat[])", "mean_z_e_random * mu_g_e_hat", model_string_jags, fixed = TRUE)
       model_string_jags <- gsub("for (j in 1:ze_random) {#begin g_e priors effects", "#begin g_e priors effects", model_string_jags, fixed = TRUE)
-      model_string_jags <- gsub("for(s in 1:n_clus_me) {g_e[j, s] ~ dnorm(mu_g_e_hat[j], tau_g_e_hat[j]) }", "for(s in 1:n_clus_me) {g_e[s] ~ dnorm(mu_g_e_hat, tau_g_e_hat) }", 
+      model_string_jags <- gsub("for(s in 1:n_clus_me) {g_e[j, s] ~ dnorm(mu_g_e_hat[j], tau_g_e_hat[j]) }", "for(s in 1:n_clus_me) {g_e[s] ~ dnorm(mu_g_e_hat, tau_g_e_hat) }",
                                 model_string_jags, fixed = TRUE)
       model_string_jags <- gsub("}#end g_e priors effects", "#end g_e priors effects", model_string_jags, fixed = TRUE)
       model_string_jags <- gsub("for(j in 1:ze_random) {mu_g_e_hat[j] ~ dnorm(0, 0.001)", "mu_g_e_hat ~ dnorm(0, 0.001)", model_string_jags, fixed = TRUE)
       model_string_jags <- gsub("s_g_e_hat[j] ~ dunif(0, 100) }", "s_g_e_hat ~ dunif(0, 100)", model_string_jags, fixed = TRUE)
-      } 
+      }
    if(model_txt_info$zc_fixed == 1) {
       inprod_c <- "Z_c_fixed[i] * gamma_c"
           if(type %in% c("MAR", "MNAR_eff")) {
@@ -657,7 +657,7 @@ write_selection <- function(dist_e , dist_c, type, model_txt_info) {
          model_string_jags <- gsub("inprod(mean_z_c_random[], mu_g_c_hat[])", "mean_z_c_random * mu_g_c_hat", model_string_jags, fixed = TRUE)
          }
          if(type %in% c("MNAR_cost", "MNAR")) {
-         model_string_jags <- gsub("inprod(mean_z_c_random[], mu_g_c_hat[]) + mu_d_c_hat * mean(cost[])", "mean_z_c_random * mu_g_c_hat + mu_d_c_hat * mean(cost[])", 
+         model_string_jags <- gsub("inprod(mean_z_c_random[], mu_g_c_hat[]) + mu_d_c_hat * mean(cost[])", "mean_z_c_random * mu_g_c_hat + mu_d_c_hat * mean(cost[])",
                                    model_string_jags, fixed = TRUE)
          }
       model_string_jags <- gsub("inprod(Z_c_random[i, ], g_c[, clus_mc[i]])", "Z_c_random[i] * g_c[clus_mc[i]]", model_string_jags, fixed = TRUE)
@@ -669,8 +669,8 @@ write_selection <- function(dist_e , dist_c, type, model_txt_info) {
       model_string_jags <- gsub("}#end g_c priors costs", "#end g_c priors costs", model_string_jags, fixed = TRUE)
       model_string_jags <- gsub("for(j in 1:zc_random) {mu_g_c_hat[j] ~ dnorm(0, 0.001)", "mu_g_c_hat ~ dnorm(0, 0.001)", model_string_jags, fixed = TRUE)
       model_string_jags <- gsub("s_g_c_hat[j] ~ dunif(0, 100) }", "s_g_c_hat ~ dunif(0, 100)", model_string_jags, fixed = TRUE)
-      } 
-      model_string_jags <- prior_selection(type = type, dist_e = dist_e, dist_c = dist_c, 
+      }
+      model_string_jags <- prior_selection(type = type, dist_e = dist_e, dist_c = dist_c,
                                            model_txt_info = model_txt_info, model_string_jags = model_string_jags)
    writeLines(model_string_jags, "selection.txt")
    model_string <- "selection.txt"

@@ -60,8 +60,8 @@
 #' - **cea**: A list containing the output of the economic evaluation performed using the function [BCEA::bcea()].
 #' - **type**: A character variable that indicate which type of missing value mechanism used to run the model, either `MAR` or `MNAR` (see details).
 #' - **data_format**: A character variable that indicates which type of analysis was conducted, either using a `wide` or `long` dataset.
-#' - **se_prior**: A numeric value that indicates the value assumed for the standard deviation associated with the degenerate structural effects prior distribution to implement the model in `JAGS`.
-#' - **sc_prior**: A numeric value that indicates the value assumed for the standard deviation associated with the degenerate structural costs prior distribution to implement the model in `JAGS`.
+#' - **se_prior**: A numeric value that indicates the value assumed for the standard deviation associated with the degenerate structural effects prior distribution to implement the model in `JAGS` (deafult = 0.00001).
+#' - **sc_prior**: A numeric value that indicates the value assumed for the standard deviation associated with the degenerate structural costs prior distribution to implement the model in `JAGS` (deafult = 0.00001).
 #' - **call**: The matched call.
 #'
 #' @seealso [R2jags::jags()], [BCEA::bcea()].

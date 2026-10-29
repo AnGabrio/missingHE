@@ -11,20 +11,18 @@
 
 \item{digits}{Integer indicating the number of decimal places to be used for rounding (default = 3).}
 
-\item{...}{Additional arguments affecting the summary produced.}
+\item{\dots}{Additional arguments affecting the summary produced.}
 }
 \value{
-Prints all fixed regression coefficients based on the type of model fitted using the function \code{selection}, \code{pattern}, \code{hurdle} or \code{\link{lmdm}}.
+Prints all fixed regression coefficients based on the type of model fitted using the function \code{\link[=selection]{selection()}}, \code{\link[=pattern]{pattern()}}, \code{\link[=hurdle]{hurdle()}} or \code{\link[=lmdm]{lmdm()}}.
 Summary estimates based on posterior means of each fixed regression coefficient included into the fitted models are provided.
 }
 \description{
 Produces a printout of the (posterior mean) estimate for each regression coefficient included in the outcome and missingness/structural value
-models based on the health economic evaluation probabilistic model run using the function \code{\link{selection}}, \code{\link{pattern}},
-\code{\link{hurdle}} or \code{\link{lmdm}}.
+models based on the health economic evaluation probabilistic model run using the function \code{\link[=selection]{selection()}}, \code{\link[=pattern]{pattern()}}, \code{\link[=hurdle]{hurdle()}} or \code{\link[=lmdm]{lmdm()}}.
 }
 \examples{
-# For examples see the function \code{\link{selection}}, \code{\link{pattern}}, 
-# \code{\link{hurdle}} or \code{\link{lmdm}}
+# For examples see the function [selection()], [pattern()], [hurdle()] or [lmdm()].
 #
 #
 }
@@ -32,7 +30,7 @@ models based on the health economic evaluation probabilistic model run using the
 Baio, G.(2012). \emph{Bayesian Methods in Health Economcis}. CRC/Chapman Hall, London.
 }
 \seealso{
-\code{\link{selection}} \code{\link{pattern}} \code{\link{hurdle}} \code{\link{lmdm}} \code{\link{diagnostic}} \code{\link{plot.missingHE}}
+\code{\link[=selection]{selection()}} \code{\link[=pattern]{pattern()}} \code{\link[=hurdle]{hurdle()}} \code{\link[=lmdm]{lmdm()}} \code{\link[=diagnostic]{diagnostic()}} \code{\link[=print.missingHE]{print.missingHE()}}
 }
 \author{
 Andrea Gabrio
