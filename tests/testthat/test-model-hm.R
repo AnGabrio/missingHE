@@ -17,10 +17,10 @@ test_that("check output from hurdle function", {
   hm <- hurdle(data = MenSS, model.eff = model.eff, dist_e = dist_e, se = se, sc = sc,
                   model.cost = model.cost, dist_c = dist_c, type = type, n.iter = n.iter)
 
-  expect_length(hm, 7)
+  expect_length(hm, 9)
   expect_type(hm, "list")
   expect_named(hm, c("data_set", "model_output", "mod_est", "cea", "type",
-                     "data_format", "call"))
+                     "data_format", "se.prior", "sc.prior", "call"))
 
   expect_equal(hm$type, "SCAR")
 
@@ -33,6 +33,9 @@ test_that("check output from hurdle function", {
   expect_length(hm$mod_est, 4)
   expect_type(hm$mod_est, "list")
   expect_named(hm$mod_est, c("model.eff", "model.cost", "model.se", "model.sc"))
+
+  expect_equal(hm$se.prior, 0.00001)
+  expect_equal(hm$sc.prior, 0.00001)
 
   expect_length(hm$call, 10)
   expect_type(hm$call, "language")

@@ -29,39 +29,39 @@ lmdm(
 \arguments{
 \item{data}{A data frame in which to find the longitudinal variables supplied in \code{model.eff}, \code{model.cost} (model formulas for effects and costs)
 and \code{model.me}, \code{model.mc} (model formulas for the missing effect and cost models). Among these,
-effectiveness, cost, time and treatment indicator (only two arms) variables must always be provided and named 'e', 'c', 'time' and 'trt', respectively.}
+effectiveness, cost, time and treatment indicator variables must always be provided and named \code{e}, \code{c}, \code{time} and \code{trt}, respectively.}
 
 \item{model.eff}{A formula expression in conventional \code{R} linear modelling syntax. The response must be a health economic
-effectiveness outcome ('e') whose name must correspond to that used in \code{data}. Any covariates in the model must be provided on the right-hand side of the formula.
+effectiveness outcome (\code{e}) whose name must correspond to that used in \code{data}. Any covariates in the model must be provided on the right-hand side of the formula.
 If there are no covariates, \code{1} should be specified on the right hand side of the formula. By default, covariates are placed on the "location" parameter of the distribution through a linear model.
 Random effects can also be specified for each model parameter. See details for how these can be specified.}
 
 \item{model.cost}{A formula expression in conventional \code{R} linear modelling syntax. The response must be a health economic
-cost outcome ('c') whose name must correspond to that used in \code{data}. Any covariates in the model must be provided on the right-hand side of the formula.
+cost outcome (\code{c}) whose name must correspond to that used in \code{data}. Any covariates in the model must be provided on the right-hand side of the formula.
 If there are no covariates, \code{1} should be specified on the right hand side of the formula. By default, covariates are placed on the "location" parameter of the distribution through a linear model.
-A joint bivariate distribution for effects and costs can be specified by including 'e' on the right-hand side of the formula for the costs model.
+A joint bivariate distribution for effects and costs can be specified by including \code{e} on the right-hand side of the formula for the costs model.
 Random effects can also be specified for each model parameter. See details for how these can be specified.}
 
 \item{model.me}{A formula expression in conventional \code{R} linear modelling syntax. The response must be indicated with the
-term 'me' (missing effects) and any covariates must be provided on the right-hand side of the formula. If there are no covariates, \code{1} should be specified on the right hand side of the formula.
+term \code{me} (missing effects) and any covariates must be provided on the right-hand side of the formula. If there are no covariates, \code{1} should be specified on the right hand side of the formula.
 By default, covariates are placed on the "probability" parameter for the missing effects through a logistic-linear model.
 Random effects can also be specified for each model parameter. See details for how these can be specified.}
 
-\item{model.mc}{A formula expression in conventional \code{R} linear modelling syntax. The response must be indicated with the term 'mc' (missing costs) and any covariates must be provided on the right-hand side of the formula.
+\item{model.mc}{A formula expression in conventional \code{R} linear modelling syntax. The response must be indicated with the term \code{mc} (missing costs) and any covariates must be provided on the right-hand side of the formula.
 If there are no covariates, \code{1} should be specified on the right hand side of the formula. By default, covariates are placed on the "probability" parameter for the missing costs through a logistic-linear model.
 Random effects can also be specified for each model parameter. See details for how these can be specified.}
 
-\item{dist_e}{Distribution assumed for the effects. Current available chocies are: Normal ('norm'), Beta ('beta'), Gamma ('gamma'), Exponential ('exp'),
-Weibull ('weib'), Logistic ('logis'), Poisson ('pois'), Negative Binomial ('negbin') or Bernoulli ('bern').}
+\item{dist_e}{Distribution assumed for the effects. Current available choices are: Normal (\code{norm}), Beta (\code{beta}), Gamma (\code{gamma}), Exponential (\code{exp}),
+Weibull (\code{weib}), Logistic (\code{logis}), Poisson (\code{pois}), Negative Binomial (\code{negbin}) or Bernoulli (\code{bern}).}
 
-\item{dist_c}{Distribution assumed for the costs. Current available chocies are: Normal ('norm'), Gamma ('gamma') or LogNormal ('lnorm').}
+\item{dist_c}{Distribution assumed for the costs. Current available choices are: Normal ('norm'), Gamma (\code{gamma}) or LogNormal (\code{lnorm}).}
 
-\item{type}{Type of missingness mechanism assumed. Choices are Missing At Random (MAR) and Missing Not At Random (MNAR).}
+\item{type}{Type of missingness mechanism assumed. Choices are Missing At Random (\code{MAR}) and Missing Not At Random (\code{MNAR}).}
 
 \item{time_dep}{Type of dependence structure assumed between effectiveness and cost outcomes.
-Current choices include: autoregressive structure of order one ('AR1') - default, bivariate at each time ('biv') and independence ('none').}
+Current choices include: autoregressive structure of order one (\code{AR1}) - default, bivariate at each time (\code{biv}) and independence (\code{none}).}
 
-\item{prob}{A numeric vector of probabilities within the range (0, 1), representing the upper and lower
+\item{prob}{A numeric vector of probabilities within the range \verb{(0, 1)}, representing the upper and lower
 CI sample quantiles to be calculated and returned for the imputed values.}
 
 \item{n.chains}{Number of chains.}
@@ -71,8 +71,7 @@ CI sample quantiles to be calculated and returned for the imputed values.}
 \item{n.burnin}{Number of warmup iterations.}
 
 \item{inits}{A list with elements equal to the number of chains selected; each element of the list is itself a list of starting values for the
-\code{JAGS} model, or a function creating (possibly random) initial values. If \code{inits} is \code{NULL}, \code{JAGS}
-will generate initial values for all the model parameters.}
+\code{JAGS} model, or a function creating (possibly random) initial values. If \code{inits} is \code{NULL}, \code{JAGS} will generate initial values for all the model parameters.}
 
 \item{n.thin}{Thinning interval.}
 
@@ -81,41 +80,45 @@ in the current working directory.}
 
 \item{prior}{A list containing the hyperprior values provided by the user. Each element of this list must be a vector
 containing the user-provided prior distribution and parameter values and must be named with the name of the corresponding parameter. For example, the hyperprior
-values for the standard deviation parameter for the effects can be provided using the list \code{prior = list('sigma.prior.e' = c("unif", 0, 10))}. For more information about how
-to provide prior hypervalues for different types of parameters and models see details. If \code{prior} is set to 'default', the default values will be used.}
+values for the standard deviation parameter for the effects can be provided using the list \code{prior = list("sigma.prior.e" = c("unif", 0, 10))}. For more information about how
+to provide prior hypervalues for different types of parameters and models see details. If \code{prior} is set to \code{default}, the default values will be used.}
 
 \item{center}{Logical. If \code{center} is \code{TRUE}, all covariates in both the effect and cost models will be centred.}
 
-\item{...}{Additional arguments that can be provided by the user. Examples are the additional arguments that can be provided to the function \code{\link[BCEA]{bcea}} to summarise the health economic evaluation results.}
+\item{\dots}{Additional arguments that can be provided by the user. Examples are the additional arguments that can be provided to the function \code{\link[BCEA:bcea]{BCEA::bcea()}} to summarise the health economic evaluation results.}
 }
 \value{
-An object of the class 'missingHE' containing the following elements
-\describe{
-\item{data_set}{A list containing the original data set provided in \code{data} (see Arguments). Additional information is also included about, among others,
-the number of observed and missing individuals, the total number of individuals by treatment arm and the indicator vectors for the missing values}
-\item{model_output}{A list containing the output of a \code{JAGS} model generated from the functions \code{\link[R2jags]{jags}}, and
-the posterior samples for the main parameters of the model}
-\item{cea}{A list containing the output of the economic evaluation performed using the function \code{\link[BCEA]{bcea}}}
-\item{type}{A character variable that indicate which type of missing value mechanism used to run the model, either \code{MAR} or \code{MNAR} (see details)}
-\item{data_format}{A character variable that indicates which type of analysis was conducted, either using a \code{wide} or \code{long} dataset}
-\item{time_dep}{A character variable that indicate which type of time dependence assumption was made, either \code{none} or \code{AR1}}
+An object of the class 'missingHE' containing the following elements:
+\itemize{
+\item \strong{data_set}: A list containing the original data set provided in \code{data} (see Arguments). Additional information is also included about, among others,
+the number of observed and missing individuals, the total number of individuals by treatment arm and the indicator vectors for the missing values.
+\item \strong{model_output}: A list containing the output of a \code{JAGS} model generated from the functions \code{\link[R2jags:jags]{R2jags::jags()}}, and
+the posterior samples for the main parameters of the model.
+\item \strong{cea}: A list containing the output of the economic evaluation performed using the function \code{\link[BCEA:bcea]{BCEA::bcea()}}.
+\item \strong{type}: A character variable that indicate which type of missing value mechanism used to run the model, either \code{MAR} or \code{MNAR} (see details).
+\item \strong{data_format}: A character variable that indicates which type of analysis was conducted, either using a \code{wide} or \code{long} dataset.
+\item \strong{time_dep}: A character variable that indicate which type of time dependence assumption was made, either \code{none} or \code{AR1}.
+\item \strong{w_e}: A numeric vector containing the weight values used to calculate aggregated effectiveness mean parameters used in the \code{cea} output.
+\item \strong{w_c}: A numeric vector containing the weight values used to calculate aggregated cost mean parameters used in the \code{cea} output.
+\item \strong{call}: The matched call.
 }
 }
 \description{
 Full Bayesian cost-effectiveness models to handle missing data in longitudinal outcomes under different missing data
 mechanism assumptions, using alternative parametric distributions for the effect and cost variables. The analysis is performed using the \code{BUGS} language,
-which is implemented in the software \code{JAGS} using the function \code{\link[R2jags]{jags}} The output is stored in an object of class 'missingHE'.
+which is implemented in the software \code{JAGS} using the function \code{\link[R2jags:jags]{R2jags::jags()}} The output is stored in an object of class \code{missingHE}.
 }
 \details{
 Depending on the distributions specified for the outcome variables in the arguments \code{dist_e} and
 \code{dist_c} and the type of missingness mechanism specified in the argument \code{type}, different models
 are built and run in the background by the function \code{lmdm}. These models fit multinomial logistic regressions to estimate
 the probability of a given missing data pattern \code{k} (1 = completers, 2 = intermittent, 3 = dropout) in one or both longitudinal outcomes. A simple example can be used
-to show how longitudinal missing data models are specified. Consider a longitudinal data set comprising a response variable \eqn{y} measured at \code{S} occasions
+to show how longitudinal missing data models are specified. Consider a longitudinal data set comprising a response variable \eqn{y} measured at \eqn{S} occasions
 and a set of centered covariate \eqn{X_j}, for \eqn{i = j, ..., J}. For each subject in the trial \eqn{i = 1, ..., n} and time \eqn{s = 1, ..., S} we define
 an indicator variable \eqn{m_i} taking value \code{k = 1} if the \eqn{i}-th individual is associated with no missing value (completer), a value \code{k = 2}
 for intermittent missingness over the study period, and a value \code{k = 3} for dropout.
 This is modelled as:
+
 \deqn{m_i ~ Multinomial(\pi^k_i)}
 \deqn{\pi^k_i = \phi^k_i/\sum\phi_i}
 \deqn{log(\phi^k_i) = \sum\gamma^k_j X_j + \delta^k y_i}
@@ -125,27 +128,30 @@ where
 \item \eqn{\gamma^k_j} represents the impact on the missing data probability in \eqn{y} of the covariate \eqn{X_j} for pattern \eqn{k} at a given time.
 \item \eqn{\delta^k} represents the impact on the missing data probability in \eqn{y} for pattern \eqn{k} of missingness itself at a given time.
 }
-When \eqn{\delta = 0} the model assumes a 'MAR' mechanism, while when \eqn{\delta != 0} the mechanism is 'MNAR'. For the parameters indexing the missingness model,
+
+When \eqn{\delta = 0} the model assumes a \code{MAR} mechanism, while when \eqn{\delta != 0} the mechanism is \code{MNAR}. For the parameters indexing the missingness model,
 the default prior distributions assumed are:
 \itemize{
-\item \eqn{\gamma^k_j ~ Normal(0, 0.01)}
-\item \eqn{\delta^k ~ Normal(0, 1)}
+\item \eqn{\gamma^k_j ~ Normal(0, 0.01)}.
+\item \eqn{\delta^k ~ Normal(0, 1)}.
 }
+
 When user-defined hyperprior values are supplied via the argument \code{prior} in the function \code{lmdm}, the elements of this list (see Arguments)
 must be vectors containing the user-provided distribution name and hyperprior values and must take specific names according to the parameters they are associated with.
 Specifically, the names for the parameters indexing the model which are accepted by \strong{missingHE} are the following:
 \itemize{
-\item auxiliary parameters \eqn{\sigma}: "sigma.prior.e"(effects) and/or "sigma.prior.c"(costs)
-\item covariate parameters \eqn{\alpha_j} and \eqn{\beta_j}: "alpha.prior"(effects) and/or "beta.prior"(costs)
-\item covariate parameters in the missingness model \eqn{\gamma_j} (if covariate data provided): "gamma.prior.e"(effects) and/or "gamma.prior.c"(costs)
-\item mnar parameter \eqn{\delta}: "delta.prior.e"(effects) and/or "delta.prior.c"(costs)
+\item auxiliary parameters \eqn{\sigma}: \code{sigma.prior.e} (effects) and/or \code{sigma.prior.c} (costs).
+\item covariate parameters \eqn{\alpha_j} and \eqn{\beta_j}: \code{alpha.prior} (effects) and/or \code{beta.prior} (costs).
+\item covariate parameters in the missingness model \eqn{\gamma_j} (if covariate data provided): \code{gamma.prior.e} (effects) and/or \code{gamma.prior.c} (costs).
+\item mnar parameter \eqn{\delta}: \code{delta.prior.e} (effects) and/or \code{delta.prior.c} (costs).
 }
+
 For simplicity, here we have assumed that the set of covariates \eqn{X_j} used in the models for the effects/costs and in the
 model of the missing effect/cost values is the same. However, it is possible to specify different sets of covariates for each model
 using the arguments in the function \code{lmdm} (see Arguments).
 
-For each model, random effects can also be specified for each parameter by adding the term + (x | z) to each model formula,
-where x is the fixed regression coefficient for which also the random effects are desired and z is the clustering variable across which
+For each model, random effects can also be specified for each parameter by adding the term \code{+ (x | z)} to each model formula,
+where \code{x} is the fixed regression coefficient for which also the random effects are desired and \code{z} is the clustering variable across which
 the random effects are specified (must be the name of a factor variable in the dataset).
 }
 \examples{
@@ -200,10 +206,10 @@ Baio, G.(2012). \emph{Bayesian Methods in Health Economics}. CRC/Chapman Hall, L
 
 Gelman, A. Carlin, JB., Stern, HS. Rubin, DB.(2003). \emph{Bayesian Data Analysis, 2nd edition}, CRC Press.
 
-Plummer, M. \emph{JAGS: A program for analysis of Bayesian graphical models using Gibbs sampling.} (2003).
+Plummer, M. \emph{JAGS: A program for analysis of Bayesian graphical models using Gibbs sampling} (2003).
 }
 \seealso{
-\code{\link[R2jags]{jags}}, \code{\link[BCEA]{bcea}}
+\code{\link[R2jags:jags]{R2jags::jags()}}, \code{\link[BCEA:bcea]{BCEA::bcea()}}.
 }
 \author{
 Andrea Gabrio
