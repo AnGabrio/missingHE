@@ -57,7 +57,7 @@ data_read_pattern <- function(data, model.eff, model.cost,
     name_clus_e <- sub('.*\\|', '', random_e)
     if(lengths(strsplit(name_clus_e, " ")) > 2) { stop("Please provide a single clustering variable for each model")}
     name_clus_e <- gsub(" ", "", name_clus_e, fixed = TRUE)
-    if(!name_clus_e %in% names(cov_matrix)) { stop("Please provide the clustering variable in the dataset")}
+    if(!name_clus_e %in% names(cov_matrix)) { stop("Please provide a valid clustering variable in `model.eff`")}
     if(strsplit(name_re_e_coeff, "")[[1]][1] == 0) {
       no_random_int_e <- TRUE} else { no_random_int_e <- FALSE}
     if(no_random_int_e) {
@@ -94,7 +94,7 @@ data_read_pattern <- function(data, model.eff, model.cost,
     name_clus_c <- sub('.*\\|', '', random_c)
     if(lengths(strsplit(name_clus_c, " ")) > 2) { stop("Please provide a single clustering variable for each model")}
     name_clus_c <- gsub(" ", "", name_clus_c, fixed = TRUE)
-    if(!name_clus_c %in% names(cov_matrix)) { stop("Please provide the clustering variable in the dataset")}
+    if(!name_clus_c %in% names(cov_matrix)) { stop("Please provide a valid clustering variable in `model.cost`")}
     if(strsplit(name_re_c_coeff, "")[[1]][1] == 0) {
       no_random_int_c <- TRUE} else {no_random_int_c <- FALSE}
     if(no_random_int_c) {

@@ -55,8 +55,6 @@ test_that("check output from longitudinal missing data function", {
   expect_length(lmm$data_set$model_formula, 8)
   expect_type(lmm$data_set$model_formula, "list")
   expect_type(lmm$data_set$data_raw$data, "list")
-
-
   expect_vector(lmm$data_set$data_raw$e_long)
   expect_vector(lmm$data_set$data_raw$c_long)
   expect_equal(lmm$data_set$data_raw$e_long, PBS$e, ignore_attr = TRUE)
