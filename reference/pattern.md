@@ -6,8 +6,8 @@ alternative parametric distributions for the effect and cost variables
 and using a pattern mixture model approach to identify the model. The
 analysis is performed using the `BUGS` language, which is implemented in
 the software `JAGS` using the function
-[`jags`](https://rdrr.io/pkg/R2jags/man/jags.html) The output is stored
-in an object of class 'missingHE'.
+[`R2jags::jags()`](https://rdrr.io/pkg/R2jags/man/jags.html) The output
+is stored in an object of class `missingHE`.
 
 ## Usage
 
@@ -39,13 +39,13 @@ pattern(
 
   A data frame in which to find the variables supplied in `model.eff`,
   `model.cost` (model formulas for effects and costs). Among these,
-  effectiveness, cost and treatment indicator (only two arms) variables
-  must always be provided and named 'e', 'c' and 'trt', respectively.
+  effectiveness, cost and treatment indicator variables must always be
+  provided and named `e`, `c` and `trt`, respectively.
 
 - model.eff:
 
   A formula expression in conventional `R` linear modelling syntax. The
-  response must be a health economic effectiveness outcome ('e') whose
+  response must be a health economic effectiveness outcome (`e`) whose
   name must correspond to that used in `data`. Any covariates in the
   model must be provided on the right-hand side of the formula. If there
   are no covariates, `1` should be specified on the right hand side of
@@ -57,13 +57,13 @@ pattern(
 - model.cost:
 
   A formula expression in conventional `R` linear modelling syntax. The
-  response must be a health economic cost outcome ('c') whose name must
+  response must be a health economic cost outcome (`c`) whose name must
   correspond to that used in `data`. Any covariates in the model must be
   provided on the right-hand side of the formula. If there are no
   covariates, `1` should be specified on the right hand side of the
   formula. By default, covariates are placed on the "location" parameter
   of the distribution through a linear model. A joint bivariate
-  distribution for effects and costs can be specified by including 'e'
+  distribution for effects and costs can be specified by including `e`
   on the right-hand side of the formula for the costs model. Random
   effects can also be specified for each model parameter. See details
   for how these can be specified.
@@ -71,30 +71,30 @@ pattern(
 - dist_e:
 
   Distribution assumed for the effects. Current available choices are:
-  Normal ('norm'), Beta ('beta'), Gamma ('gamma'), Exponential ('exp'),
-  Weibull ('weib'), Logistic ('logis'), Poisson ('pois'), Negative
-  Binomial ('negbin') or Bernoulli ('bern').
+  Normal (`norm`), Beta (`beta`), Gamma (`gamma`), Exponential (`exp`),
+  Weibull (`weib`), Logistic (`logis`), Poisson (`pois`), Negative
+  Binomial (`negbin`) or Bernoulli (`bern`).
 
 - dist_c:
 
   Distribution assumed for the costs. Current available choices are:
-  Normal ('norm'), Gamma ('gamma') or LogNormal ('lnorm').
+  Normal (`norm`), Gamma (`gamma`) or LogNormal (`lnorm`).
 
 - type:
 
   Type of missingness mechanism assumed. Choices are Missing At Random
-  (MAR) and Missing Not At Random (MNAR).
+  (`MAR`) and Missing Not At Random (`MNAR`).
 
 - restriction:
 
   type of identifying restriction to be imposed to identify the
   distributions of the missing data in each pattern. Available choices
-  are: complete case restrcition ('CC') - default - or available case
-  restriction ('AC').
+  are: complete case restriction (`CC`) - default - or available case
+  restriction (`AC`).
 
 - prob:
 
-  A numeric vector of probabilities within the range (0, 1),
+  A numeric vector of probabilities within the range `(0, 1)`,
   representing the upper and lower CI sample quantiles to be calculated
   and returned for the imputed values.
 
@@ -135,9 +135,9 @@ pattern(
   name of the corresponding parameter. For example, the hyperprior
   values for the standard deviation parameter for the effects can be
   provided using the list
-  `prior = list('sigma.prior.e' = c("unif", 0, 10))`. For more
+  `prior = list("sigma.prior.e" = c("unif", 0, 10))`. For more
   information about how to provide prior hypervalues for different types
-  of parameters and models see details. If `prior` is set to 'default',
+  of parameters and models see details. If `prior` is set to `default`,
   the default values will be used.
 
 - center:
@@ -149,42 +149,39 @@ pattern(
 
   Additional arguments that can be provided by the user. Examples are
   the additional arguments that can be provided to the function
-  [`bcea`](https://n8thangreen.github.io/BCEA/reference/bcea.html) to
-  summarise the health economic evaluation results.
+  [`BCEA::bcea()`](https://n8thangreen.github.io/BCEA/reference/bcea.html)
+  to summarise the health economic evaluation results.
 
 ## Value
 
-An object of the class 'missingHE' containing the following elements
+An object of the class 'missingHE' containing the following elements:
 
-- data_set:
+- **data_set**: A list containing the original data set provided in
+  `data` (see Arguments). Additional information is also included about,
+  among others, the number of observed and missing individuals, the
+  total number of individuals by treatment arm and the indicator vectors
+  for the missing values.
 
-  A list containing the original data set provided in `data` (see
-  Arguments). Additional information is also included about, among
-  others, the number of observed and missing individuals, the total
-  number of individuals by treatment arm and the indicator vectors for
-  the missing values
+- **model_output**: A list containing the output of a `JAGS` model
+  generated from the functions
+  [`R2jags::jags()`](https://rdrr.io/pkg/R2jags/man/jags.html), and the
+  posterior samples for the main parameters of the model.
 
-- model_output:
+- **cea**: A list containing the output of the economic evaluation
+  performed using the function
+  [`BCEA::bcea()`](https://n8thangreen.github.io/BCEA/reference/bcea.html).
 
-  A list containing the output of a `JAGS` model generated from the
-  functions [`jags`](https://rdrr.io/pkg/R2jags/man/jags.html), and the
-  posterior samples for the main parameters of the model
+- **type**: A character variable that indicate which type of missing
+  value mechanism used to run the model, either `MAR` or `MNAR` (see
+  details).
 
-- cea:
+- **data_format**: A character variable that indicates which type of
+  analysis was conducted, either using a `wide` or `long` dataset.
 
-  A list containing the output of the economic evaluation performed
-  using the function
-  [`bcea`](https://n8thangreen.github.io/BCEA/reference/bcea.html)
+- **restriction**: A character name that indicates under which type of
+  restrictions the model was identified (see details).
 
-- type:
-
-  A character variable that indicate which type of missing value
-  mechanism used to run the model, either `MAR` or `MNAR` (see details)
-
-- data_format:
-
-  A character variable that indicates which type of analysis was
-  conducted, either using a `wide` or `long` dataset
+- **call**: The matched call.
 
 ## Details
 
@@ -195,8 +192,8 @@ models are built and run in the background by the function `pattern`.
 The model for the outcomes is fitted in each missingness pattern and the
 parameters indexing the missing data distributions are identified using:
 the corresponding parameters identified from the observed data in other
-patterns (under 'MAR'); or a combination of the parameters identified by
-the observed data and some sensitivity parameters (under 'MNAR'). A
+patterns (under `MAR`); or a combination of the parameters identified by
+the observed data and some sensitivity parameters (under `MNAR`). A
 simple example can be used to show how pattern mixture models are
 specified. Consider a data set comprising a response variable \\y\\ and
 a set of centered covariates \\X_j\\. We denote with \\d_i\\ the
@@ -208,13 +205,14 @@ neither of the two outcomes is observed. \\d_i\\ is assigned a
 multinomial distribution, which probabilities are modelled using a
 Dirichlet prior. Next, the outcomes model is fitted in each pattern and
 parameters that cannot be identified in each pattern (d = 2, 3, 4), e.g.
-\\mu_e\[d\]\\ and `mu_c[d]`, are identified using some restrictions
+\\mu_e\[d\]\\ and \\mu_c\[d\]\\, are identified using some restrictions
 based on the parameters estimated from other patterns. Two choices are
-currently available: the complete cases ('CC') or available cases
-('AC'). For example, using the 'CC' restriction, the parameters indexing
-the distributions of the missing data are identified as: \$\$mu_e\[2\] =
-\mu_e\[4\] = \mu_e\[1\] + \delta_e\$\$ \$\$mu_c\[3\] = \mu_c\[4\] =
-\mu_c\[1\] + \delta_c\$\$ where
+currently available: the complete cases (`CC`) or available cases
+(`AC`). For example, using the `CC` restriction, the parameters indexing
+the distributions of the missing data are identified as:
+
+\$\$mu_e\[2\] = \mu_e\[4\] = \mu_e\[1\] + \delta_e\$\$ \$\$mu_c\[3\] =
+\mu_c\[4\] = \mu_c\[1\] + \delta_c\$\$ where
 
 - \\\mu_e\[1\]\\ is the effects mean for the completers.
 
@@ -226,11 +224,11 @@ the distributions of the missing data are identified as: \$\$mu_e\[2\] =
 - \\\delta_c\\ is the sensitivity parameters associated with the
   marginal costs mean.
 
-If the 'AC' restriction is chosen, only the parameters estimated from
+If the `AC` restriction is chosen, only the parameters estimated from
 the observed data in pattern 2 (costs) and pattern 3 (effects) are used
 to identify those in the other patterns. When \\\delta_e = 0\\ and
-\\\delta_c = 0\\ the model assumes a 'MAR' mechanism. When \\\delta_e !=
-0\\ and/or \\\delta_c != 0\\ 'MNAR' departures for the effects and/or
+\\\delta_c = 0\\ the model assumes a `MAR` mechanism. When \\\delta_e !=
+0\\ and/or \\\delta_c != 0\\ `MNAR` departures for the effects and/or
 costs are explored with priors on sensitivity parameters that must be
 provided by the user (see Arguments).
 
@@ -242,29 +240,27 @@ parameters they are associated with. Specifically, the names for the
 parameters indexing the model which are accepted by **missingHE** are
 the following:
 
-- auxiliary parameters \\\sigma\\: "sigma.prior.e"(effects) and/or
-  "sigma.prior.c"(costs)
+- auxiliary parameters \\\sigma\\: `sigma.prior.e` (effects) and/or
+  `sigma.prior.c` (costs).
 
-- covariate parameters \\\alpha_j\\ and \\\beta_j\\:
-  "alpha.prior"(effects) and/or "beta.prior"(costs)
+- covariate parameters \\\alpha_j\\ and \\\beta_j\\: `alpha.prior`
+  (effects) and/or `beta.prior` (costs).
 
 - covariate parameters in the missingness model \\\gamma_j\\ (if
-  covariate data provided): "gamma.prior.e"(effects) and/or
-  "gamma.prior.c"(costs)
+  covariate data provided): `gamma.prior.e` (effects) and/or
+  `gamma.prior.c` (costs).
 
-- sensitivity parameters \\\delta\\: "delta.prior.e"(effects) and/or
-  "delta.prior.c"(costs)
+- sensitivity parameters \\\delta\\: `delta.prior.e` (effects) and/or
+  `delta.prior.c` (costs).
 
-- missingness patterns' probabilities \\\pi\\: "patterns.prior"
+- missingness patterns' probabilities \\\pi\\: `patterns.prior`.
 
 For each outcome model, random effects can also be specified for each
-parameter by adding the term + (x \| z) to each model formula, where x
-is the fixed regression coefficient for which also the random effects
-are desired and z is the clustering variable across which the random
-effects are specified (must be the name of a factor variable in the
-dataset). Multiple random effects can be specified using the notation +
-(x1 + x2 \| site) for each covariate that was included in the fixed
-effects formula.
+parameter by adding the term `+ (x | z)` to each model formula, where
+`x` is the fixed regression coefficient for which also the random
+effects are desired and `z` is the clustering variable across which the
+random effects are specified (must be the name of a factor variable in
+the dataset).
 
 ## References
 
@@ -279,12 +275,12 @@ Gelman, A. Carlin, JB., Stern, HS. Rubin, DB.(2003). *Bayesian Data
 Analysis, 2nd edition*, CRC Press.
 
 Plummer, M. *JAGS: A program for analysis of Bayesian graphical models
-using Gibbs sampling.* (2003).
+using Gibbs sampling*. (2003).
 
 ## See also
 
-[`jags`](https://rdrr.io/pkg/R2jags/man/jags.html),
-[`bcea`](https://n8thangreen.github.io/BCEA/reference/bcea.html)
+[`R2jags::jags()`](https://rdrr.io/pkg/R2jags/man/jags.html),
+[`BCEA::bcea()`](https://n8thangreen.github.io/BCEA/reference/bcea.html).
 
 ## Author
 

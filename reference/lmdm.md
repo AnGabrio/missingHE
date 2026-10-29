@@ -5,8 +5,8 @@ longitudinal outcomes under different missing data mechanism
 assumptions, using alternative parametric distributions for the effect
 and cost variables. The analysis is performed using the `BUGS` language,
 which is implemented in the software `JAGS` using the function
-[`jags`](https://rdrr.io/pkg/R2jags/man/jags.html) The output is stored
-in an object of class 'missingHE'.
+[`R2jags::jags()`](https://rdrr.io/pkg/R2jags/man/jags.html) The output
+is stored in an object of class `missingHE`.
 
 ## Usage
 
@@ -42,13 +42,13 @@ lmdm(
   `model.eff`, `model.cost` (model formulas for effects and costs) and
   `model.me`, `model.mc` (model formulas for the missing effect and cost
   models). Among these, effectiveness, cost, time and treatment
-  indicator (only two arms) variables must always be provided and named
-  'e', 'c', 'time' and 'trt', respectively.
+  indicator variables must always be provided and named `e`, `c`, `time`
+  and `trt`, respectively.
 
 - model.eff:
 
   A formula expression in conventional `R` linear modelling syntax. The
-  response must be a health economic effectiveness outcome ('e') whose
+  response must be a health economic effectiveness outcome (`e`) whose
   name must correspond to that used in `data`. Any covariates in the
   model must be provided on the right-hand side of the formula. If there
   are no covariates, `1` should be specified on the right hand side of
@@ -60,13 +60,13 @@ lmdm(
 - model.cost:
 
   A formula expression in conventional `R` linear modelling syntax. The
-  response must be a health economic cost outcome ('c') whose name must
+  response must be a health economic cost outcome (`c`) whose name must
   correspond to that used in `data`. Any covariates in the model must be
   provided on the right-hand side of the formula. If there are no
   covariates, `1` should be specified on the right hand side of the
   formula. By default, covariates are placed on the "location" parameter
   of the distribution through a linear model. A joint bivariate
-  distribution for effects and costs can be specified by including 'e'
+  distribution for effects and costs can be specified by including `e`
   on the right-hand side of the formula for the costs model. Random
   effects can also be specified for each model parameter. See details
   for how these can be specified.
@@ -74,7 +74,7 @@ lmdm(
 - model.me:
 
   A formula expression in conventional `R` linear modelling syntax. The
-  response must be indicated with the term 'me' (missing effects) and
+  response must be indicated with the term `me` (missing effects) and
   any covariates must be provided on the right-hand side of the formula.
   If there are no covariates, `1` should be specified on the right hand
   side of the formula. By default, covariates are placed on the
@@ -85,7 +85,7 @@ lmdm(
 - model.mc:
 
   A formula expression in conventional `R` linear modelling syntax. The
-  response must be indicated with the term 'mc' (missing costs) and any
+  response must be indicated with the term `mc` (missing costs) and any
   covariates must be provided on the right-hand side of the formula. If
   there are no covariates, `1` should be specified on the right hand
   side of the formula. By default, covariates are placed on the
@@ -95,31 +95,31 @@ lmdm(
 
 - dist_e:
 
-  Distribution assumed for the effects. Current available chocies are:
-  Normal ('norm'), Beta ('beta'), Gamma ('gamma'), Exponential ('exp'),
-  Weibull ('weib'), Logistic ('logis'), Poisson ('pois'), Negative
-  Binomial ('negbin') or Bernoulli ('bern').
+  Distribution assumed for the effects. Current available choices are:
+  Normal (`norm`), Beta (`beta`), Gamma (`gamma`), Exponential (`exp`),
+  Weibull (`weib`), Logistic (`logis`), Poisson (`pois`), Negative
+  Binomial (`negbin`) or Bernoulli (`bern`).
 
 - dist_c:
 
-  Distribution assumed for the costs. Current available chocies are:
-  Normal ('norm'), Gamma ('gamma') or LogNormal ('lnorm').
+  Distribution assumed for the costs. Current available choices are:
+  Normal ('norm'), Gamma (`gamma`) or LogNormal (`lnorm`).
 
 - type:
 
   Type of missingness mechanism assumed. Choices are Missing At Random
-  (MAR) and Missing Not At Random (MNAR).
+  (`MAR`) and Missing Not At Random (`MNAR`).
 
 - time_dep:
 
   Type of dependence structure assumed between effectiveness and cost
   outcomes. Current choices include: autoregressive structure of order
-  one ('AR1') - default, bivariate at each time ('biv') and independence
-  ('none').
+  one (`AR1`) - default, bivariate at each time (`biv`) and independence
+  (`none`).
 
 - prob:
 
-  A numeric vector of probabilities within the range (0, 1),
+  A numeric vector of probabilities within the range `(0, 1)`,
   representing the upper and lower CI sample quantiles to be calculated
   and returned for the imputed values.
 
@@ -160,9 +160,9 @@ lmdm(
   name of the corresponding parameter. For example, the hyperprior
   values for the standard deviation parameter for the effects can be
   provided using the list
-  `prior = list('sigma.prior.e' = c("unif", 0, 10))`. For more
+  `prior = list("sigma.prior.e" = c("unif", 0, 10))`. For more
   information about how to provide prior hypervalues for different types
-  of parameters and models see details. If `prior` is set to 'default',
+  of parameters and models see details. If `prior` is set to `default`,
   the default values will be used.
 
 - center:
@@ -174,47 +174,46 @@ lmdm(
 
   Additional arguments that can be provided by the user. Examples are
   the additional arguments that can be provided to the function
-  [`bcea`](https://n8thangreen.github.io/BCEA/reference/bcea.html) to
-  summarise the health economic evaluation results.
+  [`BCEA::bcea()`](https://n8thangreen.github.io/BCEA/reference/bcea.html)
+  to summarise the health economic evaluation results.
 
 ## Value
 
-An object of the class 'missingHE' containing the following elements
+An object of the class 'missingHE' containing the following elements:
 
-- data_set:
+- **data_set**: A list containing the original data set provided in
+  `data` (see Arguments). Additional information is also included about,
+  among others, the number of observed and missing individuals, the
+  total number of individuals by treatment arm and the indicator vectors
+  for the missing values.
 
-  A list containing the original data set provided in `data` (see
-  Arguments). Additional information is also included about, among
-  others, the number of observed and missing individuals, the total
-  number of individuals by treatment arm and the indicator vectors for
-  the missing values
+- **model_output**: A list containing the output of a `JAGS` model
+  generated from the functions
+  [`R2jags::jags()`](https://rdrr.io/pkg/R2jags/man/jags.html), and the
+  posterior samples for the main parameters of the model.
 
-- model_output:
+- **cea**: A list containing the output of the economic evaluation
+  performed using the function
+  [`BCEA::bcea()`](https://n8thangreen.github.io/BCEA/reference/bcea.html).
 
-  A list containing the output of a `JAGS` model generated from the
-  functions [`jags`](https://rdrr.io/pkg/R2jags/man/jags.html), and the
-  posterior samples for the main parameters of the model
+- **type**: A character variable that indicate which type of missing
+  value mechanism used to run the model, either `MAR` or `MNAR` (see
+  details).
 
-- cea:
+- **data_format**: A character variable that indicates which type of
+  analysis was conducted, either using a `wide` or `long` dataset.
 
-  A list containing the output of the economic evaluation performed
-  using the function
-  [`bcea`](https://n8thangreen.github.io/BCEA/reference/bcea.html)
+- **time_dep**: A character variable that indicate which type of time
+  dependence assumption was made, either `none` or `AR1`.
 
-- type:
+- **w_e**: A numeric vector containing the weight values used to
+  calculate aggregated effectiveness mean parameters used in the `cea`
+  output.
 
-  A character variable that indicate which type of missing value
-  mechanism used to run the model, either `MAR` or `MNAR` (see details)
+- **w_c**: A numeric vector containing the weight values used to
+  calculate aggregated cost mean parameters used in the `cea` output.
 
-- data_format:
-
-  A character variable that indicates which type of analysis was
-  conducted, either using a `wide` or `long` dataset
-
-- time_dep:
-
-  A character variable that indicate which type of time dependence
-  assumption was made, either `none` or `AR1`
+- **call**: The matched call.
 
 ## Details
 
@@ -227,13 +226,14 @@ missing data pattern `k` (1 = completers, 2 = intermittent, 3 = dropout)
 in one or both longitudinal outcomes. A simple example can be used to
 show how longitudinal missing data models are specified. Consider a
 longitudinal data set comprising a response variable \\y\\ measured at
-`S` occasions and a set of centered covariate \\X_j\\, for \\i = j, ...,
-J\\. For each subject in the trial \\i = 1, ..., n\\ and time \\s = 1,
-..., S\\ we define an indicator variable \\m_i\\ taking value `k = 1` if
-the \\i\\-th individual is associated with no missing value (completer),
-a value `k = 2` for intermittent missingness over the study period, and
-a value `k = 3` for dropout. This is modelled as: \$\$m_i ~
-Multinomial(\pi^k_i)\$\$ \$\$\pi^k_i = \phi^k_i/\sum\phi_i\$\$
+\\S\\ occasions and a set of centered covariate \\X_j\\, for \\i = j,
+..., J\\. For each subject in the trial \\i = 1, ..., n\\ and time \\s =
+1, ..., S\\ we define an indicator variable \\m_i\\ taking value `k = 1`
+if the \\i\\-th individual is associated with no missing value
+(completer), a value `k = 2` for intermittent missingness over the study
+period, and a value `k = 3` for dropout. This is modelled as:
+
+\$\$m_i ~ Multinomial(\pi^k_i)\$\$ \$\$\pi^k_i = \phi^k_i/\sum\phi_i\$\$
 \$\$log(\phi^k_i) = \sum\gamma^k_j X_j + \delta^k y_i\$\$ where
 
 - \\\pi^k_i\\ is the individual probability of a missing value in \\y\\
@@ -245,13 +245,13 @@ Multinomial(\pi^k_i)\$\$ \$\$\pi^k_i = \phi^k_i/\sum\phi_i\$\$
 - \\\delta^k\\ represents the impact on the missing data probability in
   \\y\\ for pattern \\k\\ of missingness itself at a given time.
 
-When \\\delta = 0\\ the model assumes a 'MAR' mechanism, while when
-\\\delta != 0\\ the mechanism is 'MNAR'. For the parameters indexing the
+When \\\delta = 0\\ the model assumes a `MAR` mechanism, while when
+\\\delta != 0\\ the mechanism is `MNAR`. For the parameters indexing the
 missingness model, the default prior distributions assumed are:
 
-- \\\gamma^k_j ~ Normal(0, 0.01)\\
+- \\\gamma^k_j ~ Normal(0, 0.01)\\.
 
-- \\\delta^k ~ Normal(0, 1)\\
+- \\\delta^k ~ Normal(0, 1)\\.
 
 When user-defined hyperprior values are supplied via the argument
 `prior` in the function `lmdm`, the elements of this list (see
@@ -261,18 +261,18 @@ parameters they are associated with. Specifically, the names for the
 parameters indexing the model which are accepted by **missingHE** are
 the following:
 
-- auxiliary parameters \\\sigma\\: "sigma.prior.e"(effects) and/or
-  "sigma.prior.c"(costs)
+- auxiliary parameters \\\sigma\\: `sigma.prior.e` (effects) and/or
+  `sigma.prior.c` (costs).
 
-- covariate parameters \\\alpha_j\\ and \\\beta_j\\:
-  "alpha.prior"(effects) and/or "beta.prior"(costs)
+- covariate parameters \\\alpha_j\\ and \\\beta_j\\: `alpha.prior`
+  (effects) and/or `beta.prior` (costs).
 
 - covariate parameters in the missingness model \\\gamma_j\\ (if
-  covariate data provided): "gamma.prior.e"(effects) and/or
-  "gamma.prior.c"(costs)
+  covariate data provided): `gamma.prior.e` (effects) and/or
+  `gamma.prior.c` (costs).
 
-- mnar parameter \\\delta\\: "delta.prior.e"(effects) and/or
-  "delta.prior.c"(costs)
+- mnar parameter \\\delta\\: `delta.prior.e` (effects) and/or
+  `delta.prior.c` (costs).
 
 For simplicity, here we have assumed that the set of covariates \\X_j\\
 used in the models for the effects/costs and in the model of the missing
@@ -281,10 +281,11 @@ different sets of covariates for each model using the arguments in the
 function `lmdm` (see Arguments).
 
 For each model, random effects can also be specified for each parameter
-by adding the term + (x \| z) to each model formula, where x is the
+by adding the term `+ (x | z)` to each model formula, where `x` is the
 fixed regression coefficient for which also the random effects are
-desired and z is the clustering variable across which the random effects
-are specified (must be the name of a factor variable in the dataset).
+desired and `z` is the clustering variable across which the random
+effects are specified (must be the name of a factor variable in the
+dataset).
 
 ## References
 
@@ -303,12 +304,12 @@ Gelman, A. Carlin, JB., Stern, HS. Rubin, DB.(2003). *Bayesian Data
 Analysis, 2nd edition*, CRC Press.
 
 Plummer, M. *JAGS: A program for analysis of Bayesian graphical models
-using Gibbs sampling.* (2003).
+using Gibbs sampling* (2003).
 
 ## See also
 
-[`jags`](https://rdrr.io/pkg/R2jags/man/jags.html),
-[`bcea`](https://n8thangreen.github.io/BCEA/reference/bcea.html)
+[`R2jags::jags()`](https://rdrr.io/pkg/R2jags/man/jags.html),
+[`BCEA::bcea()`](https://n8thangreen.github.io/BCEA/reference/bcea.html).
 
 ## Author
 

@@ -6,8 +6,8 @@ distributions for the effect and cost variables. Alternative assumptions
 about the mechanisms of the structural values are implemented using a
 hurdle approach. The analysis is performed using the `BUGS` language,
 which is implemented in the software `JAGS` using the function
-[`jags`](https://rdrr.io/pkg/R2jags/man/jags.html). The output is stored
-in an object of class 'missingHE'.
+[`R2jags::jags()`](https://rdrr.io/pkg/R2jags/man/jags.html). The output
+is stored in an object of class `missingHE`.
 
 ## Usage
 
@@ -43,14 +43,13 @@ hurdle(
   A data frame in which to find the variables supplied in `model.eff`,
   `model.cost` (model formulas for effects and costs) and `model.se`,
   `model.sc` (model formulas for the structural effect and cost models).
-  Among these, effectiveness, cost and treatment indicator (only two
-  arms) variables must always be provided and named 'e', 'c' and 'trt',
-  respectively.
+  Among these, effectiveness, cost and treatment indicator variables
+  must always be provided and named `e`, `c` and `trt`, respectively.
 
 - model.eff:
 
   A formula expression in conventional `R` linear modelling syntax. The
-  response must be a health economic effectiveness outcome ('e') whose
+  response must be a health economic effectiveness outcome (`e`) whose
   name must correspond to that used in `data`. Any covariates in the
   model must be provided on the right-hand side of the formula. If there
   are no covariates, `1` should be specified on the right hand side of
@@ -62,13 +61,13 @@ hurdle(
 - model.cost:
 
   A formula expression in conventional `R` linear modelling syntax. The
-  response must be a health economic cost outcome ('c') whose name must
+  response must be a health economic cost outcome (`c`) whose name must
   correspond to that used in `data`. Any covariates in the model must be
   provided on the right-hand side of the formula. If there are no
   covariates, `1` should be specified on the right hand side of the
   formula. By default, covariates are placed on the "location" parameter
   of the distribution through a linear model. A joint bivariate
-  distribution for effects and costs can be specified by including 'e'
+  distribution for effects and costs can be specified by including `e`
   on the right-hand side of the formula for the costs model. Random
   effects can also be specified for each model parameter. See details
   for how these can be specified.
@@ -76,18 +75,18 @@ hurdle(
 - model.se:
 
   A formula expression in conventional `R` linear modelling syntax. The
-  response must be indicated with the term 'se'(structural effects). Any
-  covariates in the model must be provided on the right-hand side of the
-  formula. If there are no covariates, `1` should be specified on the
-  right hand side of the formula. By default, covariates are placed on
-  the "probability" parameter for the structural effects through a
+  response must be indicated with the term `se` (structural effects).
+  Any covariates in the model must be provided on the right-hand side of
+  the formula. If there are no covariates, `1` should be specified on
+  the right hand side of the formula. By default, covariates are placed
+  on the "probability" parameter for the structural effects through a
   logistic-linear model. Random effects can also be specified for each
   model parameter. See details for how these can be specified.
 
 - model.sc:
 
   A formula expression in conventional `R` linear modelling syntax. The
-  response must be indicated with the term 'sc'(structural costs). Any
+  response must be indicated with the term `sc` (structural costs). Any
   covariates in the model must be provided on the right-hand side of the
   formula. If there are no covariates, `1` should be specified on the
   right hand side of the formula. By default, covariates are placed on
@@ -110,23 +109,23 @@ hurdle(
 - dist_e:
 
   Distribution assumed for the effects. Current available choices are:
-  Normal ('norm'), Beta ('beta'), Gamma ('gamma'), Exponential ('exp'),
-  Weibull ('weib'), Logistic ('logis'), Poisson ('pois'), Negative
-  Binomial ('negbin') or Bernoulli ('bern').
+  Normal (`norm`), Beta (`beta`), Gamma (`gamma`), Exponential (`exp`),
+  Weibull (`weib`), Logistic (`logis`), Poisson (`pois`), Negative
+  Binomial (`negbin`) or Bernoulli (`bern`).
 
 - dist_c:
 
   Distribution assumed for the costs. Current available choices are:
-  Normal ('norm'), Gamma ('gamma') or LogNormal ('lnorm').
+  Normal (`norm`), Gamma (`gamma`) or LogNormal (`lnorm`).
 
 - type:
 
   Type of structural value mechanism assumed. Choices are Structural
-  Completely At Random (SCAR), and Structural At Random (SAR).
+  Completely At Random (`SCAR`), and Structural At Random (`SAR`).
 
 - prob:
 
-  A numeric vector of probabilities within the range (0, 1),
+  A numeric vector of probabilities within the range `(0, 1)`,
   representing the upper and lower CI sample quantiles to be calculated
   and returned for the imputed values.
 
@@ -167,9 +166,9 @@ hurdle(
   name of the corresponding parameter. For example, the hyperprior
   values for the standard deviation parameter for the effects can be
   provided using the list
-  `prior = list('sigma.prior.e' = c("unif", 0, 10))`. For more
+  `prior = list("sigma.prior.e" = c("unif", 0, 10))`. For more
   information about how to provide prior hypervalues for different types
-  of parameters and models see details. If `prior` is set to 'default',
+  of parameters and models see details. If `prior` is set to `default`,
   the default values will be used.
 
 - center:
@@ -181,42 +180,44 @@ hurdle(
 
   Additional arguments that can be provided by the user. Examples are
   the additional arguments that can be provided to the function
-  [`bcea`](https://n8thangreen.github.io/BCEA/reference/bcea.html) to
-  summarise the health economic evaluation results.
+  [`BCEA::bcea()`](https://n8thangreen.github.io/BCEA/reference/bcea.html)
+  to summarise the health economic evaluation results.
 
 ## Value
 
-An object of the class 'missingHE' containing the following elements
+An object of the class `missingHE` containing the following elements:
 
-- data_set:
+- **data_set**: A list containing the original data set provided in
+  `data` (see Arguments). Additional information is also included about,
+  among others, the number of observed and missing individuals, the
+  total number of individuals by treatment arm and the indicator vectors
+  for the missing values.
 
-  A list containing the original data set provided in `data` (see
-  Arguments). Additional information is also included about, among
-  others, the number of observed and missing individuals, the total
-  number of individuals by treatment arm and the indicator vectors for
-  the structural values
+- **model_output**: A list containing the output of a `JAGS` model
+  generated from the functions
+  [`R2jags::jags()`](https://rdrr.io/pkg/R2jags/man/jags.html), and the
+  posterior samples for the main parameters of the model.
 
-- model_output:
+- **cea**: A list containing the output of the economic evaluation
+  performed using the function
+  [`BCEA::bcea()`](https://n8thangreen.github.io/BCEA/reference/bcea.html).
 
-  A list containing the output of a `JAGS` model generated from the
-  functions [`jags`](https://rdrr.io/pkg/R2jags/man/jags.html), and the
-  posterior samples for the main parameters of the model
+- **type**: A character variable that indicate which type of missing
+  value mechanism used to run the model, either `MAR` or `MNAR` (see
+  details).
 
-- cea:
+- **data_format**: A character variable that indicates which type of
+  analysis was conducted, either using a `wide` or `long` dataset.
 
-  A list containing the output of the economic evaluation performed
-  using the function
-  [`bcea`](https://n8thangreen.github.io/BCEA/reference/bcea.html)
+- **se_prior**: A numeric value that indicates the value assumed for the
+  standard deviation associated with the degenerate structural effects
+  prior distribution to implement the model in `JAGS`.
 
-- type:
+- **sc_prior**: A numeric value that indicates the value assumed for the
+  standard deviation associated with the degenerate structural costs
+  prior distribution to implement the model in `JAGS`.
 
-  A character variable that indicate which type of structural value
-  mechanism used to run the model, either `SCAR` or `SAR` (see details)
-
-- data_format:
-
-  A character variable that indicates which type of analysis was
-  conducted, either using a `wide` or `long` dataset
+- **call**: The matched call.
 
 ## Details
 
@@ -228,16 +229,18 @@ mixture models defined by two components: the first one is a mass
 distribution at the spike, while the second is a parametric model
 applied to the natural range of the relevant variable. Usually, a
 logistic regression is used to estimate the probability of incurring a
-"structural" value (e.g. 0 for the costs, or 1 for the effects); this is
-then used to weigh the mean of the "non-structural" values estimated in
-the second component. A simple example can be used to show how hurdle
-models are specified. Consider a data set comprising a response variable
-\\y\\ and a set of centered covariates \\X_j\\, for \\i = j, ...,
-J\\.Specifically, for each subject in the trial \\i = 1, ..., n\\ we
-define an indicator variable \\s_i\\ taking value `1` if the \\i\\-th
-individual is associated with a structural value and `0` otherwise. This
-is modelled as: \$\$s_i ~ Bernoulli(\pi_i)\$\$ \$\$logit(\pi_i) =
-\sum\gamma_j X_j\$\$ where
+"structural" value (e.g. `0` for the costs, or `1` for the effects);
+this is then used to weight the mean of the "non-structural" values
+estimated in the second component. A simple example can be used to show
+how hurdle models are specified. Consider a data set comprising a
+response variable \\y\\ and a set of centered covariates \\X_j\\, for
+\\i = j, ..., J\\.Specifically, for each subject in the trial \\i = 1,
+..., n\\ we define an indicator variable \\s_i\\ taking value `1` if the
+\\i\\-th individual is associated with a structural value and `0`
+otherwise. This is modelled as:
+
+\$\$s_i ~ Bernoulli(\pi_i)\$\$ \$\$logit(\pi_i) = \sum\gamma_j X_j\$\$
+where
 
 - \\\pi_i\\ is the individual probability of a structural value in
   \\y\\.
@@ -245,11 +248,11 @@ is modelled as: \$\$s_i ~ Bernoulli(\pi_i)\$\$ \$\$logit(\pi_i) =
 - \\\gamma_j\\ represents the impact on the probability of a structural
   value in \\y\\ of the covariate \\X_j\\.
 
-When \\\gamma_j = 0\\, the model assumes a 'SCAR' mechanism, while when
-\\\gamma_j != 0\\ the mechanism is 'SAR'. For the parameters indexing
+When \\\gamma_j = 0\\, the model assumes a `SCAR` mechanism, while when
+\\\gamma_j != 0\\ the mechanism is `SAR`. For the parameters indexing
 the structural value model, the default prior distributions assumed are:
 
-- \\\gamma_j ~ Normal(0, 0.01)\\
+- \\\gamma_j ~ Normal(0, 0.01)\\.
 
 When user-defined hyperprior values are supplied via the argument
 `prior` in the function `hurdle`, the elements of this list (see
@@ -258,15 +261,15 @@ name and hyperprior values and must take specific names according to the
 parameters they are associated with. Specifically, the names accepted by
 **missingHE** are the following:
 
-- auxiliary parameters \\\sigma\\: "sigma.prior.e"(effects) and/or
-  "sigma.prior.c"(costs)
+- auxiliary parameters \\\sigma\\: `sigma.prior.e` (effects) and/or
+  `sigma.prior.c` (costs).
 
-- covariate parameters \\\alpha_j, \beta_j\\: "alpha.prior"(effects)
-  and/or "beta.prior"(costs)
+- covariate parameters \\\alpha_j\\ and \\\beta_j\\: `alpha.prior`
+  (effects) and/or `beta.prior` (costs).
 
-- covariate parameters in the model of the structural values
-  \\\gamma_j\\ (if covariate data provided): "gamma.prior.e"(effects)
-  and/or "gamma.prior.c"(costs)
+- covariate parameters in the structural values model \\\gamma_j\\ (if
+  covariate data provided): `gamma.prior.e` (effects) and/or
+  `gamma.prior.c` (costs).
 
 For simplicity, here we assumed that the set of covariates \\X_j\\ used
 in the models for the effects/costs and in the model of the structural
@@ -275,13 +278,11 @@ different sets of covariates for each model using the arguments in the
 function `hurdle` (see Arguments).
 
 For each model, random effects can also be specified for each parameter
-by adding the term + (x \| z) to each model formula, where x is the
+by adding the term `+ (x | z)` to each model formula, where `x` is the
 fixed regression coefficient for which also the random effects are
-desired and z is the clustering variable across which the random effects
-are specified (must be the name of a factor variable in the dataset).
-Multiple random effects can be specified using the notation + (x1 + x2
-\| site) for each covariate that was included in the fixed effects
-formula.
+desired and `z` is the clustering variable across which the random
+effects are specified (must be the name of a factor variable in the
+dataset).
 
 ## References
 
@@ -299,12 +300,12 @@ Gelman, A. Carlin, JB., Stern, HS. Rubin, DB.(2003). *Bayesian Data
 Analysis, 2nd edition*, CRC Press.
 
 Plummer, M. *JAGS: A program for analysis of Bayesian graphical models
-using Gibbs sampling.* (2003).
+using Gibbs sampling*. (2003).
 
 ## See also
 
-[`jags`](https://rdrr.io/pkg/R2jags/man/jags.html),
-[`bcea`](https://n8thangreen.github.io/BCEA/reference/bcea.html)
+[`R2jags::jags()`](https://rdrr.io/pkg/R2jags/man/jags.html),
+[`BCEA::bcea()`](https://n8thangreen.github.io/BCEA/reference/bcea.html).
 
 ## Author
 
@@ -519,7 +520,7 @@ pic.looic
 #> [22,]  9.967619    0.02112852 0.1772704 -19.935239      -0.0246415407
 #> [23,] -8.031869    0.03193744 0.4921050  16.063738       0.2478689311
 #> [24,] -6.875947    0.02446344 0.3011887  13.751893       0.0200758658
-#> [25,] 18.588772    0.01745666 0.1163794 -37.177545       0.3891124817
+#> [25,] 18.588772    0.01745666 0.1163794 -37.177545       0.3891124818
 #> [26,]  2.462092    0.02249810 0.3222907  -4.924184       0.1325672201
 #> [27,] -6.734996    0.02936329 0.4146636  13.469992       0.4005480339
 #> [28,] -7.404790    0.07712162 0.8783735  14.809580       0.5371811660
@@ -548,7 +549,7 @@ pic.looic
 #>  [6] -0.0589286925  0.3436233911  0.4847931750 -0.0084560518  0.4405804357
 #> [11]  0.3371369119  0.1875701629  0.1353121031 -0.0236012606  0.5563061611
 #> [16]  0.6735394136  0.3226176336 -0.0698248243  0.0003563834  0.2921721457
-#> [21]  0.2726255407 -0.0246415407  0.2478689311  0.0200758658  0.3891124817
+#> [21]  0.2726255407 -0.0246415407  0.2478689311  0.0200758658  0.3891124818
 #> [26]  0.1325672201  0.4005480339  0.5371811660  0.1321666454  0.1769719469
 #> [31]  0.0702051395  0.1488625232  0.2025403884 -0.1901684449  0.3172510936
 #> [36] -0.0071318038  0.2087177345  0.0581563649  0.1564820099  0.0060505310
