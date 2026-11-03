@@ -215,6 +215,9 @@ An object of the class 'missingHE' containing the following elements:
 
 - **call**: The matched call.
 
+- **prior**: The custom prior choices specified by the user. If no
+  custom prior specified, default priors are used (see details).
+
 ## Details
 
 Depending on the distributions specified for the outcome variables in

@@ -843,7 +843,7 @@ model fitted under MAR for both outcomes. The `R` command
 
 displays the names of the different elements in the list.
 
-    #> [1] "data_set"     "model_output" "mod_est"      "cea"          "type"         "data_format"  "call"
+    #> [1] "data_set"     "model_output" "mod_est"      "cea"          "type"         "data_format"  "call"         "prior"
 
 The objects `data_set`, `model_output` and `cea` are themselves lists,
 whereas `type` and `data_format` are strings. These elements contain the
