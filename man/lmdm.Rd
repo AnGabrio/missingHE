@@ -101,6 +101,7 @@ the posterior samples for the main parameters of the model.
 \item \strong{w_e}: A numeric vector containing the weight values used to calculate aggregated effectiveness mean parameters used in the \code{cea} output.
 \item \strong{w_c}: A numeric vector containing the weight values used to calculate aggregated cost mean parameters used in the \code{cea} output.
 \item \strong{call}: The matched call.
+\item \strong{prior}: The custom prior choices specified by the user. If no custom prior specified, default priors are used (see details).
 }
 }
 \description{

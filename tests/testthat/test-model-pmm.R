@@ -18,10 +18,10 @@ test_that("check output from pattern mixture function", {
   pmm <- pattern(data = MenSSv2, model.eff = model.eff, dist_e = dist_e,
                   model.cost = model.cost, dist_c = dist_c, type = type, n.iter = n.iter)
 
-  expect_length(pmm, 8)
+  expect_length(pmm, 9)
   expect_type(pmm, "list")
   expect_named(pmm, c("data_set", "model_output", "mod_est", "cea", "type",
-                     "data_format", "restriction", "call"))
+                     "data_format", "restriction", "call", "prior"))
 
   expect_equal(pmm$type, "MAR")
 
@@ -40,6 +40,10 @@ test_that("check output from pattern mixture function", {
   expect_length(pmm$call, 8)
   expect_type(pmm$call, "language")
   expect_named(pmm$call, c("", "model.eff", "model.cost", "data", "dist_e", "dist_c", "type", "n.iter"))
+
+  expect_length(pmm$prior, 1)
+  expect_type(pmm$prior, "list")
+  expect_named(pmm$prior, "default")
 
   expect_length(pmm$cea, 24)
   expect_type(pmm$cea, "list")

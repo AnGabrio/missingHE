@@ -50,6 +50,7 @@
 #' - **data_format**: A character variable that indicates which type of analysis was conducted, either using a `wide` or `long` dataset.
 #' - **restriction**: A character name that indicates under which type of restrictions the model was identified (see details).
 #' - **call**: The matched call.
+#' - **prior**: The custom prior choices specified by the user. If no custom prior specified, default priors are used (see details).
 
 #' @seealso [R2jags::jags()], [BCEA::bcea()].
 #' @keywords CEA JAGS missing data Pattern Mixture Models
@@ -466,7 +467,8 @@ pattern <- function(data, model.eff, model.cost,
                     interventions = interventions, Kmax = Kmax, k = wtp, plot = plot)
   format <- "wide"
   res <- list(data_set = data_read, model_output = model_output, mod_est = print_mod_est,
-              cea = cea, type = type, data_format = format, restriction = restriction, call = mf)
+              cea = cea, type = type, data_format = format, restriction = restriction,
+              call = mf, prior = prior)
   class(res) <- "missingHE"
   return(res)
 }

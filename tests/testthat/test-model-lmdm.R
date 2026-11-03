@@ -17,10 +17,10 @@ test_that("check output from longitudinal missing data function", {
   lmm <- lmdm(data = PBS, model.eff = model.eff, dist_e = dist_e,
                   model.cost = model.cost, dist_c = dist_c, type = type, n.iter = n.iter)
 
-  expect_length(lmm, 10)
+  expect_length(lmm, 11)
   expect_type(lmm, "list")
   expect_named(lmm, c("data_set", "model_output", "mod_est", "cea", "type",
-                     "data_format", "time_dep", "w_e", "w_c", "call"))
+                     "data_format", "time_dep", "w_e", "w_c", "call", "prior"))
 
   expect_equal(lmm$type, "MAR")
 
@@ -42,6 +42,10 @@ test_that("check output from longitudinal missing data function", {
   expect_length(lmm$call, 8)
   expect_type(lmm$call, "language")
   expect_named(lmm$call, c("", "model.eff", "model.cost", "data", "dist_e", "dist_c", "type", "n.iter"))
+
+  expect_length(lmm$prior, 1)
+  expect_type(lmm$prior, "list")
+  expect_named(lmm$prior, "default")
 
   expect_length(lmm$cea, 24)
   expect_type(lmm$cea, "list")

@@ -107,6 +107,7 @@ the posterior samples for the main parameters of the model.
 \item \strong{se_prior}: A numeric value that indicates the value assumed for the standard deviation associated with the degenerate structural effects prior distribution to implement the model in \code{JAGS} (deafult = 0.00001).
 \item \strong{sc_prior}: A numeric value that indicates the value assumed for the standard deviation associated with the degenerate structural costs prior distribution to implement the model in \code{JAGS} (deafult = 0.00001).
 \item \strong{call}: The matched call.
+\item \strong{prior}: The custom prior choices specified by the user. If no custom prior specified, default priors are used (see details).
 }
 }
 \description{

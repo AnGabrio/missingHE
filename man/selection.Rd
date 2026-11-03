@@ -95,6 +95,7 @@ the posterior samples for the main parameters of the model.
 \item \strong{type}: A character variable that indicate which type of missing value mechanism used to run the model, either \code{MAR} or \code{MNAR} (see details).
 \item \strong{data_format}: A character variable that indicates which type of analysis was conducted, either using a \code{wide} or \code{long} dataset.
 \item \strong{call}: The matched call.
+\item \strong{prior}: The custom prior choices specified by the user. If no custom prior specified, default priors are used (see details).
 }
 }
 \description{

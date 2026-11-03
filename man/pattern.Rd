@@ -88,6 +88,7 @@ the posterior samples for the main parameters of the model.
 \item \strong{data_format}: A character variable that indicates which type of analysis was conducted, either using a \code{wide} or \code{long} dataset.
 \item \strong{restriction}: A character name that indicates under which type of restrictions the model was identified (see details).
 \item \strong{call}: The matched call.
+\item \strong{prior}: The custom prior choices specified by the user. If no custom prior specified, default priors are used (see details).
 }
 }
 \description{

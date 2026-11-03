@@ -15,10 +15,10 @@ test_that("check output from selection function", {
   sm <- selection(data = MenSS, model.eff = model.eff, dist_e = dist_e,
                   model.cost = model.cost, dist_c = dist_c, type = type, n.iter = n.iter)
 
-  expect_length(sm, 7)
+  expect_length(sm, 8)
   expect_type(sm, "list")
   expect_named(sm, c("data_set", "model_output", "mod_est", "cea", "type",
-                     "data_format", "call"))
+                     "data_format", "call", "prior"))
 
   expect_equal(sm$type, "MAR")
 
@@ -35,6 +35,10 @@ test_that("check output from selection function", {
   expect_length(sm$call, 8)
   expect_type(sm$call, "language")
   expect_named(sm$call, c("", "model.eff", "model.cost", "data", "dist_e", "dist_c", "type", "n.iter"))
+
+  expect_length(sm$prior, 1)
+  expect_type(sm$prior, "list")
+  expect_named(sm$prior, "default")
 
   expect_length(sm$cea, 24)
   expect_type(sm$cea, "list")

@@ -58,6 +58,7 @@
 #' - **w_e**: A numeric vector containing the weight values used to calculate aggregated effectiveness mean parameters used in the `cea` output.
 #' - **w_c**: A numeric vector containing the weight values used to calculate aggregated cost mean parameters used in the `cea` output.
 #' - **call**: The matched call.
+#' - **prior**: The custom prior choices specified by the user. If no custom prior specified, default priors are used (see details).
 
 #' @seealso [R2jags::jags()], [BCEA::bcea()].
 #' @keywords CEA JAGS missing data longitudinal models
@@ -688,7 +689,7 @@ lmdm <- function(data, model.eff, model.cost,
   format <- "long"
   res <- list(data_set = data_read, model_output = model_output, mod_est = print_mod_est,
               cea = cea, type = type, data_format = format, time_dep = time_dep, w_e = w_e,
-              w_c = w_c, call = mf)
+              w_c = w_c, call = mf, prior = prior)
   class(res) <- "missingHE"
   return(res)
 }

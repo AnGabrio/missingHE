@@ -63,6 +63,8 @@
 #' - **se_prior**: A numeric value that indicates the value assumed for the standard deviation associated with the degenerate structural effects prior distribution to implement the model in `JAGS` (deafult = 0.00001).
 #' - **sc_prior**: A numeric value that indicates the value assumed for the standard deviation associated with the degenerate structural costs prior distribution to implement the model in `JAGS` (deafult = 0.00001).
 #' - **call**: The matched call.
+#' - **prior**: The custom prior choices specified by the user. If no custom prior specified, default priors are used (see details).
+#'
 #'
 #' @seealso [R2jags::jags()], [BCEA::bcea()].
 #' @keywords CEA JAGS missing data Hurdle Models
@@ -647,7 +649,8 @@ hurdle <- function(data, model.eff, model.cost,
                     interventions = interventions, Kmax = Kmax, k = wtp, plot = plot)
   format <- "wide"
   res <- list(data_set = data_read, model_output = model_output, mod_est = print_mod_est,
-              cea = cea, type = type, data_format = format, se.prior = se.prior, sc.prior = sc.prior, call = mf)
+              cea = cea, type = type, data_format = format, se.prior = se.prior, sc.prior = sc.prior,
+              call = mf, prior = prior)
   class(res) <- "missingHE"
   return(res)
 }
