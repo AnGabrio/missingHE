@@ -1,4 +1,4 @@
-test_that("check output from write model file internal functions", {
+test_that("check output from writing model file and prior updating internal functions", {
 
   load(test_path("testdata/sm.RData"))
 
@@ -28,12 +28,17 @@ test_that("check output from write model file internal functions", {
                          "prior" = sm$prior)
   write_sm <- write_selection(type = type , dist_e = dist_e, dist_c = dist_c,
                               model_txt_info = model_txt_info)
+  sm_txt <- paste(readLines("selection.txt"), collapse = "\n")
+  prior_sm <- prior_selection(type = type, dist_e = dist_e, dist_c = dist_c,
+                              model_txt_info = model_txt_info,
+                              model_string_jags = sm_txt)
   unlink(write_sm)
 
   expect_length(write_sm, 1)
   expect_vector(write_sm)
   expect_equal(write_sm, "selection.txt")
-
+  expect_length(prior_sm, 1)
+  expect_type(prior_sm, "character")
 
 
   load(test_path("testdata/pmm.RData"))
@@ -59,11 +64,18 @@ test_that("check output from write model file internal functions", {
 
   write_pmm <- write_pattern(type = type , dist_e = dist_e, dist_c = dist_c,
                               model_txt_info = model_txt_info)
+  pmm_txt <- paste(readLines("pattern.txt"), collapse = "\n")
+  prior_pmm <- prior_pattern(type = type, dist_e = dist_e, dist_c = dist_c,
+                              model_txt_info = model_txt_info,
+                              model_string_jags = pmm_txt)
   unlink(write_pmm)
 
   expect_length(write_pmm, 1)
   expect_vector(write_pmm)
   expect_equal(write_pmm, "pattern.txt")
+  expect_length(prior_pmm, 1)
+  expect_type(prior_pmm, "character")
+
 
 
   load(test_path("testdata/hm.RData"))
@@ -96,11 +108,18 @@ test_that("check output from write model file internal functions", {
                          "prior" = hm$prior)
   write_hm <- write_hurdle(type = type , dist_e = dist_e, dist_c = dist_c,
                               model_txt_info = model_txt_info)
+  hm_txt <- paste(readLines("hurdle.txt"), collapse = "\n")
+  prior_hm <- prior_hurdle(type = type, dist_e = dist_e, dist_c = dist_c,
+                             model_txt_info = model_txt_info,
+                             model_string_jags = hm_txt)
   unlink(write_hm)
 
   expect_length(write_hm, 1)
   expect_vector(write_hm)
   expect_equal(write_hm, "hurdle.txt")
+  expect_length(prior_hm, 1)
+  expect_type(prior_hm, "character")
+
 
 
   load(test_path("testdata/lmm.RData"))
@@ -133,12 +152,17 @@ test_that("check output from write model file internal functions", {
                          "time_dep" = lmm$time_dep)
   write_lmdm <- write_lmdm(type = type , dist_e = dist_e, dist_c = dist_c,
                               model_txt_info = model_txt_info)
+  lmdm_txt <- paste(readLines("lmdm.txt"), collapse = "\n")
+  prior_lmdm <- prior_hurdle(type = type, dist_e = dist_e, dist_c = dist_c,
+                           model_txt_info = model_txt_info,
+                           model_string_jags = lmdm_txt)
   unlink(write_lmdm)
 
   expect_length(write_lmdm, 1)
   expect_vector(write_lmdm)
   expect_equal(write_lmdm, "lmdm.txt")
-
+  expect_length(prior_lmdm, 1)
+  expect_type(prior_lmdm, "character")
 
 
 })
