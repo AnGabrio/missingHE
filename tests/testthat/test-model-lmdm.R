@@ -235,6 +235,9 @@ test_that("check output from longitudinal missing data function", {
                                   "effects_random", "costs_random", "mis_effects_random",
                                   "mis_costs_random", "imputed", "imputed_trt", "loglik", "type",
                                   "method", "ind_fixed", "ind_random", "dist_e", "dist_c", "filein"))
+  expect_true(is.matrix(lmm$model_output$summary))
+  expect_contains(colnames(lmm$model_output$summary), c("mean", "sd", "2.5%", "25%", "50%",
+                                                        "75%", "97.5%", "Rhat", "n.eff"))
   expect_shape(lmm$model_output$summary, ncol = 9)
   expect_type(lmm$model_output$model, "list")
   expect_shape(lmm$model_output$mean_effects, dim = c(n.iter, n.trt, n.time))
@@ -342,6 +345,7 @@ test_that("check output from longitudinal missing data function", {
   expect_true(lmm$model_output$model$DIC)
   expect_equal(lmm$model_output$model$n.iter, n.iter)
   expect_equal(lmm$model_output$model$model.file, lmm$model_output$filein)
+  expect_type(lmm$model_output$model$parameters.to.save, "character")
   expect_vector(lmm$model_output$model$parameters.to.save)
   expect_type(lmm$model_output$model$model, "list")
   expect_named(lmm$model_output$model$model, c("ptr", "data", "model", "state", "nchain",
@@ -368,6 +372,9 @@ test_that("check output from longitudinal missing data function", {
   expect_type(lmm$model_output$model$BUGSoutput$median, "list")
   expect_type(lmm$model_output$model$BUGSoutput$sd, "list")
   expect_type(lmm$model_output$model$BUGSoutput$mean, "list")
+  expect_true(is.matrix(lmm$model_output$model$BUGSoutput$summary))
+  expect_contains(colnames(lmm$model_output$model$BUGSoutput$summary), c("mean", "sd", "2.5%", "25%", "50%",
+                                                       "75%", "97.5%", "Rhat", "n.eff"))
   expect_shape(lmm$model_output$model$BUGSoutput$summary, ncol = 9)
   expect_shape(lmm$model_output$model$BUGSoutput$sims.matrix, nrow = n.iter)
   expect_type(lmm$model_output$model$BUGSoutput$sims.list, "list")
