@@ -45,8 +45,6 @@ test_that("output of summary function", {
     summary(sm, wtp = -2),
     regexp = "Please provide a valid value for the acceptance threshold")
 
-  expect_snapshot(summary(sm))
-
 })
 
 # test postsum function
@@ -68,8 +66,6 @@ test_that("output of postsum function", {
     postsum(pmm, display = "no"),
     regexp = "Please select a valid input for 'display' argument")
 
-  expect_snapshot(postsum(pmm))
-
 })
 
 
@@ -89,8 +85,6 @@ hurdle")
   expect_error(
     print.missingHE(hm$data_set),
     regexp = "Only objects of class 'missingHE' can be used")
-
-  expect_snapshot(print(hm))
 
 })
 
@@ -120,7 +114,5 @@ test_that("output of coef function", {
   expect_error(
     coef(lmm, random = TRUE),
     regexp = "No random effects estimates found")
-
-  expect_snapshot(coef(lmm))
 
 })

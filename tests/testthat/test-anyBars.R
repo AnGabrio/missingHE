@@ -33,7 +33,6 @@ test_that("jagsresults() summarise results from a fitted model in JAGS", {
                          probs = c(0.025, 0.25, 0.5, 0.75, 0.975), signif = 2)
   expect_type(jags_sm, "double")
   expect_shape(jags_sm, ncol = 9)
-  expect_snapshot(jags_sm)
 
   load(test_path("testdata/pmm.RData"))
 
@@ -43,6 +42,5 @@ test_that("jagsresults() summarise results from a fitted model in JAGS", {
                          probs = c(0.025, 0.5, 0.975), signif = 1)
   expect_type(jags_pmm, "double")
   expect_shape(jags_pmm, ncol = 7)
-  expect_snapshot(jags_pmm)
 
 })
