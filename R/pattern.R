@@ -430,6 +430,7 @@ pattern <- function(data, model.eff, model.cost,
   if(exists("refresh", where = exArgs)) { refresh = exArgs$refresh} else { refresh = n.iter/50}
   if(exists("RNGname", where = exArgs)) { RNGname = exArgs$RNGname} else { RNGname = "Wichmann-Hill"}
   if(exists("quiet", where = exArgs)) { quiet = exArgs$quiet} else { quiet = FALSE}
+  if(exists("digits", where = exArgs)) { digits = exArgs$digits} else { digits = 3}
   if(!is.logical(dic)) { stop("Please provide logical value for dic argument")}
   model_info <- list("is_c_random_c" = is_c_random_c, "is_int_c_random_c" = is_int_c_random_c,
                      "ind_random" = ind_random, "ind_fixed" = ind_fixed,
@@ -440,7 +441,7 @@ pattern <- function(data, model.eff, model.cost,
                      "n.burnin" = n.burnin, "n.thin" = n.thin, "prior" = prior, "patterns.prior" = patterns.prior,
                      "n.mci" = n.mci, "prob" = prob, "restriction" = restriction,
                      "progress.bar" = progress.bar, "refresh" = refresh,
-                     "RNGname" = RNGname, "quiet" = quiet)
+                     "RNGname" = RNGname, "quiet" = quiet, "digits" = digits)
   model_output <- run_pattern(data_model = data_model, type = type,
                                 dist_e = dist_e, dist_c = dist_c, model_info = model_info)
   effects_fixed <- cbind.data.frame(model_output$effects_fixed)

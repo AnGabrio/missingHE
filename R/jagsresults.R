@@ -101,8 +101,8 @@
 #'
 
 jagsresults <-
-  function(x, params, regex=FALSE, invert=FALSE,
-           probs=c(0.025, 0.25, 0.5, 0.75, 0.975), signif, ...) {
+  function(x, params, regex = FALSE, invert = FALSE,
+           probs = c(0.025, 0.25, 0.5, 0.75, 0.975), signif, ...) {
     if(!isTRUE(requireNamespace("methods"))) {
       stop("You need to install the R package 'methods'.
            Please run in your R terminal:\n install.packages('methods')")

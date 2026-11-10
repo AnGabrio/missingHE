@@ -78,7 +78,8 @@ test_that("check output from running model internal functions", {
                      "progress.bar" = "text",
                      "refresh" = 10000/50,
                      "RNGname" = "Wichmann-Hill",
-                     "quiet" = FALSE)
+                     "quiet" = FALSE,
+                     "digits" = 3)
   run_sm <- run_selection(data_model = data_model, type = type ,
                             dist_e = dist_e, dist_c = dist_c,
                             model_info = model_info)
@@ -320,7 +321,8 @@ test_that("check output from running model internal functions", {
                      "progress.bar" = "text",
                      "refresh" = 10000/50,
                      "RNGname" = "Wichmann-Hill",
-                     "quiet" = FALSE)
+                     "quiet" = FALSE,
+                     "digits" = 3)
   run_pmm <- run_pattern(data_model = data_model, type = type ,
                           dist_e = dist_e, dist_c = dist_c,
                           model_info = model_info)
@@ -573,7 +575,8 @@ test_that("check output from running model internal functions", {
                      "progress.bar" = "text",
                      "refresh" = 10000/50,
                      "RNGname" = "Wichmann-Hill",
-                     "quiet" = FALSE)
+                     "quiet" = FALSE,
+                     "digits" = 3)
   run_hm <- run_hurdle(data_model = data_model, type = type ,
                           dist_e = dist_e, dist_c = dist_c,
                           model_info = model_info)
@@ -843,7 +846,8 @@ test_that("check output from running model internal functions", {
                      "progress.bar" = "text",
                      "refresh" = 10000/50,
                      "RNGname" = "Wichmann-Hill",
-                     "quiet" = FALSE)
+                     "quiet" = FALSE,
+                     "digits" = 3)
   run_lmm <- run_lmdm(data_model = data_model, type = type ,
                           dist_e = dist_e, dist_c = dist_c,
                           model_info = model_info)

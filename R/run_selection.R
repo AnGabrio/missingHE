@@ -380,7 +380,8 @@ run_selection <- function(data_model, type, dist_e, dist_c, model_info) {
     if(dist_e %in% c("beta", "gamma", "weib")) { param_jags_show <- c(param_jags_show, "ctau_e")}
     if(dist_c %in% c("gamma")) { param_jags_show <- c(param_jags_show, "ctau_c")}
     if(dist_c %in% c("lnorm")) { param_jags_show <- c(param_jags_show, "clmu_c")}
-    model_sum <- round(jagsresults(x = model, params = param_jags_show, invert = TRUE), digits = 3)
+    model_sum <- jagsresults(x = model, params = param_jags_show,
+                             invert = TRUE, signif = model_info$digits)
   } else{ model_sum <- NULL}
   loglik <- list("effects" = loglik_e, "costs" = loglik_c,
                  "missing indicators effects" = loglik_me,

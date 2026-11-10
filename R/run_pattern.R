@@ -334,7 +334,8 @@ run_pattern <- function(data_model, type, dist_e, dist_c, model_info) {
     if(dist_e %in% c("beta", "gamma", "weib")) { param_jags_show <- c(param_jags_show, "ctau_e")}
     if(dist_c %in% c("gamma")) { param_jags_show <- c(param_jags_show, "ctau_c")}
     if(dist_c %in% c("lnorm")) { param_jags_show <- c(param_jags_show, "clmu_c")}
-    model_sum <- round(jagsresults(x = model, params = param_jags_show, invert = TRUE), digits = 3)
+    model_sum <- jagsresults(x = model, params = param_jags_show,
+                             invert = TRUE, signif = model_info$digits)
   } else{ model_sum <- NULL}
   loglik <- list("effects" = loglik_e, "costs" = loglik_c, "pattern indicators" = loglik_d)
   imputed_e <- list("avg" = eff_pos_imp_avg, "ql" = eff_pos_imp_ql, "qu" = eff_pos_imp_qu, "index" = which(is.na(data_model$eff)))
