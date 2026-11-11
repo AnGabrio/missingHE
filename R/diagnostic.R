@@ -80,9 +80,6 @@
 diagnostic <- function(x, type = "denplot", param = "all", theme = NULL, ...) {
   if(!inherits(x, "missingHE")) {
     stop("Only objects of class 'missingHE' can be used")}
-  if(!isTRUE(requireNamespace("ggmcmc")) | !isTRUE(requireNamespace("mcmcr")) | !isTRUE(requireNamespace("coda"))) {
-    stop("You need to install the R packages 'ggmcmc', 'coda' and 'mcmcr'.
-         Please run in your R terminal:\n install.packages('ggmcmc', 'coda', 'mcmcr')")}
   if(is.null(theme)) { theme = "classic"}
   if(!theme %in% c("classic", "base", "calc", "economist", "excel", "few", "538", "gdocs",
                    "hc", "par", "pander", "solarized", "stata", "tufte", "wsj")) {
