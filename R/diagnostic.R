@@ -67,9 +67,10 @@
 #' Gelman, A. Carlin, JB., Stern, HS. Rubin, DB.(2003). *Bayesian Data Analysis, 2nd edition*, CRC Press.
 #'
 #' Brooks, S. Gelman, A. Jones, JL. Meng, XL. (2011). *Handbook of Markov Chain Monte Carlo*, CRC/Chapman and Hall.
-#' @import ggplot2 mcmcr
+#' @import ggplot2
+#' @import mcmcr
+#' @rawNamespace import(coda, except = c(ess, rhat, thin))
 #' @importFrom stats quantile
-#' @importFrom coda varnames varnames<- as.mcmc
 #' @export
 #' @examples
 #' # For examples see the function [selection()], [pattern()], [hurdle()] or [lmdm()].
@@ -85,7 +86,7 @@ diagnostic <- function(x, type = "denplot", param = "all", theme = NULL, ...) {
   if(is.null(theme)) { theme = "classic"}
   if(!theme %in% c("classic", "base", "calc", "economist", "excel", "few", "538", "gdocs",
                    "hc", "par", "pander", "solarized", "stata", "tufte", "wsj")) {
-    stop("Please provide a valid theme type among those available. Type ''help(ggthemes)'' for more details.")}
+    stop("Please provide a valid theme type among those available")}
   if(length(param) != 1) {
     stop("You can only visualise diagnostic checks for one family of parameters at a time
          or for all parameters together by setting param = 'all'")}
@@ -119,13 +120,13 @@ diagnostic <- function(x, type = "denplot", param = "all", theme = NULL, ...) {
                         "random.alpha", "random.beta", "random.beta.f", "random.alpha.time", "random.beta.time", "random.gamma.e", "random.gamma.c", "random.delta.e", "random.delta.c")
   if(x$model_output$method == "SELECTION") {
     if(x$type == "MAR") {
-      if(!param %in% par_sel_mar) { stop("Please provide valid parameter names based on the fitted model.")}
+      if(!param %in% par_sel_mar) { stop("Please provide valid parameter names based on the fitted model")}
       }
     if(x$type == "MNAR_eff") {
-      if(!param %in% par_sel_mnar_e) { stop("Please provide valid parameter names based on the fitted model.")}
+      if(!param %in% par_sel_mnar_e) { stop("Please provide valid parameter names based on the fitted model")}
       }
     if(x$type == "MNAR_cost") {
-      if(!param %in% par_sel_mnar_c) { stop("Please provide valid parameter names based on the fitted model.")}
+      if(!param %in% par_sel_mnar_c) { stop("Please provide valid parameter names based on the fitted model")}
       }
     if(x$type == "MNAR") {
       if(!param %in% par_sel_mnar_ec) { stop("Please provide valid parameter names based on the fitted model.")}
@@ -133,41 +134,41 @@ diagnostic <- function(x, type = "denplot", param = "all", theme = NULL, ...) {
   }
   if(x$model_output$method == "HURDLE") {
     if(!is.null(x$model_output$mean_nostr_effects) & !is.null(x$model_output$mean_nostr_costs)) {
-      if(!param %in% par_hur_ec) { stop("Please provide valid parameter names based on the fitted model.")}
+      if(!param %in% par_hur_ec) { stop("Please provide valid parameter names based on the fitted model")}
     }
     if(!is.null(x$model_output$mean_nostr_effects) & is.null(x$model_output$mean_nostr_costs)) {
-      if(!param %in% par_hur_e) { stop("Please provide valid parameter names based on the fitted model.")}
+      if(!param %in% par_hur_e) { stop("Please provide valid parameter names based on the fitted model")}
     }
     if(is.null(x$model_output$mean_nostr_effects) & !is.null(x$model_output$mean_nostr_costs)) {
-      if(!param %in% par_hur_c) { stop("Please provide valid parameter names based on the fitted model.")}
+      if(!param %in% par_hur_c) { stop("Please provide valid parameter names based on the fitted model")}
     }
   }
   if(x$model_output$method == "PATTERN") {
     if(x$type == "MAR") {
-      if(!param %in% par_pat_mar) { stop("Please provide valid parameter names based on the fitted model.")}
+      if(!param %in% par_pat_mar) { stop("Please provide valid parameter names based on the fitted model")}
     }
     if(x$type == "MNAR_eff") {
-      if(!param %in% par_pat_mnar_e) { stop("Please provide valid parameter names based on the fitted model.")}
+      if(!param %in% par_pat_mnar_e) { stop("Please provide valid parameter names based on the fitted model")}
     }
     if(x$type == "MNAR_cost") {
-      if(!param %in% par_pat_mnar_c) { stop("Please provide valid parameter names based on the fitted model.")}
+      if(!param %in% par_pat_mnar_c) { stop("Please provide valid parameter names based on the fitted model")}
     }
     if(x$type == "MNAR") {
-      if(!param %in% par_pat_mnar_ec) { stop("Please provide valid parameter names based on the fitted model.")}
+      if(!param %in% par_pat_mnar_ec) { stop("Please provide valid parameter names based on the fitted model")}
     }
   }
   if(x$model_output$method == "LMDM") {
     if(x$type == "MAR") {
-      if(!param %in% par_lmdm_mar) { stop("Please provide valid parameter names based on the fitted model.")}
+      if(!param %in% par_lmdm_mar) { stop("Please provide valid parameter names based on the fitted model")}
     }
     if(x$type == "MNAR_eff") {
-      if(!param %in% par_lmdm_mnar_e) { stop("Please provide valid parameter names based on the fitted model.")}
+      if(!param %in% par_lmdm_mnar_e) { stop("Please provide valid parameter names based on the fitted model")}
     }
     if(x$type == "MNAR_cost") {
-      if(!param %in% par_lmdm_mnar_c) { stop("Please provide valid parameter names based on the fitted model.")}
+      if(!param %in% par_lmdm_mnar_c) { stop("Please provide valid parameter names based on the fitted model")}
     }
     if(x$type == "MNAR") {
-      if(!param %in% par_lmdm_mnar_ec) { stop("Please provide valid parameter names based on the fitted model.")}
+      if(!param %in% par_lmdm_mnar_ec) { stop("Please provide valid parameter names based on the fitted model")}
     }
   }
   labs <- param

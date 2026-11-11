@@ -18,6 +18,7 @@ export(pic)
 export(postsum)
 export(ppc)
 export(selection)
+import(coda, except = c(ess, rhat, thin))
 import(ggplot2)
 import(ggpubr)
 import(mcmcr)
@@ -45,11 +46,6 @@ importFrom(bayesplot,
   ppc_scatter_avg,
   ppc_stat,
   ppc_stat_2d
-)
-importFrom(coda,
-  "varnames<-",
-  as.mcmc,
-  varnames
 )
 importFrom(graphics,text)
 importFrom(methods,is)
