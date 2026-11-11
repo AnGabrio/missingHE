@@ -707,8 +707,6 @@ parameter estimates from the model. In this case, as displayed in Figure
 @ref(fig:fig2), no major issues in convergence are identified with the
 traceplots showing acceptable mixing in the two chains.
 
-    #> Loading required namespace: ggmcmc
-
 ![Checking convergence using the diagnostic function for a model fitted
 in missingHE, for example through inspection of the
 traceplots.](Introduction_to_missingHE_files/figure-html/fig2-1.png)

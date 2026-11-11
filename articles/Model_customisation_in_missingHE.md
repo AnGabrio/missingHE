@@ -492,8 +492,6 @@ each family of model parameters. For example, the following code shows
 how autocorrelation plots for all regression coefficients in `model.eff`
 may be obtained based on the model in `sm1_nn_cov`.
 
-    #> Loading required namespace: ggmcmc
-
 ![Checking convergence using the diagnostic function for a family of
 model parameters estimated in missingHE, for example through inspection
 of the autocorrelation

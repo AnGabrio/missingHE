@@ -495,8 +495,6 @@ the effectiveness variable within the cost models. In this case, as
 displayed in Figure @ref(fig:fig2), no major issues in convergence are
 identified for these parameters.
 
-    #> Loading required namespace: ggmcmc
-
 ![Checking convergence using the diagnostic function for a model fitted
 in missingHE, for example through inspection of density
 plots.](Longitudinal_models_in_missingHE_files/figure-html/fig2-1.png)
