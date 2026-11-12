@@ -709,8 +709,6 @@ corresponding credible intervals. The arguments `class = "boxplot"`,
 `missingHE` to display boxplots for the cost outcome in the TAU arm at
 time $`2`$.
 
-    #> Loading required namespace: ggthemes
-
 ![Boxplots of observed and imputed effectiveness data in the TAU arm at
 time 2 under normal distributions using a longitudinal
 model.](Longitudinal_models_in_missingHE_files/figure-html/figplot-1.png)

@@ -535,8 +535,6 @@ We can inspect the posterior results by typing
 and look at how imputations in each treatment group are carried out
 based using the `plot` function.
 
-    #> Loading required namespace: ggthemes
-
 ![Scatter plots of observed and imputed effectiveness data in the SoC
 arm (trt = 1) based on an hurdle model assuming all individuals younger
 than 22 years old are associated with a perfect healf

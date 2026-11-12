@@ -1005,8 +1005,6 @@ means of corresponding credible intervals. The arguments
 `missingHE` to display scatter plots for the effectiveness outcome in
 the MenSS arm.
 
-    #> Loading required namespace: ggthemes
-
 ![Scatter plots of observed and imputed effectiveness data in the MenSS
 arm under normal distributions using a selection
 model.](Introduction_to_missingHE_files/figure-html/figplot-1.png)
