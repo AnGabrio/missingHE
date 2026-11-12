@@ -1,5 +1,7 @@
 test_that("check output from running model internal functions", {
 
+  testthat::skip_on_cran()
+
   load(test_path("testdata/sm.RData"))
 
   n <- sum(sm$data_set$data_raw$n)

@@ -40,18 +40,15 @@
 plot.missingHE <- function(x, prob = c(0.025, 0.975),
                            class = "scatter", outcome = "both", trt = "all",
                            time_plot = NULL, theme = NULL, only.plot = TRUE, ...) {
-  if(!isTRUE(requireNamespace("ggplot2")) | !isTRUE(requireNamespace("ggthemes"))) {
-    stop("You need to install the R package 'ggplot2'.
-         Please run in your R terminal:\n install.packages('ggplot2')")}
   if(is.null(theme)) { theme = "classic"}
   if(!theme %in% c("classic", "base", "calc", "economist", "excel", "few", "538", "gdocs",
                    "hc", "par", "pander", "solarized", "stata", "tufte", "wsj")) {
-    stop("Please provide a valid theme type among those available. Type ''help(ggthemes)'' for more details.")}
-  if(!is.logical(only.plot)) { stop("Please provide a logical value to the 'only.plot' argument.")}
+    stop("Please provide a valid theme type among those available")}
+  if(!is.logical(only.plot)) { stop("Please provide a logical value to the 'only.plot' argument")}
   if(!class %in% c("scatter", "histogram", "boxplot")) {
-    stop("Please provide a plot class name among those available.")}
+    stop("Please provide a plot class name among those available")}
   if(!outcome %in% c("both", "effects", "costs")) {
-    stop("Please provide an outcome name among those available.")}
+    stop("Please provide an outcome name among those available")}
   n_trt <- length(x$data_set$data_raw$trt_index)
   trt_lev <- names(x$data_set$data_raw$trt_index)
   if(!inherits(x, "missingHE")) {
@@ -70,15 +67,15 @@ plot.missingHE <- function(x, prob = c(0.025, 0.975),
   Individuals <- Mean <- QL <- QU <- Type <- e <- NULL
   if(is.numeric(trt)) {
     if(length(trt) == 1 & !any(trt %in% c(1:n_trt))) {
-      stop("Please provide a trt value among those available.")
+      stop("Please provide a trt value among those available")
     } else if(length(trt) > 1 & !any(trt %in% c(2:n_trt))){
-      stop("Please provide a trt value among those available.")}
+      stop("Please provide a trt value among those available")}
   } else if(is.character(trt)) {
     if(length(trt) == 1 & !any(trt %in% c("all", trt_lev, "none"))) {
-      stop("Please provide a trt name among those available.")
+      stop("Please provide a trt name among those available")
     } else if(length(trt) > 1 & !length(trt) %in% c(2:n_trt)){
-      stop("Please provide a trt name among those available.")}
-  } else { stop("Please provide a trt name or value among those available.")}
+      stop("Please provide a trt name among those available")}
+  } else { stop("Please provide a trt name or value among those available")}
   if(any(x$data_set$data_raw$n_mis_e == 0) & outcome %in% c("effects", "both")) {
     stop("No missing values found in the data to be plotted")}
   if(any(x$data_set$data_raw$n_mis_c == 0) & outcome %in% c("costs", "both")) {
@@ -149,15 +146,15 @@ plot.missingHE <- function(x, prob = c(0.025, 0.975),
     if(exists("time.plot", where = exArgs)) { time.plot = exArgs$time.plot } else { time.plot = 1}
     if(is.numeric(time.plot)) {
       if(length(time.plot) == 1 & !any(time.plot %in% c(1:max_time))) {
-        stop("Please provide a time.plot value among those available.")
+        stop("Please provide a time.plot value among those available")
       } else if(length(time.plot) > 1 & !any(time.plot %in% c(2:max_time))){
-        stop("Please provide a time.plot value among those available.")}
+        stop("Please provide a time.plot value among those available")}
     } else if(is.character(time.plot)) {
       if(length(time.plot) == 1 & !any(time.plot %in% c("all", 1:max_time))) {
-        stop("Please provide a time.plot name among those available.")
+        stop("Please provide a time.plot name among those available")
       } else if(length(time.plot) > 1 & !length(time.plot) %in% c(2:max_time)){
         stop("Please provide a time.plot name among those available.")}
-    } else { stop("Please provide a time.plot name or value among those available.")}
+    } else { stop("Please provide a time.plot name or value among those available")}
     if(any(x$data_set$data_raw$n_mis_e == 0) & outcome %in% c("effects", "both")) {
       stop("No missing values found in the data to be plotted")}
     if(any(x$data_set$data_raw$n_mis_c == 0) & outcome %in% c("costs", "both")) {

@@ -39,24 +39,20 @@
 ppc <- function(x, type = "histogram", outcome = "both", ndisplay = 15,
                 trt = "all", theme = NULL, scheme_set = NULL, ...) {
   if(!inherits(x, "missingHE")) { stop("Only objects of class 'missingHE' can be used")}
-  if(!isTRUE(requireNamespace("ggplot2")) | !isTRUE(requireNamespace("bayesplot")) | !isTRUE(requireNamespace("ggpubr"))) {
-    stop("You need to install the R packages 'ggplot2', 'bayesplot' and 'ggpubr'.
-         Please run in your R terminal:\n install.packages('ggplot2', 'bayesplot', 'ggpubr')")
-  }
   if(is.null(theme)) { theme = "classic"}
   if(!theme %in% c("classic", "base", "calc", "economist", "excel", "few", "538", "gdocs",
                    "hc", "par", "pander", "solarized", "stata", "tufte", "wsj")) {
-    stop("Please provide a valid theme type among those available. Type ''help(ggthemes)'' for more details.")}
+    stop("Please provide a valid theme type among those available")}
   if(is.null(scheme_set)) { scheme_set = "blue"}
   if(!scheme_set %in% c("blue", "brightblue", "gray", "darkgray", "green", "pink", "purple", "red", "teal", "yellow",
                         "viridis", "viridisA", "viridisB", "viridisC", "viridisE", "mix-x-y")) {
-    stop("Please provide a valid scheme set among those available.")}
+    stop("Please provide a valid scheme set among those available")}
   if(!type %in% c("histogram", "boxplot", "freqpoly", "dens", "dens_overlay", "ecdf_overlay", "stat", "stat_2d", "error_hist",
                   "error_scatter", "error_scatter_avg", "error_binned", "intervals", "ribbon", "scatter", "scatter_avg",
                   "pit_ecdf", "loo_pit_ecdf", "loo_pit_overlay")) {
-    stop("Please provide a plot type among those available.")}
+    stop("Please provide a plot type among those available")}
   if(!outcome %in% c("both", "effects", "costs")) {
-    stop("Please provide an outcome name among those available.")}
+    stop("Please provide an outcome name among those available")}
   exArgs <- list(...)
   if(exists("legend.position", where = exArgs)) { legend.pos = exArgs$legend.position } else { legend.pos = "top"}
   if(exists("hjust", where = exArgs)) { hjust = exArgs$hjust } else { hjust = -0.5}
@@ -65,47 +61,47 @@ ppc <- function(x, type = "histogram", outcome = "both", ndisplay = 15,
   if(exists("corr", where = exArgs)) { corr = exArgs$corr} else { corr = NULL}
   values <- NULL
   if(!is.null(corr) & outcome != "both" | !is.null(corr) & !is.function(corr)) {
-    stop("The argument 'corr' must be a function and is available only when outcome is set to 'both'.")}
+    stop("The argument 'corr' must be a function and is available only when outcome is set to 'both'")}
   if(exists("stat", where = exArgs)) { stat = exArgs$stat} else { stat = NULL}
   if(exists("bpp", where = exArgs)) { bpp = exArgs$bpp} else { bpp = FALSE}
-  if(bpp & type == "stat_2d") { stop("Bayesian p-values are not available for 'stat_2d' type.")}
+  if(bpp & type == "stat_2d") { stop("Bayesian p-values are not available for 'stat_2d' type")}
   if(type == "stat" & is.null(corr)) {
   if(is.null(stat) | length(stat) !=1 | !is.function(stat)) {
-    stop("Please use the argument 'stat' to provide a single function for computing statistics.")}
+    stop("Please use the argument 'stat' to provide a single function for computing statistics")}
   }
   if(type == "stat_2d" & is.null(stat) | type == "stat_2d" & length(stat) !=2 | type == "stat_2d" & !any(sapply(stat, is.function))) {
-    stop("Please use the argument 'stat' to provide a vector of two functions for computing statistics.")}
+    stop("Please use the argument 'stat' to provide a vector of two functions for computing statistics")}
   n_sim <- x$model_output$model$n.iter
   n_trt <- length(x$data_set$data_raw$trt_index)
   trt_lev <- names(x$data_set$data_raw$trt_index)
   if(is.numeric(trt)) {
     if(length(trt) == 1 & !any(trt %in% c(1:n_trt))) {
-      stop("Please provide a trt value among those available.")
+      stop("Please provide a trt value among those available")
     } else if(length(trt) > 1 & !any(trt %in% c(2:n_trt))){
-      stop("Please provide a trt value among those available.")}
+      stop("Please provide a trt value among those available")}
   } else if(is.character(trt)) {
     if(length(trt) == 1 & !any(trt %in% c("all", trt_lev, "none"))) {
-      stop("Please provide a trt name among those available.")
+      stop("Please provide a trt name among those available")
     } else if(length(trt) > 1 & !length(trt) %in% c(2:n_trt)){
-      stop("Please provide a trt name among those available.")}
-  } else { stop("Please provide a trt name or value among those available.")}
+      stop("Please provide a trt name among those available")}
+  } else { stop("Please provide a trt name or value among those available")}
   if(!is.numeric(ndisplay) |  ndisplay < 1 | ndisplay > n_sim) {
-    stop("Number of replications to display is not valid.")}
+    stop("Number of replications to display is not valid")}
   if(exists("time.plot", where = exArgs)) { time.plot = exArgs$time.plot } else { time.plot = 1}
   if(x$data_format == "long") {
     n_time <- max(x$data_set$data_raw$time_long, na.rm = TRUE)
   } else { n_time <- 1}
   if(is.numeric(time.plot)) {
     if(length(time.plot) == 1 & !any(time.plot %in% c(1:n_time))) {
-      stop("Please provide a time.plot value among those available.")
+      stop("Please provide a time.plot value among those available")
     } else if(length(time.plot) > 1 & !any(time.plot %in% c(2:n_time))){
-      stop("Please provide a time.plot value among those available.")}
+      stop("Please provide a time.plot value among those available")}
   } else if(is.character(time.plot)) {
     if(length(time.plot) == 1 & !any(time.plot %in% c("all", 1:n_time))) {
-      stop("Please provide a time.plot name among those available.")
+      stop("Please provide a time.plot name among those available")
     } else if(length(time.plot) > 1 & !length(time.plot) %in% c(2:n_time)){
-      stop("Please provide a time.plot name among those available.")}
-  } else { stop("Please provide a time.plot name or value among those available.")}
+      stop("Please provide a time.plot name among those available")}
+  } else { stop("Please provide a time.plot name or value among those available")}
   if(x$data_format == "wide") {
     me_type <- ifelse(x$data_set$data_raw$me == 1, "missing", "observed")
     mc_type <- ifelse(x$data_set$data_raw$mc == 1, "missing", "observed")
@@ -1195,7 +1191,7 @@ ppc <- function(x, type = "histogram", outcome = "both", ndisplay = 15,
     if(exists("adjust", where = exArgs)) { adjust = exArgs$adjust} else { adjust = 1}
     if(exists("kernel", where = exArgs)) { kernel = exArgs$kernel} else { kernel = "gaussian"}
     if(exists("n_dens", where = exArgs)) { n_dens = exArgs$n_dens} else { n_dens = 1024}
-    if(is.null(lw) & is.null(psis_object)) { stop("Please provide either a matrix of (smoothed) log weights or a 'psis_object' when computing LOO predictive checks.")}
+    if(is.null(lw) & is.null(psis_object)) { stop("Please provide either a matrix of (smoothed) log weights or a 'psis_object'")}
     if(!is.null(lw)) { lw = lw[1 : ndisplay, ]}
     if(!is.null(psis_object)) { psis_object$log_weights = psis_object$log_weights[1 : ndisplay, ]}
     if(x$data_format == "wide") {
@@ -1337,7 +1333,7 @@ ppc <- function(x, type = "histogram", outcome = "both", ndisplay = 15,
     if(exists("plot_diff", where = exArgs)) { plot_diff = exArgs$plot_diff} else { plot_diff = FALSE}
     if(exists("interpolate_adj", where = exArgs)) { interpolate_adj = exArgs$interpolate_adj} else { interpolate_adj = NULL}
     if(exists("method", where = exArgs)) { method = exArgs$method} else { method = "correlated"}
-    if(is.null(lw) & is.null(psis_object)) { stop("Please provide either a matrix of (smoothed) log weights or a 'psis_object' when computing LOO predictive checks.")}
+    if(is.null(lw) & is.null(psis_object)) { stop("Please provide either a matrix of (smoothed) log weights or a 'psis_object'")}
     if(!is.null(lw)) { lw = lw[1 : ndisplay, ]}
     if(!is.null(psis_object)) { psis_object$log_weights = psis_object$log_weights[1 : ndisplay, ]}
     if(x$data_format == "wide") {
@@ -1659,7 +1655,7 @@ ppc <- function(x, type = "histogram", outcome = "both", ndisplay = 15,
             }
           }
           if(!any(list.time_name %in% as.character(1:n_time))){
-            stop("Please provide only valid time.plot values.")
+            stop("Please provide only valid time.plot values")
           }
         }
         if(all(length(list.trt_name) > 1 & length(list.time_name) == 1)) {
@@ -1671,7 +1667,7 @@ ppc <- function(x, type = "histogram", outcome = "both", ndisplay = 15,
               df_stat0_gplot$time_trt <- factor(df_stat0_gplot$time_trt, levels = c(sapply(as.character(list.time_name), paste, as.character(list.trt_name), sep = ".")))
             }
             if(!any(as.character(list.trt_name) %in% trt_lev)){
-              stop("Please provide only valid treatment names or values.")
+              stop("Please provide only valid treatment names or values")
             }
           }
         }
@@ -1684,11 +1680,11 @@ ppc <- function(x, type = "histogram", outcome = "both", ndisplay = 15,
               df_stat0_gplot$time_trt <- factor(df_stat0_gplot$time_trt, levels = c(sapply(as.character(list.time_name), paste, as.character(list.trt_name), sep = ".")))
             }
             if(!any(list.trt_name %in% trt_lev)){
-              stop("Please provide only valid treatment names or values.")
+              stop("Please provide only valid treatment names or values")
             }
           }
           if(!any(list.time_name %in% as.character(1:n_time))){
-            stop("Please provide only valid time.plot values.")
+            stop("Please provide only valid time.plot values")
           }
         }
       }
@@ -1717,7 +1713,7 @@ ppc <- function(x, type = "histogram", outcome = "both", ndisplay = 15,
           gplot_ppc <- gplot_ppc + ggplot2::facet_wrap(outcome ~ trt, scales = "free")
         }
         if(!any(df.trt_name %in% trt_lev)){
-          stop("Please provide only valid treatment names or values.")}
+          stop("Please provide only valid treatment names or values")}
       }
       }
       if(x$data_format == "long") {
@@ -2057,7 +2053,7 @@ ppc <- function(x, type = "histogram", outcome = "both", ndisplay = 15,
         }
       }
       if(!any(list.trt_name %in% trt_lev)){
-        stop("Please provide only valid treatment names or values.")
+        stop("Please provide only valid treatment names or values")
       }
     }
   }

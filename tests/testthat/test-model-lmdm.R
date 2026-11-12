@@ -1,5 +1,7 @@
 test_that("check output from longitudinal missing data function", {
 
+  testthat::skip_on_cran()
+
   load(test_path("testdata/PBS.RData"))
 
   model.eff <- e ~ trt

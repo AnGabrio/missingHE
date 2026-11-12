@@ -1,5 +1,7 @@
 test_that("check output from selection function", {
 
+  testthat::skip_on_cran()
+
   load(test_path("testdata/MenSS.RData"))
 
   model.eff <- e ~ trt

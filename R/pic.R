@@ -61,15 +61,13 @@
 #' #
 
 pic <- function(x, criterion = "dic", cases = "cc", ...) {
-  if(!isTRUE(requireNamespace("loo", quietly = TRUE))) {
-    stop("You need to install the R package 'loo'. Please run in your R terminal:\n install.packages('loo')")}
   if(!is.character(criterion)) {
     stop("Criterion must be a character name")}
   criterion <- tolower(criterion)
   if(!criterion %in% c("dic", "waic", "looic")) {
-    stop("Please, select a character name for 'criterion' among those available. For details type 'help(pic)'")}
+    stop("Please, select a character name for 'criterion' among those available")}
   if(!cases %in% c("all", "cc", "ac_e", "ac_c")) {
-    stop("Please, select a character name for 'cases' among those available. For details type 'help(pic)'")}
+    stop("Please, select a character name for 'cases' among those available")}
   if(!is.list(x)) { stop("Only an object or list of objects of class 'missingHE' can be used")}
   if(!inherits(x, "missingHE")) {
     if(!all(unlist(lapply(x, function(m) { inherits(m, "missingHE")})))) {
