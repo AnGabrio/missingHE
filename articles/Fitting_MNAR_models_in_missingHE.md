@@ -20,7 +20,7 @@ from MAR in terms of mean effectiveness and cost parameters. This
 tutorial illustrates how to specify a MNAR model in `missingHE` using
 the built-in data set `MenSS`, which is directly available when loading
 `missingHE` in the user’s `R` workspace. See [Introduction to
-missingHE](https://angabrio.github.io/missingHE/articles/Introduction_to_missingHE.Rmd)
+missingHE](https://angabrio.github.io/missingHE/articles/Introduction_to_missingHE.md)
 for an introductory tutorial on each type of missingness approach in
 `missingHE` and for a general presentation of the `MenSS` dataset.
 

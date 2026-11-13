@@ -2,9 +2,6 @@
 
 ### Tutorials
 
-- [Missing Cost Effectiveness
-  Models](https://angabrio.github.io/missingHE/articles/missingHE-package.md):
-
 - [Introduction to
   missingHE](https://angabrio.github.io/missingHE/articles/Introduction_to_missingHE.md):
 

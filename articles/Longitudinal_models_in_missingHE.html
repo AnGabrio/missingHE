@@ -42,8 +42,7 @@
 <li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="../articles/missingHE-package.html">Missing Cost Effectiveness Models</a></li>
-    <li><a class="dropdown-item" href="../articles/Introduction_to_missingHE.html">Introduction to missingHE</a></li>
+<li><a class="dropdown-item" href="../articles/Introduction_to_missingHE.html">Introduction to missingHE</a></li>
     <li><a class="dropdown-item" href="../articles/Fitting_MNAR_models_in_missingHE.html">Fitting MNAR models in missingHE</a></li>
     <li><a class="dropdown-item" href="../articles/Model_customisation_in_missingHE.html">Model and output customisation in missingHE</a></li>
     <li><a class="dropdown-item" href="../articles/Longitudinal_models_in_missingHE.html">Longitudinal models in missingHE</a></li>
@@ -132,7 +131,7 @@ function <code>lmdm</code> alongside the available customisation options
 in the package. Throughout, we will use the built-in dataset
 <code>PBS</code> as a toy example, which is directly available when
 loading <code>missingHE</code> in the user’s <code>R</code> workspace.
-See <a href="Introduction_to_missingHE.Rmd">Introduction to
+See <a href="Introduction_to_missingHE.html">Introduction to
 missingHE</a> for an introductory tutorial of each type of missingness
 approach in <code>missingHE</code>.</p>
 <p>If you would like to have more information on the package, or would
@@ -500,7 +499,7 @@ and <code>c</code> are both normally distributed with no covariates
 included in their models; a MAR mechanism is assumed for both outcomes,
 and a bivariate structure is assumed for the time dependence. For
 demonstrative purposes and to ease presentation of results, in this
-tutorial we only consider models fitted under MAR. See <a href="Fitting_MNAR_models_in_missingHE.Rmd">Fitting MNAR models in
+tutorial we only consider models fitted under MAR. See <a href="Fitting_MNAR_models_in_missingHE.html">Fitting MNAR models in
 missingHE</a> for an overview about how informative missingness models
 can be fitted in <code>missingHE</code>.</p>
 <p>The model is implemented using the function <code>lmdm</code>.</p>
@@ -607,7 +606,7 @@ leave-one-out information criterion (LOOIC) was selected as specified in
 dataset (<code>cases = "cc"</code>). Its value may be inspected by
 typing:</p>
 <pre class="text"><code>&gt; pic_lmdm1_mar$looic
-#&gt; [1] 14260.39</code></pre>
+#&gt; [1] 14257</code></pre>
 <p>Note that all information criteria in <code>missingHE</code> can only
 be used as relative measures of fit to compare models, with lower values
 typically indicating better fit. In addition, predictive information
@@ -653,19 +652,19 @@ using the <code>postsum</code> function by typing</p>
 <span><span class="co">#&gt; Coefficients:</span></span>
 <span><span class="co">#&gt; $model.eff</span></span>
 <span><span class="co">#&gt; (Intercept).1        trt2.1 (Intercept).2        trt2.2 (Intercept).3        trt2.3 </span></span>
-<span><span class="co">#&gt;         0.477         0.082         0.497         0.141         0.482         0.134 </span></span>
+<span><span class="co">#&gt;         0.476         0.083         0.499         0.140         0.483         0.134 </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $model.cost</span></span>
 <span><span class="co">#&gt; (Intercept).1        trt2.1 (Intercept).2        trt2.2 (Intercept).3        trt2.3           e.1           e.2           e.3 </span></span>
-<span><span class="co">#&gt;        55.880        31.853        54.103        32.457        33.520        20.906        -5.789        -4.822        -1.703 </span></span>
+<span><span class="co">#&gt;        58.100        36.954        56.465        34.686        35.502        21.163        -4.721        -7.333        -2.028 </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $model.me</span></span>
 <span><span class="co">#&gt; (Intercept).1.r.1 (Intercept).2.r.1 (Intercept).3.r.1 (Intercept).1.r.2 (Intercept).2.r.2 (Intercept).3.r.2 (Intercept).1.r.3 (Intercept).2.r.3 (Intercept).3.r.3 </span></span>
-<span><span class="co">#&gt;             0.815             2.423             0.630            -1.346             0.259            -1.535            -1.752            -0.134            -1.926 </span></span>
+<span><span class="co">#&gt;            -5.829             2.245            -2.619            -7.998             0.095            -4.777            -8.409            -0.348            -5.194 </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $model.mc</span></span>
 <span><span class="co">#&gt; (Intercept).1.r.1 (Intercept).2.r.1 (Intercept).3.r.1 (Intercept).1.r.2 (Intercept).2.r.2 (Intercept).3.r.2 (Intercept).1.r.3 (Intercept).2.r.3 (Intercept).3.r.3 </span></span>
-<span><span class="co">#&gt;             0.389             1.736             6.784            -3.528            -2.198             2.852            -2.802            -1.423             3.605</span></span></code></pre>
+<span><span class="co">#&gt;            -4.219             1.781            -2.352            -8.133            -2.139            -6.266            -7.396            -1.401            -5.530</span></span></code></pre>
 <p><code>missingHE</code> standardises the format of the output to
 report summary quantities related to key model parameters, including the
 mean effectiveness and costs at each time point across treatment arms on
@@ -686,24 +685,24 @@ displayed using the <code>coef</code> function by typing</p>
 <p>which returns</p>
 <pre><code><span><span class="co">#&gt; $Effects</span></span>
 <span><span class="co">#&gt;                Mean    SD     QL    QU</span></span>
-<span><span class="co">#&gt; (Intercept).1 0.477 0.034  0.411 0.547</span></span>
-<span><span class="co">#&gt; trt2.1        0.082 0.048 -0.003 0.177</span></span>
-<span><span class="co">#&gt; (Intercept).2 0.497 0.032  0.437 0.558</span></span>
-<span><span class="co">#&gt; trt2.2        0.141 0.047  0.051 0.234</span></span>
-<span><span class="co">#&gt; (Intercept).3 0.482 0.028  0.428 0.540</span></span>
-<span><span class="co">#&gt; trt2.3        0.134 0.043  0.050 0.215</span></span>
+<span><span class="co">#&gt; (Intercept).1 0.476 0.033  0.408 0.539</span></span>
+<span><span class="co">#&gt; trt2.1        0.083 0.050 -0.015 0.186</span></span>
+<span><span class="co">#&gt; (Intercept).2 0.499 0.031  0.442 0.562</span></span>
+<span><span class="co">#&gt; trt2.2        0.140 0.047  0.048 0.230</span></span>
+<span><span class="co">#&gt; (Intercept).3 0.483 0.029  0.426 0.539</span></span>
+<span><span class="co">#&gt; trt2.3        0.134 0.046  0.045 0.223</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $Costs</span></span>
 <span><span class="co">#&gt;                 Mean     SD      QL      QU</span></span>
-<span><span class="co">#&gt; (Intercept).1 55.880 30.938  -3.508 118.929</span></span>
-<span><span class="co">#&gt; trt2.1        31.853 32.792 -34.664  94.788</span></span>
-<span><span class="co">#&gt; (Intercept).2 54.103 30.827  -3.999 116.096</span></span>
-<span><span class="co">#&gt; trt2.2        32.457 32.434 -31.262  95.926</span></span>
-<span><span class="co">#&gt; (Intercept).3 33.520 32.970 -28.906  98.342</span></span>
-<span><span class="co">#&gt; trt2.3        20.906 31.369 -42.101  82.585</span></span>
-<span><span class="co">#&gt; e.1           -5.789 31.497 -65.421  57.390</span></span>
-<span><span class="co">#&gt; e.2           -4.822 31.768 -66.864  58.480</span></span>
-<span><span class="co">#&gt; e.3           -1.703 32.187 -64.000  62.265</span></span></code></pre>
+<span><span class="co">#&gt; (Intercept).1 58.100 32.104  -5.917 119.795</span></span>
+<span><span class="co">#&gt; trt2.1        36.954 31.883 -21.309 100.637</span></span>
+<span><span class="co">#&gt; (Intercept).2 56.465 32.546  -6.156 123.680</span></span>
+<span><span class="co">#&gt; trt2.2        34.686 31.218 -24.457  93.296</span></span>
+<span><span class="co">#&gt; (Intercept).3 35.502 31.440 -27.575  95.872</span></span>
+<span><span class="co">#&gt; trt2.3        21.163 32.633 -40.003  85.796</span></span>
+<span><span class="co">#&gt; e.1           -4.721 31.227 -64.264  51.771</span></span>
+<span><span class="co">#&gt; e.2           -7.333 31.074 -70.296  53.639</span></span>
+<span><span class="co">#&gt; e.3           -2.028 33.081 -66.156  61.588</span></span></code></pre>
 <p>The regression output is separately reported by outcome. The
 following parameter estimates are reported at each time point in the
 model: the intercepts <span class="math inline">\(\alpha_{j0}=\)</span>
@@ -724,7 +723,7 @@ outcome data have been imputed from the model, using
 <code>ggplot2</code> as the graphical engine. For example, the
 command</p>
 <pre class="text"><code>&gt; plot(lmdm1_mar, class = "boxplot", outcome = "costs", 
-&gt;      trt = "1", time.plot = 2)</code></pre>
++      trt = "1", time.plot = 2)</code></pre>
 <p>displays boxplots of the observed (black dots and boxes) and imputed
 (red dots and boxes) effectiveness variables in the <code>"TAU"</code>
 (<code>trt = 1</code>) arm at time <span class="math inline">\(2\)</span> based on the model results stored in

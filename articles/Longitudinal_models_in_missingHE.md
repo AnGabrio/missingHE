@@ -57,7 +57,7 @@ function `lmdm` alongside the available customisation options in the
 package. Throughout, we will use the built-in dataset `PBS` as a toy
 example, which is directly available when loading `missingHE` in the
 user’s `R` workspace. See [Introduction to
-missingHE](https://angabrio.github.io/missingHE/articles/Introduction_to_missingHE.Rmd)
+missingHE](https://angabrio.github.io/missingHE/articles/Introduction_to_missingHE.md)
 for an introductory tutorial of each type of missingness approach in
 `missingHE`.
 
@@ -436,7 +436,7 @@ MAR mechanism is assumed for both outcomes, and a bivariate structure is
 assumed for the time dependence. For demonstrative purposes and to ease
 presentation of results, in this tutorial we only consider models fitted
 under MAR. See [Fitting MNAR models in
-missingHE](https://angabrio.github.io/missingHE/articles/Fitting_MNAR_models_in_missingHE.Rmd)
+missingHE](https://angabrio.github.io/missingHE/articles/Fitting_MNAR_models_in_missingHE.md)
 for an overview about how informative missingness models can be fitted
 in `missingHE`.
 
@@ -553,7 +553,7 @@ leave-one-out information criterion (LOOIC) was selected as specified in
 
 ``` text
 > pic_lmdm1_mar$looic
-#> [1] 14260.39
+#> [1] 14257
 ```
 
 Note that all information criteria in `missingHE` can only be used as
@@ -606,19 +606,19 @@ which returns
     #> Coefficients:
     #> $model.eff
     #> (Intercept).1        trt2.1 (Intercept).2        trt2.2 (Intercept).3        trt2.3 
-    #>         0.477         0.082         0.497         0.141         0.482         0.134 
+    #>         0.476         0.083         0.499         0.140         0.483         0.134 
     #> 
     #> $model.cost
     #> (Intercept).1        trt2.1 (Intercept).2        trt2.2 (Intercept).3        trt2.3           e.1           e.2           e.3 
-    #>        55.880        31.853        54.103        32.457        33.520        20.906        -5.789        -4.822        -1.703 
+    #>        58.100        36.954        56.465        34.686        35.502        21.163        -4.721        -7.333        -2.028 
     #> 
     #> $model.me
     #> (Intercept).1.r.1 (Intercept).2.r.1 (Intercept).3.r.1 (Intercept).1.r.2 (Intercept).2.r.2 (Intercept).3.r.2 (Intercept).1.r.3 (Intercept).2.r.3 (Intercept).3.r.3 
-    #>             0.815             2.423             0.630            -1.346             0.259            -1.535            -1.752            -0.134            -1.926 
+    #>            -5.829             2.245            -2.619            -7.998             0.095            -4.777            -8.409            -0.348            -5.194 
     #> 
     #> $model.mc
     #> (Intercept).1.r.1 (Intercept).2.r.1 (Intercept).3.r.1 (Intercept).1.r.2 (Intercept).2.r.2 (Intercept).3.r.2 (Intercept).1.r.3 (Intercept).2.r.3 (Intercept).3.r.3 
-    #>             0.389             1.736             6.784            -3.528            -2.198             2.852            -2.802            -1.423             3.605
+    #>            -4.219             1.781            -2.352            -8.133            -2.139            -6.266            -7.396            -1.401            -5.530
 
 `missingHE` standardises the format of the output to report summary
 quantities related to key model parameters, including the mean
@@ -645,24 +645,24 @@ which returns
 
     #> $Effects
     #>                Mean    SD     QL    QU
-    #> (Intercept).1 0.477 0.034  0.411 0.547
-    #> trt2.1        0.082 0.048 -0.003 0.177
-    #> (Intercept).2 0.497 0.032  0.437 0.558
-    #> trt2.2        0.141 0.047  0.051 0.234
-    #> (Intercept).3 0.482 0.028  0.428 0.540
-    #> trt2.3        0.134 0.043  0.050 0.215
+    #> (Intercept).1 0.476 0.033  0.408 0.539
+    #> trt2.1        0.083 0.050 -0.015 0.186
+    #> (Intercept).2 0.499 0.031  0.442 0.562
+    #> trt2.2        0.140 0.047  0.048 0.230
+    #> (Intercept).3 0.483 0.029  0.426 0.539
+    #> trt2.3        0.134 0.046  0.045 0.223
     #> 
     #> $Costs
     #>                 Mean     SD      QL      QU
-    #> (Intercept).1 55.880 30.938  -3.508 118.929
-    #> trt2.1        31.853 32.792 -34.664  94.788
-    #> (Intercept).2 54.103 30.827  -3.999 116.096
-    #> trt2.2        32.457 32.434 -31.262  95.926
-    #> (Intercept).3 33.520 32.970 -28.906  98.342
-    #> trt2.3        20.906 31.369 -42.101  82.585
-    #> e.1           -5.789 31.497 -65.421  57.390
-    #> e.2           -4.822 31.768 -66.864  58.480
-    #> e.3           -1.703 32.187 -64.000  62.265
+    #> (Intercept).1 58.100 32.104  -5.917 119.795
+    #> trt2.1        36.954 31.883 -21.309 100.637
+    #> (Intercept).2 56.465 32.546  -6.156 123.680
+    #> trt2.2        34.686 31.218 -24.457  93.296
+    #> (Intercept).3 35.502 31.440 -27.575  95.872
+    #> trt2.3        21.163 32.633 -40.003  85.796
+    #> e.1           -4.721 31.227 -64.264  51.771
+    #> e.2           -7.333 31.074 -70.296  53.639
+    #> e.3           -2.028 33.081 -66.156  61.588
 
 The regression output is separately reported by outcome. The following
 parameter estimates are reported at each time point in the model: the
@@ -682,7 +682,7 @@ engine. For example, the command
 
 ``` text
 > plot(lmdm1_mar, class = "boxplot", outcome = "costs", 
->      trt = "1", time.plot = 2)
++      trt = "1", time.plot = 2)
 ```
 
 displays boxplots of the observed (black dots and boxes) and imputed

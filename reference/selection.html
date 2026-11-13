@@ -30,8 +30,7 @@ which is implemented in the software JAGS using the function R2jags::jags() The 
       <ul class="navbar-nav me-auto"><li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/missingHE-package.html">Missing Cost Effectiveness Models</a></li>
-    <li><a class="dropdown-item" href="../articles/Introduction_to_missingHE.html">Introduction to missingHE</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/Introduction_to_missingHE.html">Introduction to missingHE</a></li>
     <li><a class="dropdown-item" href="../articles/Fitting_MNAR_models_in_missingHE.html">Fitting MNAR models in missingHE</a></li>
     <li><a class="dropdown-item" href="../articles/Model_customisation_in_missingHE.html">Model and output customisation in missingHE</a></li>
     <li><a class="dropdown-item" href="../articles/Longitudinal_models_in_missingHE.html">Longitudinal models in missingHE</a></li>
@@ -242,7 +241,8 @@ the random effects are specified (must be the name of a factor variable in the d
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Quick example to run using subset of MenSS dataset</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Logic.html" class="external-link">isTRUE</a></span><span class="op">(</span><span class="kw"><a href="https://rdrr.io/r/base/conditions.html" class="external-link">tryCatch</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"rjags"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, error <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">e</span><span class="op">)</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="co"># Quick example to run using subset of MenSS dataset</span></span></span>
 <span class="r-in"><span><span class="va">MenSS.subset</span> <span class="op">&lt;-</span> <span class="va">MenSS</span><span class="op">[</span><span class="fl">50</span><span class="op">:</span><span class="fl">100</span>, <span class="op">]</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Run the model using the selection function assuming a SCAR mechanism</span></span></span>
@@ -250,6 +250,63 @@ the random effects are specified (must be the name of a factor variable in the d
 <span class="r-in"><span><span class="va">model.selection</span> <span class="op">&lt;-</span> <span class="fu">selection</span><span class="op">(</span>data <span class="op">=</span> <span class="va">MenSS.subset</span>, model.eff <span class="op">=</span> <span class="va">e</span> <span class="op">~</span> <span class="va">trt</span>, model.cost <span class="op">=</span> <span class="va">c</span> <span class="op">~</span> <span class="va">trt</span>,</span></span>
 <span class="r-in"><span>   model.me <span class="op">=</span> <span class="va">me</span> <span class="op">~</span> <span class="fl">1</span>, model.mc <span class="op">=</span> <span class="va">mc</span> <span class="op">~</span> <span class="fl">1</span>, dist_e <span class="op">=</span> <span class="st">"norm"</span>, dist_c <span class="op">=</span> <span class="st">"norm"</span>,</span></span>
 <span class="r-in"><span>   type <span class="op">=</span> <span class="st">"MAR"</span>, n.chains <span class="op">=</span> <span class="fl">2</span>, n.iter <span class="op">=</span> <span class="fl">100</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Print the results of the JAGS model</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">model.selection</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co">#</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Use dic information criterion to assess model fit</span></span></span>
+<span class="r-in"><span><span class="va">pic.dic</span> <span class="op">&lt;-</span> <span class="fu"><a href="pic.html">pic</a></span><span class="op">(</span><span class="va">model.selection</span>, criterion <span class="op">=</span> <span class="st">"dic"</span>, cases <span class="op">=</span> <span class="st">"cc"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">pic.dic</span></span></span>
+<span class="r-in"><span><span class="co">#</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Extract regression coefficient estimates</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">model.selection</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co">#</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu">DONTSHOW</span><span class="op">(</span><span class="op">{</span></span></span>
+<span class="r-in"><span><span class="co"># Use waic to assess model fit</span></span></span>
+<span class="r-in"><span><span class="va">pic.waic</span> <span class="op">&lt;-</span> <span class="fu"><a href="pic.html">pic</a></span><span class="op">(</span><span class="va">model.selection</span>, criterion <span class="op">=</span> <span class="st">"waic"</span>, cases <span class="op">=</span> <span class="st">"cc"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">pic.waic</span></span></span>
+<span class="r-in"><span><span class="op">}</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Assess model convergence using graphical tools</span></span></span>
+<span class="r-in"><span><span class="co"># Produce histograms of the posterior samples for the mean effects</span></span></span>
+<span class="r-in"><span><span class="va">diag.hist</span> <span class="op">&lt;-</span> <span class="fu"><a href="diagnostic.html">diagnostic</a></span><span class="op">(</span><span class="va">model.selection</span>, type <span class="op">=</span> <span class="st">"histogram"</span>, param <span class="op">=</span> <span class="st">"mu.e"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co">#</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Compare observed effect data with imputations from the model</span></span></span>
+<span class="r-in"><span><span class="co"># using plots (posterior means and credible intervals)</span></span></span>
+<span class="r-in"><span><span class="va">p1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">model.selection</span>, class <span class="op">=</span> <span class="st">"scatter"</span>, outcome <span class="op">=</span> <span class="st">"effects"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co">#</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Summarise the CEA information from the model</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">model.selection</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># \donttest{</span></span></span>
+<span class="r-in"><span><span class="co"># Further examples which take longer to run</span></span></span>
+<span class="r-in"><span><span class="va">model.selection</span> <span class="op">&lt;-</span> <span class="fu">selection</span><span class="op">(</span>data <span class="op">=</span> <span class="va">MenSS</span>, model.eff <span class="op">=</span> <span class="va">e</span> <span class="op">~</span> <span class="va">trt</span>, model.cost <span class="op">=</span> <span class="va">c</span> <span class="op">~</span> <span class="va">trt</span> <span class="op">+</span> <span class="va">e</span>,</span></span>
+<span class="r-in"><span>   model.se <span class="op">=</span> <span class="va">me</span> <span class="op">~</span> <span class="va">age</span>, model.mc <span class="op">=</span> <span class="va">mc</span> <span class="op">~</span> <span class="va">age</span>, dist_e <span class="op">=</span> <span class="st">"norm"</span>, dist_c <span class="op">=</span> <span class="st">"norm"</span>,</span></span>
+<span class="r-in"><span>   type <span class="op">=</span> <span class="st">"MAR"</span>, n.chains <span class="op">=</span> <span class="fl">2</span>, n.iter <span class="op">=</span> <span class="fl">500</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co">#</span></span></span>
+<span class="r-in"><span><span class="co"># Print results for all imputed values</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">model.selection</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Use looic to assess model fit</span></span></span>
+<span class="r-in"><span><span class="va">pic.looic</span> <span class="op">&lt;-</span> <span class="fu"><a href="pic.html">pic</a></span><span class="op">(</span><span class="va">model.selection</span>, criterion <span class="op">=</span> <span class="st">"looic"</span>, cases <span class="op">=</span> <span class="st">"cc"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">pic.looic</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Show density plots for mean costs parameters</span></span></span>
+<span class="r-in"><span><span class="va">diag.den</span> <span class="op">&lt;-</span> <span class="fu"><a href="diagnostic.html">diagnostic</a></span><span class="op">(</span><span class="va">model.selection</span>, type <span class="op">=</span> <span class="st">"denplot"</span>, param <span class="op">=</span> <span class="st">"mu.c"</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Plots of imputations for all data</span></span></span>
+<span class="r-in"><span><span class="va">p1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">model.selection</span>, class <span class="op">=</span> <span class="st">"scatter"</span>, outcome <span class="op">=</span> <span class="st">"both"</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Summarise the CEA results</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">model.selection</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># }</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Compiling model graph</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    Resolving undeclared variables</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    Allocating nodes</span>
@@ -260,9 +317,6 @@ the random effects are specified (must be the name of a factor variable in the d
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Initializing model</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Print the results of the JAGS model</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">model.selection</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Call:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> selection(model.eff = e ~ trt, model.cost = c ~ trt, model.me = me ~ </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     1, model.mc = mc ~ 1, data = MenSS.subset, dist_e = "norm", </span>
@@ -285,27 +339,6 @@ the random effects are specified (must be the name of a factor variable in the d
 <span class="r-out co"><span class="r-pr">#&gt;</span> (Intercept) </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       0.889 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-in"><span><span class="co">#</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Use dic information criterion to assess model fit</span></span></span>
-<span class="r-in"><span><span class="va">pic.dic</span> <span class="op">&lt;-</span> <span class="fu"><a href="pic.html">pic</a></span><span class="op">(</span><span class="va">model.selection</span>, criterion <span class="op">=</span> <span class="st">"dic"</span>, cases <span class="op">=</span> <span class="st">"cc"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">pic.dic</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $d_bar</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 249.4578</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $pD</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 2.475565</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $dic</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 251.9334</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $d_hat</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 246.9823</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-in"><span><span class="co">#</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Extract regression coefficient estimates</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">model.selection</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $Effects</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>              Mean    SD     QL    QU</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> (Intercept) 0.904 0.038  0.827 0.980</span>
@@ -316,21 +349,6 @@ the random effects are specified (must be the name of a factor variable in the d
 <span class="r-out co"><span class="r-pr">#&gt;</span> (Intercept) 48.878 31.705 -11.684 110.215</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> trt2        14.709 29.964 -37.039  64.457</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-in"><span><span class="co">#</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Assess model convergence using graphical tools</span></span></span>
-<span class="r-in"><span><span class="co"># Produce histograms of the posterior samples for the mean effects</span></span></span>
-<span class="r-in"><span><span class="va">diag.hist</span> <span class="op">&lt;-</span> <span class="fu"><a href="diagnostic.html">diagnostic</a></span><span class="op">(</span><span class="va">model.selection</span>, type <span class="op">=</span> <span class="st">"histogram"</span>, param <span class="op">=</span> <span class="st">"mu.e"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="co">#</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Compare observed effect data with imputations from the model</span></span></span>
-<span class="r-in"><span><span class="co"># using plots (posterior means and credible intervals)</span></span></span>
-<span class="r-in"><span><span class="va">p1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">model.selection</span>, class <span class="op">=</span> <span class="st">"scatter"</span>, outcome <span class="op">=</span> <span class="st">"effects"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="co">#</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Summarise the CEA information from the model</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">model.selection</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  Cost-effectiveness analysis summary </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
@@ -352,12 +370,6 @@ the random effects are specified (must be the name of a factor variable in the d
 <span class="r-out co"><span class="r-pr">#&gt;</span>    Mean   SD    QL    QU</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1 45161 2071 41149 49211</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2 49295 2947 43593 55130</span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># \donttest{</span></span></span>
-<span class="r-in"><span><span class="co"># Further examples which take longer to run</span></span></span>
-<span class="r-in"><span><span class="va">model.selection</span> <span class="op">&lt;-</span> <span class="fu">selection</span><span class="op">(</span>data <span class="op">=</span> <span class="va">MenSS</span>, model.eff <span class="op">=</span> <span class="va">e</span> <span class="op">~</span> <span class="va">trt</span>, model.cost <span class="op">=</span> <span class="va">c</span> <span class="op">~</span> <span class="va">trt</span> <span class="op">+</span> <span class="va">e</span>,</span></span>
-<span class="r-in"><span>   model.se <span class="op">=</span> <span class="va">me</span> <span class="op">~</span> <span class="va">age</span>, model.mc <span class="op">=</span> <span class="va">mc</span> <span class="op">~</span> <span class="va">age</span>, dist_e <span class="op">=</span> <span class="st">"norm"</span>, dist_c <span class="op">=</span> <span class="st">"norm"</span>,</span></span>
-<span class="r-in"><span>   type <span class="op">=</span> <span class="st">"MAR"</span>, n.chains <span class="op">=</span> <span class="fl">2</span>, n.iter <span class="op">=</span> <span class="fl">500</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Compiling model graph</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    Resolving undeclared variables</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    Allocating nodes</span>
@@ -368,9 +380,6 @@ the random effects are specified (must be the name of a factor variable in the d
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Initializing model</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-in"><span><span class="co">#</span></span></span>
-<span class="r-in"><span><span class="co"># Print results for all imputed values</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">model.selection</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Call:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> selection(model.eff = e ~ trt, model.cost = c ~ trt + e, model.mc = mc ~ </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     age, data = MenSS, dist_e = "norm", dist_c = "norm", type = "MAR", </span>
@@ -393,116 +402,6 @@ the random effects are specified (must be the name of a factor variable in the d
 <span class="r-out co"><span class="r-pr">#&gt;</span> (Intercept)         age </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       1.163      -0.009 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Use looic to assess model fit</span></span></span>
-<span class="r-in"><span><span class="va">pic.looic</span> <span class="op">&lt;-</span> <span class="fu"><a href="pic.html">pic</a></span><span class="op">(</span><span class="va">model.selection</span>, criterion <span class="op">=</span> <span class="st">"looic"</span>, cases <span class="op">=</span> <span class="st">"cc"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">pic.looic</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $elpd</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] -403.6339</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $elpd_se</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] -403.6339</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $p</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 8.956858</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $p_se</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 8.956858</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $looic</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 807.2679</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $looic_se</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 807.2679</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $pointwise</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         elpd_loo mcse_elpd_loo      p_loo    looic influence_pareto_k</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1,]  -7.825187    0.01084903 0.05605215 15.65037        0.086099763</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [2,]  -7.858576    0.01077115 0.05490270 15.71715        0.110453554</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [3,] -12.493000    0.04912260 0.57195573 24.98600        0.316528483</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [4,]  -8.788244    0.01332154 0.07742027 17.57649        0.141788319</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [5,]  -7.725899    0.01183095 0.06284891 15.45180        0.172268281</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [6,]  -7.834046    0.01331965 0.07601311 15.66809        0.191233680</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [7,] -12.398947    0.05526224 0.66473251 24.79789        0.321208512</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [8,] -12.379724    0.06630884 0.71888272 24.75945        0.588482370</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [9,]  -8.163500    0.01286260 0.07551407 16.32700        0.020272569</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [10,]  -7.838328    0.01125006 0.06059511 15.67666        0.062940439</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11,]  -8.169266    0.01197165 0.06618442 16.33853        0.055122534</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [12,]  -8.188012    0.01293412 0.07546762 16.37602       -0.006994716</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [13,]  -7.744277    0.01124773 0.05782128 15.48855        0.149155230</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [14,]  -8.143820    0.01264923 0.07323945 16.28764        0.032584511</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [15,] -17.735473    0.21601046 2.73470239 35.47095        0.996619249</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [16,]  -8.193593    0.01217213 0.06831791 16.38719        0.109353539</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [17,]  -8.069692    0.01889814 0.13142893 16.13938        0.164236568</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [18,]  -7.945904    0.01140006 0.06014884 15.89181        0.043717578</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [19,]  -7.781479    0.01172601 0.06473184 15.56296        0.079289231</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [20,]  -8.941887    0.01497480 0.09158008 17.88377        0.122967140</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [21,]  -8.908918    0.02069401 0.16492814 17.81784        0.177014504</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [22,]  -7.844166    0.01094485 0.05710022 15.68833        0.096293516</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [23,]  -9.342772    0.01824613 0.14627524 18.68554        0.232388442</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [24,]  -8.197209    0.01170397 0.06289414 16.39442        0.184629074</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [25,]  -8.162817    0.01197596 0.06619461 16.32563        0.078915925</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [26,]  -8.115835    0.01260951 0.07248086 16.23167       -0.030231155</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [27,]  -8.005677    0.01566634 0.10300759 16.01135        0.130348810</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [28,]  -7.915311    0.01279257 0.07293672 15.83062        0.325508159</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [29,]  -8.209591    0.01366196 0.08342116 16.41918        0.145373751</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [30,]  -8.131228    0.01426611 0.08871708 16.26246        0.125425976</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [31,]  -9.223388    0.01824655 0.13220601 18.44678        0.262940342</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [32,]  -8.158981    0.01517186 0.09843337 16.31796        0.129923124</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [33,]  -9.607338    0.02975666 0.30526974 19.21468        0.100179661</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [34,]  -7.827069    0.01183252 0.06368886 15.65414        0.072849432</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [35,]  -8.196958    0.02782186 0.22327056 16.39392        0.224674986</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [36,]  -7.968912    0.01226385 0.06831006 15.93782        0.052673669</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [37,]  -9.858171    0.03335463 0.37111768 19.71634        0.174013817</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [38,]  -8.186854    0.01396085 0.08647280 16.37371        0.152042710</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [39,]  -8.159541    0.01449480 0.09105226 16.31908        0.183271473</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [40,]  -8.285482    0.01382556 0.08107018 16.57096        0.209816564</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [41,]  -8.249914    0.01398655 0.08655397 16.49983        0.132899162</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [42,]  -8.283421    0.01788697 0.11566132 16.56684        0.264833315</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [43,]  -8.793350    0.01582738 0.10791532 17.58670        0.239223387</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [44,]  -8.262877    0.01638371 0.10895738 16.52575        0.402241894</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [45,]  -8.031047    0.01332111 0.07688793 16.06209        0.220000965</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [46,]  -9.488250    0.02140834 0.17949463 18.97650        0.151977252</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $diagnostics</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $diagnostics$pareto_k</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1]  0.086099763  0.110453554  0.316528483  0.141788319  0.172268281</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [6]  0.191233680  0.321208512  0.588482370  0.020272569  0.062940439</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11]  0.055122534 -0.006994716  0.149155230  0.032584511  0.996619249</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [16]  0.109353539  0.164236568  0.043717578  0.079289231  0.122967140</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [21]  0.177014504  0.096293516  0.232388442  0.184629074  0.078915925</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [26] -0.030231155  0.130348810  0.325508159  0.145373751  0.125425976</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [31]  0.262940342  0.129923124  0.100179661  0.072849432  0.224674986</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [36]  0.052673669  0.174013817  0.152042710  0.183271473  0.209816564</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [41]  0.132899162  0.264833315  0.239223387  0.402241894  0.220000965</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [46]  0.151977252</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $diagnostics$n_eff</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] 471.67347 472.02329 226.00082 458.31695 466.62248 458.62870 197.57093</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [8] 155.78956 461.32518 469.86457 466.11839 460.69744 469.58971 462.45032</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [15]  20.18279 465.32518 422.98997 468.85731 467.38013 448.08461 410.53153</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [22] 471.29278 428.85384 467.77501 466.11219 462.46079 444.73115 462.50807</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [29] 456.88386 452.82471 428.26385 447.60327 345.14350 466.49948 358.87847</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [36] 464.33380 319.95940 455.10392 451.64699 456.18543 454.50240 429.82377</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [43] 443.47072 440.78445 459.00952 406.19272</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $diagnostics$r_eff</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [39] 1 1 1 1 1 1 1 1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $psis_object</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Show density plots for mean costs parameters</span></span></span>
-<span class="r-in"><span><span class="va">diag.den</span> <span class="op">&lt;-</span> <span class="fu"><a href="diagnostic.html">diagnostic</a></span><span class="op">(</span><span class="va">model.selection</span>, type <span class="op">=</span> <span class="st">"denplot"</span>, param <span class="op">=</span> <span class="st">"mu.c"</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Plots of imputations for all data</span></span></span>
-<span class="r-in"><span><span class="va">p1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">model.selection</span>, class <span class="op">=</span> <span class="st">"scatter"</span>, outcome <span class="op">=</span> <span class="st">"both"</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Summarise the CEA results</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">model.selection</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  Cost-effectiveness analysis summary </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  </span>
@@ -524,9 +423,6 @@ the random effects are specified (must be the name of a factor variable in the d
 <span class="r-out co"><span class="r-pr">#&gt;</span>    Mean   SD    QL    QU</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1 45017 1132 42910 47192</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2 44971 1346 42349 47716</span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># }</span></span></span>
-<span class="r-in"><span><span class="co">#</span></span></span>
 <span class="r-in"><span><span class="co">#</span></span></span>
 </code></pre></div>
     </div>

@@ -65,11 +65,11 @@ represented the default analysis setting in the health economics
 literature. More advanced models and customisation options available in
 `missingHE` are discussed in separate vignettes, including
 [non-ignorable
-models](https://angabrio.github.io/missingHE/articles/Fitting_MNAR_models_in_missingHE.Rmd),
+models](https://angabrio.github.io/missingHE/articles/Fitting_MNAR_models_in_missingHE.md),
 [model customisation
-options](https://angabrio.github.io/missingHE/articles/Model_customisation_in_missingHE.Rmd),
+options](https://angabrio.github.io/missingHE/articles/Model_customisation_in_missingHE.md),
 and [longitudinal data
-analysis](https://angabrio.github.io/missingHE/articles/Longitudinal_models_in_missingHE.Rmd).
+analysis](https://angabrio.github.io/missingHE/articles/Longitudinal_models_in_missingHE.md).
 
 Trial-based health economic data usually consist in the cross-sectional
 cost-effectiveness pair of variables \\(e\_{it},c\_{it})\\, collected on

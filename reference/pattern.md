@@ -298,6 +298,7 @@ Andrea Gabrio
 ## Examples
 
 ``` r
+if (isTRUE(tryCatch(requireNamespace("rjags", quietly = TRUE), error = function(e) FALSE))) {
 # Quick example to run using subset of MenSS dataset
 MenSS.subset <- MenSS[50:100, ]
 
@@ -305,6 +306,61 @@ MenSS.subset <- MenSS[50:100, ]
 # Use only 100 iterations to run a quick check
 model.pattern <- pattern(data = MenSS.subset,model.eff = e ~ trt, model.cost = c ~ trt,
    dist_e = "norm", dist_c = "norm", type = "MAR", n.chains = 2, n.iter = 100)
+
+# Print the results of the JAGS model
+print(model.pattern)
+#
+
+# Use dic information criterion to assess model fit
+pic.dic <- pic(model.pattern, criterion = "dic", cases = "cc")
+pic.dic
+#
+
+# Extract regression coefficient estimates
+coef(model.pattern)
+#
+DONTSHOW({
+# Use waic information criterion to assess model fit
+pic.waic <- pic(model.pattern, criterion = "waic", cases = "cc")
+pic.waic
+})
+
+# Assess model convergence using graphical tools
+# Produce histograms of the posterior samples for the mean effects
+diag.hist <- diagnostic(model.pattern, type = "histogram", param = "mu.e")
+#
+
+# Compare observed effect data with imputations from the model
+# using plots (posteiror means and credible intervals)
+p1 <- plot(model.pattern, class = "scatter", outcome = "effects")
+#
+
+# Summarise the CEA information from the model
+summary(model.pattern)
+
+# \donttest{
+# Further examples which take longer to run
+model.pattern <- pattern(data = MenSS, model.eff = e ~ trt, model.cost = c ~ trt + e,
+   dist_e = "norm", dist_c = "norm", type = "MAR", n.chains = 2, n.iter = 500)
+#
+# Print results for all imputed values
+print(model.pattern)
+
+# Use looic to assess model fit
+pic.looic <- pic(model.pattern, criterion = "looic", cases = "cc")
+pic.looic
+
+# Show density plots for mean costs parameters
+diag.den <- diagnostic(model.pattern, type = "denplot", param = "mu.c")
+
+# Plots of imputations for all data
+p1 <- plot(model.pattern, class = "scatter", outcome = "both")
+
+# Summarise the CEA results
+summary(model.pattern)
+
+# }
+}
 #> Compiling model graph
 #>    Resolving undeclared variables
 #>    Allocating nodes
@@ -315,9 +371,6 @@ model.pattern <- pattern(data = MenSS.subset,model.eff = e ~ trt, model.cost = c
 #> 
 #> Initializing model
 #> 
-
-# Print the results of the JAGS model
-print(model.pattern)
 #> Call:
 #> pattern(model.eff = e ~ trt, model.cost = c ~ trt, data = MenSS.subset, 
 #>     dist_e = "norm", dist_c = "norm", type = "MAR", n.chains = 2, 
@@ -336,27 +389,6 @@ print(model.pattern)
 #>    p1    p2 
 #> 0.296 0.704 
 #> 
-#
-
-# Use dic information criterion to assess model fit
-pic.dic <- pic(model.pattern, criterion = "dic", cases = "cc")
-pic.dic
-#> $d_bar
-#> [1] 211.8549
-#> 
-#> $pD
-#> [1] 2.242907
-#> 
-#> $dic
-#> [1] 214.0978
-#> 
-#> $d_hat
-#> [1] 209.612
-#> 
-#
-
-# Extract regression coefficient estimates
-coef(model.pattern)
 #> $Effects
 #>                Mean    SD     QL    QU
 #> (Intercept).1 0.907 0.036  0.844 0.983
@@ -371,21 +403,6 @@ coef(model.pattern)
 #> (Intercept).2 21.337 31.658 -33.686  84.128
 #> trt2.2        21.337 31.658 -33.686  84.128
 #> 
-#
-
-
-# Assess model convergence using graphical tools
-# Produce histograms of the posterior samples for the mean effects
-diag.hist <- diagnostic(model.pattern, type = "histogram", param = "mu.e")
-#
-
-# Compare observed effect data with imputations from the model
-# using plots (posteiror means and credible intervals)
-p1 <- plot(model.pattern, class = "scatter", outcome = "effects")
-#
-
-# Summarise the CEA information from the model
-summary(model.pattern)
 #> 
 #>  Cost-effectiveness analysis summary 
 #>  
@@ -407,11 +424,6 @@ summary(model.pattern)
 #>    Mean   SD    QL    QU
 #> 1 45306 1898 42299 49474
 #> 2 48469 3164 42374 55110
-
-# \donttest{
-# Further examples which take longer to run
-model.pattern <- pattern(data = MenSS, model.eff = e ~ trt, model.cost = c ~ trt + e,
-   dist_e = "norm", dist_c = "norm", type = "MAR", n.chains = 2, n.iter = 500)
 #> Compiling model graph
 #>    Resolving undeclared variables
 #>    Allocating nodes
@@ -422,9 +434,6 @@ model.pattern <- pattern(data = MenSS, model.eff = e ~ trt, model.cost = c ~ trt
 #> 
 #> Initializing model
 #> 
-#
-# Print results for all imputed values
-print(model.pattern)
 #> Call:
 #> pattern(model.eff = e ~ trt, model.cost = c ~ trt + e, data = MenSS, 
 #>     dist_e = "norm", dist_c = "norm", type = "MAR", n.chains = 2, 
@@ -445,115 +454,6 @@ print(model.pattern)
 #>   p1   p2 
 #> 0.29 0.71 
 #> 
-
-# Use looic to assess model fit
-pic.looic <- pic(model.pattern, criterion = "looic", cases = "cc")
-pic.looic
-#> $elpd
-#> [1] -345.7407
-#> 
-#> $elpd_se
-#> [1] -345.7407
-#> 
-#> $p
-#> [1] 6.954153
-#> 
-#> $p_se
-#> [1] 6.954153
-#> 
-#> $looic
-#> [1] 691.4814
-#> 
-#> $looic_se
-#> [1] 691.4814
-#> 
-#> $pointwise
-#>         elpd_loo mcse_elpd_loo      p_loo    looic influence_pareto_k
-#>  [1,]  -6.562130   0.008883579 0.03789003 13.12426        0.057764523
-#>  [2,]  -6.604481   0.009111540 0.03976173 13.20896        0.010944416
-#>  [3,] -11.160392   0.045313396 0.55037839 22.32078        0.186127403
-#>  [4,]  -7.492706   0.010195133 0.05021975 14.98541        0.139698648
-#>  [5,]  -6.534033   0.009422550 0.04246772 13.06807        0.016189853
-#>  [6,]  -6.658334   0.009944525 0.04701667 13.31667        0.054581421
-#>  [7,] -11.036120   0.051216539 0.63006576 22.07224        0.224855575
-#>  [8,] -10.850288   0.042966503 0.54664663 21.70058        0.309763882
-#>  [9,]  -6.885140   0.011514868 0.06021282 13.77028        0.082990864
-#> [10,]  -6.569059   0.008861222 0.03754017 13.13812        0.098319729
-#> [11,]  -6.900890   0.011114368 0.05623951 13.80178        0.098868382
-#> [12,]  -6.955621   0.011446708 0.05958277 13.91124        0.047021358
-#> [13,]  -6.547546   0.008784920 0.03703576 13.09509        0.104572628
-#> [14,]  -6.851502   0.011387952 0.05891673 13.70300        0.101056853
-#> [15,] -15.619908   0.128293259 2.12375872 31.23982        0.606514298
-#> [16,]  -6.898305   0.011121371 0.05631058 13.79661        0.105902246
-#> [17,]  -6.900890   0.011114368 0.05623951 13.80178        0.098868382
-#> [18,]  -6.733632   0.009029423 0.03914134 13.46726        0.160237198
-#> [19,]  -6.525899   0.009260123 0.04095375 13.05180        0.148548505
-#> [20,]  -7.698479   0.011509749 0.06175517 15.39696        0.065623687
-#> [21,]  -7.767926   0.019345348 0.14565378 15.53585       -0.014891944
-#> [22,]  -6.572497   0.008940215 0.03835831 13.14499        0.044254523
-#> [23,]  -8.204797   0.016897784 0.11852279 16.40959        0.089581109
-#> [24,]  -6.955790   0.009585076 0.04425113 13.91158        0.122910648
-#> [25,]  -6.900890   0.011114368 0.05623951 13.80178        0.098868382
-#> [26,]  -6.855987   0.011491211 0.05994607 13.71197        0.115741959
-#> [27,]  -6.887719   0.011260862 0.05717628 13.77544        0.123840214
-#> [28,]  -6.719417   0.010252886 0.05177913 13.43883       -0.146252819
-#> [29,]  -6.984449   0.012045713 0.06816386 13.96890       -0.003754172
-#> [30,]  -6.891898   0.012038936 0.06918361 13.78380       -0.087976603
-#> [31,]  -7.956636   0.014994685 0.09473947 15.91327        0.051681034
-#> [32,]  -6.984449   0.012045713 0.06816386 13.96890       -0.003754172
-#> [33,]  -8.308023   0.027227884 0.25630601 16.61605        0.170142164
-#> [34,]  -6.598976   0.010074687 0.04565546 13.19795        0.163550850
-#> [35,]  -7.039610   0.014694096 0.08232715 14.07922        0.285501688
-#> [36,]  -6.731107   0.011028501 0.05255016 13.46221        0.131546175
-#> [37,]  -8.618053   0.029502308 0.31288641 17.23611        0.125684225
-#> [38,]  -6.984449   0.012045713 0.06816386 13.96890       -0.003754172
-#> [39,]  -6.924948   0.012066606 0.06959529 13.84990       -0.018803394
-#> [40,]  -7.096302   0.011624160 0.05920762 14.19260        0.294243178
-#> [41,]  -6.984449   0.012045713 0.06816386 13.96890       -0.003754172
-#> [42,]  -7.137420   0.010345735 0.05122120 14.27484        0.030399824
-#> [43,]  -7.518433   0.012653948 0.07381119 15.03687        0.095790160
-#> [44,]  -7.109135   0.012062805 0.06911781 14.21827        0.115814566
-#> [45,]  -6.799422   0.012671442 0.06406920 13.59884        0.228746903
-#> [46,]  -8.222555   0.021706640 0.17676663 16.44511        0.202698956
-#> 
-#> $diagnostics
-#> $diagnostics$pareto_k
-#>  [1]  0.057764523  0.010944416  0.186127403  0.139698648  0.016189853
-#>  [6]  0.054581421  0.224855575  0.309763882  0.082990864  0.098319729
-#> [11]  0.098868382  0.047021358  0.104572628  0.101056853  0.606514298
-#> [16]  0.105902246  0.098868382  0.160237198  0.148548505  0.065623687
-#> [21] -0.014891944  0.044254523  0.089581109  0.122910648  0.098868382
-#> [26]  0.115741959  0.123840214 -0.146252819 -0.003754172 -0.087976603
-#> [31]  0.051681034 -0.003754172  0.170142164  0.163550850  0.285501688
-#> [36]  0.131546175  0.125684225 -0.003754172 -0.018803394  0.294243178
-#> [41] -0.003754172  0.030399824  0.095790160  0.115814566  0.228746903
-#> [46]  0.202698956
-#> 
-#> $diagnostics$n_eff
-#>  [1] 480.6897 479.7533 245.0729 475.0820 478.2149 476.1087 215.5102 259.7523
-#>  [9] 468.3735 480.6936 470.3682 468.6498 481.0953 469.0416  53.5543 470.3540
-#> [17] 470.3682 480.0010 479.0488 468.5203 420.6516 480.4606 436.9203 477.7177
-#> [25] 470.3682 468.5577 469.5187 474.7300 465.4212 465.5353 448.5352 465.4212
-#> [33] 363.8053 475.2287 450.9608 470.4830 347.5013 465.4212 465.4135 468.0859
-#> [41] 465.4212 474.1681 462.0778 465.5023 462.2457 404.0810
-#> 
-#> $diagnostics$r_eff
-#>  [1] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
-#> [39] 1 1 1 1 1 1 1 1
-#> 
-#> 
-#> $psis_object
-#> NULL
-#> 
-
-# Show density plots for mean costs parameters
-diag.den <- diagnostic(model.pattern, type = "denplot", param = "mu.c")
-
-# Plots of imputations for all data
-p1 <- plot(model.pattern, class = "scatter", outcome = "both")
-
-# Summarise the CEA results
-summary(model.pattern)
 #> 
 #>  Cost-effectiveness analysis summary 
 #>  
@@ -575,8 +475,5 @@ summary(model.pattern)
 #>    Mean   SD    QL    QU
 #> 1 45154 1173 42889 47345
 #> 2 44917 1418 42233 47780
-
-# }
-#
 #
 ```

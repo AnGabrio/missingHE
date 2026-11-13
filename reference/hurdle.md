@@ -328,6 +328,7 @@ Andrea Gabrio
 ## Examples
 
 ``` r
+if (isTRUE(tryCatch(requireNamespace("rjags", quietly = TRUE), error = function(e) FALSE))) {
 # Quick example to run using the MenSS dataset
 
 # Run the model using the hurdle function assuming a SCAR mechanism
@@ -338,6 +339,62 @@ MenSS_ex <- MenSS[MenSS$age > 25, ]
 model.hurdle <- hurdle(data = MenSS_ex, model.eff = e ~ trt, model.cost = c ~ trt,
    model.se = se ~ 1, model.sc = sc ~ 1, se = NULL, sc = 0, dist_e = "norm", dist_c = "gamma",
    type = "SCAR", n.chains = 2, n.iter = 50)
+
+# Print the results of the JAGS model
+print(model.hurdle)
+#
+
+# Use dic information criterion to assess model fit
+pic.dic <- pic(model.hurdle, criterion = "dic", cases = "cc")
+pic.dic
+#
+# Extract regression coefficient estimates
+coef(model.hurdle)
+#
+
+DONTSHOW({
+# Use waic information criterion to assess model fit
+pic.waic <- pic(model.hurdle, criterion = "waic", cases = "cc")
+pic.waic
+})
+
+# Assess model convergence using graphical tools
+# Produce histograms of the posterior samples for the mean effects
+diag.hist <- diagnostic(model.hurdle, type = "histogram", param = "mu.e")
+#
+
+# Compare observed effect data with imputations from the model
+# using plots (posterior means and credible intervals)
+p1 <- plot(model.hurdle, class = "scatter", outcome = "effects")
+#
+
+# Summarise the CEA information from the model
+summary(model.hurdle)
+
+# \donttest{
+# Further examples which take longer to run
+model.hurdle <- hurdle(data = MenSS, model.eff = e ~ trt, model.cost = c ~ trt + e,
+   model.se = se ~ age, model.sc = sc ~ age, se = 1, sc = 0, dist_e = "beta", dist_c = "gamma",
+   type = "SAR", n.chains = 2, n.iter = 500)
+#
+# Print results for all imputed values
+print(model.hurdle)
+
+# Use looic to assess model fit
+pic.looic <- pic(model.hurdle, criterion = "looic", cases = "cc")
+pic.looic
+
+# Show density plots for mean costs parameters
+diag.den <- diagnostic(model.hurdle, type = "denplot", param = "mu.c")
+
+# Plots of imputations for all data
+p1 <- plot(model.hurdle, class = "scatter", outcome = "both")
+
+# Summarise the CEA results
+summary(model.hurdle)
+
+# }
+}
 #> module glm loaded
 #> Compiling model graph
 #>    Resolving undeclared variables
@@ -352,9 +409,6 @@ model.hurdle <- hurdle(data = MenSS_ex, model.eff = e ~ trt, model.cost = c ~ tr
 #> Registered S3 method overwritten by 'BCEA':
 #>   method     from
 #>   plot.evppi voi 
-
-# Print the results of the JAGS model
-print(model.hurdle)
 #> Call:
 #> hurdle(model.eff = e ~ trt, model.cost = c ~ trt, model.se = se ~ 
 #>     1, model.sc = sc ~ 1, data = MenSS_ex, se = NULL, sc = 0, 
@@ -377,27 +431,6 @@ print(model.hurdle)
 #> (Intercept) 
 #>      -0.945 
 #> 
-#
-
-# Use dic information criterion to assess model fit
-pic.dic <- pic(model.hurdle, criterion = "dic", cases = "cc")
-pic.dic
-#> $d_bar
-#> [1] 129.5131
-#> 
-#> $pD
-#> [1] 113.3485
-#> 
-#> $dic
-#> [1] 242.8616
-#> 
-#> $d_hat
-#> [1] 16.16456
-#> 
-#
-
-# Extract regression coefficient estimates
-coef(model.hurdle)
 #> $Effects
 #>               Mean    SD     QL    QU
 #> (Intercept)  0.885 0.036  0.822 0.950
@@ -408,21 +441,6 @@ coef(model.hurdle)
 #> (Intercept)  6.835 0.980  5.567 8.065
 #> trt2        -0.100 0.237 -0.463 0.326
 #> 
-#
-
-
-# Assess model convergence using graphical tools
-# Produce histograms of the posterior samples for the mean effects
-diag.hist <- diagnostic(model.hurdle, type = "histogram", param = "mu.e")
-#
-
-# Compare observed effect data with imputations from the model
-# using plots (posterior means and credible intervals)
-p1 <- plot(model.hurdle, class = "scatter", outcome = "effects")
-#
-
-# Summarise the CEA information from the model
-summary(model.hurdle)
 #> 
 #>  Cost-effectiveness analysis summary 
 #>  
@@ -444,12 +462,6 @@ summary(model.hurdle)
 #>    Mean   SD    QL    QU
 #> 1 43530 1609 40577 46986
 #> 2 43510 1972 39934 47496
-
-# \donttest{
-# Further examples which take longer to run
-model.hurdle <- hurdle(data = MenSS, model.eff = e ~ trt, model.cost = c ~ trt + e,
-   model.se = se ~ age, model.sc = sc ~ age, se = 1, sc = 0, dist_e = "beta", dist_c = "gamma",
-   type = "SAR", n.chains = 2, n.iter = 500)
 #> Compiling model graph
 #>    Resolving undeclared variables
 #>    Allocating nodes
@@ -460,9 +472,6 @@ model.hurdle <- hurdle(data = MenSS, model.eff = e ~ trt, model.cost = c ~ trt +
 #> 
 #> Initializing model
 #> 
-#
-# Print results for all imputed values
-print(model.hurdle)
 #> Call:
 #> hurdle(model.eff = e ~ trt, model.cost = c ~ trt + e, model.se = se ~ 
 #>     age, model.sc = sc ~ age, data = MenSS, se = 1, sc = 0, dist_e = "beta", 
@@ -485,115 +494,6 @@ print(model.hurdle)
 #> (Intercept)         age 
 #>      -1.200       0.004 
 #> 
-
-# Use looic to assess model fit
-pic.looic <- pic(model.hurdle, criterion = "looic", cases = "cc")
-pic.looic
-#> $elpd
-#> [1] 25.34684
-#> 
-#> $elpd_se
-#> [1] 25.34684
-#> 
-#> $p
-#> [1] 16.87966
-#> 
-#> $p_se
-#> [1] 16.87966
-#> 
-#> $looic
-#> [1] -50.69369
-#> 
-#> $looic_se
-#> [1] -50.69369
-#> 
-#> $pointwise
-#>        elpd_loo mcse_elpd_loo     p_loo      looic influence_pareto_k
-#>  [1,]  9.993008    0.01965004 0.1571902 -19.986016      -0.0094787762
-#>  [2,] 10.022891    0.01873503 0.1468215 -20.045782      -0.1314426952
-#>  [3,] -9.602025    0.03808458 0.5090225  19.204050       0.3475638514
-#>  [4,] -7.245874    0.02265437 0.2303490  14.491748       0.1047152584
-#>  [5,] -6.059156    0.02142212 0.2865836  12.118313      -0.2072356735
-#>  [6,] -6.325934    0.02634010 0.3777673  12.651868      -0.0589286925
-#>  [7,] -9.746028    0.04271015 0.5841980  19.492056       0.3436233911
-#>  [8,] -7.995870    0.02344037 0.1681116  15.991739       0.4847931750
-#>  [9,]  2.280038    0.02414323 0.3736633  -4.560077      -0.0084560518
-#> [10,] -5.394239    0.09960927 1.3188364  10.788478       0.4405804357
-#> [11,] 18.594957    0.01861416 0.1251534 -37.189915       0.3371369119
-#> [12,]  1.997125    0.02219916 0.3092328  -3.994250       0.1875701629
-#> [13,] 10.123251    0.01493537 0.1058958 -20.246501       0.1353121031
-#> [14,]  2.829577    0.02233003 0.3020330  -5.659155      -0.0236012606
-#> [15,] -9.221282    0.06678752 0.5604582  18.442564       0.5563061611
-#> [16,]  4.265830    0.09095245 0.6108660  -8.531659       0.6735394136
-#> [17,] 17.823217    0.05496899 0.6685305 -35.646434       0.3226176336
-#> [18,] -6.719177    0.02230125 0.3068660  13.438354      -0.0698248243
-#> [19,] -6.327481    0.02150575 0.2747684  12.654962       0.0003563834
-#> [20,]  1.321836    0.01867530 0.1878799  -2.643672       0.2921721457
-#> [21,] -7.455084    0.02955410 0.4006794  14.910169       0.2726255407
-#> [22,]  9.967619    0.02112852 0.1772704 -19.935239      -0.0246415407
-#> [23,] -8.031869    0.03193744 0.4921050  16.063738       0.2478689311
-#> [24,] -6.875947    0.02446344 0.3011887  13.751893       0.0200758658
-#> [25,] 18.588772    0.01745666 0.1163794 -37.177545       0.3891124818
-#> [26,]  2.462092    0.02249810 0.3222907  -4.924184       0.1325672201
-#> [27,] -6.734996    0.02936329 0.4146636  13.469992       0.4005480339
-#> [28,] -7.404790    0.07712162 0.8783735  14.809580       0.5371811660
-#> [29,] 18.556525    0.01564120 0.1061400 -37.113049       0.1321666454
-#> [30,]  2.418572    0.02227680 0.3138075  -4.837145       0.1769719469
-#> [31,] -7.459966    0.02684732 0.3097709  14.919931       0.0702051395
-#> [32,] 18.305526    0.02715843 0.2472626 -36.611052       0.1488625232
-#> [33,]  8.818521    0.02191011 0.1922750 -17.637042       0.2025403884
-#> [34,] -6.577861    0.02412779 0.3669596  13.155723      -0.1901684449
-#> [35,] -6.707055    0.03962710 0.4067749  13.414109       0.3172510936
-#> [36,] -6.755315    0.02521062 0.3950378  13.510631      -0.0071318038
-#> [37,] -8.088564    0.03338656 0.6199554  16.177128       0.2087177345
-#> [38,] 18.482658    0.01758479 0.1298495 -36.965316       0.0581563649
-#> [39,]  2.143892    0.02433593 0.3955351  -4.287784       0.1564820099
-#> [40,] -6.988775    0.02620126 0.4393613  13.977550       0.0060505310
-#> [41,] 18.602364    0.02133105 0.1486695 -37.204728       0.3688809022
-#> [42,] -7.284587    0.03960828 0.5948392  14.569175       0.1935831954
-#> [43,]  1.574302    0.02500345 0.3892601  -3.148603       0.1210323198
-#> [44,]  1.554940    0.02490583 0.3677816  -3.109881       0.3111400836
-#> [45,] -6.562733    0.02185917 0.2520500  13.125466       0.1524205580
-#> [46,] -7.816062    0.02902394 0.4971514  15.632124      -0.2100493468
-#> 
-#> $diagnostics
-#> $diagnostics$pareto_k
-#>  [1] -0.0094787762 -0.1314426952  0.3475638514  0.1047152584 -0.2072356735
-#>  [6] -0.0589286925  0.3436233911  0.4847931750 -0.0084560518  0.4405804357
-#> [11]  0.3371369119  0.1875701629  0.1353121031 -0.0236012606  0.5563061611
-#> [16]  0.6735394136  0.3226176336 -0.0698248243  0.0003563834  0.2921721457
-#> [21]  0.2726255407 -0.0246415407  0.2478689311  0.0200758658  0.3891124818
-#> [26]  0.1325672201  0.4005480339  0.5371811660  0.1321666454  0.1769719469
-#> [31]  0.0702051395  0.1488625232  0.2025403884 -0.1901684449  0.3172510936
-#> [36] -0.0071318038  0.2087177345  0.0581563649  0.1564820099  0.0060505310
-#> [41]  0.3688809022  0.1935831954  0.1210323198  0.3111400836  0.1524205580
-#> [46] -0.2100493468
-#> 
-#> $diagnostics$n_eff
-#>  [1] 417.7371 424.1623 289.1924 396.8054 406.0460 370.1090 260.5894 392.7801
-#>  [9] 386.5842  83.6962 425.7338 400.5298 449.2248 399.8266 155.3483  97.6956
-#> [17] 199.0434 399.7262 405.2365 425.3642 346.8815 407.2992 329.6778 384.1689
-#> [25] 433.6354 398.5721 348.8596 125.2564 445.0245 400.1980 366.1037 364.1468
-#> [33] 402.1030 386.3566 279.2174 378.9655 319.6261 431.8167 385.1329 371.3441
-#> [41] 407.5884 278.2101 379.9593 381.8756 403.2223 350.3440
-#> 
-#> $diagnostics$r_eff
-#>  [1] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
-#> [39] 1 1 1 1 1 1 1 1
-#> 
-#> 
-#> $psis_object
-#> NULL
-#> 
-
-# Show density plots for mean costs parameters
-diag.den <- diagnostic(model.hurdle, type = "denplot", param = "mu.c")
-
-# Plots of imputations for all data
-p1 <- plot(model.hurdle, class = "scatter", outcome = "both")
-
-# Summarise the CEA results
-summary(model.hurdle)
 #> 
 #>  Cost-effectiveness analysis summary 
 #>  
@@ -615,8 +515,5 @@ summary(model.hurdle)
 #>    Mean   SD    QL    QU
 #> 1 46254  923 44378 47969
 #> 2 45926 1111 43440 47739
-
-# }
-#
 #
 ```
