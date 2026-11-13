@@ -1,6 +1,6 @@
 # Changelog
 
-## missingHE 1.6.2.1
+## missingHE 1.6.3
 
 - Updated documentation across all function files, datasets, and
   `README.md`.
