@@ -1,5 +1,23 @@
 # Changelog
 
+## missingHE 1.6.2.1
+
+- Updated documentation across all function files, datasets, and
+  `README.md`.
+
+- Updated package metadata, `inst/CITATION`, and academic references
+  (`DESCRIPTION`, `.Rd` files, and `inst/REFERENCES.bib`).
+
+- Standardised canonical CRAN URLs and DOI links across documentation.
+
+- Updated all package functions to remove redundant code lines and add a
+  selection of test functions.
+
+- Added new unit tests (`testthat`) covering all key package functions.
+
+- Updated the version of the package in the `DESCRIPTION` file to
+  `1.6.3`.
+
 ## missingHE 1.6.2
 
 CRAN release: 2026-10-13
