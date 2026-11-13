@@ -117,10 +117,9 @@ each use to ensure that you are using the most updated version.
 
 ## Further details
 
-More details on `missingHE` are available in our
-[*vignettes*](https://cran.r-project.org/web/packages/missingHE/vignettes/).
+The `pkgdown` site is [here](https://angabrio.github.io/missingHE/).
 Also, details about the package, including some references and links to
-a pdf presentation and some posts on my own blog) are given
+a pdf presentation and some posts on my own blog are given
 [here](https://angabrio.github.io/software/missingHE/).
 
 ## License
