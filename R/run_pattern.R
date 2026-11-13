@@ -124,7 +124,7 @@ run_pattern <- function(data_model, type, dist_e, dist_c, model_info) {
                          "ind_random" = ind_random, "model_e_random" = model_info$model_e_random,
                          "model_c_random" = model_info$model_c_random, "is_c_random_c" = is_c_random_c,
                          "is_int_c_random_c" = is_int_c_random_c, "prior" = model_info$prior,
-                         "restriction" = model_info$restriction, "d_or" = unique(d_or))
+                         "restriction" = model_info$restriction, "d_or" = unique(d_or), "save_model" = model_info$save_model)
   filein <- write_pattern(type = type , dist_e = dist_e, dist_c = dist_c, model_txt_info = model_txt_info)
   model <- R2jags::jags(data = datalist, inits = inits, parameters.to.save = params,
                         model.file = filein, n.chains = n.chains, n.iter = n.iter,

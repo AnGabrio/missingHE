@@ -152,7 +152,7 @@ run_hurdle <- function(data_model, type, dist_e, dist_c, model_info) {
                          "ind_random" = ind_random, "model_e_random" = model_info$model_e_random, "model_c_random" = model_info$model_c_random,
                          "model_se_random" = model_info$model_se_random, "model_sc_random" = model_info$model_sc_random,
                          "is_c_random_c" = is_c_random_c, "is_int_c_random_c" = is_int_c_random_c,
-                         "prior" = model_info$prior)
+                         "prior" = model_info$prior, "save_model" = model_info$save_model)
   filein <- write_hurdle(type = type , dist_e = dist_e, dist_c = dist_c, model_txt_info = model_txt_info)
   if(dist_c %in% c("gamma", "lnorm")) {
     if(!is.null(datalist$sc)) {

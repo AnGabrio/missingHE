@@ -598,7 +598,16 @@ write_pattern <- function(dist_e , dist_c, type, model_txt_info) {
   }
   model_string_jags <- prior_pattern(type = type, dist_e = dist_e, dist_c = dist_c,
                                      model_txt_info = model_txt_info, model_string_jags = model_string_jags)
-  writeLines(model_string_jags, "pattern.txt")
-  model_string <- "pattern.txt"
+  if (model_txt_info$save_model) {
+    model_string <- "pattern.txt"
+  } else {
+    model_string <- tempfile(pattern = "pattern", fileext = ".txt")
+    do.call(
+      "on.exit",
+      list(substitute(unlink(x), list(x = model_string)), add = TRUE),
+      envir = parent.frame()
+    )
+  }
+  writeLines(model_string_jags, model_string)
   return(model_string)
 }

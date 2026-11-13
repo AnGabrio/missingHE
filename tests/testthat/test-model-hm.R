@@ -280,7 +280,6 @@ test_that("check output from hurdle function", {
   expect_equal(hm$model_output$ind_random, !"e" %in% hm$data_set$model_formula$mf_model.c_random)
   expect_equal(hm$model_output$dist_e, dist_e)
   expect_equal(hm$model_output$dist_c, dist_c)
-  expect_equal(hm$model_output$filein, "hurdle.txt")
   expect_type(hm$model_output$model, "list")
   expect_length(hm$model_output$model, 6)
   expect_named(hm$model_output$model, c("model", "BUGSoutput", "parameters.to.save",

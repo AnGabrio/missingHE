@@ -1002,7 +1002,16 @@ write_lmdm <- function(dist_e , dist_c, type, model_txt_info) {
       }
       model_string_jags <- prior_lmdm(type = type, dist_e = dist_e, dist_c = dist_c,
                                      model_txt_info = model_txt_info, model_string_jags = model_string_jags)
-   writeLines(model_string_jags, "lmdm.txt")
-   model_string <- "lmdm.txt"
+      if (model_txt_info$save_model) {
+        model_string <- "lmdm.txt"
+      } else {
+        model_string <- tempfile(pattern = "selection", fileext = ".txt")
+        do.call(
+          "on.exit",
+          list(substitute(unlink(x), list(x = model_string)), add = TRUE),
+          envir = parent.frame()
+        )
+      }
+      writeLines(model_string_jags, model_string)
    return(model_string)
 }

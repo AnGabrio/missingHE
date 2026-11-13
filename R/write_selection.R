@@ -670,9 +670,18 @@ write_selection <- function(dist_e , dist_c, type, model_txt_info) {
       model_string_jags <- gsub("for(j in 1:zc_random) {mu_g_c_hat[j] ~ dnorm(0, 0.001)", "mu_g_c_hat ~ dnorm(0, 0.001)", model_string_jags, fixed = TRUE)
       model_string_jags <- gsub("s_g_c_hat[j] ~ dunif(0, 100) }", "s_g_c_hat ~ dunif(0, 100)", model_string_jags, fixed = TRUE)
       }
-      model_string_jags <- prior_selection(type = type, dist_e = dist_e, dist_c = dist_c,
+    model_string_jags <- prior_selection(type = type, dist_e = dist_e, dist_c = dist_c,
                                            model_txt_info = model_txt_info, model_string_jags = model_string_jags)
-   writeLines(model_string_jags, "selection.txt")
-   model_string <- "selection.txt"
+    if (model_txt_info$save_model) {
+      model_string <- "selection.txt"
+    } else {
+      model_string <- tempfile(pattern = "selection", fileext = ".txt")
+      do.call(
+        "on.exit",
+        list(substitute(unlink(x), list(x = model_string)), add = TRUE),
+        envir = parent.frame()
+      )
+    }
+    writeLines(model_string_jags, model_string)
    return(model_string)
 }

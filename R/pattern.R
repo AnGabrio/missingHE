@@ -109,6 +109,7 @@
 #' @export
 #'
 #' @examples
+#' if (isTRUE(tryCatch(requireNamespace("rjags", quietly = TRUE), error = function(e) FALSE))) {
 #' # Quick example to run using subset of MenSS dataset
 #' MenSS.subset <- MenSS[50:100, ]
 #'
@@ -129,7 +130,6 @@
 #' # Extract regression coefficient estimates
 #' coef(model.pattern)
 #' #
-#'
 #' \dontshow{
 #' # Use waic information criterion to assess model fit
 #' pic.waic <- pic(model.pattern, criterion = "waic", cases = "cc")
@@ -171,7 +171,7 @@
 #' summary(model.pattern)
 #'
 #' }
-#' #
+#' }
 #' #
 
 
@@ -443,7 +443,7 @@ pattern <- function(data, model.eff, model.cost,
                      "n.burnin" = n.burnin, "n.thin" = n.thin, "prior" = prior, "patterns.prior" = patterns.prior,
                      "n.mci" = n.mci, "prob" = prob, "restriction" = restriction,
                      "progress.bar" = progress.bar, "refresh" = refresh,
-                     "RNGname" = RNGname, "quiet" = quiet, "digits" = digits)
+                     "RNGname" = RNGname, "quiet" = quiet, "digits" = digits, "save_model" = save_model)
   model_output <- run_pattern(data_model = data_model, type = type,
                                 dist_e = dist_e, dist_c = dist_c, model_info = model_info)
   effects_fixed <- cbind.data.frame(model_output$effects_fixed)

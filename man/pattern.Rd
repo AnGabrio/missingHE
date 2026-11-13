@@ -143,6 +143,7 @@ the random effects are specified (must be the name of a factor variable in the d
 For an overview of the general modeling framework and additional package utilities, see \link{missingHE-package}.
 }
 \examples{
+if (isTRUE(tryCatch(requireNamespace("rjags", quietly = TRUE), error = function(e) FALSE))) {
 # Quick example to run using subset of MenSS dataset
 MenSS.subset <- MenSS[50:100, ]
 
@@ -163,7 +164,6 @@ pic.dic
 # Extract regression coefficient estimates
 coef(model.pattern)
 #
-
 \dontshow{
 # Use waic information criterion to assess model fit
 pic.waic <- pic(model.pattern, criterion = "waic", cases = "cc")
@@ -205,7 +205,7 @@ p1 <- plot(model.pattern, class = "scatter", outcome = "both")
 summary(model.pattern)
 
 }
-#
+}
 #
 }
 \references{

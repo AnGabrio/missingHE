@@ -1,5 +1,7 @@
 test_that("check output from writing model file and prior updating internal functions", {
 
+  testthat::skip_on_cran()
+
   load(test_path("testdata/sm.RData"))
 
   type <- sm$type
@@ -25,7 +27,8 @@ test_that("check output from writing model file and prior updating internal func
                          "is_mc_random_c" = FALSE,
                          "is_int_me_random_e" = FALSE,
                          "is_int_mc_random_c" = FALSE,
-                         "prior" = sm$prior)
+                         "prior" = sm$prior,
+                         "save_model" = TRUE)
   write_sm <- write_selection(type = type , dist_e = dist_e, dist_c = dist_c,
                               model_txt_info = model_txt_info)
   sm_txt <- paste(readLines("selection.txt"), collapse = "\n")
@@ -60,8 +63,8 @@ test_that("check output from writing model file and prior updating internal func
                          "is_int_c_random_c" = FALSE,
                          "prior" = pmm$prior,
                          "restriction" = pmm$restriction,
-                         "d_or" = unique(pmm$data_set$data_raw$d))
-
+                         "d_or" = unique(pmm$data_set$data_raw$d),
+                         "save_model" = TRUE)
   write_pmm <- write_pattern(type = type , dist_e = dist_e, dist_c = dist_c,
                               model_txt_info = model_txt_info)
   pmm_txt <- paste(readLines("pattern.txt"), collapse = "\n")
@@ -105,7 +108,8 @@ test_that("check output from writing model file and prior updating internal func
                          "is_mc_random_c" = FALSE,
                          "is_int_me_random_e" = FALSE,
                          "is_int_mc_random_c" = FALSE,
-                         "prior" = hm$prior)
+                         "prior" = hm$prior,
+                         "save_model" = TRUE)
   write_hm <- write_hurdle(type = type , dist_e = dist_e, dist_c = dist_c,
                               model_txt_info = model_txt_info)
   hm_txt <- paste(readLines("hurdle.txt"), collapse = "\n")
@@ -149,7 +153,8 @@ test_that("check output from writing model file and prior updating internal func
                          "is_int_me_random_e" = FALSE,
                          "is_int_mc_random_c" = FALSE,
                          "prior" = lmm$prior,
-                         "time_dep" = lmm$time_dep)
+                         "time_dep" = lmm$time_dep,
+                         "save_model" = TRUE)
   write_lmdm <- write_lmdm(type = type , dist_e = dist_e, dist_c = dist_c,
                               model_txt_info = model_txt_info)
   lmdm_txt <- paste(readLines("lmdm.txt"), collapse = "\n")

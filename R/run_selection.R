@@ -170,7 +170,7 @@ run_selection <- function(data_model, type, dist_e, dist_c, model_info) {
                          "is_c_random_c" = is_c_random_c, "is_int_c_random_c" = is_int_c_random_c,
                          "is_me_random_e" = is_me_random_e, "is_mc_random_c" = is_mc_random_c,
                          "is_int_me_random_e" = is_int_me_random_e, "is_int_mc_random_c" = is_int_mc_random_c,
-                         "prior" = model_info$prior)
+                         "prior" = model_info$prior, "save_model" = model_info$save_model)
   filein <- write_selection(type = type , dist_e = dist_e, dist_c = dist_c, model_txt_info = model_txt_info)
   model <- R2jags::jags(data = datalist, inits = inits, parameters.to.save = params,
                         model.file = filein, n.chains = n.chains, n.iter = n.iter,

@@ -81,11 +81,11 @@ test_that("check output from running model internal functions", {
                      "refresh" = 10000/50,
                      "RNGname" = "Wichmann-Hill",
                      "quiet" = FALSE,
-                     "digits" = 3)
+                     "digits" = 3,
+                     "save_model" = FALSE)
   run_sm <- run_selection(data_model = data_model, type = type ,
                             dist_e = dist_e, dist_c = dist_c,
                             model_info = model_info)
-  unlink("selection.txt")
 
   expect_length(run_sm, 26)
   expect_type(run_sm, "list")
@@ -98,7 +98,6 @@ test_that("check output from running model internal functions", {
 
   expect_length(run_sm$filein, 1)
   expect_type(run_sm$filein, "character")
-  expect_equal(run_sm$filein, "selection.txt")
   expect_length(run_sm$dist_c, 1)
   expect_type(run_sm$dist_c, "character")
   expect_equal(run_sm$dist_c, dist_c)
@@ -215,7 +214,6 @@ test_that("check output from running model internal functions", {
                                         "model.file", "n.iter", "DIC"))
   expect_true(run_sm$model$DIC)
   expect_equal(run_sm$model$n.iter, n.iter)
-  expect_equal(run_sm$model$model.file, "selection.txt")
   expect_type(run_sm$model$parameters.to.save, "character")
   expect_vector(run_sm$model$parameters.to.save)
   expect_type(run_sm$model$model, "list")
@@ -233,7 +231,6 @@ test_that("check output from running model internal functions", {
   expect_length(run_sm$model$BUGSoutput$pV, 1)
   expect_equal(run_sm$model$BUGSoutput$DICbyR, run_sm$model$DIC)
   expect_equal(run_sm$model$BUGSoutput$isDIC, run_sm$model$DIC)
-  expect_equal(run_sm$model$BUGSoutput$model.file, sm$model_output$filein)
   expect_equal(run_sm$model$BUGSoutput$program, "jags")
   expect_type(run_sm$model$BUGSoutput$last.values, "list")
   expect_type(run_sm$model$BUGSoutput$indexes.short, "list")
@@ -324,11 +321,11 @@ test_that("check output from running model internal functions", {
                      "refresh" = 10000/50,
                      "RNGname" = "Wichmann-Hill",
                      "quiet" = FALSE,
-                     "digits" = 3)
+                     "digits" = 3,
+                     "save_model" = FALSE)
   run_pmm <- run_pattern(data_model = data_model, type = type ,
                           dist_e = dist_e, dist_c = dist_c,
                           model_info = model_info)
-  unlink("pattern.txt")
 
   expect_length(run_pmm, 22)
   expect_type(run_pmm, "list")
@@ -340,7 +337,6 @@ test_that("check output from running model internal functions", {
 
   expect_length(run_pmm$filein, 1)
   expect_type(run_pmm$filein, "character")
-  expect_equal(run_pmm$filein, "pattern.txt")
   expect_length(run_pmm$dist_c, 1)
   expect_type(run_pmm$dist_c, "character")
   expect_equal(run_pmm$dist_c, dist_c)
@@ -452,7 +448,6 @@ test_that("check output from running model internal functions", {
                                "model.file", "n.iter", "DIC"))
   expect_true(run_pmm$model$DIC)
   expect_equal(run_pmm$model$n.iter, n.iter)
-  expect_equal(run_pmm$model$model.file, "pattern.txt")
   expect_type(run_pmm$model$parameters.to.save, "character")
   expect_vector(run_pmm$model$parameters.to.save)
   expect_type(run_pmm$model$model, "list")
@@ -470,7 +465,6 @@ test_that("check output from running model internal functions", {
   expect_length(run_pmm$model$BUGSoutput$pV, 1)
   expect_equal(run_pmm$model$BUGSoutput$DICbyR, run_pmm$model$DIC)
   expect_equal(run_pmm$model$BUGSoutput$isDIC, run_pmm$model$DIC)
-  expect_equal(run_pmm$model$BUGSoutput$model.file, pmm$model_output$filein)
   expect_equal(run_pmm$model$BUGSoutput$program, "jags")
   expect_type(run_pmm$model$BUGSoutput$last.values, "list")
   expect_type(run_pmm$model$BUGSoutput$indexes.short, "list")
@@ -578,11 +572,11 @@ test_that("check output from running model internal functions", {
                      "refresh" = 10000/50,
                      "RNGname" = "Wichmann-Hill",
                      "quiet" = FALSE,
-                     "digits" = 3)
+                     "digits" = 3,
+                     "save_model" = FALSE)
   run_hm <- run_hurdle(data_model = data_model, type = type ,
                           dist_e = dist_e, dist_c = dist_c,
                           model_info = model_info)
-  unlink("hurdle.txt")
 
   expect_length(run_hm, 30)
   expect_type(run_hm, "list")
@@ -596,7 +590,6 @@ test_that("check output from running model internal functions", {
 
   expect_length(run_hm$filein, 1)
   expect_type(run_hm$filein, "character")
-  expect_equal(run_hm$filein, "hurdle.txt")
   expect_length(run_hm$dist_c, 1)
   expect_type(run_hm$dist_c, "character")
   expect_equal(run_hm$dist_c, dist_c)
@@ -713,7 +706,6 @@ test_that("check output from running model internal functions", {
                                "model.file", "n.iter", "DIC"))
   expect_true(run_hm$model$DIC)
   expect_equal(run_hm$model$n.iter, n.iter)
-  expect_equal(run_hm$model$model.file, "hurdle.txt")
   expect_type(run_hm$model$parameters.to.save, "character")
   expect_vector(run_hm$model$parameters.to.save)
   expect_type(run_hm$model$model, "list")
@@ -731,7 +723,6 @@ test_that("check output from running model internal functions", {
   expect_length(run_hm$model$BUGSoutput$pV, 1)
   expect_equal(run_hm$model$BUGSoutput$DICbyR, run_hm$model$DIC)
   expect_equal(run_hm$model$BUGSoutput$isDIC, run_hm$model$DIC)
-  expect_equal(run_hm$model$BUGSoutput$model.file, hm$model_output$filein)
   expect_equal(run_hm$model$BUGSoutput$program, "jags")
   expect_type(run_hm$model$BUGSoutput$last.values, "list")
   expect_type(run_hm$model$BUGSoutput$indexes.short, "list")
@@ -849,7 +840,8 @@ test_that("check output from running model internal functions", {
                      "refresh" = 10000/50,
                      "RNGname" = "Wichmann-Hill",
                      "quiet" = FALSE,
-                     "digits" = 3)
+                     "digits" = 3,
+                     "save_model" = FALSE)
   run_lmm <- run_lmdm(data_model = data_model, type = type ,
                           dist_e = dist_e, dist_c = dist_c,
                           model_info = model_info)
@@ -866,7 +858,6 @@ test_that("check output from running model internal functions", {
 
   expect_length(run_lmm$filein, 1)
   expect_type(run_lmm$filein, "character")
-  expect_equal(run_lmm$filein, "lmdm.txt")
   expect_length(run_lmm$dist_c, 1)
   expect_type(run_lmm$dist_c, "character")
   expect_equal(run_lmm$dist_c, dist_c)
@@ -990,7 +981,6 @@ test_that("check output from running model internal functions", {
                                "model.file", "n.iter", "DIC"))
   expect_true(run_lmm$model$DIC)
   expect_equal(run_lmm$model$n.iter, n.iter)
-  expect_equal(run_lmm$model$model.file, "lmdm.txt")
   expect_type(run_lmm$model$parameters.to.save, "character")
   expect_vector(run_lmm$model$parameters.to.save)
   expect_type(run_lmm$model$model, "list")
@@ -1008,7 +998,6 @@ test_that("check output from running model internal functions", {
   expect_length(run_lmm$model$BUGSoutput$pV, 1)
   expect_equal(run_lmm$model$BUGSoutput$DICbyR, run_lmm$model$DIC)
   expect_equal(run_lmm$model$BUGSoutput$isDIC, run_lmm$model$DIC)
-  expect_equal(run_lmm$model$BUGSoutput$model.file, lmm$model_output$filein)
   expect_equal(run_lmm$model$BUGSoutput$program, "jags")
   expect_type(run_lmm$model$BUGSoutput$last.values, "list")
   expect_type(run_lmm$model$BUGSoutput$indexes.short, "list")

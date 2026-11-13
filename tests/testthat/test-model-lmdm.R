@@ -339,7 +339,6 @@ test_that("check output from longitudinal missing data function", {
   expect_equal(lmm$model_output$ind_random, !"e" %in% lmm$data_set$model_formula$mf_model.c_random)
   expect_equal(lmm$model_output$dist_e, dist_e)
   expect_equal(lmm$model_output$dist_c, dist_c)
-  expect_equal(lmm$model_output$filein, "lmdm.txt")
   expect_type(lmm$model_output$model, "list")
   expect_length(lmm$model_output$model, 6)
   expect_named(lmm$model_output$model, c("model", "BUGSoutput", "parameters.to.save",

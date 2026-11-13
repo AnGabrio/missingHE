@@ -150,6 +150,7 @@ the random effects are specified (must be the name of a factor variable in the d
 For an overview of the general modeling framework and additional package utilities, see \link{missingHE-package}.
 }
 \examples{
+if (isTRUE(tryCatch(requireNamespace("rjags", quietly = TRUE), error = function(e) FALSE))) {
 # Quick example to run using subset of MenSS dataset
 MenSS.subset <- MenSS[50:100, ]
 
@@ -214,7 +215,7 @@ p1 <- plot(model.selection, class = "scatter", outcome = "both")
 summary(model.selection)
 
 }
-#
+}
 #
 }
 \references{

@@ -251,7 +251,6 @@ test_that("check output from selection function", {
   expect_equal(sm$model_output$ind_random, !"e" %in% sm$data_set$model_formula$mf_model.c_random)
   expect_equal(sm$model_output$dist_e, dist_e)
   expect_equal(sm$model_output$dist_c, dist_c)
-  expect_equal(sm$model_output$filein, "selection.txt")
   expect_type(sm$model_output$model, "list")
   expect_length(sm$model_output$model, 6)
   expect_named(sm$model_output$model, c("model", "BUGSoutput", "parameters.to.save",

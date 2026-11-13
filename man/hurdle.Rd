@@ -162,6 +162,7 @@ the random effects are specified (must be the name of a factor variable in the d
 For an overview of the general modeling framework and additional package utilities, see \link{missingHE-package}.
 }
 \examples{
+if (isTRUE(tryCatch(requireNamespace("rjags", quietly = TRUE), error = function(e) FALSE))) {
 # Quick example to run using the MenSS dataset
 
 # Run the model using the hurdle function assuming a SCAR mechanism
@@ -181,7 +182,6 @@ print(model.hurdle)
 pic.dic <- pic(model.hurdle, criterion = "dic", cases = "cc")
 pic.dic
 #
-
 # Extract regression coefficient estimates
 coef(model.hurdle)
 #
@@ -228,7 +228,7 @@ p1 <- plot(model.hurdle, class = "scatter", outcome = "both")
 summary(model.hurdle)
 
 }
-#
+}
 #
 }
 \references{

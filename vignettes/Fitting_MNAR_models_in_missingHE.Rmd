@@ -10,17 +10,25 @@ pkgdown:
 vignette: >
   %\VignetteIndexEntry{Fitting MNAR models in missingHE}
   %\VignetteEngine{knitr::rmarkdown}
-  \usepackage[utf8]{inputenc}
+  %\VignetteEncoding{UTF-8}
 ---
 
-```{r, echo = FALSE, message = FALSE}
-knitr::opts_chunk$set(prompt = TRUE, highlight = F, background = '#FFFFFF',
-                      collapse = T, comment = "#>", error = TRUE)
+```{r setup, include=FALSE}
+has_jags <- isTRUE(tryCatch({ loadNamespace("rjags"); TRUE }, error = function(e) FALSE))
+
+knitr::opts_chunk$set(
+  eval = has_jags,
+  prompt = TRUE,
+  highlight = FALSE,
+  background = '#FFFFFF',
+  collapse = TRUE,
+  comment = "#>"
+)
+
 library(missingHE)
 library(bookdown)
 library(ggplot2)
 
-MenSS$trt <- factor(MenSS$trt)
 levels(MenSS$trt) <- c("SoC", "MenSS")
 
 options(width = 300)
@@ -29,7 +37,7 @@ set.seed(1014)
 
 When analysing partially-observed data, any statistical method makes either explicit or implicit assumptions about the missing values that can never be verified from the data at hand. Often, analyses rely on a *missing at random* (MAR) assumption, that is they assume that the observed data are able to fully explain missingness. However, there is always the chance that this assumption is not correct and that missingness also depends on some values which are not observed, leading to a *missing not at random* (MNAR) assumption. Thus, it is extremely important that the robustness of the results to a range of alternative missingness assumptions is assessed in sensitivity analysis, including MNAR.
 
-Each missingness model approach in `missingHE`, implemented either through the function `selection`, `pattern`, or `hurdle`, can be fitted under MNAR for either or both the effectiveness and cost outcomes. MNAR assumptions are expressed in terms of some suitably-defined departures from MAR in terms of mean effectiveness and cost parameters. This tutorial illustrates how to specify a MNAR model in `missingHE` using the built-in data set `MenSS`, which is directly available when loading `missingHE` in the user's `R` workspace. See [Introduction to missingHE](Introduction_to_missingHE.Rmd) for an introductory tutorial on each type of missingness approach in `missingHE` and for a general presentation of the `MenSS` dataset. 
+Each missingness model approach in `missingHE`, implemented either through the function `selection`, `pattern`, or `hurdle`, can be fitted under MNAR for either or both the effectiveness and cost outcomes. MNAR assumptions are expressed in terms of some suitably-defined departures from MAR in terms of mean effectiveness and cost parameters. This tutorial illustrates how to specify a MNAR model in `missingHE` using the built-in data set `MenSS`, which is directly available when loading `missingHE` in the user's `R` workspace. See [Introduction to missingHE](Introduction_to_missingHE.html) for an introductory tutorial on each type of missingness approach in `missingHE` and for a general presentation of the `MenSS` dataset. 
 
 If you would like to have more information on the package, or would like to point out potential issues in the current version, feel free to contact the maintainer at <a.gabrio@maastrichtuniversity.nl>. Suggestions on how to improve the package are also very welcome. A development version of the package is also available from the author's main GitHub repository at <https://github.com/AnGabrio/missingHE>.
 
@@ -50,7 +58,7 @@ where `me` and `mc` indicate the effectiveness and cost missingness indicator va
 
 As an example, let us fit a MNAR selection model for the effectiveness variables (QALYs) in the `MenSS` dataset using the following command
 
-```{r mnar-sel1-hide, echo=FALSE, eval=TRUE, message=FALSE, warning=FALSE,  results='hide'}
+```{r mnar-sel1-hide, echo=FALSE, message=FALSE, warning=FALSE,  results='hide'}
 NN.sel1 <- selection(data = MenSS, model.eff = e ~ trt + u.0, 
          model.cost = c ~ trt, model.me = me ~ e, 
          model.mc = mc ~ 1, type = "MNAR", 
@@ -70,7 +78,7 @@ The MNAR assumption is encoded into the model by: setting the argument `type = "
 
 `missingHE` allows a separate specification of the assumptions on the effectiveness and cost missingness mechanisms through the arguments `model.me` and `model.mc`, respectively. When desired, other fully-observed variables can also be included into the missingness models (either under MAR or MNAR assumptions), to improve the estimation of the model parameters. Posterior summaries for the estimates of model parameters under the selected missingness assumptions can then be retrieved through the `postsum` function.
 
-```{r print-sel1, echo=TRUE, eval=TRUE, message=FALSE}
+```{r print-sel1, echo=TRUE, message=FALSE}
 postsum(NN.sel1)
 ```
 
@@ -78,7 +86,7 @@ We now consider an alternative MNAR specification where we encode informative pr
 
 We first define our priors by creating a list object called `my.prior`. Within this list, we create a vector called `"delta.prior.e"` containing the following elements: name of the prior distribution (`"norm"`); the prior values for the selected distribution (mean of $10$ and precision of $1$).
 
-```{r prior-sel2, echo=TRUE, eval=TRUE, message=FALSE}
+```{r prior-sel2, echo=TRUE, message=FALSE}
 my.prior <- list(
   "delta.prior.e" = c("norm", 10, 1)
 )
@@ -86,7 +94,7 @@ my.prior <- list(
 
 As a simple exercise, we increase the prior mean of $\delta_e$ to $10$ to assess the impact on posterior estimates of a quite informative prior about this parameter (relatively high positive value on the logit scale). We then fit the model using the new prior specification by passing `my.prior` to the argument `prior` inside `selection`.
 
-```{r mnar-sel2-hide, echo=FALSE, eval=TRUE, message=FALSE, warning=FALSE,  results='hide'}
+```{r mnar-sel2-hide, echo=FALSE, message=FALSE, warning=FALSE,  results='hide'}
 NN.sel2 <- selection(data = MenSS, model.eff = e ~ trt + u.0, 
          model.cost = c ~ trt, model.me = me ~ e, 
          model.mc = mc ~ 1, type = "MNAR", 
@@ -104,13 +112,13 @@ NN.sel2 <- selection(data = MenSS, model.eff = e ~ trt + u.0,
 
 We can now check the results
 
-```{r print-sel2, echo=TRUE, eval=TRUE, message=FALSE}
+```{r print-sel2, echo=TRUE, message=FALSE}
 postsum(NN.sel2)
 ```
 
 and compare them to those obtained under the initial MNAR model. We see that, with respect to the results from `NN.sel1`, the mean effectiveness estimates across both groups (`tmu_e`) are on average higher. Average mean estimates for each treatment group and associated incremental results for each model can also be inspected by using the `summary` function. To have a better idea of the impact in terms of cost-effectiveness conclusions, we can use the function `ceac.plot`, from the package `BCEA`, to display the cost-effectiveness acceptability curves based on the results from each model.
 
-```{r figplotceamnarsel1, echo=FALSE, eval=TRUE, tidy=FALSE,  warning=FALSE, dpi=300, fig.show='hold',fig.cap="Cost-effectiveness acceptability curve (CEAC) derived from model 1 fitted under default MNAR prior specification for the missing effectiveness mechanism.",out.width='100%'}
+```{r figplotceamnarsel1, echo=FALSE,  warning=FALSE, dpi=300, fig.show='hold',fig.cap="Cost-effectiveness acceptability curve (CEAC) derived from model 1 fitted under default MNAR prior specification for the missing effectiveness mechanism.",out.width='100%'}
 ceac_sm1_mnar <- BCEA::ceac.plot(NN.sel1$cea, 
             graph = "ggplot2") + ggplot2::ggtitle("")
 ceac_sm2_mnar <- BCEA::ceac.plot(NN.sel2$cea, 
@@ -118,7 +126,7 @@ ceac_sm2_mnar <- BCEA::ceac.plot(NN.sel2$cea,
 ceac_sm1_mnar
 ```
 
-```{r figplotceamnarsel2, echo=FALSE, eval=TRUE, tidy=FALSE,  warning=FALSE, dpi=300, fig.show='hold',fig.cap="Cost-effectiveness acceptability curve (CEAC) derived from model 2 fitted under custom MNAR prior specification for the missing effectiveness mechanism.",out.width='100%'}
+```{r figplotceamnarsel2, echo=FALSE,  warning=FALSE, dpi=300, fig.show='hold',fig.cap="Cost-effectiveness acceptability curve (CEAC) derived from model 2 fitted under custom MNAR prior specification for the missing effectiveness mechanism.",out.width='100%'}
 ceac_sm2_mnar
 ```
 
@@ -151,7 +159,7 @@ my.prior <- list(
 
 Next, we fit the desired MNAR model using the function `pattern`, setting the arguments `restriction = "CC"`, `type = "MNAR"` and overwriting the default priors for $\delta_e$ with those contained in the object `my.prior`.  
 
-```{r mnar-pat2-hide, echo=FALSE, eval=TRUE, message=FALSE, warning=FALSE,  results='hide'}
+```{r mnar-pat2-hide, echo=FALSE, message=FALSE, warning=FALSE,  results='hide'}
 NN.pat2 <- pattern(data = MenSS, model.eff = e ~ trt + u.0, 
          model.cost = c ~ trt, type = "MNAR", 
          restriction = "CC", n.iter = 1000, 
@@ -169,7 +177,7 @@ NN.pat2 <- pattern(data = MenSS, model.eff = e ~ trt + u.0,
 
 Baseline utilities are included in the model for $e$, which is identified under MNAR using complete case restrictions (`restriction = "CC"`) and informative priors on the sensitivity parameters for the mean $e$. Economic results in terms of posterior summaries about mean parameters can be inspected using the `postsum` function
 
-```{r print-pm2, echo=TRUE, eval=TRUE, message=FALSE}
+```{r print-pm2, echo=TRUE, message=FALSE}
 postsum(NN.pat2)
 ```
 
@@ -183,7 +191,7 @@ my.prior2 <- list(
 
 which is then passed to the argument `prior` in the `pattern` function
 
-```{r mnar-pat3-hide, echo=FALSE, eval=TRUE, message=FALSE, warning=FALSE,  results='hide'}
+```{r mnar-pat3-hide, echo=FALSE, message=FALSE, warning=FALSE,  results='hide'}
 NN.pat3 <- pattern(data = MenSS, model.eff = e ~ trt + u.0, 
          model.cost = c ~ trt, type = "MNAR", 
          restriction = "CC", n.iter = 1000, 
@@ -201,7 +209,7 @@ NN.pat3 <- pattern(data = MenSS, model.eff = e ~ trt + u.0,
 
 We assess the impact on the cost-effectiveness results by looking at the acceptability curves derived from each MNAR model using again the function `ceac.plot`.
 
-```{r figplotceamnarpat1, echo=FALSE, eval=TRUE, tidy=FALSE,  warning=FALSE, dpi=300, fig.show='hold',fig.cap="Cost-effectiveness acceptability curves (CEAC) derived from model 1 fitted under uniform MNAR priors for the effectiveness sensitivity parameter.",out.width='100%'}
+```{r figplotceamnarpat1, echo=FALSE,  warning=FALSE, dpi=300, fig.show='hold',fig.cap="Cost-effectiveness acceptability curves (CEAC) derived from model 1 fitted under uniform MNAR priors for the effectiveness sensitivity parameter.",out.width='100%'}
 ceac_pm2_mnar <- BCEA::ceac.plot(NN.pat2$cea, 
             graph = "ggplot2") + ggplot2::ggtitle("")
 ceac_pm3_mnar <- BCEA::ceac.plot(NN.pat3$cea, 
@@ -209,7 +217,7 @@ ceac_pm3_mnar <- BCEA::ceac.plot(NN.pat3$cea,
 ceac_pm2_mnar
 ```
 
-```{r figplotceamnarpat2, echo=FALSE, eval=TRUE, tidy=FALSE,  warning=FALSE, dpi=300, fig.show='hold',fig.cap="Cost-effectiveness acceptability curves (CEAC) derived from model 2 fitted under normal MNAR priors for the effectiveness sensitivity parameter.",out.width='100%'}
+```{r figplotceamnarpat2, echo=FALSE,  warning=FALSE, dpi=300, fig.show='hold',fig.cap="Cost-effectiveness acceptability curves (CEAC) derived from model 2 fitted under normal MNAR priors for the effectiveness sensitivity parameter.",out.width='100%'}
 ceac_pm3_mnar
 ```
 
@@ -228,7 +236,7 @@ where `se` and `sc` indicate the effectiveness and cost structural value indicat
 
 Let us first consider a standard hurdle model specification under MAR. We specify the model to handle both structural ones and zeros in $e$ and $c$ from the `MenSS` dataset, where structural values are set by using the arguments `se = 1` and `sc = 0` inside `hurdle`, respectively. Since these values are assumed to be "fixed", their occurrence does not affect the choice of a distribution for the non-structural component of the outcomes. As a result, we can assign distributions that are not defined at $1$ and $0$ to the non-structural outcome values, such as Beta and Gamma distributions for $e$ and $c$, respectively. 
 
-```{r mar-hm1-hide, echo=FALSE, eval=TRUE, message=FALSE, warning=FALSE,  results='hide'}
+```{r mar-hm1-hide, echo=FALSE, message=FALSE, warning=FALSE,  results='hide'}
 NN.hur1 <- hurdle(data = MenSS, model.eff = e ~ trt + u.0, 
          model.cost = c ~ trt, model.se = se ~ 1, 
          model.sc = sc ~ 1, type = "SCAR", 
@@ -264,7 +272,7 @@ sum(mys_e == 1, na.rm = T)
 
 The number of individuals associated with $e=1$ has considerably increased with respect to the observed data alone. We can now proceed to fit the hurdle model by replacing the original structural indicator variable of $e$ with the newly created one using the argument `s_e = mys_e`. 
 
-```{r mnar-hm2-hide, echo=FALSE, eval=TRUE, message=FALSE, warning=FALSE,  results='hide'}
+```{r mnar-hm2-hide, echo=FALSE, message=FALSE, warning=FALSE,  results='hide'}
 set.seed(1014)
 NN.hur2 <- hurdle(data = MenSS, model.eff = e ~ trt + u.0, 
          model.cost = c ~ trt, model.se = se ~ 1, 
@@ -283,19 +291,19 @@ NN.hur2 <- hurdle(data = MenSS, model.eff = e ~ trt + u.0,
 
 We can inspect the posterior results by typing
 
-```{r print-hm2, echo=TRUE, eval=TRUE, message=FALSE}
+```{r print-hm2, echo=TRUE, message=FALSE}
 postsum(NN.hur2)
 ```
 
 and look at how imputations in each treatment group are carried out based using the `plot` function.
 
-```{r figplothm2, echo=FALSE, eval=TRUE, tidy=FALSE,  warning=FALSE, dpi=300, fig.show='hold',fig.cap="Scatter plots of observed and imputed effectiveness data in the SoC arm (trt = 1) based on an hurdle model assuming all individuals younger than 22 years old are associated with a perfect healf state.",out.width='100%'}
+```{r figplothm2, echo=FALSE,  warning=FALSE, dpi=300, fig.show='hold',fig.cap="Scatter plots of observed and imputed effectiveness data in the SoC arm (trt = 1) based on an hurdle model assuming all individuals younger than 22 years old are associated with a perfect healf state.",out.width='100%'}
 plot(NN.hur2, class = "scatter", outcome = "effects", trt = "SoC")
 ```
 
 As Figure \@ref(fig:figplothm2) shows, the model imputes each missing structural effect in `"SoC"` as one with a very small credible interval. Finally, we compare the economic results from the two hurdle models using the `ceac.plot` function from the `BCEA` package.
 
-```{r figplotceamnarhm1, echo=FALSE, eval=TRUE, tidy=FALSE,  warning=FALSE, dpi=300, fig.show='hold',fig.cap="Cost-effectiveness acceptability curves (CEAC) derived from the hurdle model fitted under a MAR assumption about the number of structural ones in SoC.",out.width='100%'}
+```{r figplotceamnarhm1, echo=FALSE,  warning=FALSE, dpi=300, fig.show='hold',fig.cap="Cost-effectiveness acceptability curves (CEAC) derived from the hurdle model fitted under a MAR assumption about the number of structural ones in SoC.",out.width='100%'}
 ceac_hm1_mnar <- BCEA::ceac.plot(NN.hur1$cea, 
             graph = "ggplot2") + ggplot2::ggtitle("")
 ceac_hm2_mnar <- BCEA::ceac.plot(NN.hur2$cea, 
@@ -303,7 +311,7 @@ ceac_hm2_mnar <- BCEA::ceac.plot(NN.hur2$cea,
 ceac_hm1_mnar
 ```
 
-```{r figplotceamnarhm2, echo=FALSE, eval=TRUE, tidy=FALSE,  warning=FALSE, dpi=300, fig.show='hold',fig.cap="Cost-effectiveness acceptability curves (CEAC) derived from the hurdle models fitted under a MNAR assumption about the number of structural ones in SoC.",out.width='100%'}
+```{r figplotceamnarhm2, echo=FALSE,  warning=FALSE, dpi=300, fig.show='hold',fig.cap="Cost-effectiveness acceptability curves (CEAC) derived from the hurdle models fitted under a MNAR assumption about the number of structural ones in SoC.",out.width='100%'}
 ceac_hm2_mnar
 ```
 

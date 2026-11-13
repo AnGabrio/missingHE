@@ -225,7 +225,6 @@ test_that("check output from pattern mixture function", {
   expect_equal(pmm$model_output$ind_random, !"e" %in% pmm$data_set$model_formula$mf_model.c_random)
   expect_equal(pmm$model_output$dist_e, dist_e)
   expect_equal(pmm$model_output$dist_c, dist_c)
-  expect_equal(pmm$model_output$filein, "pattern.txt")
   expect_vector(pmm$model_output$d_mod)
   expect_length(pmm$model_output$d_mod, n.ind)
   expect_type(pmm$model_output$model, "list")

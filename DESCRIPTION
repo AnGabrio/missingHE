@@ -8,6 +8,7 @@ Depends: R (>= 4.1.0)
 Suggests: 
     knitr,
     rmarkdown,
+    rjags,
     bookdown,
     devtools,
     testthat (>= 3.0.0)

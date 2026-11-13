@@ -121,6 +121,7 @@
 #' @export
 #'
 #' @examples
+#' if (isTRUE(tryCatch(requireNamespace("rjags", quietly = TRUE), error = function(e) FALSE))) {
 #' # Quick example to run using subset of PBS dataset
 #'
 #' # Load longitudinal dataset
@@ -160,7 +161,7 @@
 #' summary(model.long)
 #'
 #' }
-#' #
+#' }
 #' #
 
 
@@ -607,7 +608,7 @@ lmdm <- function(data, model.eff, model.cost,
                      "inits" = inits, "n.chains" = n.chains, "n.iter" = n.iter,
                      "n.burnin" = n.burnin, "n.thin" = n.thin, "prior" = prior,
                      "n.mci" = n.mci, "prob" = prob, "progress.bar" = progress.bar,
-                     "refresh" = refresh, "RNGname" = RNGname, "quiet" = quiet, "digits" = digits)
+                     "refresh" = refresh, "RNGname" = RNGname, "quiet" = quiet, "digits" = digits, "save_model" = save_model)
   model_output <- run_lmdm(data_model = data_model, type = type,
                                 dist_e = dist_e, dist_c = dist_c, model_info = model_info)
   if(time_dep %in% c("none", "biv")) {
