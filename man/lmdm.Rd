@@ -154,6 +154,8 @@ using the arguments in the function \code{lmdm} (see Arguments).
 For each model, random effects can also be specified for each parameter by adding the term \code{+ (x | z)} to each model formula,
 where \code{x} is the fixed regression coefficient for which also the random effects are desired and \code{z} is the clustering variable across which
 the random effects are specified (must be the name of a factor variable in the dataset).
+
+For an overview of the general modeling framework and additional package utilities, see \link{missingHE-package}.
 }
 \examples{
 # Quick example to run using subset of PBS dataset
@@ -199,18 +201,18 @@ summary(model.long)
 #
 }
 \references{
-Mason, AJ. Gomes, M. Carpenter, J. Grieve, R. (2021). \emph{Flexible Bayesian longitudinal models for cost‐effectiveness analyses with informative missing data}. Health economics, 30(12), 3138-3158.
+Gabrio, A., Daniels, MJ. Baio, G. (2019). \emph{A Bayesian parametric approach to handle missing longitudinal outcome data in trial-based health economic evaluations}. Journal of the Royal Statistical Society Series A: Statistics in Society, 183(2), 607-629 <10.1111/rssa.12522>
 
-Daniels, MJ. Hogan, JW. \emph{Missing Data in Longitudinal Studies: strategies for Bayesian modelling and sensitivity analysis}, CRC/Chapman Hall.
+Mason, AJ. Gomes, M. Carpenter, J. Grieve, R. (2021). \emph{Flexible Bayesian longitudinal models for cost‐effectiveness analyses with informative missing data}. Health economics, 30(12), 3138-3158. <10.1002/hec.4408>
 
-Baio, G.(2012). \emph{Bayesian Methods in Health Economics}. CRC/Chapman Hall, London.
+Daniels, MJ. Hogan, JW. \emph{Missing Data in Longitudinal Studies: strategies for Bayesian modelling and sensitivity analysis}, CRC/Chapman Hall. \url{doi:10.1201/9781420011180}
 
-Gelman, A. Carlin, JB., Stern, HS. Rubin, DB.(2003). \emph{Bayesian Data Analysis, 2nd edition}, CRC Press.
+Baio, G.(2012). \emph{Bayesian Methods in Health Economics}. CRC/Chapman Hall, London. \url{doi:10.1201/b13099}
 
-Plummer, M. \emph{JAGS: A program for analysis of Bayesian graphical models using Gibbs sampling} (2003).
+Plummer, M. \emph{JAGS: A program for analysis of Bayesian graphical models using Gibbs sampling}. (2003). \url{https://www.r-project.org/conferences/DSC-2003/Proceedings/Plummer.pdf}
 }
 \seealso{
-\code{\link[R2jags:jags]{R2jags::jags()}}, \code{\link[BCEA:bcea]{BCEA::bcea()}}.
+\link{missingHE-package} \code{\link[R2jags:jags]{R2jags::jags()}}, \code{\link[BCEA:bcea]{BCEA::bcea()}}.
 }
 \author{
 Andrea Gabrio

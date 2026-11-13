@@ -3,9 +3,10 @@ title: "Longitudinal models in missingHE"
 description: >
   This tutorial shows some examples of how to specify, customise and fit a longitudinal missingness
   model in missingHE when performing trial-based CEA using longitudinal data.
-output: 
-    bookdown::html_document2:
-        base_format: rmarkdown::html_vignette
+output: rmarkdown::html_vignette
+pkgdown:
+  as_is: true
+  output: bookdown::html_document2
 vignette: >
   %\VignetteIndexEntry{Longitudinal models in missingHE}
   %\VignetteEngine{knitr::rmarkdown}
@@ -33,7 +34,7 @@ This tutorial shows how to specify longitudinal models using the function `lmdm`
 
 If you would like to have more information on the package, or would like to point out potential issues in the current version, feel free to contact the maintainer at <a.gabrio@maastrichtuniversity.nl>. Suggestions on how to improve the package are also very welcome. A development version of the package is also available from the author's main GitHub repository at <https://github.com/AnGabrio/missingHE>.
 
-# Modelling Framework {#sec-frame}
+# Modelling Framework {#sec-frame-lmm}
 
 Trial-based health economic disaggregated data consist in the longitudinal cost-effectiveness pair of variables $(e_{ijt},c_{ijt})$, collected on the $i$-th patient at time $j$ assigned to the $t$-th treatment in the study, for $i=1,\ldots,N$ patients, $j=1,\ldots,J$ time points and $t=1,\ldots,T$ treatment options. In many jurisdictions the recommended effectiveness variable $e_{ijt}$ is a *Health-Related Quality of Life* (HRQoL) measure, typically in the form of utility scores computed from the patients' answers to generic health-related quality of life questionnaires (e.g., EQ-5D) collected at given time intervals in the study. The cost variable $c_{ijt}$ denotes the sum of all relevant patient-level costs (e.g., direct/indirect medical costs, productivity losses, etc.), collected from the patients' answers to some types of healthcare-resource utilisation questionnaires or medical records at different times.
 
@@ -66,14 +67,14 @@ Covariates may be included into the model at different scales using the link fun
 
 \begin{equation}
 \mu_e = \sum_{j=1}^J \mu_{je} \times w_{je},
- (\#eq:mue)
+(\#eq:mue)
 \end{equation}
 
 where $w_{je}=\frac{\gamma_j}{2}$ denotes the weight used in the AUC calculation, with $\gamma_j$ being the percentage of the time unit (often $1$ year) covered between the time interval $j-1$ and $j$. As an example, if responses were collected at equally-spaced time intervals, say every $6$ months, over a one-year study period, then $w_{je}=\frac{\gamma_j}{2}=\frac{6/12}{2}=0.25$ for any $j$. In the case of Total costs, aggregated mean response estimates can be typically derived as:  
 
 \begin{equation}
 \mu_c = \sum_{j=1}^J \mu_{jc} \times w_{jc},
- (\#eq:muc)
+(\#eq:muc)
 \end{equation}
 
 where setting $w_{jc}=1$ would correspond to an unweighted sum. Note that, after `missingHE` derives estimates for $(\mu_{je},\mu_{jc})$ from Equation \@ref(eq:glme) and Equation \@ref(eq:glmc), it automatically computes the aggregated estimates $(\mu_e,\mu_c)$ using the approaches described in Equation \@ref(eq:mue) and Equation \@ref(eq:muc) assuming default values of $w_{je}=0.5$ and $w_{jc}=1$ for all $j$. However, the function `lmdm` allows the user to modify these values through the optional arguments `w_e` and `w_c`, which can be provided either as single values (same value to each $j$) or as vectors of length $J$ (custom value to each $j$). This level of customisation allows the user to directly derive aggregated mean cost-effectiveness estimates and use them in the computation of all CEA output.
@@ -88,7 +89,7 @@ Assuming that the location parameters are modelled using a linear predictor as i
 \boldsymbol r_{ie} & \sim \text{Multinomial}(\pi_{ie}, 1), \\
 \pi^r_{ie} =& \frac{\iota^{r}_{ie}}{\sum_{l=1}^3 \iota^{l}_{ie}}, \\
 \log(\iota^{r}_{ie})&=\gamma^r_{j0e} + \sum_{k=1}^K \gamma^r_{jke} x_{ik} + \delta^r_{je} e_{ij} \,\,[+ \ldots], \\
- (\#eq:lmdme)
+(\#eq:lmdme)
 \end{aligned}
 
 where the upperscript $r$ indicates the pattern category (1 = completers, 2 = intermittent, 3 = dropout), $\boldsymbol r_{ie}$ is a vector with entries set to one if $m^r_{ije}=1$ and zero otherwise, $\boldsymbol \gamma^r_j = (\gamma^r_{j0e}, \ldots, \gamma^r_{jKe})$ is the set of time- and pattern-specific regression coefficients, while $\delta^r_{je}$ is the time- and pattern-specific MNAR parameter. Note that an equivalent specification to Equation \@ref(eq:lmdme) for the missingness model of the longitudinal costs can be used in `missingHE`.
@@ -149,11 +150,11 @@ The dataset consists of $`r n`$ individuals grouped in two arms, where `trt` $=1
 
 Key health economic variables are `e` and `c`, which denote the HRQoL utility and cost longitudinal outcomes, respectively. All baseline variables are fully-observed, whereas all outcome variables are partially-observed in both arms. There is a total of `r n_long_ec_cc` (`r round(n_long_ec_cc/n_long,2)*100`$\%$) outcome observations, of which `r n1_long_ec_cc` in the TAU and `r n2_long_ec_cc` in the PBS arm, while the remaining `r n_long-n_long_ec_cc` observations are missing. Figure \@ref(fig:fig1e) and Figure \@ref(fig:fig1c) show the histograms of the observed distributions for the utility and cost variables in `PBS`, separately by arm and time point.
 
-```{r fig1e, echo=FALSE, eval=TRUE, tidy=TRUE, warning=FALSE, dpi=300, fig.show='hold',fig.cap="Histograms of the observed data distributions for the utilities in the TAU and PBS arm by time point.", out.width='100%', fig.pos='h', out.extra=''}
+```{r fig1e, echo=FALSE, eval=TRUE, tidy=TRUE, warning=FALSE, dpi=300, fig.show='hold',fig.cap="Histograms of the observed data distributions for the utilities in the TAU and PBS arm by time point.", out.width='100%'}
 hist_e
 ```
 
-```{r fig1c, echo=FALSE, eval=TRUE, tidy=TRUE, warning=FALSE, dpi=300, fig.show='hold',fig.cap="Histograms of the observed data distributions for the costs in the TAU and PBS arm by time point.", out.width='100%', fig.pos='h', out.extra=''}
+```{r fig1c, echo=FALSE, eval=TRUE, tidy=TRUE, warning=FALSE, dpi=300, fig.show='hold',fig.cap="Histograms of the observed data distributions for the costs in the TAU and PBS arm by time point.", out.width='100%'}
 hist_c
 ```
 
@@ -222,7 +223,7 @@ diagnostic(x = lmdm1_mar, type = "denplot", param = "beta.f")
 
 to produce “density plots” for the regression parameters associated with the effectiveness variable within the cost models. In this case, as displayed in Figure \@ref(fig:fig2), no major issues in convergence are identified for these parameters.
 
-```{r fig2, echo=FALSE, eval=TRUE, tidy=TRUE, warning=FALSE, dpi=300, fig.show='hold',fig.cap="Checking convergence using the diagnostic function for a model fitted in missingHE, for example through inspection of density plots.", out.width='100%', fig.pos='h', out.extra=''}
+```{r fig2, echo=FALSE, eval=TRUE, tidy=TRUE, warning=FALSE, dpi=300, fig.show='hold',fig.cap="Checking convergence using the diagnostic function for a model fitted in missingHE, for example through inspection of density plots.", out.width='100%'}
 diagnostic(x = lmdm1_mar, type = "denplot", param = "beta.f")
 ```
 
@@ -239,7 +240,7 @@ ppc(x = lmdm1_mar, type = "histogram", outcome = "effects",
 
 to plot the densities of `ndisplay` $=5$ replications of the effectiveness data (light blue lines) with respect to the density of the observed data (dark blue line) in the PBS (`trt = 2`) arm. The argument `time.plot` indicates for which times the comparison between observed and replicated data should be plotted, here the third time point is selected (default $=1$). Figure \@ref(fig:fig3) shows some discrepancies between the replicated and observed data histograms, likely due to the relatively poor fit of the current model (i.e., the normality assumption of `e`) to the observed data in both arms.
 
-```{r fig3, echo=FALSE, eval=TRUE, tidy=TRUE, warning=FALSE, dpi=300, fig.show='hold',fig.cap="Posterior predictive graphical checks using the ppc function for a model fitted in missingHE, for example through inspection of histograms.", out.width='100%', fig.pos='h', out.extra=''}
+```{r fig3, echo=FALSE, eval=TRUE, tidy=TRUE, warning=FALSE, dpi=300, fig.show='hold',fig.cap="Posterior predictive graphical checks using the ppc function for a model fitted in missingHE, for example through inspection of histograms.", out.width='100%'}
 ppc(x = lmdm1_mar, type = "histogram", outcome = "effects", 
     ndisplay = 2, time.plot = 3, trt = "2")
 ```
@@ -289,7 +290,7 @@ print(lmdm1_mar, display = "fixed")
 
 `missingHE` standardises the format of the output to report summary quantities related to key model parameters, including the mean effectiveness and costs at each time point across treatment arms on their natural scale. Estimates of posterior mean (`mean`), standard deviation (`sd`) and $95\%$ credible interval boundaries (`2.5%` and `95.5%`) can be used to summarise the posterior distribution of these parameters. In addition, the MCMC diagnostics `Rhat` and `n.eff`, corresponding to the potential scale reduction factor and effective sample size diagnostics, are provided and can be used to assess convergence for these parameters.
 
-Summary statistics for the regression coefficients on the scale defined by the linear predictor of the effectiveness and cost models $(\boldsymbol \alpha, \boldsymbol \beta)$, as defined in Section \@ref(sec-frame), may also be displayed using the `coef` function by typing
+Summary statistics for the regression coefficients on the scale defined by the linear predictor of the effectiveness and cost models $(\boldsymbol \alpha, \boldsymbol \beta)$, as defined in Section \@ref(sec-frame-lmm), may also be displayed using the `coef` function by typing
 
 ```{r coef, echo=TRUE, eval=FALSE, tidy=TRUE}
 coef(lmdm1_mar)
@@ -314,7 +315,7 @@ plot(lmdm1_mar, class = "boxplot", outcome = "costs",
 
 displays boxplots of the observed (black dots and boxes) and imputed (red dots and boxes) effectiveness variables in the `"TAU"` (`trt = 1`) arm at time $2$ based on the model results stored in `lmdm1_mar`, as shown in Figure \@ref(fig:figplot). Imputed values are represented in terms of posterior mean values, and their uncertainty by means of corresponding credible intervals. The arguments `class = "boxplot"`, `outcome = "costs"`, `trt = "1"` and `time.plot = 2` instruct `missingHE` to display boxplots for the cost outcome in the TAU arm at time $2$.
 
-```{r figplot, echo=FALSE, eval=TRUE, tidy=TRUE, warning=FALSE, dpi=300, fig.show='hold',fig.cap="Boxplots of observed and imputed effectiveness data in the TAU arm at time 2 under normal distributions using a longitudinal model.", out.width='100%', fig.pos='h', out.extra=''}
+```{r figplot, echo=FALSE, eval=TRUE, tidy=TRUE, warning=FALSE, dpi=300, fig.show='hold',fig.cap="Boxplots of observed and imputed effectiveness data in the TAU arm at time 2 under normal distributions using a longitudinal model.", out.width='100%'}
 plot(lmdm1_mar, class = "boxplot", outcome = "costs", 
      trt = "1", time.plot = 2)
 ```
@@ -352,7 +353,7 @@ BCEA::ceac.plot(lmdm1_mar$cea, graph = "ggplot2")
 
 to generate Figure \@ref(fig:figplotcea1) and Figure \@ref(fig:figplotcea2), which combines cost-effectiveness plane and acceptability curve plots obtained from the PSA results stored in `lmdm1_mar$cea`.
 
-```{r figplotcea1, echo=FALSE, eval=TRUE, tidy=FALSE, warning=FALSE, dpi=300, fig.show='hold',fig.cap="Inspecting probabilistic sensitivity analysis using BCEA built-in functions, for example using the cost-effectiveness plane.",out.width='100%', fig.pos='h', out.extra=''}
+```{r figplotcea1, echo=FALSE, eval=TRUE, tidy=FALSE, warning=FALSE, dpi=300, fig.show='hold',fig.cap="Inspecting probabilistic sensitivity analysis using BCEA built-in functions, for example using the cost-effectiveness plane.",out.width='100%'}
 cep_sm1_mar <- BCEA::ceplane.plot(lmdm1_mar$cea, 
             graph = "ggplot2") + ggplot2::ggtitle("")
 ceac_sm1_mar <- BCEA::ceac.plot(lmdm1_mar$cea, 
@@ -360,7 +361,7 @@ ceac_sm1_mar <- BCEA::ceac.plot(lmdm1_mar$cea,
 cep_sm1_mar
 ```
 
-```{r figplotcea2, echo=FALSE, eval=TRUE, tidy=FALSE, warning=FALSE, dpi=300, fig.show='hold',fig.cap="Inspecting probabilistic sensitivity analysis using BCEA built-in functions, for example using the cost-effectiveness acceptability curve.",out.width='100%', fig.pos='h', out.extra=''}
+```{r figplotcea2, echo=FALSE, eval=TRUE, tidy=FALSE, warning=FALSE, dpi=300, fig.show='hold',fig.cap="Inspecting probabilistic sensitivity analysis using BCEA built-in functions, for example using the cost-effectiveness acceptability curve.",out.width='100%'}
 ceac_sm1_mar
 ```
 

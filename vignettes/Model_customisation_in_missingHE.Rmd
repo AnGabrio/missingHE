@@ -3,9 +3,10 @@ title: "Model and output customisation in missingHE"
 description: >
   This tutorial shows few examples of how different types of models and their output can be
   customised in missingHE based on the needs of the user when performing trial-based CEA.
-output: 
-    bookdown::html_document2:
-        base_format: rmarkdown::html_vignette
+output: rmarkdown::html_vignette
+pkgdown:
+  as_is: true
+  output: bookdown::html_document2
 vignette: >
   %\VignetteIndexEntry{Model and output customisation in missingHE}
   %\VignetteEngine{knitr::rmarkdown}
@@ -134,15 +135,15 @@ ppc_dens_m3 <- ppc(x = sm1_bg, type = "dens_overlay", outcome = "effects",
              ndisplay = 20, trt = "none")
 ```
 
-```{r figplotppc1, echo=FALSE, eval=TRUE, tidy=TRUE, warning=FALSE, dpi=300, fig.show='hold',fig.cap="Posterior densities of 20 replicated data under model 1 compared to the empirical density of the original data.", out.width='100%', fig.pos='h', out.extra=''}
+```{r figplotppc1, echo=FALSE, eval=TRUE, tidy=TRUE, warning=FALSE, dpi=300, fig.show='hold',fig.cap="Posterior densities of 20 replicated data under model 1 compared to the empirical density of the original data.", out.width='100%'}
 ppc_dens_m1
 ```
 
-```{r figplotppc2, echo=FALSE, eval=TRUE, tidy=TRUE, warning=FALSE, dpi=300, fig.show='hold',fig.cap="Posterior densities of 20 replicated data under model 2 compared to the empirical density of the original data.", out.width='100%', fig.pos='h', out.extra=''}
+```{r figplotppc2, echo=FALSE, eval=TRUE, tidy=TRUE, warning=FALSE, dpi=300, fig.show='hold',fig.cap="Posterior densities of 20 replicated data under model 2 compared to the empirical density of the original data.", out.width='100%'}
 ppc_dens_m2
 ```
 
-```{r figplotppc3, echo=FALSE, eval=TRUE, tidy=TRUE, warning=FALSE, dpi=300, fig.show='hold',fig.cap="Posterior densities of 20 replicated data under model 3 compared to the empirical density of the original data.", out.width='100%', fig.pos='h', out.extra=''}
+```{r figplotppc3, echo=FALSE, eval=TRUE, tidy=TRUE, warning=FALSE, dpi=300, fig.show='hold',fig.cap="Posterior densities of 20 replicated data under model 3 compared to the empirical density of the original data.", out.width='100%'}
 ppc_dens_m3
 ```
 
@@ -225,7 +226,7 @@ sm1_nn_cov_re <- selection(data = MenSS, dist_e = "norm", dist_c = "norm",
 
 As per usual, functions such as `postsum`, `print` and `coef` may be used to summarise posterior estimates for all relevant model parameters. When interest is in assessing MCMC convergence of a given model, the function `diagnostic` may be used to inspect graphical diagnostics for each family of model parameters. For example, the following code shows how autocorrelation plots for all regression coefficients in `model.eff` may be obtained based on the model in `sm1_nn_cov`.
 
-```{r figplotdiag, echo=FALSE, eval=TRUE, tidy=TRUE, warning=FALSE, dpi=300, fig.show='hold',fig.cap="Checking convergence using the diagnostic function for a family of model parameters estimated in missingHE, for example through inspection of the autocorrelation plots.", out.width='100%', fig.pos='h', out.extra=''}
+```{r figplotdiag, echo=FALSE, eval=TRUE, tidy=TRUE, warning=FALSE, dpi=300, fig.show='hold',fig.cap="Checking convergence using the diagnostic function for a family of model parameters estimated in missingHE, for example through inspection of the autocorrelation plots.", out.width='100%'}
 diagnostic(x = sm1_nn_cov, type = "acf", param = "alpha")
 ```
 

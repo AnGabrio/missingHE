@@ -26,8 +26,7 @@
 #' @name MenSS
 #' @usage data(MenSS)
 #' @format A data frame with `159` rows and `12` variables
-#' @references Bailey et al. (2016) Health Technology Assessment 20
-#' (\href{https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5204131/}{PubMed})
+#' @references Bailey et al. (2016) Health Technology Assessment 20(91). <doi:10.3310/hta20910>
 #'
 #'
 #' @examples

@@ -41,7 +41,6 @@ summary(MenSS)
 str(MenSS)
 }
 \references{
-Bailey et al. (2016) Health Technology Assessment 20
-(\href{https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5204131/}{PubMed})
+Bailey et al. (2016) Health Technology Assessment 20(91). \url{doi:10.3310/hta20910}
 }
 \keyword{datasets}

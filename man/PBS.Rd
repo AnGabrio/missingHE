@@ -40,7 +40,6 @@ summary(PBS)
 str(PBS)
 }
 \references{
-Hassiotis et al. (2014) BMC Psychiatry 14
-(\href{https://pubmed.ncbi.nlm.nih.gov/25927187/}{PubMed})
+Hassiotis et al. (2014) BMC Psychiatry 14, 219. \url{doi:10.1186/s12888-014-0219-6}
 }
 \keyword{datasets}

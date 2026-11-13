@@ -3,9 +3,10 @@ title: "Fitting MNAR models in missingHE"
 description: >
   This tutorial shows few examples of how models in missingHE can be fitted under different types of
   missing not at random (MNAR) assumptions for the outcome variables in trial-based CEA.
-output: 
-    bookdown::html_document2:
-        base_format: rmarkdown::html_vignette
+output: rmarkdown::html_vignette
+pkgdown:
+  as_is: true
+  output: bookdown::html_document2
 vignette: >
   %\VignetteIndexEntry{Fitting MNAR models in missingHE}
   %\VignetteEngine{knitr::rmarkdown}
@@ -109,7 +110,7 @@ postsum(NN.sel2)
 
 and compare them to those obtained under the initial MNAR model. We see that, with respect to the results from `NN.sel1`, the mean effectiveness estimates across both groups (`tmu_e`) are on average higher. Average mean estimates for each treatment group and associated incremental results for each model can also be inspected by using the `summary` function. To have a better idea of the impact in terms of cost-effectiveness conclusions, we can use the function `ceac.plot`, from the package `BCEA`, to display the cost-effectiveness acceptability curves based on the results from each model.
 
-```{r figplotceamnarsel1, echo=FALSE, eval=TRUE, tidy=FALSE,  warning=FALSE, dpi=300, fig.show='hold',fig.cap="Cost-effectiveness acceptability curve (CEAC) derived from model 1 fitted under default MNAR prior specification for the missing effectiveness mechanism.",out.width='100%', fig.pos='h', out.extra=''}
+```{r figplotceamnarsel1, echo=FALSE, eval=TRUE, tidy=FALSE,  warning=FALSE, dpi=300, fig.show='hold',fig.cap="Cost-effectiveness acceptability curve (CEAC) derived from model 1 fitted under default MNAR prior specification for the missing effectiveness mechanism.",out.width='100%'}
 ceac_sm1_mnar <- BCEA::ceac.plot(NN.sel1$cea, 
             graph = "ggplot2") + ggplot2::ggtitle("")
 ceac_sm2_mnar <- BCEA::ceac.plot(NN.sel2$cea, 
@@ -117,7 +118,7 @@ ceac_sm2_mnar <- BCEA::ceac.plot(NN.sel2$cea,
 ceac_sm1_mnar
 ```
 
-```{r figplotceamnarsel2, echo=FALSE, eval=TRUE, tidy=FALSE,  warning=FALSE, dpi=300, fig.show='hold',fig.cap="Cost-effectiveness acceptability curve (CEAC) derived from model 2 fitted under custom MNAR prior specification for the missing effectiveness mechanism.",out.width='100%', fig.pos='h', out.extra=''}
+```{r figplotceamnarsel2, echo=FALSE, eval=TRUE, tidy=FALSE,  warning=FALSE, dpi=300, fig.show='hold',fig.cap="Cost-effectiveness acceptability curve (CEAC) derived from model 2 fitted under custom MNAR prior specification for the missing effectiveness mechanism.",out.width='100%'}
 ceac_sm2_mnar
 ```
 
@@ -200,7 +201,7 @@ NN.pat3 <- pattern(data = MenSS, model.eff = e ~ trt + u.0,
 
 We assess the impact on the cost-effectiveness results by looking at the acceptability curves derived from each MNAR model using again the function `ceac.plot`.
 
-```{r figplotceamnarpat1, echo=FALSE, eval=TRUE, tidy=FALSE,  warning=FALSE, dpi=300, fig.show='hold',fig.cap="Cost-effectiveness acceptability curves (CEAC) derived from model 1 fitted under uniform MNAR priors for the effectiveness sensitivity parameter.",out.width='100%', fig.pos='h', out.extra=''}
+```{r figplotceamnarpat1, echo=FALSE, eval=TRUE, tidy=FALSE,  warning=FALSE, dpi=300, fig.show='hold',fig.cap="Cost-effectiveness acceptability curves (CEAC) derived from model 1 fitted under uniform MNAR priors for the effectiveness sensitivity parameter.",out.width='100%'}
 ceac_pm2_mnar <- BCEA::ceac.plot(NN.pat2$cea, 
             graph = "ggplot2") + ggplot2::ggtitle("")
 ceac_pm3_mnar <- BCEA::ceac.plot(NN.pat3$cea, 
@@ -208,7 +209,7 @@ ceac_pm3_mnar <- BCEA::ceac.plot(NN.pat3$cea,
 ceac_pm2_mnar
 ```
 
-```{r figplotceamnarpat2, echo=FALSE, eval=TRUE, tidy=FALSE,  warning=FALSE, dpi=300, fig.show='hold',fig.cap="Cost-effectiveness acceptability curves (CEAC) derived from model 2 fitted under normal MNAR priors for the effectiveness sensitivity parameter.",out.width='100%', fig.pos='h', out.extra=''}
+```{r figplotceamnarpat2, echo=FALSE, eval=TRUE, tidy=FALSE,  warning=FALSE, dpi=300, fig.show='hold',fig.cap="Cost-effectiveness acceptability curves (CEAC) derived from model 2 fitted under normal MNAR priors for the effectiveness sensitivity parameter.",out.width='100%'}
 ceac_pm3_mnar
 ```
 
@@ -288,13 +289,13 @@ postsum(NN.hur2)
 
 and look at how imputations in each treatment group are carried out based using the `plot` function.
 
-```{r figplothm2, echo=FALSE, eval=TRUE, tidy=FALSE,  warning=FALSE, dpi=300, fig.show='hold',fig.cap="Scatter plots of observed and imputed effectiveness data in the SoC arm (trt = 1) based on an hurdle model assuming all individuals younger than 22 years old are associated with a perfect healf state.",out.width='100%', fig.pos='h', out.extra=''}
+```{r figplothm2, echo=FALSE, eval=TRUE, tidy=FALSE,  warning=FALSE, dpi=300, fig.show='hold',fig.cap="Scatter plots of observed and imputed effectiveness data in the SoC arm (trt = 1) based on an hurdle model assuming all individuals younger than 22 years old are associated with a perfect healf state.",out.width='100%'}
 plot(NN.hur2, class = "scatter", outcome = "effects", trt = "SoC")
 ```
 
 As Figure \@ref(fig:figplothm2) shows, the model imputes each missing structural effect in `"SoC"` as one with a very small credible interval. Finally, we compare the economic results from the two hurdle models using the `ceac.plot` function from the `BCEA` package.
 
-```{r figplotceamnarhm1, echo=FALSE, eval=TRUE, tidy=FALSE,  warning=FALSE, dpi=300, fig.show='hold',fig.cap="Cost-effectiveness acceptability curves (CEAC) derived from the hurdle model fitted under a MAR assumption about the number of structural ones in SoC.",out.width='100%', fig.pos='h', out.extra=''}
+```{r figplotceamnarhm1, echo=FALSE, eval=TRUE, tidy=FALSE,  warning=FALSE, dpi=300, fig.show='hold',fig.cap="Cost-effectiveness acceptability curves (CEAC) derived from the hurdle model fitted under a MAR assumption about the number of structural ones in SoC.",out.width='100%'}
 ceac_hm1_mnar <- BCEA::ceac.plot(NN.hur1$cea, 
             graph = "ggplot2") + ggplot2::ggtitle("")
 ceac_hm2_mnar <- BCEA::ceac.plot(NN.hur2$cea, 
@@ -302,7 +303,7 @@ ceac_hm2_mnar <- BCEA::ceac.plot(NN.hur2$cea,
 ceac_hm1_mnar
 ```
 
-```{r figplotceamnarhm2, echo=FALSE, eval=TRUE, tidy=FALSE,  warning=FALSE, dpi=300, fig.show='hold',fig.cap="Cost-effectiveness acceptability curves (CEAC) derived from the hurdle models fitted under a MNAR assumption about the number of structural ones in SoC.",out.width='100%', fig.pos='h', out.extra=''}
+```{r figplotceamnarhm2, echo=FALSE, eval=TRUE, tidy=FALSE,  warning=FALSE, dpi=300, fig.show='hold',fig.cap="Cost-effectiveness acceptability curves (CEAC) derived from the hurdle models fitted under a MNAR assumption about the number of structural ones in SoC.",out.width='100%'}
 ceac_hm2_mnar
 ```
 

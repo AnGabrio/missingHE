@@ -66,7 +66,7 @@
 #' - **prior**: The custom prior choices specified by the user. If no custom prior specified, default priors are used (see details).
 #'
 #'
-#' @seealso [R2jags::jags()], [BCEA::bcea()].
+#' @seealso [missingHE-package] [R2jags::jags()], [BCEA::bcea()].
 #' @keywords CEA JAGS missing data Hurdle Models
 #' @importFrom stats model.frame terms
 #' @details Depending on the distributions specified for the outcome variables in the arguments `dist_e` and
@@ -108,17 +108,19 @@
 #' where `x` is the fixed regression coefficient for which also the random effects are desired and `z` is the clustering variable across which
 #' the random effects are specified (must be the name of a factor variable in the dataset).
 #'
+#' For an overview of the general modeling framework and additional package utilities, see [missingHE-package].
+#'
 #' @author Andrea Gabrio
 #' @references
-#' Ntzoufras I. (2009). *Bayesian Modelling Using WinBUGS*, John Wiley and Sons.
+#' Gabrio, A., Mason, AJ. Baio, G. (2019). *A full Bayesian model to handle structural ones and missingness in economic evaluations from individual-level data*. Statistics in medicine, 38(8), 1399-1420 <10.1002/sim.8045>
 #'
-#' Daniels, MJ. Hogan, JW. (2008). *Missing Data in Longitudinal Studies: strategies for Bayesian modelling and sensitivity analysis*, CRC/Chapman Hall.
+#' Mason, AJ. Gomes, M. Carpenter, J. Grieve, R. (2021). *Flexible Bayesian longitudinal models for cost‐effectiveness analyses with informative missing data*. Health economics, 30(12), 3138-3158. <10.1002/hec.4408>
 #'
-#' Baio, G.(2012). *Bayesian Methods in Health Economics*. CRC/Chapman Hall, London.
+#' Daniels, MJ. Hogan, JW. *Missing Data in Longitudinal Studies: strategies for Bayesian modelling and sensitivity analysis*, CRC/Chapman Hall. <doi:10.1201/9781420011180>
 #'
-#' Gelman, A. Carlin, JB., Stern, HS. Rubin, DB.(2003). *Bayesian Data Analysis, 2nd edition*, CRC Press.
+#' Baio, G.(2012). *Bayesian Methods in Health Economics*. CRC/Chapman Hall, London. <doi:10.1201/b13099>
 #'
-#' Plummer, M. *JAGS: A program for analysis of Bayesian graphical models using Gibbs sampling*. (2003).
+#' Plummer, M. *JAGS: A program for analysis of Bayesian graphical models using Gibbs sampling*. (2003). <https://www.r-project.org/conferences/DSC-2003/Proceedings/Plummer.pdf>
 #' @export
 #'
 #' @examples
