@@ -11,7 +11,6 @@ articles:
   - title: Tutorials
     navbar: ~
     contents:
-      - missingHE-package
       - Introduction_to_missingHE
       - Fitting_MNAR_models_in_missingHE
       - Model_customisation_in_missingHE
