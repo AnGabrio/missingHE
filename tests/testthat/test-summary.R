@@ -53,10 +53,16 @@ test_that("output of postsum function", {
 
   load(test_path("testdata/pmm.RData"))
 
-  expect_output(postsum(pmm, display = "fixed", digits = 3),
-                regexp = "mean        sd     2.5%       50%    97.5%   Rhat n.eff")
-  expect_output(postsum(pmm, display = "loglik", digits = 3),
-                regexp = "mean      sd     2.5%     50%   97.5%  Rhat n.eff")
+
+  expect_equal(
+    colnames(postsum(pmm, display = "fixed")),
+    c("mean", "sd", "2.5%", "50%", "97.5%", "Rhat", "n.eff")
+  )
+
+  expect_equal(
+    colnames(postsum(pmm, display = "loglik")),
+    c("mean", "sd", "2.5%", "50%", "97.5%", "Rhat", "n.eff")
+  )
 
   expect_error(
     postsum.missingHE(pmm$data_set),

@@ -1,7 +1,7 @@
 Package: missingHE
 Type: Package
 Title: Missing Cost Effectiveness Models 
-Version: 1.6.2.1
+Version: 1.6.3
 Description: Performs Bayesian cost-effectiveness analysis with missing outcome data. Three classes of models can be fitted under a variety of missing data assumptions: selection models, pattern mixture models and hurdle models. The package allows to assess model convergence and summarise the statistical and economic results using different types of measures and graphs.
 Authors@R: person("Andrea", "Gabrio", email = "a.gabrio@maastrichtuniversity.nl", role = c("aut", "cre", "cph"), comment = c(ORCID = "0000-0002-7650-4534"))
 Depends: R (>= 4.1.0)
