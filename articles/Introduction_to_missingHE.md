@@ -72,103 +72,94 @@ and [longitudinal data
 analysis](https://angabrio.github.io/missingHE/articles/Longitudinal_models_in_missingHE.Rmd).
 
 Trial-based health economic data usually consist in the cross-sectional
-cost-effectiveness pair of variables $`(e_{it},c_{it})`$, collected on
-the $`i`$-th patient assigned to the $`t`$-th treatment in the study,
-for $`i=1,\ldots,N`$ patients and $`t=1,\ldots,T`$ treatment options. In
-many jurisdictions, the recommended effectiveness variable $`e_{it}`$ is
-a *Quality Adjusted Life Years* (QALYs) measure, which is typically
+cost-effectiveness pair of variables \\(e\_{it},c\_{it})\\, collected on
+the \\i\\-th patient assigned to the \\t\\-th treatment in the study,
+for \\i=1,\ldots,N\\ patients and \\t=1,\ldots,T\\ treatment options. In
+many jurisdictions, the recommended effectiveness variable \\e\_{it}\\
+is a *Quality Adjusted Life Years* (QALYs) measure, which is typically
 obtained by aggregating utility scores computed from the patients’
 answers to generic health-related quality of life questionnaires (e.g.,
-EQ-5D) collected at given time intervals. The cost variable $`c_{it}`$
+EQ-5D) collected at given time intervals. The cost variable \\c\_{it}\\
 denotes the sum of all relevant patient-level costs (e.g.,
 direct/indirect medical costs, productivity losses, etc.), which are
 often collected from the patients’ answers to different types of
 healthcare-resource utilisation questionnaires or medical records.
 
-In `missingHE`, the observed variables $`(e_{it},c_{it})`$ are modelled
-using a joint bivariate probability distribution with density
-$`p(e_{it},c_{it}\mid \boldsymbol \theta_t)`$, as a function of a vector
-of relevant parameters $`\boldsymbol \theta_t`$, and implemented using
-the following conditional factorisation
+In `missingHE`, the observed variables \\(e\_{it},c\_{it})\\ are
+modelled using a joint bivariate probability distribution with density
+\\p(e\_{it},c\_{it}\mid \boldsymbol \theta_t)\\, as a function of a
+vector of relevant parameters \\\boldsymbol \theta_t\\, and implemented
+using the following conditional factorisation
 
-``` math
-\begin{equation} 
-p(e_{it},c_{it} \mid \boldsymbol \theta_t) \quad = \quad p(e_{it} \mid \boldsymbol \theta_{et})p(c_{it} \mid e_{it},  \boldsymbol \theta_{ct}),
- (\#eq:bivmodel)
-\end{equation}
-```
+\\\begin{equation} p(e\_{it},c\_{it} \mid \boldsymbol \theta_t) \quad =
+\quad p(e\_{it} \mid \boldsymbol \theta\_{et})p(c\_{it} \mid e\_{it},
+\boldsymbol \theta\_{ct}), (\\eq:bivmodel) \end{equation}\\
 
-where $`p(e_{it}\mid \boldsymbol \theta_{et})`$ denotes the marginal
-effectiveness distribution and
-$`p(c_{it} \mid e_{it}, \boldsymbol \theta_{ct})`$ the conditional cost
-distribution given $`e_{it}`$, with $`\theta_{et}`$ and $`\theta_{ct}`$
-being the treatment-specific set of parameters indexing the marginal
-effectiveness and conditional cost distributions, respectively. To
-simplify notation, we now drop the treatment index $`t`$.
+where \\p(e\_{it}\mid \boldsymbol \theta\_{et})\\ denotes the marginal
+effectiveness distribution and \\p(c\_{it} \mid e\_{it}, \boldsymbol
+\theta\_{ct})\\ the conditional cost distribution given \\e\_{it}\\,
+with \\\theta\_{et}\\ and \\\theta\_{ct}\\ being the treatment-specific
+set of parameters indexing the marginal effectiveness and conditional
+cost distributions, respectively. To simplify notation, we now drop the
+treatment index \\t\\.
 
 Both outcome densities in Equation @ref(eq:bivmodel) are specified using
 some parametric forms for the probability distributions to describe the
 underlying uncertainty in the cost-effectiveness data. The set of model
-parameters can be generally represented as
-$`\boldsymbol \theta=(\boldsymbol \phi(x),\boldsymbol \psi(x))`$, where:
-$`\boldsymbol \phi(x)=(\phi_e(x),\phi_c(x))`$ denotes the set of
-*location* parameters (e.g., mean) and
-$`\boldsymbol \psi(x)=(\psi_e(x),\psi_c(x))`$ the set of *ancillary*
-parameters (e.g., variance) indexing the outcome distributions, both
-depending on some vector of potential baseline covariates $`x`$ (e.g.,
-age, sex, etc…). While it is possible for both $`\boldsymbol \phi`$ and
-$`\boldsymbol \psi`$ to explicitly depend on $`x`$, the model
-specification is usually simplified assuming that these only affect the
-location parameters through a generalised linear formulation. For
-example, the location parameter of the effectiveness model can be
-specified as:
+parameters can be generally represented as \\\boldsymbol
+\theta=(\boldsymbol \phi(x),\boldsymbol \psi(x))\\, where: \\\boldsymbol
+\phi(x)=(\phi_e(x),\phi_c(x))\\ denotes the set of *location* parameters
+(e.g., mean) and \\\boldsymbol \psi(x)=(\psi_e(x),\psi_c(x))\\ the set
+of *ancillary* parameters (e.g., variance) indexing the outcome
+distributions, both depending on some vector of potential baseline
+covariates \\x\\ (e.g., age, sex, etc…). While it is possible for both
+\\\boldsymbol \phi\\ and \\\boldsymbol \psi\\ to explicitly depend on
+\\x\\, the model specification is usually simplified assuming that these
+only affect the location parameters through a generalised linear
+formulation. For example, the location parameter of the effectiveness
+model can be specified as:
 
-``` math
-\begin{equation}
-g_e(\phi_{ie}) \quad = \quad \alpha_{0} + \sum_{k=1}^K \alpha_kx_{ik}\,\,[+ \ldots],
- (\#eq:glme)
-\end{equation}
-```
+\\\begin{equation} g_e(\phi\_{ie}) \quad = \quad \alpha\_{0} +
+\sum\_{k=1}^K \alpha_kx\_{ik}\\\\\[+ \ldots\], (\\eq:glme)
+\end{equation}\\
 
 and the location parameter of the cost model as:
 
-``` math
-\begin{equation}
-g_c(\phi_{ic}) \quad = \quad \beta_{0} + \sum_{k=1}^K \beta_kx_{ik} + \beta_f e_{i}, \,\,[+ \ldots],
- (\#eq:glmc)
-\end{equation}
-```
+\\\begin{equation} g_c(\phi\_{ic}) \quad = \quad \beta\_{0} +
+\sum\_{k=1}^K \beta_kx\_{ik} + \beta_f e\_{i}, \\\\\[+ \ldots\],
+(\\eq:glmc) \end{equation}\\
 
-where the regression coefficient $`\beta_f`$ is included to capture the
-possible dependence between $`c_{i}`$ and $`e_{i}`$ at the location
+where the regression coefficient \\\beta_f\\ is included to capture the
+possible dependence between \\c\_{i}\\ and \\e\_{i}\\ at the location
 level. Covariates may be included into the model at different scales
-using the link functions $`g_e(\cdot)`$ and $`g_c(\cdot)`$, being either
+using the link functions \\g_e(\cdot)\\ and \\g_c(\cdot)\\, being either
 identity, logarithmic or logit, depending on the type of outcome and
 distribution specified. Note that `missingHE` expands any categorical
 covariates to a set of dummy variables. In addition, Equation
 @ref(eq:glme) and Equation @ref(eq:glmc) can be extended, as indicated
-by $`[+ \ldots]`$, to include additional terms into the model, e.g.,
+by \\\[+ \ldots\]\\, to include additional terms into the model, e.g.,
 clustering effects to account for the possible multilevel structure of
 the data. The objective of the statistical analysis is the estimation of
-population average effectiveness and cost parameters
-$`\boldsymbol \mu=(\mu_{e},\mu_{c})`$ in each treatment group as well as
-to quantify the (posterior) uncertainty around them. Estimates of these
-parameters can be obtained from Equation @ref(eq:glme) and Equation
-@ref(eq:glmc) either from their respective regression parameters after
-mean centring all covariates or through repeatedly sampling from the
-predictive distribution of the outcomes using Monte Carlo integration.
+population average effectiveness and cost parameters \\\boldsymbol
+\mu=(\mu\_{e},\mu\_{c})\\ in each treatment group as well as to quantify
+the (posterior) uncertainty around them. Estimates of these parameters
+can be obtained from Equation @ref(eq:glme) and Equation @ref(eq:glmc)
+either from their respective regression parameters after mean centring
+all covariates or through repeatedly sampling from the predictive
+distribution of the outcomes using Monte Carlo integration.
 
 Assuming that the location parameters are modelled using a linear
 predictor form as in Equation @ref(eq:glme) and Equation @ref(eq:glmc),
 priors on the corresponding sets of regression coefficients can be
-specified as
-$`\boldsymbol \alpha=(\alpha_0,\ldots,\alpha_K) \overset{\text{iid}}{\sim} \text{Normal}(\mu_{\alpha},\sigma_{\alpha})`$
-and
-$`\boldsymbol \beta=(\beta_0,\ldots,\beta_K,\beta_f) \overset{\text{iid}}{\sim} \text{Normal}(\mu_{\beta},\sigma_{\beta})`$,
-where the notation $`\mu_{\cdot}`$ and $`\sigma_{\cdot}`$ denotes the
-prior mean and standard deviation, respectively. By default, `missingHE`
-assumes “minimally informative” prior values of $`\mu_{\cdot}=0`$ and
-$`\sigma_{\cdot}=1000`$ for all regression coefficients. When genuine
+specified as \\\boldsymbol \alpha=(\alpha_0,\ldots,\alpha_K)
+\overset{\text{iid}}{\sim}
+\text{Normal}(\mu\_{\alpha},\sigma\_{\alpha})\\ and \\\boldsymbol
+\beta=(\beta_0,\ldots,\beta_K,\beta_f) \overset{\text{iid}}{\sim}
+\text{Normal}(\mu\_{\beta},\sigma\_{\beta})\\, where the notation
+\\\mu\_{\cdot}\\ and \\\sigma\_{\cdot}\\ denotes the prior mean and
+standard deviation, respectively. By default, `missingHE` assumes
+“minimally informative” prior values of \\\mu\_{\cdot}=0\\ and
+\\\sigma\_{\cdot}=1000\\ for all regression coefficients. When genuine
 prior knowledge on specific parameters is available, it is possible to
 modify the default priors and elicit the corresponding information into
 the model. As for the ancillary parameters, the choice of the prior
@@ -178,35 +169,32 @@ according to the modelling choices available in `missingHE`.
 ## Missingness Approach
 
 `missingHE` focusses exclusively on handling missingness in cost and
-effectiveness measures ($`o_i=c_i,e_i`$) assuming the set of baseline
-variables $`\boldsymbol x_i`$ to be fully-observed for all individuals.
+effectiveness measures (\\o_i=c_i,e_i\\) assuming the set of baseline
+variables \\\boldsymbol x_i\\ to be fully-observed for all individuals.
 When analysing incomplete outcome data, it is essential to investigate
 the reasons behind the missingness process, often referred to as the
 *missing data mechanism*. Since this is typically not under the control
 of the investigators, unverifiable assumptions have to be made, and the
 validity of the analysis depends on whether the assumptions formulated
 hold for the data at hand. Formally, given a certain outcome variable
-$`o_i`$, its missing data mechanism can be defined as a probability
-model for the distribution of the missingness indicators $`m_i`$,
+\\o_i\\, its missing data mechanism can be defined as a probability
+model for the distribution of the missingness indicators \\m_i\\,
 denoting whether the corresponding value is observed
-$`o_i=o^{\text{obs}}_i (m_i=0)`$ or missing
-$`o_i=o^{\text{mis}}_i (m_i=1)`$, conditional on $`o^{\text{obs}}_i`$,
-$`o^{\text{mis}}_i`$, and $`\boldsymbol x_i`$. Depending on the assumed
-relationship between $`m_i`$, $`o^{\text{obs}}_i`$, $`o^{\text{mis}}_i`$
-(and $`\boldsymbol x_i`$), Rubin’s taxonomy distinguishes between three
-broad types of mechanisms: *missing completely at random* (MCAR);
-*missing at random* (MAR); *missing not at random* (MNAR).
+\\o_i=o^{\text{obs}}\_i (m_i=0)\\ or missing \\o_i=o^{\text{mis}}\_i
+(m_i=1)\\, conditional on \\o^{\text{obs}}\_i\\, \\o^{\text{mis}}\_i\\,
+and \\\boldsymbol x_i\\. Depending on the assumed relationship between
+\\m_i\\, \\o^{\text{obs}}\_i\\, \\o^{\text{mis}}\_i\\ (and \\\boldsymbol
+x_i\\), Rubin’s taxonomy distinguishes between three broad types of
+mechanisms: *missing completely at random* (MCAR); *missing at random*
+(MAR); *missing not at random* (MNAR).
 
 Under a MCAR mechanism:
 
-``` math
-\begin{equation}
-p(m_i\mid o^{\text{obs}}_i,o^{\text{mis}}_i,\boldsymbol X_i,\boldsymbol \eta)=p(m_i\mid \boldsymbol \eta),
- (\#eq:mcar)
-\end{equation}
-```
+\\\begin{equation} p(m_i\mid
+o^{\text{obs}}\_i,o^{\text{mis}}\_i,\boldsymbol X_i,\boldsymbol
+\eta)=p(m_i\mid \boldsymbol \eta), (\\eq:mcar) \end{equation}\\
 
-where $`\boldsymbol \eta`$ denotes the set of parameters indexing the
+where \\\boldsymbol \eta\\ denotes the set of parameters indexing the
 missingness model. A key consequence of MCAR is that any method yielding
 valid inferences in the absence of missing values will also be valid
 when focussing on the observed data alone, including the set of
@@ -214,38 +202,32 @@ individuals with fully-observed data (“complete cases”).
 
 Under a MAR mechanism:
 
-``` math
-\begin{equation}
-p(m_i\mid o^{\text{obs}}_i,o^{\text{mis}}_i,\boldsymbol X_i, \boldsymbol \eta)=p(m_i\mid o^{\text{obs}}_i,\boldsymbol X_i, \boldsymbol \eta).
- (\#eq:mar)
-\end{equation}
-```
+\\\begin{equation} p(m_i\mid
+o^{\text{obs}}\_i,o^{\text{mis}}\_i,\boldsymbol X_i, \boldsymbol
+\eta)=p(m_i\mid o^{\text{obs}}\_i,\boldsymbol X_i, \boldsymbol \eta).
+(\\eq:mar) \end{equation}\\
 
 A key consequence of MAR is that missing values can be validly
-“predicted” using the observed data and a correct model for $`o_i`$.
+“predicted” using the observed data and a correct model for \\o_i\\.
 Both MCAR and MAR often fall in the general class of *ignorable*
-mechanisms in that, once it is established that
-$`p(m_i\mid o_i,\boldsymbol x_i)`$ does not depend on
-$`o^{\text{mis}}_i`$, it is possible to obtain valid inferences given a
-correctly specification for $`p(o_i\mid \boldsymbol x_i)`$.
+mechanisms in that, once it is established that \\p(m_i\mid
+o_i,\boldsymbol x_i)\\ does not depend on \\o^{\text{mis}}\_i\\, it is
+possible to obtain valid inferences given a correctly specification for
+\\p(o_i\mid \boldsymbol x_i)\\.
 
 Finally, under a MNAR mechanism:
 
-``` math
-\begin{equation}
-p(m_i\mid o_i,\boldsymbol X_i, \boldsymbol \eta)=p(m_i\mid o^{\text{obs}}_i,o^{\text{mis}}_i,\boldsymbol X_i, \boldsymbol \eta).
- (\#eq:mnar)
-\end{equation}
-```
+\\\begin{equation} p(m_i\mid o_i,\boldsymbol X_i, \boldsymbol
+\eta)=p(m_i\mid o^{\text{obs}}\_i,o^{\text{mis}}\_i,\boldsymbol X_i,
+\boldsymbol \eta). (\\eq:mnar) \end{equation}\\
 
 A MNAR mechanism is often referred to as *non-ignorable* or
-*informative* because the model assumed for
-$`p(m_i\mid o_i,\boldsymbol x_i)`$ must be specified and its choice will
-drive the results of the analysis. Thus, without relying on external
-information, identification of the model is driven by unverifiable
-assumptions and conducting sensitivity analysis to assess the robustness
-of the results to a range of plausible missingness assumptions becomes
-imperative.
+*informative* because the model assumed for \\p(m_i\mid o_i,\boldsymbol
+x_i)\\ must be specified and its choice will drive the results of the
+analysis. Thus, without relying on external information, identification
+of the model is driven by unverifiable assumptions and conducting
+sensitivity analysis to assess the robustness of the results to a range
+of plausible missingness assumptions becomes imperative.
 
 Under MNAR, almost all standard analysis methods are invalid, and a
 “principled” approach to missingness is instead required to obtain valid
@@ -266,49 +248,42 @@ provided.
 
 ## Selection Models
 
-The joint distribution of an outcome $`o_{i}`$
-($`e_{i} \;\text{or}\; c_{i}`$) and its missingness ($`m_i`$) is
-specified in terms of a complete data model for the outcome and an
-explicit model for the probability of missingness conditional on the
-possibly unobserved data:
+The joint distribution of an outcome \\o\_{i}\\ (\\e\_{i} \\\text{or}\\
+c\_{i}\\) and its missingness (\\m_i\\) is specified in terms of a
+complete data model for the outcome and an explicit model for the
+probability of missingness conditional on the possibly unobserved data:
 
-``` math
-\begin{equation}
-p(o_{i}, m_{i} \mid \boldsymbol \theta, \boldsymbol \eta) \quad = \quad p(o_{i} \mid \boldsymbol \theta)p(m_{i} \mid o_{i},\boldsymbol \eta),
- (\#eq:sm)
-\end{equation}
-```
+\\\begin{equation} p(o\_{i}, m\_{i} \mid \boldsymbol \theta, \boldsymbol
+\eta) \quad = \quad p(o\_{i} \mid \boldsymbol \theta)p(m\_{i} \mid
+o\_{i},\boldsymbol \eta), (\\eq:sm) \end{equation}\\
 
-where $`\boldsymbol \theta`$ and $`\boldsymbol \eta`$ denote the two
+where \\\boldsymbol \theta\\ and \\\boldsymbol \eta\\ denote the two
 (distinct) sets of parameters indexing the outcome and missingness
-model, respectively. While for $`o_{i}`$ the model specification varies
+model, respectively. While for \\o\_{i}\\ the model specification varies
 depending on the type of outcome and distributional assumptions (see
-Section @ref(sec-frame)), for $`m_{i}`$`missingHE` uses a common
-structure which models the missingness probability $`\pi^m_i`$ as
+Section @ref(sec-frame-intro)), for \\m\_{i}\\ `missingHE` uses a common
+structure which models the missingness probability \\\pi^m_i\\ as
 function of other quantities through a logistic regression:
 
-``` math
-\begin{equation}
-\text{logit}(\pi^m_i)=\gamma_{0}+ \sum_{k=1}^K \gamma_k x_{ik} + \delta o_{i} \,\,[+ \ldots],
- (\#eq:misp)
-\end{equation}
-```
+\\\begin{equation} \text{logit}(\pi^m_i)=\gamma\_{0}+ \sum\_{k=1}^K
+\gamma_k x\_{ik} + \delta o\_{i} \\\\\[+ \ldots\], (\\eq:misp)
+\end{equation}\\
 
-where $`\gamma_{0}`$, $`\boldsymbol \gamma=(\gamma_1,\ldots,\gamma_K)`$
-and $`\delta`$ denote the intercept, the set of covariates-specific
+where \\\gamma\_{0}\\, \\\boldsymbol \gamma=(\gamma_1,\ldots,\gamma_K)\\
+and \\\delta\\ denote the intercept, the set of covariates-specific
 coefficients, and the coefficient capturing the impact of the unobserved
-values (in $`o_i`$) on the missingness probability, respectively.
+values (in \\o_i\\) on the missingness probability, respectively.
 Additional terms, e.g., clustering effects, may also be included in
-Equation @ref(eq:misp) as indicated by $`[+ \ldots]`$. Due to the
-missing values in $`o_i`$, the model can only be identified by imposing
+Equation @ref(eq:misp) as indicated by \\\[+ \ldots\]\\. Due to the
+missing values in \\o_i\\, the model can only be identified by imposing
 some restrictions. These are implicitly defined from a combination of
-parametric assumptions about $`p(o_i\mid \boldsymbol \theta)`$ and
-dependence structure assumed for $`p(m_i \mid o_i,\boldsymbol \eta)`$.
+parametric assumptions about \\p(o_i\mid \boldsymbol \theta)\\ and
+dependence structure assumed for \\p(m_i \mid o_i,\boldsymbol \eta)\\.
 As a result, sensitivity analysis to assess the impact of alternative
 missingness assumptions on the inferences can be done by: varying the
-distributional assumption of $`p(o_i\mid \boldsymbol \theta)`$; varying
+distributional assumption of \\p(o_i\mid \boldsymbol \theta)\\; varying
 the modelling structure in Equation @ref(eq:misp); and, within a
-Bayesian setting, varying the prior distribution on $`\delta`$.
+Bayesian setting, varying the prior distribution on \\\delta\\.
 
 ## Pattern Mixture Models
 
@@ -316,37 +291,30 @@ The joint distribution of outcome and missingness is specified in terms
 of a conditional model for the outcome given the missingness indicators
 and a marginal model for the probability of missingness:
 
-``` math
-\begin{equation}
-p(o_i, m_i \mid \boldsymbol \theta, \boldsymbol \zeta) \quad = \quad p(o_i \mid m_i, \boldsymbol \nu)p(m_i \mid \boldsymbol \zeta),
- (\#eq:pmm)
-\end{equation}
-```
+\\\begin{equation} p(o_i, m_i \mid \boldsymbol \theta, \boldsymbol
+\zeta) \quad = \quad p(o_i \mid m_i, \boldsymbol \nu)p(m_i \mid
+\boldsymbol \zeta), (\\eq:pmm) \end{equation}\\
 
-where $`\boldsymbol \nu`$ and $`\boldsymbol \zeta`$ denote the
+where \\\boldsymbol \nu\\ and \\\boldsymbol \zeta\\ denote the
 (distinct) sets of parameters indexing the conditional model for the
 outcome and the marginal model of missingness, respectively. In contrast
-to Section @ref(sec-sm), the marginal model for $`m_i`$ corresponds to a
-model for the different missingness patterns $`d^m_i`$ to which
+to Section @ref(sec-sm), the marginal model for \\m_i\\ corresponds to a
+model for the different missingness patterns \\d^m_i\\ to which
 individuals can be assigned (according to the values of the indicators
-$`m_i`$). Following standard practice, to ease specification of
-$`p(m_i \mid \boldsymbol \zeta)`$, `missingHE` directly models the
-missingness pattern indicator $`d^m_i`$ using a Multinomial distribution
+\\m_i\\). Following standard practice, to ease specification of \\p(m_i
+\mid \boldsymbol \zeta)\\, `missingHE` directly models the missingness
+pattern indicator \\d^m_i\\ using a Multinomial distribution
 
-``` math
-\begin{equation}
-d^m_i \sim \text{Multinomial}(\boldsymbol \pi^{d^m}),
- (\#eq:pattern)
-\end{equation}
-```
+\\\begin{equation} d^m_i \sim \text{Multinomial}(\boldsymbol \pi^{d^m}),
+(\\eq:pattern) \end{equation}\\
 
-with $`\boldsymbol \pi^{d^m}`$ being the set of probabilities for each
-possible pattern, which is modelled through a joint prior
-$`\boldsymbol \pi^{d^m} \sim \text{Dirichlet}(\boldsymbol a^d)`$, where
-$`\boldsymbol a^d`$ denotes the set of prior concentration parameters.
-By default, `missingHE` assumes a minimally informative prior on these
-parameters by setting $`\boldsymbol a^d=\boldsymbol 1`$ to assign the
-same weight to each pattern probability.
+with \\\boldsymbol \pi^{d^m}\\ being the set of probabilities for each
+possible pattern, which is modelled through a joint prior \\\boldsymbol
+\pi^{d^m} \sim \text{Dirichlet}(\boldsymbol a^d)\\, where \\\boldsymbol
+a^d\\ denotes the set of prior concentration parameters. By default,
+`missingHE` assumes a minimally informative prior on these parameters by
+setting \\\boldsymbol a^d=\boldsymbol 1\\ to assign the same weight to
+each pattern probability.
 
 Note that, the conditional distribution of the outcomes is not always
 identifiable because, for all but the complete cases, some values are
@@ -363,30 +331,26 @@ unidentified outcome distributions in Equation @ref(eq:pmm) using the
 corresponding estimates from the complete case pattern.
 
 Exploration of non-ignorable assumptions is achieved by including
-*sensitivity parameters* $`\delta`$ within the type of restrictions used
+*sensitivity parameters* \\\delta\\ within the type of restrictions used
 to identify the model under ignorability. `missingHE` assesses MNAR
-using location-shift parameters $`\delta`$ within the imposed
-restrictions on pattern-specific means $`\mu^{d^m \star}`$ that are not
+using location-shift parameters \\\delta\\ within the imposed
+restrictions on pattern-specific means \\\mu^{d^m \star}\\ that are not
 identifiable from the data. For example, using the CC restrictions,
-`missingHE` identifies the marginal mean of a given outcome ($`e`$ or
-$`c`$) in the fully-missing pattern as:
+`missingHE` identifies the marginal mean of a given outcome (\\e\\ or
+\\c\\) in the fully-missing pattern as:
 
-``` math
-\begin{equation}
-\mu^{(1,1)} = \mu^{(0,0)} + \delta,
- (\#eq:senspar)
-\end{equation}
-```
+\\\begin{equation} \mu^{(1,1)} = \mu^{(0,0)} + \delta, (\\eq:senspar)
+\end{equation}\\
 
-where $`\mu^{(1,1)}`$ and $`\mu^{(0,0)}`$ denote the marginal mean in
+where \\\mu^{(1,1)}\\ and \\\mu^{(0,0)}\\ denote the marginal mean in
 the fully-missing and complete case pattern, respectively. Sensitivity
 analysis can then be conducted by: varying the type of identifying
-restrictions imposed; varying the prior distribution on $`\delta`$.
+restrictions imposed; varying the prior distribution on \\\delta\\.
 
 ## Hurdle Models
 
 Although hurdle models do not explicitly specify the joint distribution
-$`p(o_i,m_i)`$, and therefore cannot be classified as principled
+\\p(o_i,m_i)\\, and therefore cannot be classified as principled
 missingness methods, they can be tailored to assess the impact of
 alternative non-ignorable missingness assumptions. A key advantage of
 hurdle models in trial-based economic evaluations is their ability to
@@ -395,62 +359,54 @@ outcomes, also referred to as “structural values” (e.g., zero costs or
 perfect health state), which often make model implementation quite
 problematic.
 
-For a given outcome variable $`o_i`$ (i.e. $`e_i`$ or $`c_i`$),
+For a given outcome variable \\o_i\\ (i.e. \\e_i\\ or \\c_i\\),
 `missingHE` implements a hurdle model to handle a given structural value
-$`s`$ by creating a corresponding indicator variable $`d^s_i`$, taking
-value $`1`$ when $`o_i=s`$ and $`0`$ otherwise. The probability of
-observing a structural value $`\pi^s_i`$ is then estimated via logistic
+\\s\\ by creating a corresponding indicator variable \\d^s_i\\, taking
+value \\1\\ when \\o_i=s\\ and \\0\\ otherwise. The probability of
+observing a structural value \\\pi^s_i\\ is then estimated via logistic
 regression
 
-``` math
-\begin{equation}
-\text{logit}(\pi^s_i)=\gamma_{0} + \sum_{k=1}^K \gamma_k x_{ik} \,\,[+ \ldots]
- (\#eq:strp)
-\end{equation}
-```
+\\\begin{equation} \text{logit}(\pi^s_i)=\gamma\_{0} + \sum\_{k=1}^K
+\gamma_k x\_{ik} \\\\\[+ \ldots\] (\\eq:strp) \end{equation}\\
 
-as function of the intercept $`\gamma_{0}`$, the covariates-specific
-coefficients $`\boldsymbol \gamma=(\gamma_1,\ldots,\gamma_K)`$, and
-other (possibly) relevant terms $`[+ \ldots]`$ (e.g., clustering
+as function of the intercept \\\gamma\_{0}\\, the covariates-specific
+coefficients \\\boldsymbol \gamma=(\gamma_1,\ldots,\gamma_K)\\, and
+other (possibly) relevant terms \\\[+ \ldots\]\\ (e.g., clustering
 effects). Estimates for the marginal probability of being associated
-with a structural value $`\pi^s`$ are retrieved by either applying the
+with a structural value \\\pi^s\\ are retrieved by either applying the
 inverse logit function to Equation @ref(eq:strp) after mean-centring all
 covariates or by repeatedly sampling from the posterior predictive
 distribution of the outcomes through Monte Carlo Integration. Finally,
-estimates for the marginal mean of $`o_i`$ are obtained from the linear
+estimates for the marginal mean of \\o_i\\ are obtained from the linear
 combination
 
-``` math
-\begin{equation}
-\mu=(1-\pi^s)\mu^{(d^s=0)}+\pi^s s,
- (\#eq:muweight)
-\end{equation}
-```
+\\\begin{equation} \mu=(1-\pi^s)\mu^{(d^s=0)}+\pi^s s, (\\eq:muweight)
+\end{equation}\\
 
-where $`(1-\pi^s)`$ and $`\mu^{(d^s=0)}`$ denote the marginal
-probability of not being associated with the structural value $`s`$ and
+where \\(1-\pi^s)\\ and \\\mu^{(d^s=0)}\\ denote the marginal
+probability of not being associated with the structural value \\s\\ and
 the marginal mean for the non-structural component of the outcome,
-respectively. `missingHE` retrieves estimates of $`\mu^{(d^s=0)}`$ using
+respectively. `missingHE` retrieves estimates of \\\mu^{(d^s=0)}\\ using
 the same modelling framework and distributions as in Section
-@ref(sec-frame), but applied to $`o_i`$ for only the non-structural
-cases, i.e., all individuals for whom $`d^s_i=0`$. Making a parallel
-with the missing data literature, depending on whether no or some
-covariates are included in Equation @ref(eq:strp), the underlying
+@ref(sec-frame-intro), but applied to \\o_i\\ for only the
+non-structural cases, i.e., all individuals for whom \\d^s_i=0\\. Making
+a parallel with the missing data literature, depending on whether no or
+some covariates are included in Equation @ref(eq:strp), the underlying
 mechanism has been named *structural completely at random* (SCAR) or
 *structural at random* (SAR). However, a key difference with respect to
 MCAR or MAR is that failure to correctly specify Equation @ref(eq:strp)
-will always lead to invalid inferences since estimates of $`\pi^s`$ are
+will always lead to invalid inferences since estimates of \\\pi^s\\ are
 needed in Equation @ref(eq:muweight).
 
-When some outcome data are missing, values of $`d^s_i`$ are unknown for
+When some outcome data are missing, values of \\d^s_i\\ are unknown for
 at least some individuals and, under MAR, valid inferences can be
 obtained provided a correct specification of Equation @ref(eq:strp) as
 well as of the model fitted to the non-structural values. In addition,
 hurdle models allow to explore the robustness of the results to specific
 non-ignorable assumptions, therefore allowing to perform a simple type
-of sensitivity analysis. This is achieved by arbitrarily set $`d^s_i`$
+of sensitivity analysis. This is achieved by arbitrarily set \\d^s_i\\
 to assign the individuals with missing outcome values to either the
-structural ($`d^s_i=1`$) or non-structural ($`d^s_i=0`$) component of
+structural (\\d^s_i=1\\) or non-structural (\\d^s_i=0\\) component of
 the mixture, and exploring alternative configurations in terms of the
 proportions of these values (e.g., between treatment groups).
 
@@ -492,22 +448,22 @@ to show the first and last few rows:
     #>  158 0.725    NA NA  28         1          1          0       NA     0   0    3 MenSS
     #>  159 1.000    NA NA  38         0          0          6       NA     0   0    3 MenSS
 
-The dataset consists of $`159`$ individuals grouped in two arms, where
-`trt` $`=1`$ indicates the SoC and `trt` $`=2`$ indicates the MenSS
+The dataset consists of \\159\\ individuals grouped in two arms, where
+`trt` \\=1\\ indicates the SoC and `trt` \\=2\\ indicates the MenSS
 intervention, with `id` denoting the participant identification number.
 
 Key health economic variables are `u.0`, `e` and `c`, which denote the
 baseline utility score, QALY and Total cost outcomes, respectively. All
 baseline variables are fully-observed, whereas all outcome variables are
-partially-observed in both treatment arms. A total of 46 (29$`\%`$)
+partially-observed in both treatment arms. A total of 46 (29\\\\\\)
 individuals has observed QALYs and Total costs, of which 0 in the SoC
 and 0 in the MenSS arm, while the remaining 113 individuals have both
 `e` and `c` missing. Figure @ref(fig:fig1e) and Figure @ref(fig:fig1c)
 show histograms of the observed distributions for the QALY and Total
 cost variables in `MenSS`, separately by treatment arm. We note that,
-among the observed cases, 17 (37$`\%`$) individuals are associated with
-structural values of perfect health ($`s^e=1`$), while 12 (26$`\%`$)
-individuals have structural values of no service use ($`s^c = 0`$).
+among the observed cases, 17 (37\\\\\\) individuals are associated with
+structural values of perfect health (\\s^e=1\\), while 12 (26\\\\\\)
+individuals have structural values of no service use (\\s^c = 0\\).
 
 ![Histograms of the observed data distributions for the QALYs in the SoC
 and MenSS arm.](Introduction_to_missingHE_files/figure-html/fig1e-1.png)
@@ -530,7 +486,7 @@ approaches while providing a series of customisation options. Although
 some of these options are specific to a given approach, many of the
 available arguments are shared across the three functions to ensure
 consistency and uniformity when implementing the framework in Section
-@ref(sec-frame). In particular, key options include: choice of the
+@ref(sec-frame-intro). In particular, key options include: choice of the
 probability distribution for the effectiveness and cost variables,
 choice of the regression model for each outcome, and type of missingness
 mechanism assumed.
@@ -540,7 +496,7 @@ built-in parameterisations, for the effectiveness (`e`) and/or cost
 (`c`) variables are available. The user may select a given
 distributional choice by passing the corresponding `missingHE` name to
 the arguments `dist_e` and `dist_c` of the desired function. The outcome
-model $`p(e,c)`$ requires a separate specification of the effectiveness
+model \\p(e,c)\\ requires a separate specification of the effectiveness
 and cost model formula following Equation @ref(eq:bivmodel) using the
 notation:
 
@@ -583,10 +539,10 @@ values of these optional arguments. The only exception is related to:
 number of MCMC chains (`n.chains`), number of iterations (`n.iter`) and
 values of the prior distribution parameters (`prior`). As an example,
 consider the default priors for the linear predictor coefficients in the
-effectiveness and cost model, namely
-$`\boldsymbol \beta \overset{\text{iid}}{\sim}\text{Normal}(\mu_{\beta},\sigma_{\beta})`$
-and
-$`\boldsymbol \alpha \overset{\text{iid}}{\sim}\text{Normal}(\mu_{\alpha},\sigma_{\alpha})`$.
+effectiveness and cost model, namely \\\boldsymbol \beta
+\overset{\text{iid}}{\sim}\text{Normal}(\mu\_{\beta},\sigma\_{\beta})\\
+and \\\boldsymbol \alpha
+\overset{\text{iid}}{\sim}\text{Normal}(\mu\_{\alpha},\sigma\_{\alpha})\\.
 Suppose the user wants to select different prior mean and standard
 deviation values for these parameters. This can be done by typing
 
@@ -596,8 +552,8 @@ myprior <- list("beta.prior" = c("norm", 0, 0.01), "alpha.prior" = c("norm", 0, 
 ```
 
 which instructs `missingHE` to separately assign normal distributions to
-each regression coefficient in the models with prior mean of $`0`$ and
-precision (inverse of variance) of $`0.01`$. The list `myprior` can then
+each regression coefficient in the models with prior mean of \\0\\ and
+precision (inverse of variance) of \\0.01\\. The list `myprior` can then
 be passed to the optional `prior` argument in the function to implement
 the model using the updated priors.
 
@@ -620,7 +576,7 @@ such as `rjags` from the `R2jags` package.
 ## Fitting models under MAR
 
 We consider the following common model specification for
-$`p(e_i)p(c_i\mid e_i)`$: `e` and `c` are both normally distributed;
+\\p(e_i)p(c_i\mid e_i)\\: `e` and `c` are both normally distributed;
 `u.0` is included as a covariate in the effectiveness model; a MAR
 mechanism is assumed for both outcomes. The model is first implemented
 using a selection approach through the function `selection` under a MAR
@@ -650,7 +606,7 @@ complete cases under a MAR assumption (`type = "MAR"`).
 
 Finally, the model is specified under a hurdle approach but assuming a
 Beta and Gamma distribution for `e` and `c`, respectively. In
-particular, individuals with $`e_i=1`$ and $`c_i=0`$ are assigned to a
+particular, individuals with \\e_i=1\\ and \\c_i=0\\ are assigned to a
 structural component in the QALY and Total cost model, respectively. The
 model is implemented through the function `hurdle`, under a SCAR
 assumption about the structural value mechanism, using the following
@@ -723,15 +679,15 @@ available options is the following.
 
 - `type`: the class of diagnostic plot, which must be named according to
   the options and terminology accepted by `missingHE`. Examples include:
-  density plots (default $`=`$`"denplot"`), traceplots (`"traceplot"`)
+  density plots (default \\=\\ `"denplot"`), traceplots (`"traceplot"`)
   and autocorrelation plots (`"acf"`).
 
 - `param`: family of parameters to be displayed, named according to the
   options and terminology accepted by `missingHE`. Examples include:
-  effectiveness location regression coefficients $`\boldsymbol \alpha`$
-  (`"alpha"`) and marginal means $`\mu_e`$ (`"mu.e"`) as well as their
-  corresponding cost parameters $`\boldsymbol \beta`$ (`"beta"`) and
-  $`\mu_c`$ (`"mu.c"`). Default value is `"all"`, indicating all
+  effectiveness location regression coefficients \\\boldsymbol \alpha\\
+  (`"alpha"`) and marginal means \\\mu_e\\ (`"mu.e"`) as well as their
+  corresponding cost parameters \\\boldsymbol \beta\\ (`"beta"`) and
+  \\\mu_c\\ (`"mu.c"`). Default value is `"all"`, indicating all
   parameters stored in the object passed to `x`. Note that some family
   of parameters are only available for specific types of model
   structures and missingness assumptions.
@@ -750,7 +706,7 @@ the selection model stored in the `sm1_mar`; we may use the command
 > ppc(x = sm1_mar, type = "dens_overlay", outcome = "effects", ndisplay = 20)
 ```
 
-to plot the densities of `ndisplay` $`=20`$ replications of the
+to plot the densities of `ndisplay` \\=20\\ replications of the
 effectiveness data (light blue lines) with respect to the density of the
 observed data (dark blue line), separately in the Soc (`trt = 1`) and
 MenSS (`trt = 2`) arm. In this case, as displayed in Figure
@@ -774,17 +730,17 @@ following.
 
 - `type`: class of posterior predictive check, named according to the
   available options and terminology accepted by `missingHE`. Examples
-  include: histograms (default $`=`$`"histogram"`), overlayed densities
+  include: histograms (default \\=\\ `"histogram"`), overlayed densities
   (`"dens_overlay"`) and boxplots (`"boxplot"`).
 
 - `outcome`: outcome variable, named according to the available options
   and terminology accepted by `missingHE`. Available choices are:
   effectiveness (`"effects"`), costs (`"costs"`) or both outcomes
-  (default $`=`$`"both"`).
+  (default \\=\\ `"both"`).
 
 - `ndisplay`: number of model-based replications of the data to be
   displayed for each selected type of outcome and graph (default
-  $`=15`$).
+  \\=15\\).
 
 ### Predictive information criteria
 
@@ -814,10 +770,10 @@ relative measures of fit to compare models, with lower values typically
 indicating better fit. A quick description of the main arguments in
 `pic` is the following.
 
-- `criterion`: type of information criteria: DIC (default $`=`$`"dic"`),
-  WAIC (`"waic"`) and LOOIC (`"looic"`). Alongside the value of the
-  criterion, additional quantities used in its computation are also
-  stored and may be returned.
+- `criterion`: type of information criteria: DIC (default \\=\\
+  `"dic"`), WAIC (`"waic"`) and LOOIC (`"looic"`). Alongside the value
+  of the criterion, additional quantities used in its computation are
+  also stored and may be returned.
 
 - `cases`: the group of observed cases for which information criterion
   should be computed. Available choices include: complete cases
@@ -893,7 +849,7 @@ and further customise the model results.
 
 Key quantities of interest are the posterior estimates of the mean
 effectiveness and cost parameters in each treatment arm
-$`\boldsymbol=(\mu_{et},\mu_{ct})`$. Summary statistics computed based
+\\\boldsymbol=(\mu\_{et},\mu\_{ct})\\. Summary statistics computed based
 on posterior samples of these parameters may be accessed using the
 `postsum` function by typing
 
@@ -926,7 +882,7 @@ which returns the following output
 quantities related to key model parameters, by default the mean
 effectiveness and costs across treatment arms on their natural scale.
 Estimates of posterior mean (`mean`), standard deviation (`sd`) and
-$`95\%`$ credible interval boundaries (`2.5%` and `95.5%`) can be used
+\\95\\\\ credible interval boundaries (`2.5%` and `95.5%`) can be used
 to summarise the posterior distribution of the parameters. In addition,
 the MCMC diagnostics `Rhat` and `n.eff`, corresponding to the potential
 scale reduction factor and effective sample size diagnostics, are
@@ -954,7 +910,7 @@ outcome (`model.eff` and `model.cost`) and missingness (`model.me` and
 
 More detailed summary statistics on the coefficient estimates, on the
 scale defined by the linear predictor of the effectiveness and cost
-models $`(\boldsymbol \alpha, \boldsymbol \beta)`$, may be displayed
+models \\(\boldsymbol \alpha, \boldsymbol \beta)\\, may be displayed
 using the `coef` function by typing
 
 ``` text
@@ -977,13 +933,13 @@ which returns
 
 The regression output is separately reported by outcome. Based on the
 results stored in `sm1_mar`, the following estimates are reported: the
-intercept $`\alpha_0=`$`(Intercept)` and baseline utility coefficient
-$`\alpha_1=`$`u.0` in the effectiveness model; the intercept
-$`\beta_0=`$`(Intercept)` and effectiveness coefficient $`\beta_f=`$`e`
-in the cost model. For each regression parameter, estimates are
+intercept \\\alpha_0=\\ `(Intercept)` and baseline utility coefficient
+\\\alpha_1=\\ `u.0` in the effectiveness model; the intercept
+\\\beta_0=\\ `(Intercept)` and effectiveness coefficient \\\beta_f=\\
+`e` in the cost model. For each regression parameter, estimates are
 summarised using posterior means (`mean`), standard deviations (`sd`)
 and credible interval boundaries (`lower` and `upper`), the latter being
-calculated assuming by default a credible level of $`95\%`$.
+calculated assuming by default a credible level of \\95\\\\.
 
 ### Inspect imputed values
 
@@ -1051,18 +1007,18 @@ which returns
     #> MenSS 45942 1128 43709 48109
 
 The results stored in `sm1_mar` are reported in terms of posterior
-summaries, such as mean, standard deviation and $`95\%`$ credible
+summaries, such as mean, standard deviation and \\95\\\\ credible
 interval boundaries, for key health economic quantities. These are:
 
 - the mean effectiveness and cost parameters in each arm
-  ($`\mu_{et},\mu_{ct}`$)
+  (\\\mu\_{et},\mu\_{ct}\\)
 
 - the net monetary benefit (NMB) parameter in each arm
-  ($`\mu_{et}\times k - \mu_{ct}`$), calculated at a given willingness
-  to pay ($`k`$) value (default $`=50000`$).
+  (\\\mu\_{et}\times k - \mu\_{ct}\\), calculated at a given willingness
+  to pay (\\k\\) value (default \\=50000\\).
 
 Incremental cost-effectiveness results between the reference arm (`trt`
-$`=2`$) and each of the other study arms (`trt` $`=1`$) can be obtained
+\\=2\\) and each of the other study arms (`trt` \\=1\\) can be obtained
 by setting the argument `incremental` to `TRUE`.
 
 ``` text
@@ -1072,16 +1028,15 @@ by setting the argument `incremental` to `TRUE`.
 These results include:
 
 - the mean incremental effectiveness and cost parameters
-  ($`\Delta_{e}=\mu_{e2}-\mu_{e1},\Delta_{c}=\mu_{c2}-\mu_{c1}`$)
+  (\\\Delta\_{e}=\mu\_{e2}-\mu\_{e1},\Delta\_{c}=\mu\_{c2}-\mu\_{c1}\\)
 
-- the incremental net monetary benefit (INMB)
-  ($`\Delta_{e}\times k - \Delta_{c}`$), calculated at the given $`k`$
-  value.
+- the incremental net monetary benefit (INMB) (\\\Delta\_{e}\times k -
+  \Delta\_{c}\\), calculated at the given \\k\\ value.
 
 - the estimated mean of the *Incremental Cost-Effectiveness Ratio*
   (ICER), which quantifies the cost per incremental unit of
   effectiveness, computed based on posterior samples as
-  $`\text{ICER}=\frac{\Delta_{c}}{\Delta_{e}}`$.
+  \\\text{ICER}=\frac{\Delta\_{c}}{\Delta\_{e}}\\.
 
 The above output compares the cost-effectiveness of the two arms in the
 `MenSS` data set based on the results of the model stored in `sm1_mar`.
@@ -1090,7 +1045,7 @@ on average associated with higher QALYs (0.031) and Total costs (24.188)
 with respect to `"SoC"`, leading to a positive value of the estimated
 ICER (781.864). However, a considerable degree of uncertainty is
 associated with the mean incremental estimates as indicated by the
-$`95\%`$ credible intervals which include $`0`$ for both outcomes.
+\\95\\\\ credible intervals which include \\0\\ for both outcomes.
 
 ### Probabilistic sensitivity analysis
 
@@ -1125,13 +1080,13 @@ Inspecting probabilistic sensitivity analysis using BCEA built-in
 functions, for example in terms of cost-effectiveness acceptability
 curve.
 
-Both graphs are generated based on $`1000`$ posterior samples and
+Both graphs are generated based on \\1000\\ posterior samples and
 suggest a favourable cost-effectiveness assessment of `"MenSS"` vs
 `"SoC"`. In the cost-effectiveness plane, shown in Figure
 @ref(fig:figplotcea1), most of the incremental estimates fall in the
 top/bottom-right quadrants (where `"MenSS"` is more effective than
 `"SoC"`) and are associated with ICER estimates that are lower than
-$`k=25000`$ (shaded area). In the cost-effectiveness acceptability
+\\k=25000\\ (shaded area). In the cost-effectiveness acceptability
 curve, shown in Figure @ref(fig:figplotcea2), estimates of the
-probability of cost-effectiveness for `"MenSS"` are close to $`0.8`$ for
-most values of the willingness to pay $`k`$.
+probability of cost-effectiveness for `"MenSS"` are close to \\0.8\\ for
+most values of the willingness to pay \\k\\.

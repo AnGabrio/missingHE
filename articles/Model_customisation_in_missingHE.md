@@ -123,10 +123,10 @@ QALYs (`e`) and Total costs (`c`):
 - Model 3: Beta for `e` and Gamma for `c`
 
 Prior to fitting the model, the data are pre-processed by: replacing the
-default levels for the factor variable `trt` ($`1`$ and $`2`$) with the
+default levels for the factor variable `trt` (\\1\\ and \\2\\) with the
 actual treatment names (`"SoC"` and `"MenSS"`); add/subtract to the
-cost/QALY data a small constant of $`0.01`$ to allow estimation of Gamma
-and Beta distributions, whose support does not include $`0`$ and $`1`$,
+cost/QALY data a small constant of \\0.01\\ to allow estimation of Gamma
+and Beta distributions, whose support does not include \\0\\ and \\1\\,
 respectively.
 
 ``` text
@@ -221,7 +221,7 @@ graphical and/or numeric **posterior predictive checks** (PPC) using the
 function `ppc`.
 
 As an example, the following commands generate posterior density plots
-for a total of $`20`$ replications of QALYs and/or Total costs under
+for a total of \\20\\ replications of QALYs and/or Total costs under
 each model, which are compared to the empirical densities of the
 observed outcomes. The arguments inside `ppc` can be used to customise
 the resulting plot:
@@ -361,7 +361,7 @@ example, estimates for the “fixed effects” parameters (default) from
 
 The output shows for each parameter a selection of posterior summaries
 obtained directly from `JAGS` including: mean, standard deviation,
-median, $`2.5\%`$ and $`97.5\%`$ percentiles as well as two MCMC
+median, \\2.5\\\\ and \\97.5\\\\ percentiles as well as two MCMC
 diagnostic measures, the potential scale reduction factor (`Rhat`) and
 the number of effective sample size (`n.eff`). The names and number of
 parameters displayed reflect the structure of the outcome (`model.eff`
@@ -427,11 +427,11 @@ The output produced is split into two parts: one related to the
 coefficient estimates for the effectiveness model (`$effects`) and the
 other to the cost model (`$costs`). For each coefficient, the name of
 the associated variable alongside posterior mean, standard deviation,
-lower and upper bounds of a $`(1-\alpha)\%`$ credibility interval (CI)
-are displayed. By default, boundary estimates for a $`95\%`$ interval
+lower and upper bounds of a \\(1-\alpha)\\\\ credibility interval (CI)
+are displayed. By default, boundary estimates for a \\95\\\\ interval
 are computed, but the user can also specify custom boundary estimates
 using the optional argument `prob`, i.e., `prob = (0.05, 0.95)` for a
-$`90\%`$ CI.
+\\90\\\\ CI.
 
 ## Outcome model structure
 
@@ -501,7 +501,7 @@ Checking convergence using the diagnostic function for a family of model
 parameters estimated in missingHE, for example through inspection of the
 autocorrelation plots.
 
-Graphs are displayed for each MCMC chain (default $`=2`$) for each model
+Graphs are displayed for each MCMC chain (default \\=2\\) for each model
 parameter belonging to the specified family (`alpha`), while the
 argument `type` is used to select the specific type of diagnostic based
 on a set of available names accepted by `missingHE`. Several types of
@@ -565,10 +565,10 @@ following:
 
 `missingHE` fits each approach under weakly-informative prior
 distribution choices for all model parameters assuming a general lack of
-prior knowledge. Examples include Normal distributions centred at $`0`$
-with generally low precision values (i.e., $`1\times10^{6}`$) for all
+prior knowledge. Examples include Normal distributions centred at \\0\\
+with generally low precision values (i.e., \\1\times10^{6}\\) for all
 regression coefficients, and Half-Cauchy distributions with a scale
-value of $`2.5`$. However, when desired and if prior information on some
+value of \\2.5\\. However, when desired and if prior information on some
 parameters is available, the user may overwrite default prior choices
 using the argument `prior` in each function. It is important that
 user-specific priors are passed to `prior` in a list form containing
@@ -606,8 +606,8 @@ vector tells the name of the specific distribution assumed for the
 prior, while the successive elements denote the canonical parameters
 indexing the chosen distribution. For example, for the first group of
 parameters `"beta"`, `myprior` instructs `missingHE` to replace their
-default priors with Normal distributions centred at $`0`$ with a
-precision of $`0.01`$. Similarly, `myprior` instructs `missingHE` to
+default priors with Normal distributions centred at \\0\\ with a
+precision of \\0.01\\. Similarly, `myprior` instructs `missingHE` to
 specify Uniform priors on the standard deviations with differing ranges
 for the effectiveness and cost outcomes, through the information
 contained in the `"sigma.prior.e"` and `"sigma.prior.c"` elements.

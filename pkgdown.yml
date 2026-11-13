@@ -5,8 +5,9 @@ articles:
   Fitting_MNAR_models_in_missingHE: Fitting_MNAR_models_in_missingHE.html
   Introduction_to_missingHE: Introduction_to_missingHE.html
   Longitudinal_models_in_missingHE: Longitudinal_models_in_missingHE.html
+  missingHE-package: missingHE-package.html
   Model_customisation_in_missingHE: Model_customisation_in_missingHE.html
-last_built: 2026-11-12T14:59Z
+last_built: 2026-11-13T11:41Z
 urls:
   reference: https://angabrio.github.io/missingHE/reference
   article: https://angabrio.github.io/missingHE/articles

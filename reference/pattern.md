@@ -265,23 +265,29 @@ effects are desired and `z` is the clustering variable across which the
 random effects are specified (must be the name of a factor variable in
 the dataset).
 
+For an overview of the general modeling framework and additional package
+utilities, see
+[missingHE-package](https://angabrio.github.io/missingHE/reference/missingHE-package.md).
+
 ## References
+
+Molenberghs, G. Verbeke G. *Pattern-Mixture Models*, Linear Mixed Models
+for Longitudinal Data, 275-293 \<10.1007/978-1-4419-0300-6_18\>
 
 Daniels, MJ. Hogan, JW. *Missing Data in Longitudinal Studies:
 strategies for Bayesian modelling and sensitivity analysis*, CRC/Chapman
-Hall.
+Hall. <doi:10.1201/9781420011180>
 
 Baio, G.(2012). *Bayesian Methods in Health Economics*. CRC/Chapman
-Hall, London.
-
-Gelman, A. Carlin, JB., Stern, HS. Rubin, DB.(2003). *Bayesian Data
-Analysis, 2nd edition*, CRC Press.
+Hall, London. <doi:10.1201/b13099>
 
 Plummer, M. *JAGS: A program for analysis of Bayesian graphical models
 using Gibbs sampling*. (2003).
+<https://www.r-project.org/conferences/DSC-2003/Proceedings/Plummer.pdf>
 
 ## See also
 
+[missingHE-package](https://angabrio.github.io/missingHE/reference/missingHE-package.md)
 [`R2jags::jags()`](https://rdrr.io/pkg/R2jags/man/jags.html),
 [`BCEA::bcea()`](https://n8thangreen.github.io/BCEA/reference/bcea.html).
 

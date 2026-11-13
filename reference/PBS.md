@@ -54,8 +54,8 @@ A data frame with `732` rows and `16` variables
 
 ## References
 
-Hassiotis et al. (2014) BMC Psychiatry 14
-([PubMed](https://pubmed.ncbi.nlm.nih.gov/25927187/))
+Hassiotis et al. (2014) BMC Psychiatry 14, 219.
+<doi:10.1186/s12888-014-0219-6>
 
 ## Examples
 

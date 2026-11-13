@@ -36,7 +36,7 @@ main GitHub repository at <https://github.com/AnGabrio/missingHE>.
 Selection models encode MNAR assumptions by directly modelling the
 missingness mechanism, i.e., the model for the missing data indicator,
 as a function of some partially-observed variables. In `missingHE`, MNAR
-is specified by including the outcome variables ($`e`$ and/or $`c`$)
+is specified by including the outcome variables (\\e\\ and/or \\c\\)
 inside the model formulae of the corresponding missing indicators
 (`model.me` and `model.mc`). For example, a model encoding a MNAR
 assumption for the missing effectiveness mechanism and a MAR assumption
@@ -54,14 +54,14 @@ of covariates to be included in each model. Inclusion of `e` into
 `model.me` instructs `missingHE` to include the partially-observed
 effectiveness variable into the logistic regression model for its
 missingness indicator. Since the regression coefficient capturing the
-dependence between missingness and outcome ($`\delta_e`$) cannot be
+dependence between missingness and outcome (\\\delta_e\\) cannot be
 fully estimated from the observed data, its estimation implies some form
 of MNAR assumption for the missing effectiveness mechanism. In selection
 models, two sources of external information are used to identify these
 parameters: **informative prior distributions** and **distributional
 outcome assumptions**.
 
-1.  Informative priors on $`\delta_e`$ (or $`\delta_c`$ for costs) can
+1.  Informative priors on \\\delta_e\\ (or \\\delta_c\\ for costs) can
     be specified through an `R` list object containing information about
     the desired prior specification, including name of the parametric
     distribution assumed (among a set of pre-defined choices) and its
@@ -75,8 +75,8 @@ outcome assumptions**.
     literature) using the arguments `dist_e` and `dist_c` inside the
     `selection` function. Type
     [`help(selection)`](https://angabrio.github.io/missingHE/reference/selection.md)
-    to access the full list of available distributions for $`e`$ and
-    $`c`$.
+    to access the full list of available distributions for \\e\\ and
+    \\c\\.
 
 As an example, let us fit a MNAR selection model for the effectiveness
 variables (QALYs) in the `MenSS` dataset using the following command
@@ -93,8 +93,8 @@ The MNAR assumption is encoded into the model by: setting the argument
 `type = "MNAR"`; adding the term `e` inside `model.me`. As for the
 outcome model, both effectiveness and costs are assumed to follow normal
 distributions, with the inclusion of the baseline utilities (`u.0`) as
-covariates into the model of $`e`$. Since we did not provide custom
-priors, default standard normals are specified for $`\delta_e`$.
+covariates into the model of \\e\\. Since we did not provide custom
+priors, default standard normals are specified for \\\delta_e\\.
 
 `missingHE` allows a separate specification of the assumptions on the
 effectiveness and cost missingness mechanisms through the arguments
@@ -127,7 +127,7 @@ retrieved through the `postsum` function.
 ```
 
 We now consider an alternative MNAR specification where we encode
-informative priors on $`\delta_e`$. In general, it is difficult to
+informative priors on \\\delta_e\\. In general, it is difficult to
 attach a specific interpretation to the values for this parameter (and
 therefore also to its priors) because its effect may vary depending on
 the distributional assumptions made on the outcome. In this applied
@@ -139,8 +139,8 @@ context.
 We first define our priors by creating a list object called `my.prior`.
 Within this list, we create a vector called `"delta.prior.e"` containing
 the following elements: name of the prior distribution (`"norm"`); the
-prior values for the selected distribution (mean of $`10`$ and precision
-of $`1`$).
+prior values for the selected distribution (mean of \\10\\ and precision
+of \\1\\).
 
 ``` text
 > my.prior <- list(
@@ -148,8 +148,8 @@ of $`1`$).
 + )
 ```
 
-As a simple exercise, we increase the prior mean of $`\delta_e`$ to
-$`10`$ to assess the impact on posterior estimates of a quite
+As a simple exercise, we increase the prior mean of \\\delta_e\\ to
+\\10\\ to assess the impact on posterior estimates of a quite
 informative prior about this parameter (relatively high positive value
 on the logit scale). We then fit the model using the new prior
 specification by passing `my.prior` to the argument `prior` inside
@@ -228,17 +228,17 @@ of two elements: **identifying restrictions** and **sensitivity
 parameters**. Identifying restrictions consist in modelling restrictions
 imposed to identify those parameters in each missingness pattern that
 cannot otherwise be identified from the data. In the context of a
-bivariate cross-sectional outcome ($`e,c`$), a total of four missingness
+bivariate cross-sectional outcome (\\e,c\\), a total of four missingness
 patterns can be observed based on the values of their missingness
-indicators $`d^m=(m_i^c,m^e_i)`$. These are: complete cases $`(0,0)`$;
-missing costs only $`(1,0)`$; missing effects only $`(0,1)`$; fully
-missing cases $`(1,1)`$. A typical example of these restrictions is when
+indicators \\d^m=(m_i^c,m^e_i)\\. These are: complete cases \\(0,0)\\;
+missing costs only \\(1,0)\\; missing effects only \\(0,1)\\; fully
+missing cases \\(1,1)\\. A typical example of these restrictions is when
 unidentifiable parameters in a given pattern (e.g., fully missing cases)
 are identified by matching those from a corresponding identifiable
 pattern (e.g., complete cases). Under MAR, these restrictions are the
 only element used to achieve the identification of the model. However,
 when MNAR assumptions are specified, identifying restrictions can be
-combined with additional parameters $`\boldsymbol \delta`$ to identify
+combined with additional parameters \\\boldsymbol \delta\\ to identify
 the model under a range of departures from MAR. These so-called
 “sensitivity parameters” are entirely identified using informative
 priors to encode in the model evidence that is external to the observed
@@ -256,29 +256,26 @@ missing values: either `MAR` or `MNAR`. Under MAR, the model is
 identified only based on the given identifying restrictions imposed in
 each unidentified pattern for both outcomes. For example, when `"CC"`
 restrictions are selected, the mean effectiveness and cost parameters in
-the fully missing cases $`\mu_e^{(1,1)}`$ and $`\mu_c^{(1,1)}`$ are set
-equal to those from the complete cases $`\mu_e^{(0,0)}`$ and
-$`\mu_c^{(0,0)}`$, respectively. Under MNAR, location-shift sensitivity
-parameters ($`\delta_e`$, $`\delta_c`$) are included within the chosen
+the fully missing cases \\\mu_e^{(1,1)}\\ and \\\mu_c^{(1,1)}\\ are set
+equal to those from the complete cases \\\mu_e^{(0,0)}\\ and
+\\\mu_c^{(0,0)}\\, respectively. Under MNAR, location-shift sensitivity
+parameters (\\\delta_e\\, \\\delta_c\\) are included within the chosen
 identification strategy. Using the same example, under MNAR, the mean
 outcomes in the fully missing cases are identified as:
 
-``` math
-\begin{equation}
-\mu_e^{(1,1)}=\mu_e^{(0,0)}+\delta_e \;\;\; \text{and}  \;\;\; \mu_c^{(1,1)}=\mu_c^{(0,0)}+\delta_c,
- (\#eq:pmsp)
-\end{equation}
-```
+\\\begin{equation} \mu_e^{(1,1)}=\mu_e^{(0,0)}+\delta_e \\\\\\
+\text{and} \\\\\\ \mu_c^{(1,1)}=\mu_c^{(0,0)}+\delta_c, (\\eq:pmsp)
+\end{equation}\\
 
-where $`\delta_e`$ and $`\delta_c`$ are by default assigned with
-minimally informative uniform priors between $`0`$ ans $`1`$ by
-`missingHE` (both set to $`0`$ under MAR). Sensitivity analysis to
+where \\\delta_e\\ and \\\delta_c\\ are by default assigned with
+minimally informative uniform priors between \\0\\ ans \\1\\ by
+`missingHE` (both set to \\0\\ under MAR). Sensitivity analysis to
 alternative MNAR scenarios can then be conducted by:
 
 1.  Choose alternative identifying restrictions to be passed to the
     argument `restriction`, i.e., either `"CC"` or `"AC"`.
 
-2.  Specify informative priors on $`\delta_e`$ and/or $`\delta_c`$
+2.  Specify informative priors on \\\delta_e\\ and/or \\\delta_c\\
     through an `R` list object containing information about the desired
     prior specification, including name of the parametric distribution
     assumed (among a set of pre-defined choices) and its corresponding
@@ -289,13 +286,13 @@ alternative MNAR scenarios can then be conducted by:
 
 Going back to our example, based on external information, let us assume
 that the mean effectiveness among the missing cases is on average
-between $`0.2`$ and $`0.3`$ lower compared to that among the observed
+between \\0.2\\ and \\0.3\\ lower compared to that among the observed
 cases, across both treatment arms. This information can be encoded into
-a prior distribution for $`\delta_e`$ within a pattern mixture model in
+a prior distribution for \\\delta_e\\ within a pattern mixture model in
 a similar way to what shown in Section @ref(sec-sm) for selection
 models. The following code shows how to specify a uniform distribution
-(`"unif"`), with prior boundary values of $`0.2`$ and $`0.3`$, for
-$`\delta_e`$.
+(`"unif"`), with prior boundary values of \\0.2\\ and \\0.3\\, for
+\\\delta_e\\.
 
 ``` text
 > my.prior <- list(
@@ -305,7 +302,7 @@ $`\delta_e`$.
 
 Next, we fit the desired MNAR model using the function `pattern`,
 setting the arguments `restriction = "CC"`, `type = "MNAR"` and
-overwriting the default priors for $`\delta_e`$ with those contained in
+overwriting the default priors for \\\delta_e\\ with those contained in
 the object `my.prior`.
 
 ``` text
@@ -316,10 +313,10 @@ the object `my.prior`.
 +          dist_e = "norm", dist_c = "norm")
 ```
 
-Baseline utilities are included in the model for $`e`$, which is
+Baseline utilities are included in the model for \\e\\, which is
 identified under MNAR using complete case restrictions
 (`restriction = "CC"`) and informative priors on the sensitivity
-parameters for the mean $`e`$. Economic results in terms of posterior
+parameters for the mean \\e\\. Economic results in terms of posterior
 summaries about mean parameters can be inspected using the `postsum`
 function
 
@@ -390,7 +387,7 @@ parameter.
 Figure @ref(fig:figplotceamnarpat1) and Figure
 @ref(fig:figplotceamnarpat2) indicate a slightly lower chance for the
 new intervention to be cost-effective when comparing the results under
-an informative normal distribution for $`\delta_e`$ (`NN.pat3`) with
+an informative normal distribution for \\\delta_e\\ (`NN.pat3`) with
 respect to a uniform distribution (`NN.pat3`). Note that, in real
 applications, the range of values and choice of distribution for the
 sensitivity parameters should be informed based on some external source
@@ -399,7 +396,7 @@ of information (e.g., expert opinion) to guide the elicitation process.
 ## Handling MNAR using hurdle models
 
 Hurdle models consist of two-part mixture models, where the outcome
-variable (i.e., $`e`$, $`c`$ or both) are split into two components: one
+variable (i.e., \\e\\, \\c\\ or both) are split into two components: one
 associated with identical values (called “structural”) which are assumed
 to be fixed; and one associated with a set of values (called
 non-structural) which are assumed to be generated from a given
@@ -436,14 +433,14 @@ of specific MNAR assumptions about the number of missing individuals
 assigned with a structural value.
 
 Let us first consider a standard hurdle model specification under MAR.
-We specify the model to handle both structural ones and zeros in $`e`$
-and $`c`$ from the `MenSS` dataset, where structural values are set by
+We specify the model to handle both structural ones and zeros in \\e\\
+and \\c\\ from the `MenSS` dataset, where structural values are set by
 using the arguments `se = 1` and `sc = 0` inside `hurdle`, respectively.
 Since these values are assumed to be “fixed”, their occurrence does not
 affect the choice of a distribution for the non-structural component of
 the outcomes. As a result, we can assign distributions that are not
-defined at $`1`$ and $`0`$ to the non-structural outcome values, such as
-Beta and Gamma distributions for $`e`$ and $`c`$, respectively.
+defined at \\1\\ and \\0\\ to the non-structural outcome values, such as
+Beta and Gamma distributions for \\e\\ and \\c\\, respectively.
 
 ``` text
 > NN.hur1 <- hurdle(data = MenSS, model.eff = e ~ trt + u.0, 
@@ -480,8 +477,8 @@ generate this indicator by typing
 Next, for all or some of the individuals with a missing effect value, we
 set the value of `s_e = 1` to assign them to the structural component of
 the model. For example, we may believe that it is likely for all
-individuals aged $`<22`$ to be associated with a perfect health state
-(i.e., $`e=1`$). We can encode this information into a new object called
+individuals aged \\\<22\\ to be associated with a perfect health state
+(i.e., \\e=1\\). We can encode this information into a new object called
 `mys_e` by typing
 
 ``` text
@@ -491,10 +488,10 @@ individuals aged $`<22`$ to be associated with a perfect health state
 #> [1] 41
 ```
 
-The number of individuals associated with $`e=1`$ has considerably
+The number of individuals associated with \\e=1\\ has considerably
 increased with respect to the observed data alone. We can now proceed to
 fit the hurdle model by replacing the original structural indicator
-variable of $`e`$ with the newly created one using the argument
+variable of \\e\\ with the newly created one using the argument
 `s_e = mys_e`.
 
 ``` text
@@ -570,7 +567,7 @@ ones in SoC.
 According to Figure @ref(fig:figplotceamnarhm1) and Figure
 @ref(fig:figplotceamnarhm2), the probability of cost-effectiveness for
 the hurdle model under MAR (`NN.hur1`) shows a moderate increase
-alongside the willingness to pay threshold up to $`0.7`$, where a
+alongside the willingness to pay threshold up to \\0.7\\, where a
 plateau is observed. Conversely, results from the MNAR model (`NN.hur2`)
 indicate a systematically lower chance of cost-effectiveness, especially
 for lower willingness to pay values.

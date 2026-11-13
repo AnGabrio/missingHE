@@ -5,7 +5,13 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Fitting MNAR models in missingHE • missingHE</title>
-<script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<!-- mathjax math --><script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js" integrity="sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI=" crossorigin="anonymous"></script><script>
+  window.MathJax = {
+    chtml: {
+      fontURL: "https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/output/chtml/fonts/woff-v2"
+    }
+  };
+</script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
@@ -36,10 +42,11 @@
 <li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="../articles/Fitting_MNAR_models_in_missingHE.html">Fitting MNAR models in missingHE</a></li>
+<li><a class="dropdown-item" href="../articles/missingHE-package.html">Missing Cost Effectiveness Models</a></li>
     <li><a class="dropdown-item" href="../articles/Introduction_to_missingHE.html">Introduction to missingHE</a></li>
-    <li><a class="dropdown-item" href="../articles/Longitudinal_models_in_missingHE.html">Longitudinal models in missingHE</a></li>
+    <li><a class="dropdown-item" href="../articles/Fitting_MNAR_models_in_missingHE.html">Fitting MNAR models in missingHE</a></li>
     <li><a class="dropdown-item" href="../articles/Model_customisation_in_missingHE.html">Model and output customisation in missingHE</a></li>
+    <li><a class="dropdown-item" href="../articles/Longitudinal_models_in_missingHE.html">Longitudinal models in missingHE</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -55,8 +62,6 @@
 
   </div>
 </nav><div class="container template-article">
-
-
 
 
 <div class="row">
@@ -108,15 +113,11 @@ at <a href="https://github.com/AnGabrio/missingHE" class="external-link uri">htt
 missingness mechanism, i.e., the model for the missing data indicator,
 as a function of some partially-observed variables. In
 <code>missingHE</code>, MNAR is specified by including the outcome
-variables
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>e</mi><annotation encoding="application/x-tex">e</annotation></semantics></math>
-and/or
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>c</mi><annotation encoding="application/x-tex">c</annotation></semantics></math>)
-inside the model formulae of the corresponding missing indicators
-(<code>model.me</code> and <code>model.mc</code>). For example, a model
-encoding a MNAR assumption for the missing effectiveness mechanism and a
-MAR assumption for the missing cost mechanism can be specified by
-setting</p>
+variables (<span class="math inline">\(e\)</span> and/or <span class="math inline">\(c\)</span>) inside the model formulae of the
+corresponding missing indicators (<code>model.me</code> and
+<code>model.mc</code>). For example, a model encoding a MNAR assumption
+for the missing effectiveness mechanism and a MAR assumption for the
+missing cost mechanism can be specified by setting</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">model.me</span> <span class="op">&lt;-</span> <span class="va">me</span> <span class="op">~</span>  <span class="va">e</span> <span class="op">+</span> <span class="va">...</span></span>
 <span><span class="va">model.mc</span> <span class="op">&lt;-</span> <span class="va">mc</span> <span class="op">~</span>  <span class="fl">1</span> <span class="op">+</span> <span class="va">...</span></span></code></pre></div>
@@ -127,36 +128,27 @@ model. Inclusion of <code>e</code> into <code>model.me</code> instructs
 <code>missingHE</code> to include the partially-observed effectiveness
 variable into the logistic regression model for its missingness
 indicator. Since the regression coefficient capturing the dependence
-between missingness and outcome
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>δ</mi><mi>e</mi></msub><annotation encoding="application/x-tex">\delta_e</annotation></semantics></math>)
-cannot be fully estimated from the observed data, its estimation implies
-some form of MNAR assumption for the missing effectiveness mechanism. In
-selection models, two sources of external information are used to
-identify these parameters: <strong>informative prior
-distributions</strong> and <strong>distributional outcome
-assumptions</strong>.</p>
+between missingness and outcome (<span class="math inline">\(\delta_e\)</span>) cannot be fully estimated from
+the observed data, its estimation implies some form of MNAR assumption
+for the missing effectiveness mechanism. In selection models, two
+sources of external information are used to identify these parameters:
+<strong>informative prior distributions</strong> and
+<strong>distributional outcome assumptions</strong>.</p>
 <ol style="list-style-type: decimal">
-<li><p>Informative priors on
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>δ</mi><mi>e</mi></msub><annotation encoding="application/x-tex">\delta_e</annotation></semantics></math>
-(or
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>δ</mi><mi>c</mi></msub><annotation encoding="application/x-tex">\delta_c</annotation></semantics></math>
-for costs) can be specified through an <code>R</code> list object
-containing information about the desired prior specification, including
-name of the parametric distribution assumed (among a set of pre-defined
-choices) and its corresponding prior values. This list can then be
-passed to the <code>selection</code> function using the optional
-argument <code>prior</code> to overwrite the default priors (standard
-normals) assumed by <code>missingHE</code> for these
-parameters.</p></li>
+<li><p>Informative priors on <span class="math inline">\(\delta_e\)</span> (or <span class="math inline">\(\delta_c\)</span> for costs) can be specified
+through an <code>R</code> list object containing information about the
+desired prior specification, including name of the parametric
+distribution assumed (among a set of pre-defined choices) and its
+corresponding prior values. This list can then be passed to the
+<code>selection</code> function using the optional argument
+<code>prior</code> to overwrite the default priors (standard normals)
+assumed by <code>missingHE</code> for these parameters.</p></li>
 <li><p>The distribution assumed for each outcome can be selected among a
 pre-defined set of parametric choices (among popular choices in the
 literature) using the arguments <code>dist_e</code> and
 <code>dist_c</code> inside the <code>selection</code> function. Type
 <code><a href="../reference/selection.html">help(selection)</a></code> to access the full list of available
-distributions for
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>e</mi><annotation encoding="application/x-tex">e</annotation></semantics></math>
-and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>c</mi><annotation encoding="application/x-tex">c</annotation></semantics></math>.</p></li>
+distributions for <span class="math inline">\(e\)</span> and <span class="math inline">\(c\)</span>.</p></li>
 </ol>
 <p>As an example, let us fit a MNAR selection model for the
 effectiveness variables (QALYs) in the <code>MenSS</code> dataset using
@@ -171,11 +163,9 @@ argument <code>type = "MNAR"</code>; adding the term <code>e</code>
 inside <code>model.me</code>. As for the outcome model, both
 effectiveness and costs are assumed to follow normal distributions, with
 the inclusion of the baseline utilities (<code>u.0</code>) as covariates
-into the model of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>e</mi><annotation encoding="application/x-tex">e</annotation></semantics></math>.
-Since we did not provide custom priors, default standard normals are
-specified for
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>δ</mi><mi>e</mi></msub><annotation encoding="application/x-tex">\delta_e</annotation></semantics></math>.</p>
+into the model of <span class="math inline">\(e\)</span>. Since we did
+not provide custom priors, default standard normals are specified for
+<span class="math inline">\(\delta_e\)</span>.</p>
 <p><code>missingHE</code> allows a separate specification of the
 assumptions on the effectiveness and cost missingness mechanisms through
 the arguments <code>model.me</code> and <code>model.mc</code>,
@@ -204,9 +194,8 @@ selected missingness assumptions can then be retrieved through the
 #&gt; tmu_c     95.7748598 28.40123049  39.3187191  95.8555556 149.2801288 1.01   390
 #&gt; tmu_e      0.9041271  0.01583446   0.8755038   0.9030595   0.9374956 1.02   200</code></pre>
 <p>We now consider an alternative MNAR specification where we encode
-informative priors on
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>δ</mi><mi>e</mi></msub><annotation encoding="application/x-tex">\delta_e</annotation></semantics></math>.
-In general, it is difficult to attach a specific interpretation to the
+informative priors on <span class="math inline">\(\delta_e\)</span>. In
+general, it is difficult to attach a specific interpretation to the
 values for this parameter (and therefore also to its priors) because its
 effect may vary depending on the distributional assumptions made on the
 outcome. In this applied example we will therefore only illustrate how
@@ -217,22 +206,16 @@ within the current context.</p>
 <code>my.prior</code>. Within this list, we create a vector called
 <code>"delta.prior.e"</code> containing the following elements: name of
 the prior distribution (<code>"norm"</code>); the prior values for the
-selected distribution (mean of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>10</mn><annotation encoding="application/x-tex">10</annotation></semantics></math>
-and precision of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>1</mn><annotation encoding="application/x-tex">1</annotation></semantics></math>).</p>
+selected distribution (mean of <span class="math inline">\(10\)</span>
+and precision of <span class="math inline">\(1\)</span>).</p>
 <pre class="text"><code>&gt; my.prior &lt;- list(
 +   "delta.prior.e" = c("norm", 10, 1)
 + )</code></pre>
-<p>As a simple exercise, we increase the prior mean of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>δ</mi><mi>e</mi></msub><annotation encoding="application/x-tex">\delta_e</annotation></semantics></math>
-to
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>10</mn><annotation encoding="application/x-tex">10</annotation></semantics></math>
-to assess the impact on posterior estimates of a quite informative prior
-about this parameter (relatively high positive value on the logit
-scale). We then fit the model using the new prior specification by
-passing <code>my.prior</code> to the argument <code>prior</code> inside
-<code>selection</code>.</p>
+<p>As a simple exercise, we increase the prior mean of <span class="math inline">\(\delta_e\)</span> to <span class="math inline">\(10\)</span> to assess the impact on posterior
+estimates of a quite informative prior about this parameter (relatively
+high positive value on the logit scale). We then fit the model using the
+new prior specification by passing <code>my.prior</code> to the argument
+<code>prior</code> inside <code>selection</code>.</p>
 <pre class="text"><code>&gt; NN.sel2 &lt;- selection(data = MenSS, model.eff = e ~ trt + u.0, 
 +          model.cost = c ~ trt, model.me = me ~ e, 
 +          model.mc = mc ~ 1, type = "MNAR", 
@@ -268,14 +251,14 @@ function <code>ceac.plot</code>, from the package <code>BCEA</code>, to
 display the cost-effectiveness acceptability curves based on the results
 from each model.</p>
 <div class="figure">
-<img src="Fitting_MNAR_models_in_missingHE_files/figure-html/figplotceamnarsel1-1.png" class="r-plt" alt="Cost-effectiveness acceptability curve (CEAC) derived from model 1 fitted under default MNAR prior specification for the missing effectiveness mechanism." width="100%"><p class="caption">
+<img src="Fitting_MNAR_models_in_missingHE_files/figure-html/figplotceamnarsel1-1.png" alt="Cost-effectiveness acceptability curve (CEAC) derived from model 1 fitted under default MNAR prior specification for the missing effectiveness mechanism." width="100%"><p class="caption">
 Cost-effectiveness acceptability curve (CEAC) derived from model 1
 fitted under default MNAR prior specification for the missing
 effectiveness mechanism.
 </p>
 </div>
 <div class="figure">
-<img src="Fitting_MNAR_models_in_missingHE_files/figure-html/figplotceamnarsel2-1.png" class="r-plt" alt="Cost-effectiveness acceptability curve (CEAC) derived from model 2 fitted under custom MNAR prior specification for the missing effectiveness mechanism." width="100%"><p class="caption">
+<img src="Fitting_MNAR_models_in_missingHE_files/figure-html/figplotceamnarsel2-1.png" alt="Cost-effectiveness acceptability curve (CEAC) derived from model 2 fitted under custom MNAR prior specification for the missing effectiveness mechanism." width="100%"><p class="caption">
 Cost-effectiveness acceptability curve (CEAC) derived from model 2
 fitted under custom MNAR prior specification for the missing
 effectiveness mechanism.
@@ -297,34 +280,27 @@ specification of two elements: <strong>identifying restrictions</strong>
 and <strong>sensitivity parameters</strong>. Identifying restrictions
 consist in modelling restrictions imposed to identify those parameters
 in each missingness pattern that cannot otherwise be identified from the
-data. In the context of a bivariate cross-sectional outcome
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>e</mi><mo>,</mo><mi>c</mi></mrow><annotation encoding="application/x-tex">e,c</annotation></semantics></math>),
-a total of four missingness patterns can be observed based on the values
-of their missingness indicators
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>d</mi><mi>m</mi></msup><mo>=</mo><mo stretchy="false" form="prefix">(</mo><msubsup><mi>m</mi><mi>i</mi><mi>c</mi></msubsup><mo>,</mo><msubsup><mi>m</mi><mi>i</mi><mi>e</mi></msubsup><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">d^m=(m_i^c,m^e_i)</annotation></semantics></math>.
-These are: complete cases
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">(</mo><mn>0</mn><mo>,</mo><mn>0</mn><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">(0,0)</annotation></semantics></math>;
-missing costs only
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>,</mo><mn>0</mn><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">(1,0)</annotation></semantics></math>;
-missing effects only
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">(</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">(0,1)</annotation></semantics></math>;
-fully missing cases
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>,</mo><mn>1</mn><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">(1,1)</annotation></semantics></math>.
-A typical example of these restrictions is when unidentifiable
-parameters in a given pattern (e.g., fully missing cases) are identified
-by matching those from a corresponding identifiable pattern (e.g.,
-complete cases). Under MAR, these restrictions are the only element used
-to achieve the identification of the model. However, when MNAR
-assumptions are specified, identifying restrictions can be combined with
-additional parameters
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>𝛅</mi><annotation encoding="application/x-tex">\boldsymbol \delta</annotation></semantics></math>
-to identify the model under a range of departures from MAR. These
-so-called “sensitivity parameters” are entirely identified using
-informative priors to encode in the model evidence that is external to
-the observed data. Unlike the priors for MNAR parameters in selection
-models, sensitivity parameters in pattern mixture models can have more
-intuitive and easier-to-assess interpretations in terms of their impact
-on posterior results.</p>
+data. In the context of a bivariate cross-sectional outcome (<span class="math inline">\(e,c\)</span>), a total of four missingness
+patterns can be observed based on the values of their missingness
+indicators <span class="math inline">\(d^m=(m_i^c,m^e_i)\)</span>. These
+are: complete cases <span class="math inline">\((0,0)\)</span>; missing
+costs only <span class="math inline">\((1,0)\)</span>; missing effects
+only <span class="math inline">\((0,1)\)</span>; fully missing cases
+<span class="math inline">\((1,1)\)</span>. A typical example of these
+restrictions is when unidentifiable parameters in a given pattern (e.g.,
+fully missing cases) are identified by matching those from a
+corresponding identifiable pattern (e.g., complete cases). Under MAR,
+these restrictions are the only element used to achieve the
+identification of the model. However, when MNAR assumptions are
+specified, identifying restrictions can be combined with additional
+parameters <span class="math inline">\(\boldsymbol \delta\)</span> to
+identify the model under a range of departures from MAR. These so-called
+“sensitivity parameters” are entirely identified using informative
+priors to encode in the model evidence that is external to the observed
+data. Unlike the priors for MNAR parameters in selection models,
+sensitivity parameters in pattern mixture models can have more intuitive
+and easier-to-assess interpretations in terms of their impact on
+posterior results.</p>
 <p><code>missingHE</code> allows the specification of MNAR assumptions
 through the arguments <code>restriction</code> and <code>type</code>
 inside the function <code>pattern</code>. The first argument captures
@@ -335,94 +311,60 @@ missing values: either <code>MAR</code> or <code>MNAR</code>. Under MAR,
 the model is identified only based on the given identifying restrictions
 imposed in each unidentified pattern for both outcomes. For example,
 when <code>"CC"</code> restrictions are selected, the mean effectiveness
-and cost parameters in the fully missing cases
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>μ</mi><mi>e</mi><mrow><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>,</mo><mn>1</mn><mo stretchy="false" form="postfix">)</mo></mrow></msubsup><annotation encoding="application/x-tex">\mu_e^{(1,1)}</annotation></semantics></math>
-and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>μ</mi><mi>c</mi><mrow><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>,</mo><mn>1</mn><mo stretchy="false" form="postfix">)</mo></mrow></msubsup><annotation encoding="application/x-tex">\mu_c^{(1,1)}</annotation></semantics></math>
-are set equal to those from the complete cases
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>μ</mi><mi>e</mi><mrow><mo stretchy="false" form="prefix">(</mo><mn>0</mn><mo>,</mo><mn>0</mn><mo stretchy="false" form="postfix">)</mo></mrow></msubsup><annotation encoding="application/x-tex">\mu_e^{(0,0)}</annotation></semantics></math>
-and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>μ</mi><mi>c</mi><mrow><mo stretchy="false" form="prefix">(</mo><mn>0</mn><mo>,</mo><mn>0</mn><mo stretchy="false" form="postfix">)</mo></mrow></msubsup><annotation encoding="application/x-tex">\mu_c^{(0,0)}</annotation></semantics></math>,
-respectively. Under MNAR, location-shift sensitivity parameters
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>δ</mi><mi>e</mi></msub><annotation encoding="application/x-tex">\delta_e</annotation></semantics></math>,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>δ</mi><mi>c</mi></msub><annotation encoding="application/x-tex">\delta_c</annotation></semantics></math>)
-are included within the chosen identification strategy. Using the same
-example, under MNAR, the mean outcomes in the fully missing cases are
-identified as:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>μ</mi><mi>e</mi><mrow><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>,</mo><mn>1</mn><mo stretchy="false" form="postfix">)</mo></mrow></msubsup><mo>=</mo><msubsup><mi>μ</mi><mi>e</mi><mrow><mo stretchy="false" form="prefix">(</mo><mn>0</mn><mo>,</mo><mn>0</mn><mo stretchy="false" form="postfix">)</mo></mrow></msubsup><mo>+</mo><msub><mi>δ</mi><mi>e</mi></msub><mspace width="0.278em"></mspace><mspace width="0.278em"></mspace><mspace width="0.278em"></mspace><mtext mathvariant="normal">and</mtext><mspace width="0.278em"></mspace><mspace width="0.278em"></mspace><mspace width="0.278em"></mspace><msubsup><mi>μ</mi><mi>c</mi><mrow><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>,</mo><mn>1</mn><mo stretchy="false" form="postfix">)</mo></mrow></msubsup><mo>=</mo><msubsup><mi>μ</mi><mi>c</mi><mrow><mo stretchy="false" form="prefix">(</mo><mn>0</mn><mo>,</mo><mn>0</mn><mo stretchy="false" form="postfix">)</mo></mrow></msubsup><mo>+</mo><msub><mi>δ</mi><mi>c</mi></msub><mo>,</mo><mo stretchy="false" form="prefix">(</mo><mi>#</mi><mi>e</mi><mi>q</mi><mo>:</mo><mi>p</mi><mi>m</mi><mi>s</mi><mi>p</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\begin{equation}
-\mu_e^{(1,1)}=\mu_e^{(0,0)}+\delta_e \;\;\; \text{and}  \;\;\; \mu_c^{(1,1)}=\mu_c^{(0,0)}+\delta_c,
- (\#eq:pmsp)
-\end{equation}</annotation></semantics></math></p>
-<p>where
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>δ</mi><mi>e</mi></msub><annotation encoding="application/x-tex">\delta_e</annotation></semantics></math>
-and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>δ</mi><mi>c</mi></msub><annotation encoding="application/x-tex">\delta_c</annotation></semantics></math>
-are by default assigned with minimally informative uniform priors
-between
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0</mn><annotation encoding="application/x-tex">0</annotation></semantics></math>
-ans
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>1</mn><annotation encoding="application/x-tex">1</annotation></semantics></math>
-by <code>missingHE</code> (both set to
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0</mn><annotation encoding="application/x-tex">0</annotation></semantics></math>
-under MAR). Sensitivity analysis to alternative MNAR scenarios can then
-be conducted by:</p>
+and cost parameters in the fully missing cases <span class="math inline">\(\mu_e^{(1,1)}\)</span> and <span class="math inline">\(\mu_c^{(1,1)}\)</span> are set equal to those from
+the complete cases <span class="math inline">\(\mu_e^{(0,0)}\)</span>
+and <span class="math inline">\(\mu_c^{(0,0)}\)</span>, respectively.
+Under MNAR, location-shift sensitivity parameters (<span class="math inline">\(\delta_e\)</span>, <span class="math inline">\(\delta_c\)</span>) are included within the chosen
+identification strategy. Using the same example, under MNAR, the mean
+outcomes in the fully missing cases are identified as:</p>
+<p><span class="math display">\[\begin{equation}
+\mu_e^{(1,1)}=\mu_e^{(0,0)}+\delta_e \;\;\; \text{and}  \;\;\;
+\mu_c^{(1,1)}=\mu_c^{(0,0)}+\delta_c,
+(\#eq:pmsp)
+\end{equation}\]</span></p>
+<p>where <span class="math inline">\(\delta_e\)</span> and <span class="math inline">\(\delta_c\)</span> are by default assigned with
+minimally informative uniform priors between <span class="math inline">\(0\)</span> ans <span class="math inline">\(1\)</span> by <code>missingHE</code> (both set to
+<span class="math inline">\(0\)</span> under MAR). Sensitivity analysis
+to alternative MNAR scenarios can then be conducted by:</p>
 <ol style="list-style-type: decimal">
 <li><p>Choose alternative identifying restrictions to be passed to the
 argument <code>restriction</code>, i.e., either <code>"CC"</code> or
 <code>"AC"</code>.</p></li>
-<li><p>Specify informative priors on
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>δ</mi><mi>e</mi></msub><annotation encoding="application/x-tex">\delta_e</annotation></semantics></math>
-and/or
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>δ</mi><mi>c</mi></msub><annotation encoding="application/x-tex">\delta_c</annotation></semantics></math>
-through an <code>R</code> list object containing information about the
-desired prior specification, including name of the parametric
-distribution assumed (among a set of pre-defined choices) and its
-corresponding prior values. This list can then be passed to the
-<code>pattern</code> function using the optional argument
-<code>prior</code> to overwrite the default priors (minimally
+<li><p>Specify informative priors on <span class="math inline">\(\delta_e\)</span> and/or <span class="math inline">\(\delta_c\)</span> through an <code>R</code> list
+object containing information about the desired prior specification,
+including name of the parametric distribution assumed (among a set of
+pre-defined choices) and its corresponding prior values. This list can
+then be passed to the <code>pattern</code> function using the optional
+argument <code>prior</code> to overwrite the default priors (minimally
 informative uniforms) assumed by <code>missingHE</code> for these
 parameters under MNAR.</p></li>
 </ol>
 <p>Going back to our example, based on external information, let us
 assume that the mean effectiveness among the missing cases is on average
-between
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0.2</mn><annotation encoding="application/x-tex">0.2</annotation></semantics></math>
-and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0.3</mn><annotation encoding="application/x-tex">0.3</annotation></semantics></math>
-lower compared to that among the observed cases, across both treatment
-arms. This information can be encoded into a prior distribution for
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>δ</mi><mi>e</mi></msub><annotation encoding="application/x-tex">\delta_e</annotation></semantics></math>
-within a pattern mixture model in a similar way to what shown in Section
-@ref(sec-sm) for selection models. The following code shows how to
-specify a uniform distribution (<code>"unif"</code>), with prior
-boundary values of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0.2</mn><annotation encoding="application/x-tex">0.2</annotation></semantics></math>
-and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0.3</mn><annotation encoding="application/x-tex">0.3</annotation></semantics></math>,
-for
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>δ</mi><mi>e</mi></msub><annotation encoding="application/x-tex">\delta_e</annotation></semantics></math>.</p>
+between <span class="math inline">\(0.2\)</span> and <span class="math inline">\(0.3\)</span> lower compared to that among the
+observed cases, across both treatment arms. This information can be
+encoded into a prior distribution for <span class="math inline">\(\delta_e\)</span> within a pattern mixture model
+in a similar way to what shown in Section @ref(sec-sm) for selection
+models. The following code shows how to specify a uniform distribution
+(<code>"unif"</code>), with prior boundary values of <span class="math inline">\(0.2\)</span> and <span class="math inline">\(0.3\)</span>, for <span class="math inline">\(\delta_e\)</span>.</p>
 <pre class="text"><code>&gt; my.prior &lt;- list(
 +   "delta.prior.e" = c("unif", -0.3, -0.2)
 + )</code></pre>
 <p>Next, we fit the desired MNAR model using the function
 <code>pattern</code>, setting the arguments
 <code>restriction = "CC"</code>, <code>type = "MNAR"</code> and
-overwriting the default priors for
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>δ</mi><mi>e</mi></msub><annotation encoding="application/x-tex">\delta_e</annotation></semantics></math>
-with those contained in the object <code>my.prior</code>.</p>
+overwriting the default priors for <span class="math inline">\(\delta_e\)</span> with those contained in the
+object <code>my.prior</code>.</p>
 <pre class="text"><code>&gt; NN.pat2 &lt;- pattern(data = MenSS, model.eff = e ~ trt + u.0, 
 +          model.cost = c ~ trt, type = "MNAR", 
 +          restriction = "CC", n.iter = 1000, 
 +          ref = 2, prior = my.prior,
 +          dist_e = "norm", dist_c = "norm")</code></pre>
-<p>Baseline utilities are included in the model for
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>e</mi><annotation encoding="application/x-tex">e</annotation></semantics></math>,
-which is identified under MNAR using complete case restrictions
-(<code>restriction = "CC"</code>) and informative priors on the
-sensitivity parameters for the mean
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>e</mi><annotation encoding="application/x-tex">e</annotation></semantics></math>.
-Economic results in terms of posterior summaries about mean parameters
-can be inspected using the <code>postsum</code> function</p>
+<p>Baseline utilities are included in the model for <span class="math inline">\(e\)</span>, which is identified under MNAR using
+complete case restrictions (<code>restriction = "CC"</code>) and
+informative priors on the sensitivity parameters for the mean <span class="math inline">\(e\)</span>. Economic results in terms of posterior
+summaries about mean parameters can be inspected using the
+<code>postsum</code> function</p>
 <pre class="text"><code>&gt; postsum(NN.pat2)
 #&gt;                     mean          sd        2.5%         50%      97.5% Rhat n.eff
 #&gt; alpha_p[1,1]   0.5503279  0.07384925   0.4029207   0.5479382   0.700684 1.01   220
@@ -461,14 +403,14 @@ parameters, roughly defined on the same value range,</p>
 the acceptability curves derived from each MNAR model using again the
 function <code>ceac.plot</code>.</p>
 <div class="figure">
-<img src="Fitting_MNAR_models_in_missingHE_files/figure-html/figplotceamnarpat1-1.png" class="r-plt" alt="Cost-effectiveness acceptability curves (CEAC) derived from model 1 fitted under uniform MNAR priors for the effectiveness sensitivity parameter." width="100%"><p class="caption">
+<img src="Fitting_MNAR_models_in_missingHE_files/figure-html/figplotceamnarpat1-1.png" alt="Cost-effectiveness acceptability curves (CEAC) derived from model 1 fitted under uniform MNAR priors for the effectiveness sensitivity parameter." width="100%"><p class="caption">
 Cost-effectiveness acceptability curves (CEAC) derived from model 1
 fitted under uniform MNAR priors for the effectiveness sensitivity
 parameter.
 </p>
 </div>
 <div class="figure">
-<img src="Fitting_MNAR_models_in_missingHE_files/figure-html/figplotceamnarpat2-1.png" class="r-plt" alt="Cost-effectiveness acceptability curves (CEAC) derived from model 2 fitted under normal MNAR priors for the effectiveness sensitivity parameter." width="100%"><p class="caption">
+<img src="Fitting_MNAR_models_in_missingHE_files/figure-html/figplotceamnarpat2-1.png" alt="Cost-effectiveness acceptability curves (CEAC) derived from model 2 fitted under normal MNAR priors for the effectiveness sensitivity parameter." width="100%"><p class="caption">
 Cost-effectiveness acceptability curves (CEAC) derived from model 2
 fitted under normal MNAR priors for the effectiveness sensitivity
 parameter.
@@ -477,34 +419,30 @@ parameter.
 <p>Figure @ref(fig:figplotceamnarpat1) and Figure
 @ref(fig:figplotceamnarpat2) indicate a slightly lower chance for the
 new intervention to be cost-effective when comparing the results under
-an informative normal distribution for
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>δ</mi><mi>e</mi></msub><annotation encoding="application/x-tex">\delta_e</annotation></semantics></math>
-(<code>NN.pat3</code>) with respect to a uniform distribution
-(<code>NN.pat3</code>). Note that, in real applications, the range of
-values and choice of distribution for the sensitivity parameters should
-be informed based on some external source of information (e.g., expert
-opinion) to guide the elicitation process.</p>
+an informative normal distribution for <span class="math inline">\(\delta_e\)</span> (<code>NN.pat3</code>) with
+respect to a uniform distribution (<code>NN.pat3</code>). Note that, in
+real applications, the range of values and choice of distribution for
+the sensitivity parameters should be informed based on some external
+source of information (e.g., expert opinion) to guide the elicitation
+process.</p>
 </div>
 <div class="section level2">
 <h2 id="sec-hm">Handling MNAR using hurdle models<a class="anchor" aria-label="anchor" href="#sec-hm"></a>
 </h2>
 <p>Hurdle models consist of two-part mixture models, where the outcome
-variable (i.e.,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>e</mi><annotation encoding="application/x-tex">e</annotation></semantics></math>,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>c</mi><annotation encoding="application/x-tex">c</annotation></semantics></math>
-or both) are split into two components: one associated with identical
-values (called “structural”) which are assumed to be fixed; and one
-associated with a set of values (called non-structural) which are
-assumed to be generated from a given distribution.
-<code>missingHE</code> models the non-structural outcome values using
-some parametric distributions and uses logistic regressions to estimate
-the probability of incurring in a structural value. The function
-<code>hurdle</code> requires the user to specify separate formulae for:
-the models estimating the mean outcome for the non-structural component
-through the usual arguments <code>model.eff</code> and
-<code>model.cost</code>; the logistic regressions estimating the
-structural value probabilities using the arguments <code>model.se</code>
-and <code>model.sc</code>:</p>
+variable (i.e., <span class="math inline">\(e\)</span>, <span class="math inline">\(c\)</span> or both) are split into two components:
+one associated with identical values (called “structural”) which are
+assumed to be fixed; and one associated with a set of values (called
+non-structural) which are assumed to be generated from a given
+distribution. <code>missingHE</code> models the non-structural outcome
+values using some parametric distributions and uses logistic regressions
+to estimate the probability of incurring in a structural value. The
+function <code>hurdle</code> requires the user to specify separate
+formulae for: the models estimating the mean outcome for the
+non-structural component through the usual arguments
+<code>model.eff</code> and <code>model.cost</code>; the logistic
+regressions estimating the structural value probabilities using the
+arguments <code>model.se</code> and <code>model.sc</code>:</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">model.se</span> <span class="op">&lt;-</span> <span class="va">se</span> <span class="op">~</span>  <span class="fl">1</span> <span class="op">+</span> <span class="va">...</span></span>
 <span><span class="va">model.sc</span> <span class="op">&lt;-</span> <span class="va">sc</span> <span class="op">~</span>  <span class="fl">1</span> <span class="op">+</span> <span class="va">...</span></span></code></pre></div>
@@ -526,24 +464,14 @@ the impact of specific MNAR assumptions about the number of missing
 individuals assigned with a structural value.</p>
 <p>Let us first consider a standard hurdle model specification under
 MAR. We specify the model to handle both structural ones and zeros in
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>e</mi><annotation encoding="application/x-tex">e</annotation></semantics></math>
-and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>c</mi><annotation encoding="application/x-tex">c</annotation></semantics></math>
-from the <code>MenSS</code> dataset, where structural values are set by
-using the arguments <code>se = 1</code> and <code>sc = 0</code> inside
-<code>hurdle</code>, respectively. Since these values are assumed to be
-“fixed”, their occurrence does not affect the choice of a distribution
-for the non-structural component of the outcomes. As a result, we can
-assign distributions that are not defined at
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>1</mn><annotation encoding="application/x-tex">1</annotation></semantics></math>
-and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0</mn><annotation encoding="application/x-tex">0</annotation></semantics></math>
-to the non-structural outcome values, such as Beta and Gamma
-distributions for
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>e</mi><annotation encoding="application/x-tex">e</annotation></semantics></math>
-and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>c</mi><annotation encoding="application/x-tex">c</annotation></semantics></math>,
-respectively.</p>
+<span class="math inline">\(e\)</span> and <span class="math inline">\(c\)</span> from the <code>MenSS</code> dataset,
+where structural values are set by using the arguments
+<code>se = 1</code> and <code>sc = 0</code> inside <code>hurdle</code>,
+respectively. Since these values are assumed to be “fixed”, their
+occurrence does not affect the choice of a distribution for the
+non-structural component of the outcomes. As a result, we can assign
+distributions that are not defined at <span class="math inline">\(1\)</span> and <span class="math inline">\(0\)</span> to the non-structural outcome values,
+such as Beta and Gamma distributions for <span class="math inline">\(e\)</span> and <span class="math inline">\(c\)</span>, respectively.</p>
 <pre class="text"><code>&gt; NN.hur1 &lt;- hurdle(data = MenSS, model.eff = e ~ trt + u.0, 
 +          model.cost = c ~ trt, model.se = se ~ 1, 
 +          model.sc = sc ~ 1, type = "SCAR", 
@@ -572,24 +500,18 @@ indicator by typing</p>
 <p>Next, for all or some of the individuals with a missing effect value,
 we set the value of <code>s_e = 1</code> to assign them to the
 structural component of the model. For example, we may believe that it
-is likely for all individuals aged
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>&lt;</mo><mn>22</mn></mrow><annotation encoding="application/x-tex">&lt;22</annotation></semantics></math>
-to be associated with a perfect health state (i.e.,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>e</mi><mo>=</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">e=1</annotation></semantics></math>).
-We can encode this information into a new object called
-<code>mys_e</code> by typing</p>
+is likely for all individuals aged <span class="math inline">\(&lt;22\)</span> to be associated with a perfect
+health state (i.e., <span class="math inline">\(e=1\)</span>). We can
+encode this information into a new object called <code>mys_e</code> by
+typing</p>
 <pre class="text"><code>&gt; mys_e &lt;- ifelse(is.na(s_e) &amp; MenSS$age &lt; 22, 1, s_e)
 &gt; #number of ones
 &gt; sum(mys_e == 1, na.rm = T)
 #&gt; [1] 41</code></pre>
-<p>The number of individuals associated with
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>e</mi><mo>=</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">e=1</annotation></semantics></math>
-has considerably increased with respect to the observed data alone. We
-can now proceed to fit the hurdle model by replacing the original
-structural indicator variable of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>e</mi><annotation encoding="application/x-tex">e</annotation></semantics></math>
-with the newly created one using the argument
-<code>s_e = mys_e</code>.</p>
+<p>The number of individuals associated with <span class="math inline">\(e=1\)</span> has considerably increased with
+respect to the observed data alone. We can now proceed to fit the hurdle
+model by replacing the original structural indicator variable of <span class="math inline">\(e\)</span> with the newly created one using the
+argument <code>s_e = mys_e</code>.</p>
 <pre class="text"><code>&gt; NN.hur2 &lt;- hurdle(data = MenSS, model.eff = e ~ trt + u.0, 
 +          model.cost = c ~ trt, model.se = se ~ 1, 
 +          model.sc = sc ~ 1, type = "SCAR", s_e = mys_e,
@@ -621,7 +543,7 @@ with the newly created one using the argument
 <p>and look at how imputations in each treatment group are carried out
 based using the <code>plot</code> function.</p>
 <div class="figure">
-<img src="Fitting_MNAR_models_in_missingHE_files/figure-html/figplothm2-1.png" class="r-plt" alt="Scatter plots of observed and imputed effectiveness data in the SoC arm (trt = 1) based on an hurdle model assuming all individuals younger than 22 years old are associated with a perfect healf state." width="100%"><p class="caption">
+<img src="Fitting_MNAR_models_in_missingHE_files/figure-html/figplothm2-1.png" alt="Scatter plots of observed and imputed effectiveness data in the SoC arm (trt = 1) based on an hurdle model assuming all individuals younger than 22 years old are associated with a perfect healf state." width="100%"><p class="caption">
 Scatter plots of observed and imputed effectiveness data in the SoC arm
 (trt = 1) based on an hurdle model assuming all individuals younger than
 22 years old are associated with a perfect healf state.
@@ -633,14 +555,14 @@ credible interval. Finally, we compare the economic results from the two
 hurdle models using the <code>ceac.plot</code> function from the
 <code>BCEA</code> package.</p>
 <div class="figure">
-<img src="Fitting_MNAR_models_in_missingHE_files/figure-html/figplotceamnarhm1-1.png" class="r-plt" alt="Cost-effectiveness acceptability curves (CEAC) derived from the hurdle model fitted under a MAR assumption about the number of structural ones in SoC." width="100%"><p class="caption">
+<img src="Fitting_MNAR_models_in_missingHE_files/figure-html/figplotceamnarhm1-1.png" alt="Cost-effectiveness acceptability curves (CEAC) derived from the hurdle model fitted under a MAR assumption about the number of structural ones in SoC." width="100%"><p class="caption">
 Cost-effectiveness acceptability curves (CEAC) derived from the hurdle
 model fitted under a MAR assumption about the number of structural ones
 in SoC.
 </p>
 </div>
 <div class="figure">
-<img src="Fitting_MNAR_models_in_missingHE_files/figure-html/figplotceamnarhm2-1.png" class="r-plt" alt="Cost-effectiveness acceptability curves (CEAC) derived from the hurdle models fitted under a MNAR assumption about the number of structural ones in SoC." width="100%"><p class="caption">
+<img src="Fitting_MNAR_models_in_missingHE_files/figure-html/figplotceamnarhm2-1.png" alt="Cost-effectiveness acceptability curves (CEAC) derived from the hurdle models fitted under a MNAR assumption about the number of structural ones in SoC." width="100%"><p class="caption">
 Cost-effectiveness acceptability curves (CEAC) derived from the hurdle
 models fitted under a MNAR assumption about the number of structural
 ones in SoC.
@@ -649,11 +571,10 @@ ones in SoC.
 <p>According to Figure @ref(fig:figplotceamnarhm1) and Figure
 @ref(fig:figplotceamnarhm2), the probability of cost-effectiveness for
 the hurdle model under MAR (<code>NN.hur1</code>) shows a moderate
-increase alongside the willingness to pay threshold up to
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0.7</mn><annotation encoding="application/x-tex">0.7</annotation></semantics></math>,
-where a plateau is observed. Conversely, results from the MNAR model
-(<code>NN.hur2</code>) indicate a systematically lower chance of
-cost-effectiveness, especially for lower willingness to pay values.</p>
+increase alongside the willingness to pay threshold up to <span class="math inline">\(0.7\)</span>, where a plateau is observed.
+Conversely, results from the MNAR model (<code>NN.hur2</code>) indicate
+a systematically lower chance of cost-effectiveness, especially for
+lower willingness to pay values.</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

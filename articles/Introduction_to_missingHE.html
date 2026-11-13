@@ -5,7 +5,13 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Introduction to missingHE • missingHE</title>
-<script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<!-- mathjax math --><script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js" integrity="sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI=" crossorigin="anonymous"></script><script>
+  window.MathJax = {
+    chtml: {
+      fontURL: "https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/output/chtml/fonts/woff-v2"
+    }
+  };
+</script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
@@ -36,10 +42,11 @@
 <li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="../articles/Fitting_MNAR_models_in_missingHE.html">Fitting MNAR models in missingHE</a></li>
+<li><a class="dropdown-item" href="../articles/missingHE-package.html">Missing Cost Effectiveness Models</a></li>
     <li><a class="dropdown-item" href="../articles/Introduction_to_missingHE.html">Introduction to missingHE</a></li>
-    <li><a class="dropdown-item" href="../articles/Longitudinal_models_in_missingHE.html">Longitudinal models in missingHE</a></li>
+    <li><a class="dropdown-item" href="../articles/Fitting_MNAR_models_in_missingHE.html">Fitting MNAR models in missingHE</a></li>
     <li><a class="dropdown-item" href="../articles/Model_customisation_in_missingHE.html">Model and output customisation in missingHE</a></li>
+    <li><a class="dropdown-item" href="../articles/Longitudinal_models_in_missingHE.html">Longitudinal models in missingHE</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -55,8 +62,6 @@
 
   </div>
 </nav><div class="container template-article">
-
-
 
 
 <div class="row">
@@ -126,7 +131,7 @@ to improve the package are also very welcome. A development version of
 the package is also available from the author’s main GitHub repository
 at <a href="https://github.com/AnGabrio/missingHE" class="external-link uri">https://github.com/AnGabrio/missingHE</a>.</p>
 <div class="section level2">
-<h2 id="sec-frame">Modelling Framework<a class="anchor" aria-label="anchor" href="#sec-frame"></a>
+<h2 id="sec-frame-intro">Modelling Framework<a class="anchor" aria-label="anchor" href="#sec-frame-intro"></a>
 </h2>
 <p>The modelling approach in <code>missingHE</code> can be customised by
 the user according to three key aspects: 1) parameterisation structure
@@ -141,215 +146,155 @@ literature. More advanced models and customisation options available in
 options</a>, and <a href="Longitudinal_models_in_missingHE.Rmd">longitudinal data
 analysis</a>.</p>
 <p>Trial-based health economic data usually consist in the
-cross-sectional cost-effectiveness pair of variables
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">(</mo><msub><mi>e</mi><mrow><mi>i</mi><mi>t</mi></mrow></msub><mo>,</mo><msub><mi>c</mi><mrow><mi>i</mi><mi>t</mi></mrow></msub><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">(e_{it},c_{it})</annotation></semantics></math>,
-collected on the
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>-th
-patient assigned to the
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>t</mi><annotation encoding="application/x-tex">t</annotation></semantics></math>-th
-treatment in the study, for
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>i</mi><mo>=</mo><mn>1</mn><mo>,</mo><mi>…</mi><mo>,</mo><mi>N</mi></mrow><annotation encoding="application/x-tex">i=1,\ldots,N</annotation></semantics></math>
-patients and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>t</mi><mo>=</mo><mn>1</mn><mo>,</mo><mi>…</mi><mo>,</mo><mi>T</mi></mrow><annotation encoding="application/x-tex">t=1,\ldots,T</annotation></semantics></math>
-treatment options. In many jurisdictions, the recommended effectiveness
-variable
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>e</mi><mrow><mi>i</mi><mi>t</mi></mrow></msub><annotation encoding="application/x-tex">e_{it}</annotation></semantics></math>
-is a <em>Quality Adjusted Life Years</em> (QALYs) measure, which is
-typically obtained by aggregating utility scores computed from the
-patients’ answers to generic health-related quality of life
-questionnaires (e.g., EQ-5D) collected at given time intervals. The cost
-variable
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>c</mi><mrow><mi>i</mi><mi>t</mi></mrow></msub><annotation encoding="application/x-tex">c_{it}</annotation></semantics></math>
-denotes the sum of all relevant patient-level costs (e.g.,
-direct/indirect medical costs, productivity losses, etc.), which are
-often collected from the patients’ answers to different types of
-healthcare-resource utilisation questionnaires or medical records.</p>
-<p>In <code>missingHE</code>, the observed variables
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">(</mo><msub><mi>e</mi><mrow><mi>i</mi><mi>t</mi></mrow></msub><mo>,</mo><msub><mi>c</mi><mrow><mi>i</mi><mi>t</mi></mrow></msub><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">(e_{it},c_{it})</annotation></semantics></math>
-are modelled using a joint bivariate probability distribution with
-density
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mo stretchy="false" form="prefix">(</mo><msub><mi>e</mi><mrow><mi>i</mi><mi>t</mi></mrow></msub><mo>,</mo><msub><mi>c</mi><mrow><mi>i</mi><mi>t</mi></mrow></msub><mo>∣</mo><msub><mi>𝛉</mi><mi>t</mi></msub><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">p(e_{it},c_{it}\mid \boldsymbol \theta_t)</annotation></semantics></math>,
-as a function of a vector of relevant parameters
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>𝛉</mi><mi>t</mi></msub><annotation encoding="application/x-tex">\boldsymbol \theta_t</annotation></semantics></math>,
-and implemented using the following conditional factorisation</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mo stretchy="false" form="prefix">(</mo><msub><mi>e</mi><mrow><mi>i</mi><mi>t</mi></mrow></msub><mo>,</mo><msub><mi>c</mi><mrow><mi>i</mi><mi>t</mi></mrow></msub><mo>∣</mo><msub><mi>𝛉</mi><mi>t</mi></msub><mo stretchy="false" form="postfix">)</mo><mspace width="1.0em"></mspace><mo>=</mo><mspace width="1.0em"></mspace><mi>p</mi><mo stretchy="false" form="prefix">(</mo><msub><mi>e</mi><mrow><mi>i</mi><mi>t</mi></mrow></msub><mo>∣</mo><msub><mi>𝛉</mi><mrow><mi>e</mi><mi>t</mi></mrow></msub><mo stretchy="false" form="postfix">)</mo><mi>p</mi><mo stretchy="false" form="prefix">(</mo><msub><mi>c</mi><mrow><mi>i</mi><mi>t</mi></mrow></msub><mo>∣</mo><msub><mi>e</mi><mrow><mi>i</mi><mi>t</mi></mrow></msub><mo>,</mo><msub><mi>𝛉</mi><mrow><mi>c</mi><mi>t</mi></mrow></msub><mo stretchy="false" form="postfix">)</mo><mo>,</mo><mo stretchy="false" form="prefix">(</mo><mi>#</mi><mi>e</mi><mi>q</mi><mo>:</mo><mi>b</mi><mi>i</mi><mi>v</mi><mi>m</mi><mi>o</mi><mi>d</mi><mi>e</mi><mi>l</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\begin{equation} 
-p(e_{it},c_{it} \mid \boldsymbol \theta_t) \quad = \quad p(e_{it} \mid \boldsymbol \theta_{et})p(c_{it} \mid e_{it},  \boldsymbol \theta_{ct}),
- (\#eq:bivmodel)
-\end{equation}</annotation></semantics></math></p>
-<p>where
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mo stretchy="false" form="prefix">(</mo><msub><mi>e</mi><mrow><mi>i</mi><mi>t</mi></mrow></msub><mo>∣</mo><msub><mi>𝛉</mi><mrow><mi>e</mi><mi>t</mi></mrow></msub><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">p(e_{it}\mid \boldsymbol \theta_{et})</annotation></semantics></math>
-denotes the marginal effectiveness distribution and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mo stretchy="false" form="prefix">(</mo><msub><mi>c</mi><mrow><mi>i</mi><mi>t</mi></mrow></msub><mo>∣</mo><msub><mi>e</mi><mrow><mi>i</mi><mi>t</mi></mrow></msub><mo>,</mo><msub><mi>𝛉</mi><mrow><mi>c</mi><mi>t</mi></mrow></msub><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">p(c_{it} \mid e_{it}, \boldsymbol \theta_{ct})</annotation></semantics></math>
-the conditional cost distribution given
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>e</mi><mrow><mi>i</mi><mi>t</mi></mrow></msub><annotation encoding="application/x-tex">e_{it}</annotation></semantics></math>,
-with
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>θ</mi><mrow><mi>e</mi><mi>t</mi></mrow></msub><annotation encoding="application/x-tex">\theta_{et}</annotation></semantics></math>
-and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>θ</mi><mrow><mi>c</mi><mi>t</mi></mrow></msub><annotation encoding="application/x-tex">\theta_{ct}</annotation></semantics></math>
-being the treatment-specific set of parameters indexing the marginal
-effectiveness and conditional cost distributions, respectively. To
-simplify notation, we now drop the treatment index
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>t</mi><annotation encoding="application/x-tex">t</annotation></semantics></math>.</p>
+cross-sectional cost-effectiveness pair of variables <span class="math inline">\((e_{it},c_{it})\)</span>, collected on the <span class="math inline">\(i\)</span>-th patient assigned to the <span class="math inline">\(t\)</span>-th treatment in the study, for <span class="math inline">\(i=1,\ldots,N\)</span> patients and <span class="math inline">\(t=1,\ldots,T\)</span> treatment options. In many
+jurisdictions, the recommended effectiveness variable <span class="math inline">\(e_{it}\)</span> is a <em>Quality Adjusted Life
+Years</em> (QALYs) measure, which is typically obtained by aggregating
+utility scores computed from the patients’ answers to generic
+health-related quality of life questionnaires (e.g., EQ-5D) collected at
+given time intervals. The cost variable <span class="math inline">\(c_{it}\)</span> denotes the sum of all relevant
+patient-level costs (e.g., direct/indirect medical costs, productivity
+losses, etc.), which are often collected from the patients’ answers to
+different types of healthcare-resource utilisation questionnaires or
+medical records.</p>
+<p>In <code>missingHE</code>, the observed variables <span class="math inline">\((e_{it},c_{it})\)</span> are modelled using a
+joint bivariate probability distribution with density <span class="math inline">\(p(e_{it},c_{it}\mid \boldsymbol
+\theta_t)\)</span>, as a function of a vector of relevant parameters
+<span class="math inline">\(\boldsymbol \theta_t\)</span>, and
+implemented using the following conditional factorisation</p>
+<p><span class="math display">\[\begin{equation}
+p(e_{it},c_{it} \mid \boldsymbol \theta_t) \quad = \quad p(e_{it} \mid
+\boldsymbol \theta_{et})p(c_{it} \mid e_{it},  \boldsymbol \theta_{ct}),
+(\#eq:bivmodel)
+\end{equation}\]</span></p>
+<p>where <span class="math inline">\(p(e_{it}\mid \boldsymbol
+\theta_{et})\)</span> denotes the marginal effectiveness distribution
+and <span class="math inline">\(p(c_{it} \mid e_{it}, \boldsymbol
+\theta_{ct})\)</span> the conditional cost distribution given <span class="math inline">\(e_{it}\)</span>, with <span class="math inline">\(\theta_{et}\)</span> and <span class="math inline">\(\theta_{ct}\)</span> being the treatment-specific
+set of parameters indexing the marginal effectiveness and conditional
+cost distributions, respectively. To simplify notation, we now drop the
+treatment index <span class="math inline">\(t\)</span>.</p>
 <p>Both outcome densities in Equation @ref(eq:bivmodel) are specified
 using some parametric forms for the probability distributions to
 describe the underlying uncertainty in the cost-effectiveness data. The
-set of model parameters can be generally represented as
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝛉</mi><mo>=</mo><mo stretchy="false" form="prefix">(</mo><mi>𝛟</mi><mo stretchy="false" form="prefix">(</mo><mi>x</mi><mo stretchy="false" form="postfix">)</mo><mo>,</mo><mi>𝛙</mi><mo stretchy="false" form="prefix">(</mo><mi>x</mi><mo stretchy="false" form="postfix">)</mo><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\boldsymbol \theta=(\boldsymbol \phi(x),\boldsymbol \psi(x))</annotation></semantics></math>,
-where:
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝛟</mi><mo stretchy="false" form="prefix">(</mo><mi>x</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mo stretchy="false" form="prefix">(</mo><msub><mi>ϕ</mi><mi>e</mi></msub><mo stretchy="false" form="prefix">(</mo><mi>x</mi><mo stretchy="false" form="postfix">)</mo><mo>,</mo><msub><mi>ϕ</mi><mi>c</mi></msub><mo stretchy="false" form="prefix">(</mo><mi>x</mi><mo stretchy="false" form="postfix">)</mo><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\boldsymbol \phi(x)=(\phi_e(x),\phi_c(x))</annotation></semantics></math>
-denotes the set of <em>location</em> parameters (e.g., mean) and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝛙</mi><mo stretchy="false" form="prefix">(</mo><mi>x</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mo stretchy="false" form="prefix">(</mo><msub><mi>ψ</mi><mi>e</mi></msub><mo stretchy="false" form="prefix">(</mo><mi>x</mi><mo stretchy="false" form="postfix">)</mo><mo>,</mo><msub><mi>ψ</mi><mi>c</mi></msub><mo stretchy="false" form="prefix">(</mo><mi>x</mi><mo stretchy="false" form="postfix">)</mo><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\boldsymbol \psi(x)=(\psi_e(x),\psi_c(x))</annotation></semantics></math>
+set of model parameters can be generally represented as <span class="math inline">\(\boldsymbol \theta=(\boldsymbol
+\phi(x),\boldsymbol \psi(x))\)</span>, where: <span class="math inline">\(\boldsymbol \phi(x)=(\phi_e(x),\phi_c(x))\)</span>
+denotes the set of <em>location</em> parameters (e.g., mean) and <span class="math inline">\(\boldsymbol \psi(x)=(\psi_e(x),\psi_c(x))\)</span>
 the set of <em>ancillary</em> parameters (e.g., variance) indexing the
 outcome distributions, both depending on some vector of potential
-baseline covariates
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>x</mi><annotation encoding="application/x-tex">x</annotation></semantics></math>
-(e.g., age, sex, etc…). While it is possible for both
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>𝛟</mi><annotation encoding="application/x-tex">\boldsymbol \phi</annotation></semantics></math>
-and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>𝛙</mi><annotation encoding="application/x-tex">\boldsymbol \psi</annotation></semantics></math>
-to explicitly depend on
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>x</mi><annotation encoding="application/x-tex">x</annotation></semantics></math>,
-the model specification is usually simplified assuming that these only
-affect the location parameters through a generalised linear formulation.
-For example, the location parameter of the effectiveness model can be
-specified as:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>g</mi><mi>e</mi></msub><mo stretchy="false" form="prefix">(</mo><msub><mi>ϕ</mi><mrow><mi>i</mi><mi>e</mi></mrow></msub><mo stretchy="false" form="postfix">)</mo><mspace width="1.0em"></mspace><mo>=</mo><mspace width="1.0em"></mspace><msub><mi>α</mi><mn>0</mn></msub><mo>+</mo><munderover><mo>∑</mo><mrow><mi>k</mi><mo>=</mo><mn>1</mn></mrow><mi>K</mi></munderover><msub><mi>α</mi><mi>k</mi></msub><msub><mi>x</mi><mrow><mi>i</mi><mi>k</mi></mrow></msub><mspace width="0.167em"></mspace><mspace width="0.167em"></mspace><mo stretchy="false" form="prefix">[</mo><mi>+</mi><mi>…</mi><mo stretchy="false" form="postfix">]</mo><mo>,</mo><mo stretchy="false" form="prefix">(</mo><mi>#</mi><mi>e</mi><mi>q</mi><mo>:</mo><mi>g</mi><mi>l</mi><mi>m</mi><mi>e</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\begin{equation}
-g_e(\phi_{ie}) \quad = \quad \alpha_{0} + \sum_{k=1}^K \alpha_kx_{ik}\,\,[+ \ldots],
- (\#eq:glme)
-\end{equation}</annotation></semantics></math></p>
+baseline covariates <span class="math inline">\(x\)</span> (e.g., age,
+sex, etc…). While it is possible for both <span class="math inline">\(\boldsymbol \phi\)</span> and <span class="math inline">\(\boldsymbol \psi\)</span> to explicitly depend on
+<span class="math inline">\(x\)</span>, the model specification is
+usually simplified assuming that these only affect the location
+parameters through a generalised linear formulation. For example, the
+location parameter of the effectiveness model can be specified as:</p>
+<p><span class="math display">\[\begin{equation}
+g_e(\phi_{ie}) \quad = \quad \alpha_{0} + \sum_{k=1}^K
+\alpha_kx_{ik}\,\,[+ \ldots],
+(\#eq:glme)
+\end{equation}\]</span></p>
 <p>and the location parameter of the cost model as:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>g</mi><mi>c</mi></msub><mo stretchy="false" form="prefix">(</mo><msub><mi>ϕ</mi><mrow><mi>i</mi><mi>c</mi></mrow></msub><mo stretchy="false" form="postfix">)</mo><mspace width="1.0em"></mspace><mo>=</mo><mspace width="1.0em"></mspace><msub><mi>β</mi><mn>0</mn></msub><mo>+</mo><munderover><mo>∑</mo><mrow><mi>k</mi><mo>=</mo><mn>1</mn></mrow><mi>K</mi></munderover><msub><mi>β</mi><mi>k</mi></msub><msub><mi>x</mi><mrow><mi>i</mi><mi>k</mi></mrow></msub><mo>+</mo><msub><mi>β</mi><mi>f</mi></msub><msub><mi>e</mi><mi>i</mi></msub><mo>,</mo><mspace width="0.167em"></mspace><mspace width="0.167em"></mspace><mo stretchy="false" form="prefix">[</mo><mi>+</mi><mi>…</mi><mo stretchy="false" form="postfix">]</mo><mo>,</mo><mo stretchy="false" form="prefix">(</mo><mi>#</mi><mi>e</mi><mi>q</mi><mo>:</mo><mi>g</mi><mi>l</mi><mi>m</mi><mi>c</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\begin{equation}
-g_c(\phi_{ic}) \quad = \quad \beta_{0} + \sum_{k=1}^K \beta_kx_{ik} + \beta_f e_{i}, \,\,[+ \ldots],
- (\#eq:glmc)
-\end{equation}</annotation></semantics></math></p>
-<p>where the regression coefficient
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>β</mi><mi>f</mi></msub><annotation encoding="application/x-tex">\beta_f</annotation></semantics></math>
-is included to capture the possible dependence between
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>c</mi><mi>i</mi></msub><annotation encoding="application/x-tex">c_{i}</annotation></semantics></math>
-and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>e</mi><mi>i</mi></msub><annotation encoding="application/x-tex">e_{i}</annotation></semantics></math>
-at the location level. Covariates may be included into the model at
-different scales using the link functions
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>g</mi><mi>e</mi></msub><mo stretchy="false" form="prefix">(</mo><mi>⋅</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">g_e(\cdot)</annotation></semantics></math>
-and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>g</mi><mi>c</mi></msub><mo stretchy="false" form="prefix">(</mo><mi>⋅</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">g_c(\cdot)</annotation></semantics></math>,
-being either identity, logarithmic or logit, depending on the type of
-outcome and distribution specified. Note that <code>missingHE</code>
-expands any categorical covariates to a set of dummy variables. In
-addition, Equation @ref(eq:glme) and Equation @ref(eq:glmc) can be
-extended, as indicated by
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">[</mo><mi>+</mi><mi>…</mi><mo stretchy="false" form="postfix">]</mo></mrow><annotation encoding="application/x-tex">[+ \ldots]</annotation></semantics></math>,
-to include additional terms into the model, e.g., clustering effects to
-account for the possible multilevel structure of the data. The objective
-of the statistical analysis is the estimation of population average
-effectiveness and cost parameters
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝛍</mi><mo>=</mo><mo stretchy="false" form="prefix">(</mo><msub><mi>μ</mi><mi>e</mi></msub><mo>,</mo><msub><mi>μ</mi><mi>c</mi></msub><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\boldsymbol \mu=(\mu_{e},\mu_{c})</annotation></semantics></math>
-in each treatment group as well as to quantify the (posterior)
-uncertainty around them. Estimates of these parameters can be obtained
-from Equation @ref(eq:glme) and Equation @ref(eq:glmc) either from their
-respective regression parameters after mean centring all covariates or
-through repeatedly sampling from the predictive distribution of the
-outcomes using Monte Carlo integration.</p>
+<p><span class="math display">\[\begin{equation}
+g_c(\phi_{ic}) \quad = \quad \beta_{0} + \sum_{k=1}^K \beta_kx_{ik} +
+\beta_f e_{i}, \,\,[+ \ldots],
+(\#eq:glmc)
+\end{equation}\]</span></p>
+<p>where the regression coefficient <span class="math inline">\(\beta_f\)</span> is included to capture the
+possible dependence between <span class="math inline">\(c_{i}\)</span>
+and <span class="math inline">\(e_{i}\)</span> at the location level.
+Covariates may be included into the model at different scales using the
+link functions <span class="math inline">\(g_e(\cdot)\)</span> and <span class="math inline">\(g_c(\cdot)\)</span>, being either identity,
+logarithmic or logit, depending on the type of outcome and distribution
+specified. Note that <code>missingHE</code> expands any categorical
+covariates to a set of dummy variables. In addition, Equation
+@ref(eq:glme) and Equation @ref(eq:glmc) can be extended, as indicated
+by <span class="math inline">\([+ \ldots]\)</span>, to include
+additional terms into the model, e.g., clustering effects to account for
+the possible multilevel structure of the data. The objective of the
+statistical analysis is the estimation of population average
+effectiveness and cost parameters <span class="math inline">\(\boldsymbol \mu=(\mu_{e},\mu_{c})\)</span> in each
+treatment group as well as to quantify the (posterior) uncertainty
+around them. Estimates of these parameters can be obtained from Equation
+@ref(eq:glme) and Equation @ref(eq:glmc) either from their respective
+regression parameters after mean centring all covariates or through
+repeatedly sampling from the predictive distribution of the outcomes
+using Monte Carlo integration.</p>
 <p>Assuming that the location parameters are modelled using a linear
 predictor form as in Equation @ref(eq:glme) and Equation @ref(eq:glmc),
 priors on the corresponding sets of regression coefficients can be
-specified as
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝛂</mi><mo>=</mo><mo stretchy="false" form="prefix">(</mo><msub><mi>α</mi><mn>0</mn></msub><mo>,</mo><mi>…</mi><mo>,</mo><msub><mi>α</mi><mi>K</mi></msub><mo stretchy="false" form="postfix">)</mo><mover><mo>∼</mo><mtext mathvariant="normal">iid</mtext></mover><mtext mathvariant="normal">Normal</mtext><mo stretchy="false" form="prefix">(</mo><msub><mi>μ</mi><mi>α</mi></msub><mo>,</mo><msub><mi>σ</mi><mi>α</mi></msub><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\boldsymbol \alpha=(\alpha_0,\ldots,\alpha_K) \overset{\text{iid}}{\sim} \text{Normal}(\mu_{\alpha},\sigma_{\alpha})</annotation></semantics></math>
-and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝛃</mi><mo>=</mo><mo stretchy="false" form="prefix">(</mo><msub><mi>β</mi><mn>0</mn></msub><mo>,</mo><mi>…</mi><mo>,</mo><msub><mi>β</mi><mi>K</mi></msub><mo>,</mo><msub><mi>β</mi><mi>f</mi></msub><mo stretchy="false" form="postfix">)</mo><mover><mo>∼</mo><mtext mathvariant="normal">iid</mtext></mover><mtext mathvariant="normal">Normal</mtext><mo stretchy="false" form="prefix">(</mo><msub><mi>μ</mi><mi>β</mi></msub><mo>,</mo><msub><mi>σ</mi><mi>β</mi></msub><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\boldsymbol \beta=(\beta_0,\ldots,\beta_K,\beta_f) \overset{\text{iid}}{\sim} \text{Normal}(\mu_{\beta},\sigma_{\beta})</annotation></semantics></math>,
-where the notation
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>μ</mi><mo>⋅</mo></msub><annotation encoding="application/x-tex">\mu_{\cdot}</annotation></semantics></math>
-and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>σ</mi><mo>⋅</mo></msub><annotation encoding="application/x-tex">\sigma_{\cdot}</annotation></semantics></math>
-denotes the prior mean and standard deviation, respectively. By default,
-<code>missingHE</code> assumes “minimally informative” prior values of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>μ</mi><mo>⋅</mo></msub><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\mu_{\cdot}=0</annotation></semantics></math>
-and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>σ</mi><mo>⋅</mo></msub><mo>=</mo><mn>1000</mn></mrow><annotation encoding="application/x-tex">\sigma_{\cdot}=1000</annotation></semantics></math>
-for all regression coefficients. When genuine prior knowledge on
-specific parameters is available, it is possible to modify the default
-priors and elicit the corresponding information into the model. As for
-the ancillary parameters, the choice of the prior values depends on the
-form of the probability distribution selected according to the modelling
-choices available in <code>missingHE</code>.</p>
+specified as <span class="math inline">\(\boldsymbol
+\alpha=(\alpha_0,\ldots,\alpha_K) \overset{\text{iid}}{\sim}
+\text{Normal}(\mu_{\alpha},\sigma_{\alpha})\)</span> and <span class="math inline">\(\boldsymbol \beta=(\beta_0,\ldots,\beta_K,\beta_f)
+\overset{\text{iid}}{\sim}
+\text{Normal}(\mu_{\beta},\sigma_{\beta})\)</span>, where the notation
+<span class="math inline">\(\mu_{\cdot}\)</span> and <span class="math inline">\(\sigma_{\cdot}\)</span> denotes the prior mean and
+standard deviation, respectively. By default, <code>missingHE</code>
+assumes “minimally informative” prior values of <span class="math inline">\(\mu_{\cdot}=0\)</span> and <span class="math inline">\(\sigma_{\cdot}=1000\)</span> for all regression
+coefficients. When genuine prior knowledge on specific parameters is
+available, it is possible to modify the default priors and elicit the
+corresponding information into the model. As for the ancillary
+parameters, the choice of the prior values depends on the form of the
+probability distribution selected according to the modelling choices
+available in <code>missingHE</code>.</p>
 </div>
 <div class="section level2">
 <h2 id="sec-miss">Missingness Approach<a class="anchor" aria-label="anchor" href="#sec-miss"></a>
 </h2>
 <p><code>missingHE</code> focusses exclusively on handling missingness
-in cost and effectiveness measures
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>o</mi><mi>i</mi></msub><mo>=</mo><msub><mi>c</mi><mi>i</mi></msub><mo>,</mo><msub><mi>e</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">o_i=c_i,e_i</annotation></semantics></math>)
-assuming the set of baseline variables
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>𝐱</mi><mi>i</mi></msub><annotation encoding="application/x-tex">\boldsymbol x_i</annotation></semantics></math>
-to be fully-observed for all individuals. When analysing incomplete
-outcome data, it is essential to investigate the reasons behind the
-missingness process, often referred to as the <em>missing data
-mechanism</em>. Since this is typically not under the control of the
-investigators, unverifiable assumptions have to be made, and the
-validity of the analysis depends on whether the assumptions formulated
-hold for the data at hand. Formally, given a certain outcome variable
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>o</mi><mi>i</mi></msub><annotation encoding="application/x-tex">o_i</annotation></semantics></math>,
-its missing data mechanism can be defined as a probability model for the
-distribution of the missingness indicators
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>m</mi><mi>i</mi></msub><annotation encoding="application/x-tex">m_i</annotation></semantics></math>,
-denoting whether the corresponding value is observed
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>o</mi><mi>i</mi></msub><mo>=</mo><msubsup><mi>o</mi><mi>i</mi><mtext mathvariant="normal">obs</mtext></msubsup><mo stretchy="false" form="prefix">(</mo><msub><mi>m</mi><mi>i</mi></msub><mo>=</mo><mn>0</mn><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">o_i=o^{\text{obs}}_i (m_i=0)</annotation></semantics></math>
-or missing
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>o</mi><mi>i</mi></msub><mo>=</mo><msubsup><mi>o</mi><mi>i</mi><mtext mathvariant="normal">mis</mtext></msubsup><mo stretchy="false" form="prefix">(</mo><msub><mi>m</mi><mi>i</mi></msub><mo>=</mo><mn>1</mn><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">o_i=o^{\text{mis}}_i (m_i=1)</annotation></semantics></math>,
-conditional on
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>o</mi><mi>i</mi><mtext mathvariant="normal">obs</mtext></msubsup><annotation encoding="application/x-tex">o^{\text{obs}}_i</annotation></semantics></math>,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>o</mi><mi>i</mi><mtext mathvariant="normal">mis</mtext></msubsup><annotation encoding="application/x-tex">o^{\text{mis}}_i</annotation></semantics></math>,
-and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>𝐱</mi><mi>i</mi></msub><annotation encoding="application/x-tex">\boldsymbol x_i</annotation></semantics></math>.
-Depending on the assumed relationship between
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>m</mi><mi>i</mi></msub><annotation encoding="application/x-tex">m_i</annotation></semantics></math>,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>o</mi><mi>i</mi><mtext mathvariant="normal">obs</mtext></msubsup><annotation encoding="application/x-tex">o^{\text{obs}}_i</annotation></semantics></math>,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>o</mi><mi>i</mi><mtext mathvariant="normal">mis</mtext></msubsup><annotation encoding="application/x-tex">o^{\text{mis}}_i</annotation></semantics></math>
-(and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>𝐱</mi><mi>i</mi></msub><annotation encoding="application/x-tex">\boldsymbol x_i</annotation></semantics></math>),
-Rubin’s taxonomy distinguishes between three broad types of mechanisms:
-<em>missing completely at random</em> (MCAR); <em>missing at random</em>
-(MAR); <em>missing not at random</em> (MNAR).</p>
+in cost and effectiveness measures (<span class="math inline">\(o_i=c_i,e_i\)</span>) assuming the set of baseline
+variables <span class="math inline">\(\boldsymbol x_i\)</span> to be
+fully-observed for all individuals. When analysing incomplete outcome
+data, it is essential to investigate the reasons behind the missingness
+process, often referred to as the <em>missing data mechanism</em>. Since
+this is typically not under the control of the investigators,
+unverifiable assumptions have to be made, and the validity of the
+analysis depends on whether the assumptions formulated hold for the data
+at hand. Formally, given a certain outcome variable <span class="math inline">\(o_i\)</span>, its missing data mechanism can be
+defined as a probability model for the distribution of the missingness
+indicators <span class="math inline">\(m_i\)</span>, denoting whether
+the corresponding value is observed <span class="math inline">\(o_i=o^{\text{obs}}_i (m_i=0)\)</span> or missing
+<span class="math inline">\(o_i=o^{\text{mis}}_i (m_i=1)\)</span>,
+conditional on <span class="math inline">\(o^{\text{obs}}_i\)</span>,
+<span class="math inline">\(o^{\text{mis}}_i\)</span>, and <span class="math inline">\(\boldsymbol x_i\)</span>. Depending on the assumed
+relationship between <span class="math inline">\(m_i\)</span>, <span class="math inline">\(o^{\text{obs}}_i\)</span>, <span class="math inline">\(o^{\text{mis}}_i\)</span> (and <span class="math inline">\(\boldsymbol x_i\)</span>), Rubin’s taxonomy
+distinguishes between three broad types of mechanisms: <em>missing
+completely at random</em> (MCAR); <em>missing at random</em> (MAR);
+<em>missing not at random</em> (MNAR).</p>
 <p>Under a MCAR mechanism:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mo stretchy="false" form="prefix">(</mo><msub><mi>m</mi><mi>i</mi></msub><mo>∣</mo><msubsup><mi>o</mi><mi>i</mi><mtext mathvariant="normal">obs</mtext></msubsup><mo>,</mo><msubsup><mi>o</mi><mi>i</mi><mtext mathvariant="normal">mis</mtext></msubsup><mo>,</mo><msub><mi>𝐗</mi><mi>i</mi></msub><mo>,</mo><mi>𝛈</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mi>p</mi><mo stretchy="false" form="prefix">(</mo><msub><mi>m</mi><mi>i</mi></msub><mo>∣</mo><mi>𝛈</mi><mo stretchy="false" form="postfix">)</mo><mo>,</mo><mo stretchy="false" form="prefix">(</mo><mi>#</mi><mi>e</mi><mi>q</mi><mo>:</mo><mi>m</mi><mi>c</mi><mi>a</mi><mi>r</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\begin{equation}
-p(m_i\mid o^{\text{obs}}_i,o^{\text{mis}}_i,\boldsymbol X_i,\boldsymbol \eta)=p(m_i\mid \boldsymbol \eta),
- (\#eq:mcar)
-\end{equation}</annotation></semantics></math></p>
-<p>where
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>𝛈</mi><annotation encoding="application/x-tex">\boldsymbol \eta</annotation></semantics></math>
-denotes the set of parameters indexing the missingness model. A key
-consequence of MCAR is that any method yielding valid inferences in the
-absence of missing values will also be valid when focussing on the
-observed data alone, including the set of individuals with
-fully-observed data (“complete cases”).</p>
+<p><span class="math display">\[\begin{equation}
+p(m_i\mid o^{\text{obs}}_i,o^{\text{mis}}_i,\boldsymbol X_i,\boldsymbol
+\eta)=p(m_i\mid \boldsymbol \eta),
+(\#eq:mcar)
+\end{equation}\]</span></p>
+<p>where <span class="math inline">\(\boldsymbol \eta\)</span> denotes
+the set of parameters indexing the missingness model. A key consequence
+of MCAR is that any method yielding valid inferences in the absence of
+missing values will also be valid when focussing on the observed data
+alone, including the set of individuals with fully-observed data
+(“complete cases”).</p>
 <p>Under a MAR mechanism:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mo stretchy="false" form="prefix">(</mo><msub><mi>m</mi><mi>i</mi></msub><mo>∣</mo><msubsup><mi>o</mi><mi>i</mi><mtext mathvariant="normal">obs</mtext></msubsup><mo>,</mo><msubsup><mi>o</mi><mi>i</mi><mtext mathvariant="normal">mis</mtext></msubsup><mo>,</mo><msub><mi>𝐗</mi><mi>i</mi></msub><mo>,</mo><mi>𝛈</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mi>p</mi><mo stretchy="false" form="prefix">(</mo><msub><mi>m</mi><mi>i</mi></msub><mo>∣</mo><msubsup><mi>o</mi><mi>i</mi><mtext mathvariant="normal">obs</mtext></msubsup><mo>,</mo><msub><mi>𝐗</mi><mi>i</mi></msub><mo>,</mo><mi>𝛈</mi><mo stretchy="false" form="postfix">)</mo><mi>.</mi><mo stretchy="false" form="prefix">(</mo><mi>#</mi><mi>e</mi><mi>q</mi><mo>:</mo><mi>m</mi><mi>a</mi><mi>r</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\begin{equation}
-p(m_i\mid o^{\text{obs}}_i,o^{\text{mis}}_i,\boldsymbol X_i, \boldsymbol \eta)=p(m_i\mid o^{\text{obs}}_i,\boldsymbol X_i, \boldsymbol \eta).
- (\#eq:mar)
-\end{equation}</annotation></semantics></math></p>
+<p><span class="math display">\[\begin{equation}
+p(m_i\mid o^{\text{obs}}_i,o^{\text{mis}}_i,\boldsymbol X_i, \boldsymbol
+\eta)=p(m_i\mid o^{\text{obs}}_i,\boldsymbol X_i, \boldsymbol \eta).
+(\#eq:mar)
+\end{equation}\]</span></p>
 <p>A key consequence of MAR is that missing values can be validly
-“predicted” using the observed data and a correct model for
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>o</mi><mi>i</mi></msub><annotation encoding="application/x-tex">o_i</annotation></semantics></math>.
-Both MCAR and MAR often fall in the general class of <em>ignorable</em>
-mechanisms in that, once it is established that
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mo stretchy="false" form="prefix">(</mo><msub><mi>m</mi><mi>i</mi></msub><mo>∣</mo><msub><mi>o</mi><mi>i</mi></msub><mo>,</mo><msub><mi>𝐱</mi><mi>i</mi></msub><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">p(m_i\mid o_i,\boldsymbol x_i)</annotation></semantics></math>
-does not depend on
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>o</mi><mi>i</mi><mtext mathvariant="normal">mis</mtext></msubsup><annotation encoding="application/x-tex">o^{\text{mis}}_i</annotation></semantics></math>,
-it is possible to obtain valid inferences given a correctly
-specification for
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mo stretchy="false" form="prefix">(</mo><msub><mi>o</mi><mi>i</mi></msub><mo>∣</mo><msub><mi>𝐱</mi><mi>i</mi></msub><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">p(o_i\mid \boldsymbol x_i)</annotation></semantics></math>.</p>
+“predicted” using the observed data and a correct model for <span class="math inline">\(o_i\)</span>. Both MCAR and MAR often fall in the
+general class of <em>ignorable</em> mechanisms in that, once it is
+established that <span class="math inline">\(p(m_i\mid o_i,\boldsymbol
+x_i)\)</span> does not depend on <span class="math inline">\(o^{\text{mis}}_i\)</span>, it is possible to
+obtain valid inferences given a correctly specification for <span class="math inline">\(p(o_i\mid \boldsymbol x_i)\)</span>.</p>
 <p>Finally, under a MNAR mechanism:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mo stretchy="false" form="prefix">(</mo><msub><mi>m</mi><mi>i</mi></msub><mo>∣</mo><msub><mi>o</mi><mi>i</mi></msub><mo>,</mo><msub><mi>𝐗</mi><mi>i</mi></msub><mo>,</mo><mi>𝛈</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mi>p</mi><mo stretchy="false" form="prefix">(</mo><msub><mi>m</mi><mi>i</mi></msub><mo>∣</mo><msubsup><mi>o</mi><mi>i</mi><mtext mathvariant="normal">obs</mtext></msubsup><mo>,</mo><msubsup><mi>o</mi><mi>i</mi><mtext mathvariant="normal">mis</mtext></msubsup><mo>,</mo><msub><mi>𝐗</mi><mi>i</mi></msub><mo>,</mo><mi>𝛈</mi><mo stretchy="false" form="postfix">)</mo><mi>.</mi><mo stretchy="false" form="prefix">(</mo><mi>#</mi><mi>e</mi><mi>q</mi><mo>:</mo><mi>m</mi><mi>n</mi><mi>a</mi><mi>r</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\begin{equation}
-p(m_i\mid o_i,\boldsymbol X_i, \boldsymbol \eta)=p(m_i\mid o^{\text{obs}}_i,o^{\text{mis}}_i,\boldsymbol X_i, \boldsymbol \eta).
- (\#eq:mnar)
-\end{equation}</annotation></semantics></math></p>
+<p><span class="math display">\[\begin{equation}
+p(m_i\mid o_i,\boldsymbol X_i, \boldsymbol \eta)=p(m_i\mid
+o^{\text{obs}}_i,o^{\text{mis}}_i,\boldsymbol X_i, \boldsymbol \eta).
+(\#eq:mnar)
+\end{equation}\]</span></p>
 <p>A MNAR mechanism is often referred to as <em>non-ignorable</em> or
-<em>informative</em> because the model assumed for
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mo stretchy="false" form="prefix">(</mo><msub><mi>m</mi><mi>i</mi></msub><mo>∣</mo><msub><mi>o</mi><mi>i</mi></msub><mo>,</mo><msub><mi>𝐱</mi><mi>i</mi></msub><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">p(m_i\mid o_i,\boldsymbol x_i)</annotation></semantics></math>
-must be specified and its choice will drive the results of the analysis.
-Thus, without relying on external information, identification of the
-model is driven by unverifiable assumptions and conducting sensitivity
-analysis to assess the robustness of the results to a range of plausible
+<em>informative</em> because the model assumed for <span class="math inline">\(p(m_i\mid o_i,\boldsymbol x_i)\)</span> must be
+specified and its choice will drive the results of the analysis. Thus,
+without relying on external information, identification of the model is
+driven by unverifiable assumptions and conducting sensitivity analysis
+to assess the robustness of the results to a range of plausible
 missingness assumptions becomes imperative.</p>
 <p>Under MNAR, almost all standard analysis methods are invalid, and a
 “principled” approach to missingness is instead required to obtain valid
@@ -371,62 +316,44 @@ these approaches is now provided.</p>
 <div class="section level2">
 <h2 id="sec-sm">Selection Models<a class="anchor" aria-label="anchor" href="#sec-sm"></a>
 </h2>
-<p>The joint distribution of an outcome
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>o</mi><mi>i</mi></msub><annotation encoding="application/x-tex">o_{i}</annotation></semantics></math>
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>e</mi><mi>i</mi></msub><mspace width="0.278em"></mspace><mtext mathvariant="normal">or</mtext><mspace width="0.278em"></mspace><msub><mi>c</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">e_{i} \;\text{or}\; c_{i}</annotation></semantics></math>)
-and its missingness
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>m</mi><mi>i</mi></msub><annotation encoding="application/x-tex">m_i</annotation></semantics></math>)
-is specified in terms of a complete data model for the outcome and an
-explicit model for the probability of missingness conditional on the
-possibly unobserved data:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mo stretchy="false" form="prefix">(</mo><msub><mi>o</mi><mi>i</mi></msub><mo>,</mo><msub><mi>m</mi><mi>i</mi></msub><mo>∣</mo><mi>𝛉</mi><mo>,</mo><mi>𝛈</mi><mo stretchy="false" form="postfix">)</mo><mspace width="1.0em"></mspace><mo>=</mo><mspace width="1.0em"></mspace><mi>p</mi><mo stretchy="false" form="prefix">(</mo><msub><mi>o</mi><mi>i</mi></msub><mo>∣</mo><mi>𝛉</mi><mo stretchy="false" form="postfix">)</mo><mi>p</mi><mo stretchy="false" form="prefix">(</mo><msub><mi>m</mi><mi>i</mi></msub><mo>∣</mo><msub><mi>o</mi><mi>i</mi></msub><mo>,</mo><mi>𝛈</mi><mo stretchy="false" form="postfix">)</mo><mo>,</mo><mo stretchy="false" form="prefix">(</mo><mi>#</mi><mi>e</mi><mi>q</mi><mo>:</mo><mi>s</mi><mi>m</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\begin{equation}
-p(o_{i}, m_{i} \mid \boldsymbol \theta, \boldsymbol \eta) \quad = \quad p(o_{i} \mid \boldsymbol \theta)p(m_{i} \mid o_{i},\boldsymbol \eta),
- (\#eq:sm)
-\end{equation}</annotation></semantics></math></p>
-<p>where
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>𝛉</mi><annotation encoding="application/x-tex">\boldsymbol \theta</annotation></semantics></math>
-and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>𝛈</mi><annotation encoding="application/x-tex">\boldsymbol \eta</annotation></semantics></math>
-denote the two (distinct) sets of parameters indexing the outcome and
-missingness model, respectively. While for
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>o</mi><mi>i</mi></msub><annotation encoding="application/x-tex">o_{i}</annotation></semantics></math>
-the model specification varies depending on the type of outcome and
-distributional assumptions (see Section @ref(sec-frame)), for
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>m</mi><mi>i</mi></msub><annotation encoding="application/x-tex">m_{i}</annotation></semantics></math><code>missingHE</code> uses a common structure which models the
-missingness probability
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>π</mi><mi>i</mi><mi>m</mi></msubsup><annotation encoding="application/x-tex">\pi^m_i</annotation></semantics></math>
-as function of other quantities through a logistic regression:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">logit</mtext><mo stretchy="false" form="prefix">(</mo><msubsup><mi>π</mi><mi>i</mi><mi>m</mi></msubsup><mo stretchy="false" form="postfix">)</mo><mo>=</mo><msub><mi>γ</mi><mn>0</mn></msub><mo>+</mo><munderover><mo>∑</mo><mrow><mi>k</mi><mo>=</mo><mn>1</mn></mrow><mi>K</mi></munderover><msub><mi>γ</mi><mi>k</mi></msub><msub><mi>x</mi><mrow><mi>i</mi><mi>k</mi></mrow></msub><mo>+</mo><mi>δ</mi><msub><mi>o</mi><mi>i</mi></msub><mspace width="0.167em"></mspace><mspace width="0.167em"></mspace><mo stretchy="false" form="prefix">[</mo><mi>+</mi><mi>…</mi><mo stretchy="false" form="postfix">]</mo><mo>,</mo><mo stretchy="false" form="prefix">(</mo><mi>#</mi><mi>e</mi><mi>q</mi><mo>:</mo><mi>m</mi><mi>i</mi><mi>s</mi><mi>p</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\begin{equation}
-\text{logit}(\pi^m_i)=\gamma_{0}+ \sum_{k=1}^K \gamma_k x_{ik} + \delta o_{i} \,\,[+ \ldots],
- (\#eq:misp)
-\end{equation}</annotation></semantics></math></p>
-<p>where
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>γ</mi><mn>0</mn></msub><annotation encoding="application/x-tex">\gamma_{0}</annotation></semantics></math>,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝛄</mi><mo>=</mo><mo stretchy="false" form="prefix">(</mo><msub><mi>γ</mi><mn>1</mn></msub><mo>,</mo><mi>…</mi><mo>,</mo><msub><mi>γ</mi><mi>K</mi></msub><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\boldsymbol \gamma=(\gamma_1,\ldots,\gamma_K)</annotation></semantics></math>
-and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>δ</mi><annotation encoding="application/x-tex">\delta</annotation></semantics></math>
-denote the intercept, the set of covariates-specific coefficients, and
-the coefficient capturing the impact of the unobserved values (in
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>o</mi><mi>i</mi></msub><annotation encoding="application/x-tex">o_i</annotation></semantics></math>)
-on the missingness probability, respectively. Additional terms, e.g.,
-clustering effects, may also be included in Equation @ref(eq:misp) as
-indicated by
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">[</mo><mi>+</mi><mi>…</mi><mo stretchy="false" form="postfix">]</mo></mrow><annotation encoding="application/x-tex">[+ \ldots]</annotation></semantics></math>.
-Due to the missing values in
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>o</mi><mi>i</mi></msub><annotation encoding="application/x-tex">o_i</annotation></semantics></math>,
-the model can only be identified by imposing some restrictions. These
-are implicitly defined from a combination of parametric assumptions
-about
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mo stretchy="false" form="prefix">(</mo><msub><mi>o</mi><mi>i</mi></msub><mo>∣</mo><mi>𝛉</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">p(o_i\mid \boldsymbol \theta)</annotation></semantics></math>
-and dependence structure assumed for
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mo stretchy="false" form="prefix">(</mo><msub><mi>m</mi><mi>i</mi></msub><mo>∣</mo><msub><mi>o</mi><mi>i</mi></msub><mo>,</mo><mi>𝛈</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">p(m_i \mid o_i,\boldsymbol \eta)</annotation></semantics></math>.
-As a result, sensitivity analysis to assess the impact of alternative
-missingness assumptions on the inferences can be done by: varying the
-distributional assumption of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mo stretchy="false" form="prefix">(</mo><msub><mi>o</mi><mi>i</mi></msub><mo>∣</mo><mi>𝛉</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">p(o_i\mid \boldsymbol \theta)</annotation></semantics></math>;
+<p>The joint distribution of an outcome <span class="math inline">\(o_{i}\)</span> (<span class="math inline">\(e_{i}
+\;\text{or}\; c_{i}\)</span>) and its missingness (<span class="math inline">\(m_i\)</span>) is specified in terms of a complete
+data model for the outcome and an explicit model for the probability of
+missingness conditional on the possibly unobserved data:</p>
+<p><span class="math display">\[\begin{equation}
+p(o_{i}, m_{i} \mid \boldsymbol \theta, \boldsymbol \eta) \quad = \quad
+p(o_{i} \mid \boldsymbol \theta)p(m_{i} \mid o_{i},\boldsymbol \eta),
+(\#eq:sm)
+\end{equation}\]</span></p>
+<p>where <span class="math inline">\(\boldsymbol \theta\)</span> and
+<span class="math inline">\(\boldsymbol \eta\)</span> denote the two
+(distinct) sets of parameters indexing the outcome and missingness
+model, respectively. While for <span class="math inline">\(o_{i}\)</span> the model specification varies
+depending on the type of outcome and distributional assumptions (see
+Section @ref(sec-frame-intro)), for <span class="math inline">\(m_{i}\)</span> <code>missingHE</code> uses a
+common structure which models the missingness probability <span class="math inline">\(\pi^m_i\)</span> as function of other quantities
+through a logistic regression:</p>
+<p><span class="math display">\[\begin{equation}
+\text{logit}(\pi^m_i)=\gamma_{0}+ \sum_{k=1}^K \gamma_k x_{ik} + \delta
+o_{i} \,\,[+ \ldots],
+(\#eq:misp)
+\end{equation}\]</span></p>
+<p>where <span class="math inline">\(\gamma_{0}\)</span>, <span class="math inline">\(\boldsymbol
+\gamma=(\gamma_1,\ldots,\gamma_K)\)</span> and <span class="math inline">\(\delta\)</span> denote the intercept, the set of
+covariates-specific coefficients, and the coefficient capturing the
+impact of the unobserved values (in <span class="math inline">\(o_i\)</span>) on the missingness probability,
+respectively. Additional terms, e.g., clustering effects, may also be
+included in Equation @ref(eq:misp) as indicated by <span class="math inline">\([+ \ldots]\)</span>. Due to the missing values in
+<span class="math inline">\(o_i\)</span>, the model can only be
+identified by imposing some restrictions. These are implicitly defined
+from a combination of parametric assumptions about <span class="math inline">\(p(o_i\mid \boldsymbol \theta)\)</span> and
+dependence structure assumed for <span class="math inline">\(p(m_i \mid
+o_i,\boldsymbol \eta)\)</span>. As a result, sensitivity analysis to
+assess the impact of alternative missingness assumptions on the
+inferences can be done by: varying the distributional assumption of
+<span class="math inline">\(p(o_i\mid \boldsymbol \theta)\)</span>;
 varying the modelling structure in Equation @ref(eq:misp); and, within a
-Bayesian setting, varying the prior distribution on
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>δ</mi><annotation encoding="application/x-tex">\delta</annotation></semantics></math>.</p>
+Bayesian setting, varying the prior distribution on <span class="math inline">\(\delta\)</span>.</p>
 </div>
 <div class="section level2">
 <h2 id="sec-pmm">Pattern Mixture Models<a class="anchor" aria-label="anchor" href="#sec-pmm"></a>
@@ -434,44 +361,32 @@ Bayesian setting, varying the prior distribution on
 <p>The joint distribution of outcome and missingness is specified in
 terms of a conditional model for the outcome given the missingness
 indicators and a marginal model for the probability of missingness:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mo stretchy="false" form="prefix">(</mo><msub><mi>o</mi><mi>i</mi></msub><mo>,</mo><msub><mi>m</mi><mi>i</mi></msub><mo>∣</mo><mi>𝛉</mi><mo>,</mo><mi>𝛇</mi><mo stretchy="false" form="postfix">)</mo><mspace width="1.0em"></mspace><mo>=</mo><mspace width="1.0em"></mspace><mi>p</mi><mo stretchy="false" form="prefix">(</mo><msub><mi>o</mi><mi>i</mi></msub><mo>∣</mo><msub><mi>m</mi><mi>i</mi></msub><mo>,</mo><mi>𝛎</mi><mo stretchy="false" form="postfix">)</mo><mi>p</mi><mo stretchy="false" form="prefix">(</mo><msub><mi>m</mi><mi>i</mi></msub><mo>∣</mo><mi>𝛇</mi><mo stretchy="false" form="postfix">)</mo><mo>,</mo><mo stretchy="false" form="prefix">(</mo><mi>#</mi><mi>e</mi><mi>q</mi><mo>:</mo><mi>p</mi><mi>m</mi><mi>m</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\begin{equation}
-p(o_i, m_i \mid \boldsymbol \theta, \boldsymbol \zeta) \quad = \quad p(o_i \mid m_i, \boldsymbol \nu)p(m_i \mid \boldsymbol \zeta),
- (\#eq:pmm)
-\end{equation}</annotation></semantics></math></p>
-<p>where
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>𝛎</mi><annotation encoding="application/x-tex">\boldsymbol \nu</annotation></semantics></math>
-and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>𝛇</mi><annotation encoding="application/x-tex">\boldsymbol \zeta</annotation></semantics></math>
-denote the (distinct) sets of parameters indexing the conditional model
-for the outcome and the marginal model of missingness, respectively. In
-contrast to Section @ref(sec-sm), the marginal model for
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>m</mi><mi>i</mi></msub><annotation encoding="application/x-tex">m_i</annotation></semantics></math>
-corresponds to a model for the different missingness patterns
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>d</mi><mi>i</mi><mi>m</mi></msubsup><annotation encoding="application/x-tex">d^m_i</annotation></semantics></math>
-to which individuals can be assigned (according to the values of the
-indicators
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>m</mi><mi>i</mi></msub><annotation encoding="application/x-tex">m_i</annotation></semantics></math>).
-Following standard practice, to ease specification of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mo stretchy="false" form="prefix">(</mo><msub><mi>m</mi><mi>i</mi></msub><mo>∣</mo><mi>𝛇</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">p(m_i \mid \boldsymbol \zeta)</annotation></semantics></math>,
-<code>missingHE</code> directly models the missingness pattern indicator
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>d</mi><mi>i</mi><mi>m</mi></msubsup><annotation encoding="application/x-tex">d^m_i</annotation></semantics></math>
-using a Multinomial distribution</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>d</mi><mi>i</mi><mi>m</mi></msubsup><mo>∼</mo><mtext mathvariant="normal">Multinomial</mtext><mo stretchy="false" form="prefix">(</mo><msup><mi>𝛑</mi><msup><mi>d</mi><mi>m</mi></msup></msup><mo stretchy="false" form="postfix">)</mo><mo>,</mo><mo stretchy="false" form="prefix">(</mo><mi>#</mi><mi>e</mi><mi>q</mi><mo>:</mo><mi>p</mi><mi>a</mi><mi>t</mi><mi>t</mi><mi>e</mi><mi>r</mi><mi>n</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\begin{equation}
+<p><span class="math display">\[\begin{equation}
+p(o_i, m_i \mid \boldsymbol \theta, \boldsymbol \zeta) \quad = \quad
+p(o_i \mid m_i, \boldsymbol \nu)p(m_i \mid \boldsymbol \zeta),
+(\#eq:pmm)
+\end{equation}\]</span></p>
+<p>where <span class="math inline">\(\boldsymbol \nu\)</span> and <span class="math inline">\(\boldsymbol \zeta\)</span> denote the (distinct)
+sets of parameters indexing the conditional model for the outcome and
+the marginal model of missingness, respectively. In contrast to Section
+@ref(sec-sm), the marginal model for <span class="math inline">\(m_i\)</span> corresponds to a model for the
+different missingness patterns <span class="math inline">\(d^m_i\)</span> to which individuals can be
+assigned (according to the values of the indicators <span class="math inline">\(m_i\)</span>). Following standard practice, to
+ease specification of <span class="math inline">\(p(m_i \mid \boldsymbol
+\zeta)\)</span>, <code>missingHE</code> directly models the missingness
+pattern indicator <span class="math inline">\(d^m_i\)</span> using a
+Multinomial distribution</p>
+<p><span class="math display">\[\begin{equation}
 d^m_i \sim \text{Multinomial}(\boldsymbol \pi^{d^m}),
- (\#eq:pattern)
-\end{equation}</annotation></semantics></math></p>
-<p>with
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>𝛑</mi><msup><mi>d</mi><mi>m</mi></msup></msup><annotation encoding="application/x-tex">\boldsymbol \pi^{d^m}</annotation></semantics></math>
-being the set of probabilities for each possible pattern, which is
-modelled through a joint prior
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>𝛑</mi><msup><mi>d</mi><mi>m</mi></msup></msup><mo>∼</mo><mtext mathvariant="normal">Dirichlet</mtext><mo stretchy="false" form="prefix">(</mo><msup><mi>𝐚</mi><mi>d</mi></msup><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\boldsymbol \pi^{d^m} \sim \text{Dirichlet}(\boldsymbol a^d)</annotation></semantics></math>,
-where
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>𝐚</mi><mi>d</mi></msup><annotation encoding="application/x-tex">\boldsymbol a^d</annotation></semantics></math>
-denotes the set of prior concentration parameters. By default,
-<code>missingHE</code> assumes a minimally informative prior on these
-parameters by setting
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>𝐚</mi><mi>d</mi></msup><mo>=</mo><mn>𝟏</mn></mrow><annotation encoding="application/x-tex">\boldsymbol a^d=\boldsymbol 1</annotation></semantics></math>
-to assign the same weight to each pattern probability.</p>
+(\#eq:pattern)
+\end{equation}\]</span></p>
+<p>with <span class="math inline">\(\boldsymbol \pi^{d^m}\)</span> being
+the set of probabilities for each possible pattern, which is modelled
+through a joint prior <span class="math inline">\(\boldsymbol \pi^{d^m}
+\sim \text{Dirichlet}(\boldsymbol a^d)\)</span>, where <span class="math inline">\(\boldsymbol a^d\)</span> denotes the set of prior
+concentration parameters. By default, <code>missingHE</code> assumes a
+minimally informative prior on these parameters by setting <span class="math inline">\(\boldsymbol a^d=\boldsymbol 1\)</span> to assign
+the same weight to each pattern probability.</p>
 <p>Note that, the conditional distribution of the outcomes is not always
 identifiable because, for all but the complete cases, some values are
 missing. To overcome this problem, some type of <em>identifying
@@ -487,133 +402,86 @@ restrictions. For example, under the CC restrictions,
 outcome distributions in Equation @ref(eq:pmm) using the corresponding
 estimates from the complete case pattern.</p>
 <p>Exploration of non-ignorable assumptions is achieved by including
-<em>sensitivity parameters</em>
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>δ</mi><annotation encoding="application/x-tex">\delta</annotation></semantics></math>
-within the type of restrictions used to identify the model under
-ignorability. <code>missingHE</code> assesses MNAR using location-shift
-parameters
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>δ</mi><annotation encoding="application/x-tex">\delta</annotation></semantics></math>
-within the imposed restrictions on pattern-specific means
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>μ</mi><mrow><msup><mi>d</mi><mi>m</mi></msup><mo>⋆</mo></mrow></msup><annotation encoding="application/x-tex">\mu^{d^m \star}</annotation></semantics></math>
-that are not identifiable from the data. For example, using the CC
-restrictions, <code>missingHE</code> identifies the marginal mean of a
-given outcome
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>e</mi><annotation encoding="application/x-tex">e</annotation></semantics></math>
-or
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>c</mi><annotation encoding="application/x-tex">c</annotation></semantics></math>)
-in the fully-missing pattern as:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>μ</mi><mrow><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>,</mo><mn>1</mn><mo stretchy="false" form="postfix">)</mo></mrow></msup><mo>=</mo><msup><mi>μ</mi><mrow><mo stretchy="false" form="prefix">(</mo><mn>0</mn><mo>,</mo><mn>0</mn><mo stretchy="false" form="postfix">)</mo></mrow></msup><mo>+</mo><mi>δ</mi><mo>,</mo><mo stretchy="false" form="prefix">(</mo><mi>#</mi><mi>e</mi><mi>q</mi><mo>:</mo><mi>s</mi><mi>e</mi><mi>n</mi><mi>s</mi><mi>p</mi><mi>a</mi><mi>r</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\begin{equation}
+<em>sensitivity parameters</em> <span class="math inline">\(\delta\)</span> within the type of restrictions
+used to identify the model under ignorability. <code>missingHE</code>
+assesses MNAR using location-shift parameters <span class="math inline">\(\delta\)</span> within the imposed restrictions on
+pattern-specific means <span class="math inline">\(\mu^{d^m
+\star}\)</span> that are not identifiable from the data. For example,
+using the CC restrictions, <code>missingHE</code> identifies the
+marginal mean of a given outcome (<span class="math inline">\(e\)</span>
+or <span class="math inline">\(c\)</span>) in the fully-missing pattern
+as:</p>
+<p><span class="math display">\[\begin{equation}
 \mu^{(1,1)} = \mu^{(0,0)} + \delta,
- (\#eq:senspar)
-\end{equation}</annotation></semantics></math></p>
-<p>where
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>μ</mi><mrow><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>,</mo><mn>1</mn><mo stretchy="false" form="postfix">)</mo></mrow></msup><annotation encoding="application/x-tex">\mu^{(1,1)}</annotation></semantics></math>
-and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>μ</mi><mrow><mo stretchy="false" form="prefix">(</mo><mn>0</mn><mo>,</mo><mn>0</mn><mo stretchy="false" form="postfix">)</mo></mrow></msup><annotation encoding="application/x-tex">\mu^{(0,0)}</annotation></semantics></math>
-denote the marginal mean in the fully-missing and complete case pattern,
-respectively. Sensitivity analysis can then be conducted by: varying the
-type of identifying restrictions imposed; varying the prior distribution
-on
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>δ</mi><annotation encoding="application/x-tex">\delta</annotation></semantics></math>.</p>
+(\#eq:senspar)
+\end{equation}\]</span></p>
+<p>where <span class="math inline">\(\mu^{(1,1)}\)</span> and <span class="math inline">\(\mu^{(0,0)}\)</span> denote the marginal mean in
+the fully-missing and complete case pattern, respectively. Sensitivity
+analysis can then be conducted by: varying the type of identifying
+restrictions imposed; varying the prior distribution on <span class="math inline">\(\delta\)</span>.</p>
 </div>
 <div class="section level2">
 <h2 id="sec-hm">Hurdle Models<a class="anchor" aria-label="anchor" href="#sec-hm"></a>
 </h2>
 <p>Although hurdle models do not explicitly specify the joint
-distribution
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mo stretchy="false" form="prefix">(</mo><msub><mi>o</mi><mi>i</mi></msub><mo>,</mo><msub><mi>m</mi><mi>i</mi></msub><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">p(o_i,m_i)</annotation></semantics></math>,
-and therefore cannot be classified as principled missingness methods,
-they can be tailored to assess the impact of alternative non-ignorable
+distribution <span class="math inline">\(p(o_i,m_i)\)</span>, and
+therefore cannot be classified as principled missingness methods, they
+can be tailored to assess the impact of alternative non-ignorable
 missingness assumptions. A key advantage of hurdle models in trial-based
 economic evaluations is their ability to explicitly handle the
 occurrence of many identical values in the outcomes, also referred to as
 “structural values” (e.g., zero costs or perfect health state), which
 often make model implementation quite problematic.</p>
-<p>For a given outcome variable
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>o</mi><mi>i</mi></msub><annotation encoding="application/x-tex">o_i</annotation></semantics></math>
-(i.e. <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>e</mi><mi>i</mi></msub><annotation encoding="application/x-tex">e_i</annotation></semantics></math>
-or
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>c</mi><mi>i</mi></msub><annotation encoding="application/x-tex">c_i</annotation></semantics></math>),
-<code>missingHE</code> implements a hurdle model to handle a given
-structural value
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>s</mi><annotation encoding="application/x-tex">s</annotation></semantics></math>
-by creating a corresponding indicator variable
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>d</mi><mi>i</mi><mi>s</mi></msubsup><annotation encoding="application/x-tex">d^s_i</annotation></semantics></math>,
-taking value
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>1</mn><annotation encoding="application/x-tex">1</annotation></semantics></math>
-when
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>o</mi><mi>i</mi></msub><mo>=</mo><mi>s</mi></mrow><annotation encoding="application/x-tex">o_i=s</annotation></semantics></math>
-and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0</mn><annotation encoding="application/x-tex">0</annotation></semantics></math>
-otherwise. The probability of observing a structural value
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>π</mi><mi>i</mi><mi>s</mi></msubsup><annotation encoding="application/x-tex">\pi^s_i</annotation></semantics></math>
-is then estimated via logistic regression</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">logit</mtext><mo stretchy="false" form="prefix">(</mo><msubsup><mi>π</mi><mi>i</mi><mi>s</mi></msubsup><mo stretchy="false" form="postfix">)</mo><mo>=</mo><msub><mi>γ</mi><mn>0</mn></msub><mo>+</mo><munderover><mo>∑</mo><mrow><mi>k</mi><mo>=</mo><mn>1</mn></mrow><mi>K</mi></munderover><msub><mi>γ</mi><mi>k</mi></msub><msub><mi>x</mi><mrow><mi>i</mi><mi>k</mi></mrow></msub><mspace width="0.167em"></mspace><mspace width="0.167em"></mspace><mo stretchy="false" form="prefix">[</mo><mi>+</mi><mi>…</mi><mo stretchy="false" form="postfix">]</mo><mo stretchy="false" form="prefix">(</mo><mi>#</mi><mi>e</mi><mi>q</mi><mo>:</mo><mi>s</mi><mi>t</mi><mi>r</mi><mi>p</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\begin{equation}
-\text{logit}(\pi^s_i)=\gamma_{0} + \sum_{k=1}^K \gamma_k x_{ik} \,\,[+ \ldots]
- (\#eq:strp)
-\end{equation}</annotation></semantics></math></p>
-<p>as function of the intercept
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>γ</mi><mn>0</mn></msub><annotation encoding="application/x-tex">\gamma_{0}</annotation></semantics></math>,
-the covariates-specific coefficients
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝛄</mi><mo>=</mo><mo stretchy="false" form="prefix">(</mo><msub><mi>γ</mi><mn>1</mn></msub><mo>,</mo><mi>…</mi><mo>,</mo><msub><mi>γ</mi><mi>K</mi></msub><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\boldsymbol \gamma=(\gamma_1,\ldots,\gamma_K)</annotation></semantics></math>,
-and other (possibly) relevant terms
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">[</mo><mi>+</mi><mi>…</mi><mo stretchy="false" form="postfix">]</mo></mrow><annotation encoding="application/x-tex">[+ \ldots]</annotation></semantics></math>
-(e.g., clustering effects). Estimates for the marginal probability of
-being associated with a structural value
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>π</mi><mi>s</mi></msup><annotation encoding="application/x-tex">\pi^s</annotation></semantics></math>
-are retrieved by either applying the inverse logit function to Equation
-@ref(eq:strp) after mean-centring all covariates or by repeatedly
-sampling from the posterior predictive distribution of the outcomes
-through Monte Carlo Integration. Finally, estimates for the marginal
-mean of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>o</mi><mi>i</mi></msub><annotation encoding="application/x-tex">o_i</annotation></semantics></math>
-are obtained from the linear combination</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>μ</mi><mo>=</mo><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>−</mo><msup><mi>π</mi><mi>s</mi></msup><mo stretchy="false" form="postfix">)</mo><msup><mi>μ</mi><mrow><mo stretchy="false" form="prefix">(</mo><msup><mi>d</mi><mi>s</mi></msup><mo>=</mo><mn>0</mn><mo stretchy="false" form="postfix">)</mo></mrow></msup><mo>+</mo><msup><mi>π</mi><mi>s</mi></msup><mi>s</mi><mo>,</mo><mo stretchy="false" form="prefix">(</mo><mi>#</mi><mi>e</mi><mi>q</mi><mo>:</mo><mi>m</mi><mi>u</mi><mi>w</mi><mi>e</mi><mi>i</mi><mi>g</mi><mi>h</mi><mi>t</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\begin{equation}
+<p>For a given outcome variable <span class="math inline">\(o_i\)</span>
+(i.e. <span class="math inline">\(e_i\)</span> or <span class="math inline">\(c_i\)</span>), <code>missingHE</code> implements a
+hurdle model to handle a given structural value <span class="math inline">\(s\)</span> by creating a corresponding indicator
+variable <span class="math inline">\(d^s_i\)</span>, taking value <span class="math inline">\(1\)</span> when <span class="math inline">\(o_i=s\)</span> and <span class="math inline">\(0\)</span> otherwise. The probability of observing
+a structural value <span class="math inline">\(\pi^s_i\)</span> is then
+estimated via logistic regression</p>
+<p><span class="math display">\[\begin{equation}
+\text{logit}(\pi^s_i)=\gamma_{0} + \sum_{k=1}^K \gamma_k x_{ik} \,\,[+
+\ldots]
+(\#eq:strp)
+\end{equation}\]</span></p>
+<p>as function of the intercept <span class="math inline">\(\gamma_{0}\)</span>, the covariates-specific
+coefficients <span class="math inline">\(\boldsymbol
+\gamma=(\gamma_1,\ldots,\gamma_K)\)</span>, and other (possibly)
+relevant terms <span class="math inline">\([+ \ldots]\)</span> (e.g.,
+clustering effects). Estimates for the marginal probability of being
+associated with a structural value <span class="math inline">\(\pi^s\)</span> are retrieved by either applying
+the inverse logit function to Equation @ref(eq:strp) after mean-centring
+all covariates or by repeatedly sampling from the posterior predictive
+distribution of the outcomes through Monte Carlo Integration. Finally,
+estimates for the marginal mean of <span class="math inline">\(o_i\)</span> are obtained from the linear
+combination</p>
+<p><span class="math display">\[\begin{equation}
 \mu=(1-\pi^s)\mu^{(d^s=0)}+\pi^s s,
- (\#eq:muweight)
-\end{equation}</annotation></semantics></math></p>
-<p>where
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>−</mo><msup><mi>π</mi><mi>s</mi></msup><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">(1-\pi^s)</annotation></semantics></math>
-and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>μ</mi><mrow><mo stretchy="false" form="prefix">(</mo><msup><mi>d</mi><mi>s</mi></msup><mo>=</mo><mn>0</mn><mo stretchy="false" form="postfix">)</mo></mrow></msup><annotation encoding="application/x-tex">\mu^{(d^s=0)}</annotation></semantics></math>
-denote the marginal probability of not being associated with the
-structural value
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>s</mi><annotation encoding="application/x-tex">s</annotation></semantics></math>
-and the marginal mean for the non-structural component of the outcome,
-respectively. <code>missingHE</code> retrieves estimates of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>μ</mi><mrow><mo stretchy="false" form="prefix">(</mo><msup><mi>d</mi><mi>s</mi></msup><mo>=</mo><mn>0</mn><mo stretchy="false" form="postfix">)</mo></mrow></msup><annotation encoding="application/x-tex">\mu^{(d^s=0)}</annotation></semantics></math>
-using the same modelling framework and distributions as in Section
-@ref(sec-frame), but applied to
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>o</mi><mi>i</mi></msub><annotation encoding="application/x-tex">o_i</annotation></semantics></math>
-for only the non-structural cases, i.e., all individuals for whom
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>d</mi><mi>i</mi><mi>s</mi></msubsup><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">d^s_i=0</annotation></semantics></math>.
-Making a parallel with the missing data literature, depending on whether
-no or some covariates are included in Equation @ref(eq:strp), the
-underlying mechanism has been named <em>structural completely at
-random</em> (SCAR) or <em>structural at random</em> (SAR). However, a
-key difference with respect to MCAR or MAR is that failure to correctly
-specify Equation @ref(eq:strp) will always lead to invalid inferences
-since estimates of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>π</mi><mi>s</mi></msup><annotation encoding="application/x-tex">\pi^s</annotation></semantics></math>
-are needed in Equation @ref(eq:muweight).</p>
-<p>When some outcome data are missing, values of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>d</mi><mi>i</mi><mi>s</mi></msubsup><annotation encoding="application/x-tex">d^s_i</annotation></semantics></math>
-are unknown for at least some individuals and, under MAR, valid
-inferences can be obtained provided a correct specification of Equation
-@ref(eq:strp) as well as of the model fitted to the non-structural
-values. In addition, hurdle models allow to explore the robustness of
-the results to specific non-ignorable assumptions, therefore allowing to
-perform a simple type of sensitivity analysis. This is achieved by
-arbitrarily set
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>d</mi><mi>i</mi><mi>s</mi></msubsup><annotation encoding="application/x-tex">d^s_i</annotation></semantics></math>
-to assign the individuals with missing outcome values to either the
-structural
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>d</mi><mi>i</mi><mi>s</mi></msubsup><mo>=</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">d^s_i=1</annotation></semantics></math>)
-or non-structural
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>d</mi><mi>i</mi><mi>s</mi></msubsup><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">d^s_i=0</annotation></semantics></math>)
-component of the mixture, and exploring alternative configurations in
-terms of the proportions of these values (e.g., between treatment
-groups).</p>
+(\#eq:muweight)
+\end{equation}\]</span></p>
+<p>where <span class="math inline">\((1-\pi^s)\)</span> and <span class="math inline">\(\mu^{(d^s=0)}\)</span> denote the marginal
+probability of not being associated with the structural value <span class="math inline">\(s\)</span> and the marginal mean for the
+non-structural component of the outcome, respectively.
+<code>missingHE</code> retrieves estimates of <span class="math inline">\(\mu^{(d^s=0)}\)</span> using the same modelling
+framework and distributions as in Section @ref(sec-frame-intro), but
+applied to <span class="math inline">\(o_i\)</span> for only the
+non-structural cases, i.e., all individuals for whom <span class="math inline">\(d^s_i=0\)</span>. Making a parallel with the
+missing data literature, depending on whether no or some covariates are
+included in Equation @ref(eq:strp), the underlying mechanism has been
+named <em>structural completely at random</em> (SCAR) or <em>structural
+at random</em> (SAR). However, a key difference with respect to MCAR or
+MAR is that failure to correctly specify Equation @ref(eq:strp) will
+always lead to invalid inferences since estimates of <span class="math inline">\(\pi^s\)</span> are needed in Equation
+@ref(eq:muweight).</p>
+<p>When some outcome data are missing, values of <span class="math inline">\(d^s_i\)</span> are unknown for at least some
+individuals and, under MAR, valid inferences can be obtained provided a
+correct specification of Equation @ref(eq:strp) as well as of the model
+fitted to the non-structural values. In addition, hurdle models allow to
+explore the robustness of the results to specific non-ignorable
+assumptions, therefore allowing to perform a simple type of sensitivity
+analysis. This is achieved by arbitrarily set <span class="math inline">\(d^s_i\)</span> to assign the individuals with
+missing outcome values to either the structural (<span class="math inline">\(d^s_i=1\)</span>) or non-structural (<span class="math inline">\(d^s_i=0\)</span>) component of the mixture, and
+exploring alternative configurations in terms of the proportions of
+these values (e.g., between treatment groups).</p>
 </div>
 <div class="section level2">
 <h2 id="sec-data">The MenSS trial<a class="anchor" aria-label="anchor" href="#sec-data"></a>
@@ -648,41 +516,32 @@ workspace and can be inspected using the command</p>
 <span><span class="co">#&gt;  157 1.000    NA NA  21         0          0          8        0     0   0    3 MenSS</span></span>
 <span><span class="co">#&gt;  158 0.725    NA NA  28         1          1          0       NA     0   0    3 MenSS</span></span>
 <span><span class="co">#&gt;  159 1.000    NA NA  38         0          0          6       NA     0   0    3 MenSS</span></span></code></pre>
-<p>The dataset consists of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>159</mn><annotation encoding="application/x-tex">159</annotation></semantics></math>
-individuals grouped in two arms, where <code>trt</code>
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>=</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">=1</annotation></semantics></math>
-indicates the SoC and <code>trt</code>
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>=</mo><mn>2</mn></mrow><annotation encoding="application/x-tex">=2</annotation></semantics></math>
-indicates the MenSS intervention, with <code>id</code> denoting the
-participant identification number.</p>
+<p>The dataset consists of <span class="math inline">\(159\)</span>
+individuals grouped in two arms, where <code>trt</code> <span class="math inline">\(=1\)</span> indicates the SoC and <code>trt</code>
+<span class="math inline">\(=2\)</span> indicates the MenSS
+intervention, with <code>id</code> denoting the participant
+identification number.</p>
 <p>Key health economic variables are <code>u.0</code>, <code>e</code>
 and <code>c</code>, which denote the baseline utility score, QALY and
 Total cost outcomes, respectively. All baseline variables are
 fully-observed, whereas all outcome variables are partially-observed in
-both treatment arms. A total of 46
-(29<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>%</mi><annotation encoding="application/x-tex">\%</annotation></semantics></math>)
-individuals has observed QALYs and Total costs, of which 0 in the SoC
-and 0 in the MenSS arm, while the remaining 113 individuals have both
-<code>e</code> and <code>c</code> missing. Figure @ref(fig:fig1e) and
-Figure @ref(fig:fig1c) show histograms of the observed distributions for
-the QALY and Total cost variables in <code>MenSS</code>, separately by
-treatment arm. We note that, among the observed cases, 17
-(37<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>%</mi><annotation encoding="application/x-tex">\%</annotation></semantics></math>)
-individuals are associated with structural values of perfect health
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>s</mi><mi>e</mi></msup><mo>=</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">s^e=1</annotation></semantics></math>),
-while 12
-(26<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>%</mi><annotation encoding="application/x-tex">\%</annotation></semantics></math>)
-individuals have structural values of no service use
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>s</mi><mi>c</mi></msup><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">s^c = 0</annotation></semantics></math>).</p>
+both treatment arms. A total of 46 (29<span class="math inline">\(\%\)</span>) individuals has observed QALYs and
+Total costs, of which 0 in the SoC and 0 in the MenSS arm, while the
+remaining 113 individuals have both <code>e</code> and <code>c</code>
+missing. Figure @ref(fig:fig1e) and Figure @ref(fig:fig1c) show
+histograms of the observed distributions for the QALY and Total cost
+variables in <code>MenSS</code>, separately by treatment arm. We note
+that, among the observed cases, 17 (37<span class="math inline">\(\%\)</span>) individuals are associated with
+structural values of perfect health (<span class="math inline">\(s^e=1\)</span>), while 12 (26<span class="math inline">\(\%\)</span>) individuals have structural values of
+no service use (<span class="math inline">\(s^c = 0\)</span>).</p>
 <div class="figure">
-<img src="Introduction_to_missingHE_files/figure-html/fig1e-1.png" class="r-plt" alt="Histograms of the observed data distributions for the QALYs in the SoC and MenSS arm." width="100%"><p class="caption">
+<img src="Introduction_to_missingHE_files/figure-html/fig1e-1.png" alt="Histograms of the observed data distributions for the QALYs in the SoC and MenSS arm." width="100%"><p class="caption">
 Histograms of the observed data distributions for the QALYs in the SoC
 and MenSS arm.
 </p>
 </div>
 <div class="figure">
-<img src="Introduction_to_missingHE_files/figure-html/fig1c-1.png" class="r-plt" alt="Histograms of the observed data distributions for the Total costs in the SoC and MenSS arm." width="100%"><p class="caption">
+<img src="Introduction_to_missingHE_files/figure-html/fig1c-1.png" alt="Histograms of the observed data distributions for the Total costs in the SoC and MenSS arm." width="100%"><p class="caption">
 Histograms of the observed data distributions for the Total costs in the
 SoC and MenSS arm.
 </p>
@@ -698,7 +557,7 @@ providing a series of customisation options. Although some of these
 options are specific to a given approach, many of the available
 arguments are shared across the three functions to ensure consistency
 and uniformity when implementing the framework in Section
-@ref(sec-frame). In particular, key options include: choice of the
+@ref(sec-frame-intro). In particular, key options include: choice of the
 probability distribution for the effectiveness and cost variables,
 choice of the regression model for each outcome, and type of missingness
 mechanism assumed.</p>
@@ -707,10 +566,9 @@ with built-in parameterisations, for the effectiveness (<code>e</code>)
 and/or cost (<code>c</code>) variables are available. The user may
 select a given distributional choice by passing the corresponding
 <code>missingHE</code> name to the arguments <code>dist_e</code> and
-<code>dist_c</code> of the desired function. The outcome model
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mo stretchy="false" form="prefix">(</mo><mi>e</mi><mo>,</mo><mi>c</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">p(e,c)</annotation></semantics></math>
-requires a separate specification of the effectiveness and cost model
-formula following Equation @ref(eq:bivmodel) using the notation:</p>
+<code>dist_c</code> of the desired function. The outcome model <span class="math inline">\(p(e,c)\)</span> requires a separate specification
+of the effectiveness and cost model formula following Equation
+@ref(eq:bivmodel) using the notation:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">model.eff</span> <span class="op">&lt;-</span> <span class="va">e</span> <span class="op">~</span> <span class="va">trt</span> <span class="op">+</span> <span class="va">...</span></span>
 <span><span class="va">model.cost</span> <span class="op">&lt;-</span> <span class="va">c</span> <span class="op">~</span> <span class="va">trt</span> <span class="op">+</span> <span class="va">...</span></span></code></pre></div>
@@ -747,21 +605,19 @@ The only exception is related to: number of MCMC chains
 (<code>n.chains</code>), number of iterations (<code>n.iter</code>) and
 values of the prior distribution parameters (<code>prior</code>). As an
 example, consider the default priors for the linear predictor
-coefficients in the effectiveness and cost model, namely
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝛃</mi><mover><mo>∼</mo><mtext mathvariant="normal">iid</mtext></mover><mtext mathvariant="normal">Normal</mtext><mo stretchy="false" form="prefix">(</mo><msub><mi>μ</mi><mi>β</mi></msub><mo>,</mo><msub><mi>σ</mi><mi>β</mi></msub><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\boldsymbol \beta \overset{\text{iid}}{\sim}\text{Normal}(\mu_{\beta},\sigma_{\beta})</annotation></semantics></math>
-and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>𝛂</mi><mover><mo>∼</mo><mtext mathvariant="normal">iid</mtext></mover><mtext mathvariant="normal">Normal</mtext><mo stretchy="false" form="prefix">(</mo><msub><mi>μ</mi><mi>α</mi></msub><mo>,</mo><msub><mi>σ</mi><mi>α</mi></msub><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\boldsymbol \alpha \overset{\text{iid}}{\sim}\text{Normal}(\mu_{\alpha},\sigma_{\alpha})</annotation></semantics></math>.
+coefficients in the effectiveness and cost model, namely <span class="math inline">\(\boldsymbol \beta
+\overset{\text{iid}}{\sim}\text{Normal}(\mu_{\beta},\sigma_{\beta})\)</span>
+and <span class="math inline">\(\boldsymbol \alpha
+\overset{\text{iid}}{\sim}\text{Normal}(\mu_{\alpha},\sigma_{\alpha})\)</span>.
 Suppose the user wants to select different prior mean and standard
 deviation values for these parameters. This can be done by typing</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">myprior</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"beta.prior"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"norm"</span>, <span class="fl">0</span>, <span class="fl">0.01</span><span class="op">)</span>, <span class="st">"alpha.prior"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"norm"</span>, <span class="fl">0</span>, <span class="fl">0.01</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>which instructs <code>missingHE</code> to separately assign normal
 distributions to each regression coefficient in the models with prior
-mean of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0</mn><annotation encoding="application/x-tex">0</annotation></semantics></math>
-and precision (inverse of variance) of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0.01</mn><annotation encoding="application/x-tex">0.01</annotation></semantics></math>.
-The list <code>myprior</code> can then be passed to the optional
+mean of <span class="math inline">\(0\)</span> and precision (inverse of
+variance) of <span class="math inline">\(0.01\)</span>. The list
+<code>myprior</code> can then be passed to the optional
 <code>prior</code> argument in the function to implement the model using
 the updated priors.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
@@ -781,15 +637,13 @@ the new model has to be run using dedicated commands, such as
 <div class="section level2">
 <h2 id="sec-marmodel">Fitting models under MAR<a class="anchor" aria-label="anchor" href="#sec-marmodel"></a>
 </h2>
-<p>We consider the following common model specification for
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mo stretchy="false" form="prefix">(</mo><msub><mi>e</mi><mi>i</mi></msub><mo stretchy="false" form="postfix">)</mo><mi>p</mi><mo stretchy="false" form="prefix">(</mo><msub><mi>c</mi><mi>i</mi></msub><mo>∣</mo><msub><mi>e</mi><mi>i</mi></msub><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">p(e_i)p(c_i\mid e_i)</annotation></semantics></math>:
-<code>e</code> and <code>c</code> are both normally distributed;
-<code>u.0</code> is included as a covariate in the effectiveness model;
-a MAR mechanism is assumed for both outcomes. The model is first
-implemented using a selection approach through the function
-<code>selection</code> under a MAR assumption for <code>e</code>
-(conditional on <code>u.0</code>) and <code>c</code> using the following
-command.</p>
+<p>We consider the following common model specification for <span class="math inline">\(p(e_i)p(c_i\mid e_i)\)</span>: <code>e</code> and
+<code>c</code> are both normally distributed; <code>u.0</code> is
+included as a covariate in the effectiveness model; a MAR mechanism is
+assumed for both outcomes. The model is first implemented using a
+selection approach through the function <code>selection</code> under a
+MAR assumption for <code>e</code> (conditional on <code>u.0</code>) and
+<code>c</code> using the following command.</p>
 <p>The arguments <code>model.me</code> and <code>model.mc</code> are
 specific to <code>selection</code> and denote the missingness mechanism
 as in Equation @ref(eq:misp) for both outcomes. Since <code>u.0</code>
@@ -814,14 +668,11 @@ corresponding estimates from the complete cases under a MAR assumption
 (<code>type = "MAR"</code>).</p>
 <p>Finally, the model is specified under a hurdle approach but assuming
 a Beta and Gamma distribution for <code>e</code> and <code>c</code>,
-respectively. In particular, individuals with
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>e</mi><mi>i</mi></msub><mo>=</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">e_i=1</annotation></semantics></math>
-and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>c</mi><mi>i</mi></msub><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">c_i=0</annotation></semantics></math>
-are assigned to a structural component in the QALY and Total cost model,
-respectively. The model is implemented through the function
-<code>hurdle</code>, under a SCAR assumption about the structural value
-mechanism, using the following command.</p>
+respectively. In particular, individuals with <span class="math inline">\(e_i=1\)</span> and <span class="math inline">\(c_i=0\)</span> are assigned to a structural
+component in the QALY and Total cost model, respectively. The model is
+implemented through the function <code>hurdle</code>, under a SCAR
+assumption about the structural value mechanism, using the following
+command.</p>
 <p>The arguments <code>se</code>, <code>sc</code>, <code>model.se</code>
 and <code>model.sc</code> are specific to <code>hurdle</code> and denote
 the effectiveness and cost structural values and their corresponding
@@ -871,7 +722,7 @@ parameter estimates from the model. In this case, as displayed in Figure
 @ref(fig:fig2), no major issues in convergence are identified with the
 traceplots showing acceptable mixing in the two chains.</p>
 <div class="figure">
-<img src="Introduction_to_missingHE_files/figure-html/fig2-1.png" class="r-plt" alt="Checking convergence using the diagnostic function for a model fitted in missingHE, for example through inspection of the traceplots." width="100%"><p class="caption">
+<img src="Introduction_to_missingHE_files/figure-html/fig2-1.png" alt="Checking convergence using the diagnostic function for a model fitted in missingHE, for example through inspection of the traceplots." width="100%"><p class="caption">
 Checking convergence using the diagnostic function for a model fitted in
 missingHE, for example through inspection of the traceplots.
 </p>
@@ -885,24 +736,20 @@ A quick description of the available options is the following.</p>
 <ul>
 <li><p><code>type</code>: the class of diagnostic plot, which must be
 named according to the options and terminology accepted by
-<code>missingHE</code>. Examples include: density plots (default
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>=</mo><annotation encoding="application/x-tex">=</annotation></semantics></math><code>"denplot"</code>), traceplots (<code>"traceplot"</code>) and
-autocorrelation plots (<code>"acf"</code>).</p></li>
+<code>missingHE</code>. Examples include: density plots (default <span class="math inline">\(=\)</span> <code>"denplot"</code>), traceplots
+(<code>"traceplot"</code>) and autocorrelation plots
+(<code>"acf"</code>).</p></li>
 <li><p><code>param</code>: family of parameters to be displayed, named
 according to the options and terminology accepted by
 <code>missingHE</code>. Examples include: effectiveness location
-regression coefficients
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>𝛂</mi><annotation encoding="application/x-tex">\boldsymbol \alpha</annotation></semantics></math>
-(<code>"alpha"</code>) and marginal means
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>μ</mi><mi>e</mi></msub><annotation encoding="application/x-tex">\mu_e</annotation></semantics></math>
-(<code>"mu.e"</code>) as well as their corresponding cost parameters
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>𝛃</mi><annotation encoding="application/x-tex">\boldsymbol \beta</annotation></semantics></math>
-(<code>"beta"</code>) and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>μ</mi><mi>c</mi></msub><annotation encoding="application/x-tex">\mu_c</annotation></semantics></math>
-(<code>"mu.c"</code>). Default value is <code>"all"</code>, indicating
-all parameters stored in the object passed to <code>x</code>. Note that
-some family of parameters are only available for specific types of model
-structures and missingness assumptions.</p></li>
+regression coefficients <span class="math inline">\(\boldsymbol
+\alpha\)</span> (<code>"alpha"</code>) and marginal means <span class="math inline">\(\mu_e\)</span> (<code>"mu.e"</code>) as well as
+their corresponding cost parameters <span class="math inline">\(\boldsymbol \beta\)</span> (<code>"beta"</code>)
+and <span class="math inline">\(\mu_c\)</span> (<code>"mu.c"</code>).
+Default value is <code>"all"</code>, indicating all parameters stored in
+the object passed to <code>x</code>. Note that some family of parameters
+are only available for specific types of model structures and
+missingness assumptions.</p></li>
 </ul>
 <p>Note that most of the output produced by <code>diagnostic</code> is
 effectively a <code>ggplot2</code> object, and can therefore be
@@ -917,17 +764,16 @@ predictive checks for assessing the fit of a model. Consider again the
 output of the selection model stored in the <code>sm1_mar</code>; we may
 use the command</p>
 <pre class="text"><code>&gt; ppc(x = sm1_mar, type = "dens_overlay", outcome = "effects", ndisplay = 20)</code></pre>
-<p>to plot the densities of <code>ndisplay</code>
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>=</mo><mn>20</mn></mrow><annotation encoding="application/x-tex">=20</annotation></semantics></math>
-replications of the effectiveness data (light blue lines) with respect
-to the density of the observed data (dark blue line), separately in the
-Soc (<code>trt = 1</code>) and MenSS (<code>trt = 2</code>) arm. In this
-case, as displayed in Figure @ref(fig:fig3), some discrepancies between
-the replicated and observed data densities occur. This suggests a
-relatively poor fit of the current model (i.e., the normality assumption
-of <code>e</code>) to the observed data in both arms.</p>
+<p>to plot the densities of <code>ndisplay</code> <span class="math inline">\(=20\)</span> replications of the effectiveness
+data (light blue lines) with respect to the density of the observed data
+(dark blue line), separately in the Soc (<code>trt = 1</code>) and MenSS
+(<code>trt = 2</code>) arm. In this case, as displayed in Figure
+@ref(fig:fig3), some discrepancies between the replicated and observed
+data densities occur. This suggests a relatively poor fit of the current
+model (i.e., the normality assumption of <code>e</code>) to the observed
+data in both arms.</p>
 <div class="figure">
-<img src="Introduction_to_missingHE_files/figure-html/fig3-1.png" class="r-plt" alt="Posterior predictive graphical checks using the ppc function for a model fitted in missingHE, for example through inspection of overlayed densities." width="100%"><p class="caption">
+<img src="Introduction_to_missingHE_files/figure-html/fig3-1.png" alt="Posterior predictive graphical checks using the ppc function for a model fitted in missingHE, for example through inspection of overlayed densities." width="100%"><p class="caption">
 Posterior predictive graphical checks using the ppc function for a model
 fitted in missingHE, for example through inspection of overlayed
 densities.
@@ -940,19 +786,16 @@ available options is the following.</p>
 <ul>
 <li><p><code>type</code>: class of posterior predictive check, named
 according to the available options and terminology accepted by
-<code>missingHE</code>. Examples include: histograms (default
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>=</mo><annotation encoding="application/x-tex">=</annotation></semantics></math><code>"histogram"</code>), overlayed densities
-(<code>"dens_overlay"</code>) and boxplots
+<code>missingHE</code>. Examples include: histograms (default <span class="math inline">\(=\)</span> <code>"histogram"</code>), overlayed
+densities (<code>"dens_overlay"</code>) and boxplots
 (<code>"boxplot"</code>).</p></li>
 <li><p><code>outcome</code>: outcome variable, named according to the
 available options and terminology accepted by <code>missingHE</code>.
 Available choices are: effectiveness (<code>"effects"</code>), costs
-(<code>"costs"</code>) or both outcomes (default
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>=</mo><annotation encoding="application/x-tex">=</annotation></semantics></math><code>"both"</code>).</p></li>
+(<code>"costs"</code>) or both outcomes (default <span class="math inline">\(=\)</span> <code>"both"</code>).</p></li>
 <li><p><code>ndisplay</code>: number of model-based replications of the
 data to be displayed for each selected type of outcome and graph
-(default
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>=</mo><mn>15</mn></mrow><annotation encoding="application/x-tex">=15</annotation></semantics></math>).</p></li>
+(default <span class="math inline">\(=15\)</span>).</p></li>
 </ul>
 </div>
 <div class="section level3">
@@ -979,11 +822,10 @@ typically indicating better fit. A quick description of the main
 arguments in <code>pic</code> is the following.</p>
 <ul>
 <li><p><code>criterion</code>: type of information criteria: DIC
-(default
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>=</mo><annotation encoding="application/x-tex">=</annotation></semantics></math><code>"dic"</code>), WAIC (<code>"waic"</code>) and LOOIC
-(<code>"looic"</code>). Alongside the value of the criterion, additional
-quantities used in its computation are also stored and may be
-returned.</p></li>
+(default <span class="math inline">\(=\)</span> <code>"dic"</code>),
+WAIC (<code>"waic"</code>) and LOOIC (<code>"looic"</code>). Alongside
+the value of the criterion, additional quantities used in its
+computation are also stored and may be returned.</p></li>
 <li><p><code>cases</code>: the group of observed cases for which
 information criterion should be computed. Available choices include:
 complete cases (<code>"cc"</code>), available observed cases for only
@@ -1051,11 +893,9 @@ further customise the model results.</p>
 <h3 id="sec-insptab">Summarise parameter estimates<a class="anchor" aria-label="anchor" href="#sec-insptab"></a>
 </h3>
 <p>Key quantities of interest are the posterior estimates of the mean
-effectiveness and cost parameters in each treatment arm
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo mathvariant="bold">=</mo><mo stretchy="false" form="prefix">(</mo><msub><mi>μ</mi><mrow><mi>e</mi><mi>t</mi></mrow></msub><mo>,</mo><msub><mi>μ</mi><mrow><mi>c</mi><mi>t</mi></mrow></msub><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\boldsymbol=(\mu_{et},\mu_{ct})</annotation></semantics></math>.
-Summary statistics computed based on posterior samples of these
-parameters may be accessed using the <code>postsum</code> function by
-typing</p>
+effectiveness and cost parameters in each treatment arm <span class="math inline">\(\boldsymbol=(\mu_{et},\mu_{ct})\)</span>. Summary
+statistics computed based on posterior samples of these parameters may
+be accessed using the <code>postsum</code> function by typing</p>
 <pre class="text"><code>&gt; postsum(sm1_mar)</code></pre>
 <p>which returns the following output</p>
 <pre><code><span><span class="co">#&gt;                  mean          sd        2.5%         50%       97.5% Rhat n.eff</span></span>
@@ -1080,14 +920,13 @@ typing</p>
 report summary quantities related to key model parameters, by default
 the mean effectiveness and costs across treatment arms on their natural
 scale. Estimates of posterior mean (<code>mean</code>), standard
-deviation (<code>sd</code>) and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>95</mn><mi>%</mi></mrow><annotation encoding="application/x-tex">95\%</annotation></semantics></math>
-credible interval boundaries (<code>2.5%</code> and <code>95.5%</code>)
-can be used to summarise the posterior distribution of the parameters.
-In addition, the MCMC diagnostics <code>Rhat</code> and
-<code>n.eff</code>, corresponding to the potential scale reduction
-factor and effective sample size diagnostics, are provided and can be
-used to assess convergence for these parameters.</p>
+deviation (<code>sd</code>) and <span class="math inline">\(95\%\)</span> credible interval boundaries
+(<code>2.5%</code> and <code>95.5%</code>) can be used to summarise the
+posterior distribution of the parameters. In addition, the MCMC
+diagnostics <code>Rhat</code> and <code>n.eff</code>, corresponding to
+the potential scale reduction factor and effective sample size
+diagnostics, are provided and can be used to assess convergence for
+these parameters.</p>
 <p>Information on regression parameter estimates from each model stored
 in an object of class <code>missingHE</code>, alongside standard
 information on how the object was created, may be inspected by
@@ -1103,9 +942,9 @@ missingness (<code>model.me</code> and <code>model.mc</code>)
 models.</p>
 <p>More detailed summary statistics on the coefficient estimates, on the
 scale defined by the linear predictor of the effectiveness and cost
-models
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">(</mo><mi>𝛂</mi><mo>,</mo><mi>𝛃</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">(\boldsymbol \alpha, \boldsymbol \beta)</annotation></semantics></math>,
-may be displayed using the <code>coef</code> function by typing</p>
+models <span class="math inline">\((\boldsymbol \alpha, \boldsymbol
+\beta)\)</span>, may be displayed using the <code>coef</code> function
+by typing</p>
 <pre class="text"><code>&gt; coef(sm1_mar)</code></pre>
 <p>which returns</p>
 <pre><code><span><span class="co">#&gt; $Effects</span></span>
@@ -1121,16 +960,15 @@ may be displayed using the <code>coef</code> function by typing</p>
 <span><span class="co">#&gt; e           -7.201 31.367 -68.677  49.454</span></span></code></pre>
 <p>The regression output is separately reported by outcome. Based on the
 results stored in <code>sm1_mar</code>, the following estimates are
-reported: the intercept
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>α</mi><mn>0</mn></msub><mo>=</mo></mrow><annotation encoding="application/x-tex">\alpha_0=</annotation></semantics></math><code>(Intercept)</code> and baseline utility coefficient
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>α</mi><mn>1</mn></msub><mo>=</mo></mrow><annotation encoding="application/x-tex">\alpha_1=</annotation></semantics></math><code>u.0</code> in the effectiveness model; the intercept
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>β</mi><mn>0</mn></msub><mo>=</mo></mrow><annotation encoding="application/x-tex">\beta_0=</annotation></semantics></math><code>(Intercept)</code> and effectiveness coefficient
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>β</mi><mi>f</mi></msub><mo>=</mo></mrow><annotation encoding="application/x-tex">\beta_f=</annotation></semantics></math><code>e</code> in the cost model. For each regression parameter,
+reported: the intercept <span class="math inline">\(\alpha_0=\)</span>
+<code>(Intercept)</code> and baseline utility coefficient <span class="math inline">\(\alpha_1=\)</span> <code>u.0</code> in the
+effectiveness model; the intercept <span class="math inline">\(\beta_0=\)</span> <code>(Intercept)</code> and
+effectiveness coefficient <span class="math inline">\(\beta_f=\)</span>
+<code>e</code> in the cost model. For each regression parameter,
 estimates are summarised using posterior means (<code>mean</code>),
 standard deviations (<code>sd</code>) and credible interval boundaries
 (<code>lower</code> and <code>upper</code>), the latter being calculated
-assuming by default a credible level of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>95</mn><mi>%</mi></mrow><annotation encoding="application/x-tex">95\%</annotation></semantics></math>.</p>
+assuming by default a credible level of <span class="math inline">\(95\%\)</span>.</p>
 </div>
 <div class="section level3">
 <h3 id="sec-inspimp">Inspect imputed values<a class="anchor" aria-label="anchor" href="#sec-inspimp"></a>
@@ -1150,7 +988,7 @@ credible intervals. The arguments <code>class = "scatter"</code>,
 <code>missingHE</code> to display scatter plots for the effectiveness
 outcome in the MenSS arm.</p>
 <div class="figure">
-<img src="Introduction_to_missingHE_files/figure-html/figplot-1.png" class="r-plt" alt="Scatter plots of observed and imputed effectiveness data in the MenSS arm under normal distributions using a selection model." width="100%"><p class="caption">
+<img src="Introduction_to_missingHE_files/figure-html/figplot-1.png" alt="Scatter plots of observed and imputed effectiveness data in the MenSS arm under normal distributions using a selection model." width="100%"><p class="caption">
 Scatter plots of observed and imputed effectiveness data in the MenSS
 arm under normal distributions using a selection model.
 </p>
@@ -1192,41 +1030,28 @@ by typing</p>
 <span><span class="co">#&gt; SoC   44420  897 42753 46133</span></span>
 <span><span class="co">#&gt; MenSS 45942 1128 43709 48109</span></span></code></pre>
 <p>The results stored in <code>sm1_mar</code> are reported in terms of
-posterior summaries, such as mean, standard deviation and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>95</mn><mi>%</mi></mrow><annotation encoding="application/x-tex">95\%</annotation></semantics></math>
-credible interval boundaries, for key health economic quantities. These
-are:</p>
+posterior summaries, such as mean, standard deviation and <span class="math inline">\(95\%\)</span> credible interval boundaries, for
+key health economic quantities. These are:</p>
 <ul>
-<li><p>the mean effectiveness and cost parameters in each arm
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>μ</mi><mrow><mi>e</mi><mi>t</mi></mrow></msub><mo>,</mo><msub><mi>μ</mi><mrow><mi>c</mi><mi>t</mi></mrow></msub></mrow><annotation encoding="application/x-tex">\mu_{et},\mu_{ct}</annotation></semantics></math>)</p></li>
-<li><p>the net monetary benefit (NMB) parameter in each arm
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>μ</mi><mrow><mi>e</mi><mi>t</mi></mrow></msub><mo>×</mo><mi>k</mi><mo>−</mo><msub><mi>μ</mi><mrow><mi>c</mi><mi>t</mi></mrow></msub></mrow><annotation encoding="application/x-tex">\mu_{et}\times k - \mu_{ct}</annotation></semantics></math>),
-calculated at a given willingness to pay
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>)
-value (default
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>=</mo><mn>50000</mn></mrow><annotation encoding="application/x-tex">=50000</annotation></semantics></math>).</p></li>
+<li><p>the mean effectiveness and cost parameters in each arm (<span class="math inline">\(\mu_{et},\mu_{ct}\)</span>)</p></li>
+<li><p>the net monetary benefit (NMB) parameter in each arm (<span class="math inline">\(\mu_{et}\times k - \mu_{ct}\)</span>), calculated
+at a given willingness to pay (<span class="math inline">\(k\)</span>)
+value (default <span class="math inline">\(=50000\)</span>).</p></li>
 </ul>
 <p>Incremental cost-effectiveness results between the reference arm
-(<code>trt</code>
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>=</mo><mn>2</mn></mrow><annotation encoding="application/x-tex">=2</annotation></semantics></math>)
-and each of the other study arms (<code>trt</code>
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>=</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">=1</annotation></semantics></math>)
-can be obtained by setting the argument <code>incremental</code> to
-<code>TRUE</code>.</p>
+(<code>trt</code> <span class="math inline">\(=2\)</span>) and each of
+the other study arms (<code>trt</code> <span class="math inline">\(=1\)</span>) can be obtained by setting the
+argument <code>incremental</code> to <code>TRUE</code>.</p>
 <pre class="text"><code>&gt; summary(sm1_mar, incremental = TRUE)</code></pre>
 <p>These results include:</p>
 <ul>
-<li><p>the mean incremental effectiveness and cost parameters
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi mathvariant="normal">Δ</mi><mi>e</mi></msub><mo>=</mo><msub><mi>μ</mi><mrow><mi>e</mi><mn>2</mn></mrow></msub><mo>−</mo><msub><mi>μ</mi><mrow><mi>e</mi><mn>1</mn></mrow></msub><mo>,</mo><msub><mi mathvariant="normal">Δ</mi><mi>c</mi></msub><mo>=</mo><msub><mi>μ</mi><mrow><mi>c</mi><mn>2</mn></mrow></msub><mo>−</mo><msub><mi>μ</mi><mrow><mi>c</mi><mn>1</mn></mrow></msub></mrow><annotation encoding="application/x-tex">\Delta_{e}=\mu_{e2}-\mu_{e1},\Delta_{c}=\mu_{c2}-\mu_{c1}</annotation></semantics></math>)</p></li>
-<li><p>the incremental net monetary benefit (INMB)
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi mathvariant="normal">Δ</mi><mi>e</mi></msub><mo>×</mo><mi>k</mi><mo>−</mo><msub><mi mathvariant="normal">Δ</mi><mi>c</mi></msub></mrow><annotation encoding="application/x-tex">\Delta_{e}\times k - \Delta_{c}</annotation></semantics></math>),
-calculated at the given
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>
+<li><p>the mean incremental effectiveness and cost parameters (<span class="math inline">\(\Delta_{e}=\mu_{e2}-\mu_{e1},\Delta_{c}=\mu_{c2}-\mu_{c1}\)</span>)</p></li>
+<li><p>the incremental net monetary benefit (INMB) (<span class="math inline">\(\Delta_{e}\times k - \Delta_{c}\)</span>),
+calculated at the given <span class="math inline">\(k\)</span>
 value.</p></li>
 <li><p>the estimated mean of the <em>Incremental Cost-Effectiveness
 Ratio</em> (ICER), which quantifies the cost per incremental unit of
-effectiveness, computed based on posterior samples as
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">ICER</mtext><mo>=</mo><mfrac><msub><mi mathvariant="normal">Δ</mi><mi>c</mi></msub><msub><mi mathvariant="normal">Δ</mi><mi>e</mi></msub></mfrac></mrow><annotation encoding="application/x-tex">\text{ICER}=\frac{\Delta_{c}}{\Delta_{e}}</annotation></semantics></math>.</p></li>
+effectiveness, computed based on posterior samples as <span class="math inline">\(\text{ICER}=\frac{\Delta_{c}}{\Delta_{e}}\)</span>.</p></li>
 </ul>
 <p>The above output compares the cost-effectiveness of the two arms in
 the <code>MenSS</code> data set based on the results of the model stored
@@ -1235,11 +1060,8 @@ suggest that <code>"MenSS"</code> is on average associated with higher
 QALYs (0.031) and Total costs (24.188) with respect to
 <code>"SoC"</code>, leading to a positive value of the estimated ICER
 (781.864). However, a considerable degree of uncertainty is associated
-with the mean incremental estimates as indicated by the
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>95</mn><mi>%</mi></mrow><annotation encoding="application/x-tex">95\%</annotation></semantics></math>
-credible intervals which include
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0</mn><annotation encoding="application/x-tex">0</annotation></semantics></math>
-for both outcomes.</p>
+with the mean incremental estimates as indicated by the <span class="math inline">\(95\%\)</span> credible intervals which include
+<span class="math inline">\(0\)</span> for both outcomes.</p>
 <div class="section level3">
 <h3 id="sec-psaBCEA">Probabilistic sensitivity analysis<a class="anchor" aria-label="anchor" href="#sec-psaBCEA"></a>
 </h3>
@@ -1257,33 +1079,29 @@ commands</p>
 acceptability curve plots obtained from the PSA results stored in
 <code>sm1_mar$cea</code>.</p>
 <div class="figure">
-<img src="Introduction_to_missingHE_files/figure-html/figplotcea1-1.png" class="r-plt" alt="Inspecting probabilistic sensitivity analysis using BCEA built-in functions, for example in terms of cost-effectiveness plane." width="100%"><p class="caption">
+<img src="Introduction_to_missingHE_files/figure-html/figplotcea1-1.png" alt="Inspecting probabilistic sensitivity analysis using BCEA built-in functions, for example in terms of cost-effectiveness plane." width="100%"><p class="caption">
 Inspecting probabilistic sensitivity analysis using BCEA built-in
 functions, for example in terms of cost-effectiveness plane.
 </p>
 </div>
 <div class="figure">
-<img src="Introduction_to_missingHE_files/figure-html/figplotcea2-1.png" class="r-plt" alt="Inspecting probabilistic sensitivity analysis using BCEA built-in functions, for example in terms of cost-effectiveness acceptability curve." width="100%"><p class="caption">
+<img src="Introduction_to_missingHE_files/figure-html/figplotcea2-1.png" alt="Inspecting probabilistic sensitivity analysis using BCEA built-in functions, for example in terms of cost-effectiveness acceptability curve." width="100%"><p class="caption">
 Inspecting probabilistic sensitivity analysis using BCEA built-in
 functions, for example in terms of cost-effectiveness acceptability
 curve.
 </p>
 </div>
-<p>Both graphs are generated based on
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>1000</mn><annotation encoding="application/x-tex">1000</annotation></semantics></math>
-posterior samples and suggest a favourable cost-effectiveness assessment
-of <code>"MenSS"</code> vs <code>"SoC"</code>. In the cost-effectiveness
-plane, shown in Figure @ref(fig:figplotcea1), most of the incremental
-estimates fall in the top/bottom-right quadrants (where
-<code>"MenSS"</code> is more effective than <code>"SoC"</code>) and are
-associated with ICER estimates that are lower than
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>k</mi><mo>=</mo><mn>25000</mn></mrow><annotation encoding="application/x-tex">k=25000</annotation></semantics></math>
-(shaded area). In the cost-effectiveness acceptability curve, shown in
-Figure @ref(fig:figplotcea2), estimates of the probability of
-cost-effectiveness for <code>"MenSS"</code> are close to
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0.8</mn><annotation encoding="application/x-tex">0.8</annotation></semantics></math>
-for most values of the willingness to pay
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>.</p>
+<p>Both graphs are generated based on <span class="math inline">\(1000\)</span> posterior samples and suggest a
+favourable cost-effectiveness assessment of <code>"MenSS"</code> vs
+<code>"SoC"</code>. In the cost-effectiveness plane, shown in Figure
+@ref(fig:figplotcea1), most of the incremental estimates fall in the
+top/bottom-right quadrants (where <code>"MenSS"</code> is more effective
+than <code>"SoC"</code>) and are associated with ICER estimates that are
+lower than <span class="math inline">\(k=25000\)</span> (shaded area).
+In the cost-effectiveness acceptability curve, shown in Figure
+@ref(fig:figplotcea2), estimates of the probability of
+cost-effectiveness for <code>"MenSS"</code> are close to <span class="math inline">\(0.8\)</span> for most values of the willingness to
+pay <span class="math inline">\(k\)</span>.</p>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

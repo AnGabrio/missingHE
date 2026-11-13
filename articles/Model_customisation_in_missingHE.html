@@ -5,7 +5,13 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Model and output customisation in missingHE • missingHE</title>
-<script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<!-- mathjax math --><script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js" integrity="sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI=" crossorigin="anonymous"></script><script>
+  window.MathJax = {
+    chtml: {
+      fontURL: "https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/output/chtml/fonts/woff-v2"
+    }
+  };
+</script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
@@ -36,10 +42,11 @@
 <li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="../articles/Fitting_MNAR_models_in_missingHE.html">Fitting MNAR models in missingHE</a></li>
+<li><a class="dropdown-item" href="../articles/missingHE-package.html">Missing Cost Effectiveness Models</a></li>
     <li><a class="dropdown-item" href="../articles/Introduction_to_missingHE.html">Introduction to missingHE</a></li>
-    <li><a class="dropdown-item" href="../articles/Longitudinal_models_in_missingHE.html">Longitudinal models in missingHE</a></li>
+    <li><a class="dropdown-item" href="../articles/Fitting_MNAR_models_in_missingHE.html">Fitting MNAR models in missingHE</a></li>
     <li><a class="dropdown-item" href="../articles/Model_customisation_in_missingHE.html">Model and output customisation in missingHE</a></li>
+    <li><a class="dropdown-item" href="../articles/Longitudinal_models_in_missingHE.html">Longitudinal models in missingHE</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -55,8 +62,6 @@
 
   </div>
 </nav><div class="container template-article">
-
-
 
 
 <div class="row">
@@ -204,20 +209,10 @@ variables, namely QALYs (<code>e</code>) and Total costs
 </li>
 </ul>
 <p>Prior to fitting the model, the data are pre-processed by: replacing
-the default levels for the factor variable <code>trt</code>
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>1</mn><annotation encoding="application/x-tex">1</annotation></semantics></math>
-and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>2</mn><annotation encoding="application/x-tex">2</annotation></semantics></math>)
-with the actual treatment names (<code>"SoC"</code> and
-<code>"MenSS"</code>); add/subtract to the cost/QALY data a small
-constant of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0.01</mn><annotation encoding="application/x-tex">0.01</annotation></semantics></math>
-to allow estimation of Gamma and Beta distributions, whose support does
-not include
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0</mn><annotation encoding="application/x-tex">0</annotation></semantics></math>
-and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>1</mn><annotation encoding="application/x-tex">1</annotation></semantics></math>,
-respectively.</p>
+the default levels for the factor variable <code>trt</code> (<span class="math inline">\(1\)</span> and <span class="math inline">\(2\)</span>) with the actual treatment names
+(<code>"SoC"</code> and <code>"MenSS"</code>); add/subtract to the
+cost/QALY data a small constant of <span class="math inline">\(0.01\)</span> to allow estimation of Gamma and
+Beta distributions, whose support does not include <span class="math inline">\(0\)</span> and <span class="math inline">\(1\)</span>, respectively.</p>
 <pre class="text"><code>&gt; #rename trt levels
 &gt; MenSS$trt &lt;- factor(MenSS$trt)
 &gt; levels(MenSS$trt) &lt;- c("SoC", "MenSS")
@@ -301,8 +296,7 @@ To this purpose, <code>missingHE</code> allows the user to compute a
 series of graphical and/or numeric <strong>posterior predictive
 checks</strong> (PPC) using the function <code>ppc</code>.</p>
 <p>As an example, the following commands generate posterior density
-plots for a total of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>20</mn><annotation encoding="application/x-tex">20</annotation></semantics></math>
+plots for a total of <span class="math inline">\(20\)</span>
 replications of QALYs and/or Total costs under each model, which are
 compared to the empirical densities of the observed outcomes. The
 arguments inside <code>ppc</code> can be used to customise the resulting
@@ -335,19 +329,19 @@ or a character name for all data pulled across arms
 &gt; ppc_dens_m3 &lt;- ppc(x = sm1_bg, type = "dens_overlay", outcome = "effects",
 +              ndisplay = 20, trt = "none")</code></pre>
 <div class="figure">
-<img src="Model_customisation_in_missingHE_files/figure-html/figplotppc1-1.png" class="r-plt" alt="Posterior densities of 20 replicated data under model 1 compared to the empirical density of the original data." width="100%"><p class="caption">
+<img src="Model_customisation_in_missingHE_files/figure-html/figplotppc1-1.png" alt="Posterior densities of 20 replicated data under model 1 compared to the empirical density of the original data." width="100%"><p class="caption">
 Posterior densities of 20 replicated data under model 1 compared to the
 empirical density of the original data.
 </p>
 </div>
 <div class="figure">
-<img src="Model_customisation_in_missingHE_files/figure-html/figplotppc2-1.png" class="r-plt" alt="Posterior densities of 20 replicated data under model 2 compared to the empirical density of the original data." width="100%"><p class="caption">
+<img src="Model_customisation_in_missingHE_files/figure-html/figplotppc2-1.png" alt="Posterior densities of 20 replicated data under model 2 compared to the empirical density of the original data." width="100%"><p class="caption">
 Posterior densities of 20 replicated data under model 2 compared to the
 empirical density of the original data.
 </p>
 </div>
 <div class="figure">
-<img src="Model_customisation_in_missingHE_files/figure-html/figplotppc3-1.png" class="r-plt" alt="Posterior densities of 20 replicated data under model 3 compared to the empirical density of the original data." width="100%"><p class="caption">
+<img src="Model_customisation_in_missingHE_files/figure-html/figplotppc3-1.png" alt="Posterior densities of 20 replicated data under model 3 compared to the empirical density of the original data." width="100%"><p class="caption">
 Posterior densities of 20 replicated data under model 3 compared to the
 empirical density of the original data.
 </p>
@@ -437,13 +431,11 @@ typing</p>
 #&gt; tmu_e        0.8933149  0.01752864   0.85877088   0.8936012   0.9266596 1.00  1000</code></pre>
 <p>The output shows for each parameter a selection of posterior
 summaries obtained directly from <code>JAGS</code> including: mean,
-standard deviation, median,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>2.5</mn><mi>%</mi></mrow><annotation encoding="application/x-tex">2.5\%</annotation></semantics></math>
-and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>97.5</mn><mi>%</mi></mrow><annotation encoding="application/x-tex">97.5\%</annotation></semantics></math>
-percentiles as well as two MCMC diagnostic measures, the potential scale
-reduction factor (<code>Rhat</code>) and the number of effective sample
-size (<code>n.eff</code>). The names and number of parameters displayed
+standard deviation, median, <span class="math inline">\(2.5\%\)</span>
+and <span class="math inline">\(97.5\%\)</span> percentiles as well as
+two MCMC diagnostic measures, the potential scale reduction factor
+(<code>Rhat</code>) and the number of effective sample size
+(<code>n.eff</code>). The names and number of parameters displayed
 reflect the structure of the outcome (<code>model.eff</code> and
 <code>model.cost</code>) and missingness (<code>model.me</code> and
 <code>model.mc</code>) models as specified in <code>sm1_nn_mar</code>.
@@ -519,16 +511,12 @@ coefficient estimates for the effectiveness model
 (<code>$effects</code>) and the other to the cost model
 (<code>$costs</code>). For each coefficient, the name of the associated
 variable alongside posterior mean, standard deviation, lower and upper
-bounds of a
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>−</mo><mi>α</mi><mo stretchy="false" form="postfix">)</mo><mi>%</mi></mrow><annotation encoding="application/x-tex">(1-\alpha)\%</annotation></semantics></math>
+bounds of a <span class="math inline">\((1-\alpha)\%\)</span>
 credibility interval (CI) are displayed. By default, boundary estimates
-for a
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>95</mn><mi>%</mi></mrow><annotation encoding="application/x-tex">95\%</annotation></semantics></math>
-interval are computed, but the user can also specify custom boundary
-estimates using the optional argument <code>prob</code>, i.e.,
-<code>prob = (0.05, 0.95)</code> for a
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>90</mn><mi>%</mi></mrow><annotation encoding="application/x-tex">90\%</annotation></semantics></math>
-CI.</p>
+for a <span class="math inline">\(95\%\)</span> interval are computed,
+but the user can also specify custom boundary estimates using the
+optional argument <code>prob</code>, i.e.,
+<code>prob = (0.05, 0.95)</code> for a <span class="math inline">\(90\%\)</span> CI.</p>
 </div>
 <div class="section level2">
 <h2 id="sec-oms">Outcome model structure<a class="anchor" aria-label="anchor" href="#sec-oms"></a>
@@ -587,23 +575,21 @@ how autocorrelation plots for all regression coefficients in
 <code>model.eff</code> may be obtained based on the model in
 <code>sm1_nn_cov</code>.</p>
 <div class="figure">
-<img src="Model_customisation_in_missingHE_files/figure-html/figplotdiag-1.png" class="r-plt" alt="Checking convergence using the diagnostic function for a family of model parameters estimated in missingHE, for example through inspection of the autocorrelation plots." width="100%"><p class="caption">
+<img src="Model_customisation_in_missingHE_files/figure-html/figplotdiag-1.png" alt="Checking convergence using the diagnostic function for a family of model parameters estimated in missingHE, for example through inspection of the autocorrelation plots." width="100%"><p class="caption">
 Checking convergence using the diagnostic function for a family of model
 parameters estimated in missingHE, for example through inspection of the
 autocorrelation plots.
 </p>
 </div>
-<p>Graphs are displayed for each MCMC chain (default
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>=</mo><mn>2</mn></mrow><annotation encoding="application/x-tex">=2</annotation></semantics></math>)
-for each model parameter belonging to the specified family
-(<code>alpha</code>), while the argument <code>type</code> is used to
-select the specific type of diagnostic based on a set of available names
-accepted by <code>missingHE</code>. Several types of graphs are
-available, among which, some of the most popular plots and associated
-names include: trace (<code>"traceplot"</code>), density
-(<code>"denplot"</code>), histogram (<code>"histogram</code>),
-autocorrelation (<code>"acf"</code>), and running means
-(<code>"running"</code>) plots.</p>
+<p>Graphs are displayed for each MCMC chain (default <span class="math inline">\(=2\)</span>) for each model parameter belonging to
+the specified family (<code>alpha</code>), while the argument
+<code>type</code> is used to select the specific type of diagnostic
+based on a set of available names accepted by <code>missingHE</code>.
+Several types of graphs are available, among which, some of the most
+popular plots and associated names include: trace
+(<code>"traceplot"</code>), density (<code>"denplot"</code>), histogram
+(<code>"histogram</code>), autocorrelation (<code>"acf"</code>), and
+running means (<code>"running"</code>) plots.</p>
 <p>The accepted names for the family of parameters (<code>param</code>)
 are defined so to match the names assigned to the model parameters in
 <code>JAGS</code>, which can be displayed using the <code>postsum</code>
@@ -669,22 +655,19 @@ separately for each time point.</p></li>
 <p><code>missingHE</code> fits each approach under weakly-informative
 prior distribution choices for all model parameters assuming a general
 lack of prior knowledge. Examples include Normal distributions centred
-at
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0</mn><annotation encoding="application/x-tex">0</annotation></semantics></math>
-with generally low precision values (i.e.,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><mo>×</mo><msup><mn>10</mn><mn>6</mn></msup></mrow><annotation encoding="application/x-tex">1\times10^{6}</annotation></semantics></math>)
-for all regression coefficients, and Half-Cauchy distributions with a
-scale value of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>2.5</mn><annotation encoding="application/x-tex">2.5</annotation></semantics></math>.
-However, when desired and if prior information on some parameters is
-available, the user may overwrite default prior choices using the
-argument <code>prior</code> in each function. It is important that
-user-specific priors are passed to <code>prior</code> in a list form
-containing information about the desired parameters according to the
-type of model under consideration. For example, the following command
-may be used to update the priors about the effectiveness and cost
-regression coefficients and standard deviations when fitting a selection
-model using <code>selection</code>.</p>
+at <span class="math inline">\(0\)</span> with generally low precision
+values (i.e., <span class="math inline">\(1\times10^{6}\)</span>) for
+all regression coefficients, and Half-Cauchy distributions with a scale
+value of <span class="math inline">\(2.5\)</span>. However, when desired
+and if prior information on some parameters is available, the user may
+overwrite default prior choices using the argument <code>prior</code> in
+each function. It is important that user-specific priors are passed to
+<code>prior</code> in a list form containing information about the
+desired parameters according to the type of model under consideration.
+For example, the following command may be used to update the priors
+about the effectiveness and cost regression coefficients and standard
+deviations when fitting a selection model using
+<code>selection</code>.</p>
 <pre class="text"><code>&gt; #update priors on outcome regression coefficients and standard deviations
 &gt; myprior &lt;- list("beta.prior" = c("norm", 0, 0.01), 
 +          "beta_f.prior" = c("norm", 0, 0.001),
@@ -713,15 +696,13 @@ elements denote the canonical parameters indexing the chosen
 distribution. For example, for the first group of parameters
 <code>"beta"</code>, <code>myprior</code> instructs
 <code>missingHE</code> to replace their default priors with Normal
-distributions centred at
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0</mn><annotation encoding="application/x-tex">0</annotation></semantics></math>
-with a precision of
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0.01</mn><annotation encoding="application/x-tex">0.01</annotation></semantics></math>.
-Similarly, <code>myprior</code> instructs <code>missingHE</code> to
-specify Uniform priors on the standard deviations with differing ranges
-for the effectiveness and cost outcomes, through the information
-contained in the <code>"sigma.prior.e"</code> and
-<code>"sigma.prior.c"</code> elements.</p>
+distributions centred at <span class="math inline">\(0\)</span> with a
+precision of <span class="math inline">\(0.01\)</span>. Similarly,
+<code>myprior</code> instructs <code>missingHE</code> to specify Uniform
+priors on the standard deviations with differing ranges for the
+effectiveness and cost outcomes, through the information contained in
+the <code>"sigma.prior.e"</code> and <code>"sigma.prior.c"</code>
+elements.</p>
 <p>Note that specific character names for the custom prior list elements
 as well as specific names for the prior distributions must be used.
 <code>missingHE</code> allows the user to specify custom priors for
