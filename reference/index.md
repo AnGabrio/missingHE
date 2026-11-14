@@ -2,6 +2,12 @@
 
 ## All functions
 
+- [`MenSS`](https://angabrio.github.io/missingHE/reference/MenSS.md) :
+  MenSS economic data on STIs
+
+- [`PBS`](https://angabrio.github.io/missingHE/reference/PBS.md) : PBS
+  economic data on intellectual disability and challenging behaviour
+
 - [`coef(`*`<missingHE>`*`)`](https://angabrio.github.io/missingHE/reference/coef.missingHE.md)
   :
 
@@ -17,14 +23,8 @@
 - [`lmdm()`](https://angabrio.github.io/missingHE/reference/lmdm.md) :
   Bayesian Longitudinal Missing Data Models
 
-- [`MenSS`](https://angabrio.github.io/missingHE/reference/MenSS.md) :
-  MenSS economic data on STIs
-
 - [`pattern()`](https://angabrio.github.io/missingHE/reference/pattern.md)
   : Bayesian Pattern Mixture Models
-
-- [`PBS`](https://angabrio.github.io/missingHE/reference/PBS.md) : PBS
-  economic data on intellectual disability and challenging behaviour
 
 - [`pic()`](https://angabrio.github.io/missingHE/reference/pic.md) :
   Predictive information criteria for a Bayesian model

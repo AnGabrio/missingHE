@@ -8,7 +8,7 @@
 ## Citation
 
 Source:
-[`inst/CITATION`](https://github.com/AnGabrio/missingHE/blob/HEAD/inst/CITATION)
+[`inst/CITATION`](https://github.com/AnGabrio/missingHE/blob/master/inst/CITATION)
 
 Gabrio, A (2026). *Missing Cost Effectiveness Models (missingHE)*.
 [doi:10.32614/CRAN.package.missingHE](https://doi.org/10.32614/CRAN.package.missingHE).

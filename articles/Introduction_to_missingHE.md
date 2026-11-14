@@ -663,8 +663,6 @@ parameter estimates from the model. In this case, as displayed in Figure
 @ref(fig:fig2), no major issues in convergence are identified with the
 traceplots showing acceptable mixing in the two chains.
 
-    #> Loading required namespace: ggmcmc
-
 ![Checking convergence using the diagnostic function for a model fitted
 in missingHE, for example through inspection of the
 traceplots.](Introduction_to_missingHE_files/figure-html/fig2-1.png)
@@ -764,7 +762,7 @@ inspected by typing:
 
 ``` text
 > pic_sm1_mar$waic
-#> [1] 792.8317
+#> [1] 787.741
 ```
 
 Note that all information criteria in `missingHE` can only be used as
@@ -799,7 +797,7 @@ model fitted under MAR for both outcomes. The `R` command
 
 displays the names of the different elements in the list.
 
-    #> [1] "data_set"     "model_output" "mod_est"      "cea"          "type"         "data_format"  "call"
+    #> [1] "data_set"     "model_output" "mod_est"      "cea"          "type"         "data_format"  "call"         "prior"
 
 The objects `data_set`, `model_output` and `cea` are themselves lists,
 whereas `type` and `data_format` are strings. These elements contain the
@@ -861,24 +859,24 @@ on posterior samples of these parameters may be accessed using the
 
 which returns the following output
 
-    #>                   mean         sd         2.5%         50%       97.5% Rhat n.eff
-    #> alpha[1]     0.5457681  0.0762195   0.40244947   0.5430705   0.6980779 1.00  1000
-    #> alpha[2]     0.0335192  0.0282678  -0.02267469   0.0343104   0.0896876 1.00  1000
-    #> alpha[3]     0.3894166  0.0799941   0.22872415   0.3897915   0.5369699 1.00  1000
-    #> beta[1]     81.2097474 26.6895679  26.06097988  82.3095084 132.3212778 1.00   390
-    #> beta[2]     24.9246047 28.1778198 -30.06250220  24.5817307  78.1139197 1.00  1000
-    #> beta_f      -5.3046607 32.0661361 -66.39861934  -4.7931091  56.4959646 1.00  1000
-    #> gamma_c      0.9112763  0.1664372   0.60176876   0.9088895   1.2653639 1.00   450
-    #> gamma_e[1]   1.0096389  0.9468677  -0.79498476   0.9853654   2.9193653 1.00  1000
-    #> gamma_e[2]  -0.0931173  1.0593235  -2.26080651  -0.0643245   1.9121452 1.00  1000
-    #> p_c          0.7120599  0.0337673   0.64606086   0.7127729   0.7799481 1.00   460
-    #> p_e          0.7151648  0.0363158   0.64246825   0.7161018   0.7817447 1.00  1000
-    #> s_c        250.0460773 32.1681366 197.43291324 246.3574987 323.4202958 1.00   830
-    #> s_e          0.0921265  0.0104050   0.07409999   0.0911310   0.1140861 1.00  1000
-    #> tau_c        0.0000168  0.0000042   0.00000956   0.0000165   0.0000257 1.00   830
-    #> tau_e      122.2373279 26.8745575  76.83076618 120.4115566 182.1225197 1.00  1000
-    #> tmu_c       94.3774631 29.2959531  33.91507808  96.2229728 150.4688174 1.00   390
-    #> tmu_e        0.9069125  0.0144556   0.87853791   0.9065335   0.9352749 1.01   480
+    #>                  mean          sd        2.5%         50%       97.5% Rhat n.eff
+    #> alpha[1]     0.561755  0.05827044   0.4457129   0.5636849   0.6833789 1.00  1000
+    #> alpha[2]     0.029739  0.02904871  -0.0300774   0.0292221   0.0882047 1.00   400
+    #> alpha[3]     0.373024  0.06115481   0.2503782   0.3721239   0.4922676 1.00  1000
+    #> beta[1]     80.499940 26.73368067  27.2276911  80.7697199 133.1719958 1.02    85
+    #> beta[2]     24.342186 28.79296703 -30.2614876  24.8370067  81.2571853 1.00  1000
+    #> beta_f      -7.201341 31.36653514 -68.6769804  -5.9307583  49.4538246 1.00  1000
+    #> gamma_c      0.899245  0.17378540   0.5697458   0.8887602   1.2375554 1.00  1000
+    #> gamma_e[1]   0.430566  0.89341470  -1.4193590   0.3984144   2.2176378 1.05    37
+    #> gamma_e[2]   0.532659  0.99918537  -1.4286479   0.5780512   2.4949173 1.05    37
+    #> p_c          0.709500  0.03562866   0.6387045   0.7086342   0.7751382 1.00  1000
+    #> p_e          0.709728  0.03569295   0.6348714   0.7117597   0.7754833 1.00  1000
+    #> s_c        247.118588 27.24982537 198.8917987 244.3956698 303.7159599 1.04    48
+    #> s_e          0.091693  0.01008972   0.0741280   0.0908472   0.1141444 1.00   370
+    #> tau_c        0.000017  0.00000368   0.0000108   0.0000167   0.0000253 1.04    48
+    #> tau_e      123.246704 26.83919382  76.7521860 121.1649113 181.9850991 1.00   370
+    #> tmu_c       93.359963 28.99266831  33.4620088  94.8603807 146.9402755 1.02    85
+    #> tmu_e        0.906445  0.01415759   0.8780044   0.9067618   0.9323331 1.00  1000
 
 `missingHE` standardises the format of the output to report summary
 quantities related to key model parameters, by default the mean
@@ -923,15 +921,15 @@ which returns
 
     #> $Effects
     #>              Mean    SD     QL    QU
-    #> (Intercept) 0.546 0.076  0.402 0.698
-    #> trtMenSS    0.034 0.028 -0.023 0.090
-    #> u.0         0.389 0.080  0.229 0.537
+    #> (Intercept) 0.562 0.058  0.446 0.683
+    #> trtMenSS    0.030 0.029 -0.030 0.088
+    #> u.0         0.373 0.061  0.250 0.492
     #> 
     #> $Costs
     #>               Mean     SD      QL      QU
-    #> (Intercept) 81.210 26.690  26.061 132.321
-    #> trtMenSS    24.925 28.178 -30.063  78.114
-    #> e           -5.305 32.066 -66.399  56.496
+    #> (Intercept) 80.500 26.734  27.228 133.172
+    #> trtMenSS    24.342 28.793 -30.261  81.257
+    #> e           -7.201 31.367 -68.677  49.454
 
 The regression output is separately reported by outcome. Based on the
 results stored in `sm1_mar`, the following estimates are reported: the
@@ -963,8 +961,6 @@ means of corresponding credible intervals. The arguments
 `missingHE` to display scatter plots for the effectiveness outcome in
 the MenSS arm.
 
-    #> Loading required namespace: ggthemes
-
 ![Scatter plots of observed and imputed effectiveness data in the MenSS
 arm under normal distributions using a selection
 model.](Introduction_to_missingHE_files/figure-html/figplot-1.png)
@@ -995,20 +991,20 @@ which returns
     #>  
     #>  Mean effects by intervention 
     #>        Mean    SD    QL    QU
-    #> SoC   0.888 0.018 0.853 0.926
-    #> MenSS 0.923 0.022 0.879 0.966
+    #> SoC   0.890 0.018 0.856 0.924
+    #> MenSS 0.921 0.023 0.876 0.965
     #> 
     #>  
     #>  Mean costs by intervention 
     #>        Mean   SD   QL  QU
-    #> SoC    81.4 27.7 25.1 133
-    #> MenSS 106.2 37.7 29.1 176
+    #> SoC    80.7 27.8 26.6 134
+    #> MenSS 104.8 37.6 29.9 177
     #> 
     #>  
     #>  Mean net monetary benefit by intervention and wtp = 50000 
     #>        Mean   SD    QL    QU
-    #> SoC   44339  906 42560 46219
-    #> MenSS 46055 1113 43883 48198
+    #> SoC   44420  897 42753 46133
+    #> MenSS 45942 1128 43709 48109
 
 The results stored in `sm1_mar` are reported in terms of posterior
 summaries, such as mean, standard deviation and \\95\\\\ credible
@@ -1045,9 +1041,9 @@ These results include:
 The above output compares the cost-effectiveness of the two arms in the
 `MenSS` data set based on the results of the model stored in `sm1_mar`.
 For example, in this case, incremental results suggest that `"MenSS"` is
-on average associated with higher QALYs (0.035) and Total costs (24.804)
+on average associated with higher QALYs (0.031) and Total costs (24.188)
 with respect to `"SoC"`, leading to a positive value of the estimated
-ICER (712.701). However, a considerable degree of uncertainty is
+ICER (781.864). However, a considerable degree of uncertainty is
 associated with the mean incremental estimates as indicated by the
 \\95\\\\ credible intervals which include \\0\\ for both outcomes.
 

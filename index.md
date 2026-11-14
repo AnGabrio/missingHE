@@ -3,7 +3,7 @@
 > Fit Bayesian Missing Cost Effectiveness Models in R.
 
 🚀 This is the **development version** of the `R` package `missingHE`
-(currently on version 1.6.2.1). The stable version is now release 1.6.2,
+(currently on version 1.6.3). The stable version is now release 1.6.2,
 on [CRAN](https://CRAN.R-project.org/package=missingHE).
 
 ## Contents
