@@ -20,3 +20,38 @@ articles:
       - Fitting_MNAR_models_in_missingHE
       - Model_customisation_in_missingHE
       - Longitudinal_models_in_missingHE
+
+reference:
+  - title: "Package Overview"
+    contents:
+      - missingHE-package
+
+  - title: "Model Fitting"
+    desc: "Functions for fitting Bayesian missingness models to individual-level CEA data."
+    contents:
+      - selection
+      - pattern
+      - hurdle
+      - lmdm
+
+  - title: "Plotting & Diagnostics"
+    desc: "Functions for visualising model fit, MCMC convergence outputs."
+    contents:
+      - starts_with("plot")
+      - diagnostic
+      - ppc
+      - postsum
+
+  - title: "Summaries & Outputs"
+    desc: "Functions for extracting posterior summaries and model comparisons."
+    contents:
+      - starts_with("summary")
+      - starts_with("print")
+      - starts_with("coef")
+      - pic
+
+  - title: "Data"
+    desc: "Example datasets included in the package."
+    contents:
+      - MenSS
+      - PBS
