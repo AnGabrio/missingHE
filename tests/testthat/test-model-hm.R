@@ -1,6 +1,10 @@
 test_that("check output from hurdle function", {
 
   testthat::skip_on_cran()
+  testthat::skip_if_not(
+    isTRUE(tryCatch(requireNamespace("rjags", quietly = TRUE), error = function(e) FALSE)),
+    "JAGS / rjags is not available"
+  )
 
   load(test_path("testdata/MenSS.RData"))
 

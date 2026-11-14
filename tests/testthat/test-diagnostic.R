@@ -3,6 +3,10 @@
 test_that("output of diagnostic/pic/ppc/plot functions", {
 
   testthat::skip_on_cran()
+  testthat::skip_if_not(
+    isTRUE(tryCatch(requireNamespace("rjags", quietly = TRUE), error = function(e) FALSE)),
+    "JAGS / rjags is not available"
+  )
 
   # test for input errors
 

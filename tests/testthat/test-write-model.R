@@ -1,6 +1,10 @@
 test_that("check output from writing model file and prior updating internal functions", {
 
   testthat::skip_on_cran()
+  testthat::skip_if_not(
+    isTRUE(tryCatch(requireNamespace("rjags", quietly = TRUE), error = function(e) FALSE)),
+    "JAGS / rjags is not available"
+  )
 
   load(test_path("testdata/sm.RData"))
 
