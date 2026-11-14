@@ -481,6 +481,8 @@ the effectiveness variable within the cost models. In this case, as
 displayed in Figure @ref(fig:fig2), no major issues in convergence are
 identified for these parameters.
 
+    #> Loading required namespace: ggmcmc
+
 ![Checking convergence using the diagnostic function for a model fitted
 in missingHE, for example through inspection of density
 plots.](Longitudinal_models_in_missingHE_files/figure-html/fig2-1.png)
@@ -553,7 +555,7 @@ leave-one-out information criterion (LOOIC) was selected as specified in
 
 ``` text
 > pic_lmdm1_mar$looic
-#> [1] 14257
+#> [1] 14266.8
 ```
 
 Note that all information criteria in `missingHE` can only be used as
@@ -606,19 +608,19 @@ which returns
     #> Coefficients:
     #> $model.eff
     #> (Intercept).1        trt2.1 (Intercept).2        trt2.2 (Intercept).3        trt2.3 
-    #>         0.476         0.083         0.499         0.140         0.483         0.134 
+    #>         0.477         0.083         0.496         0.142         0.484         0.132 
     #> 
     #> $model.cost
     #> (Intercept).1        trt2.1 (Intercept).2        trt2.2 (Intercept).3        trt2.3           e.1           e.2           e.3 
-    #>        58.100        36.954        56.465        34.686        35.502        21.163        -4.721        -7.333        -2.028 
+    #>        57.225        33.921        55.319        34.123        32.937        19.100        -5.795        -5.725        -1.998 
     #> 
     #> $model.me
     #> (Intercept).1.r.1 (Intercept).2.r.1 (Intercept).3.r.1 (Intercept).1.r.2 (Intercept).2.r.2 (Intercept).3.r.2 (Intercept).1.r.3 (Intercept).2.r.3 (Intercept).3.r.3 
-    #>            -5.829             2.245            -2.619            -7.998             0.095            -4.777            -8.409            -0.348            -5.194 
+    #>             3.016            -2.104             2.811             0.863            -4.253             0.650             0.441            -4.685             0.242 
     #> 
     #> $model.mc
     #> (Intercept).1.r.1 (Intercept).2.r.1 (Intercept).3.r.1 (Intercept).1.r.2 (Intercept).2.r.2 (Intercept).3.r.2 (Intercept).1.r.3 (Intercept).2.r.3 (Intercept).3.r.3 
-    #>            -4.219             1.781            -2.352            -8.133            -2.139            -6.266            -7.396            -1.401            -5.530
+    #>             2.638            -1.728             7.582            -1.284            -5.639             3.658            -0.521            -4.902             4.393
 
 `missingHE` standardises the format of the output to report summary
 quantities related to key model parameters, including the mean
@@ -645,24 +647,24 @@ which returns
 
     #> $Effects
     #>                Mean    SD     QL    QU
-    #> (Intercept).1 0.476 0.033  0.408 0.539
-    #> trt2.1        0.083 0.050 -0.015 0.186
-    #> (Intercept).2 0.499 0.031  0.442 0.562
-    #> trt2.2        0.140 0.047  0.048 0.230
-    #> (Intercept).3 0.483 0.029  0.426 0.539
-    #> trt2.3        0.134 0.046  0.045 0.223
+    #> (Intercept).1 0.477 0.034  0.411 0.546
+    #> trt2.1        0.083 0.050 -0.011 0.181
+    #> (Intercept).2 0.496 0.033  0.435 0.560
+    #> trt2.2        0.142 0.048  0.048 0.237
+    #> (Intercept).3 0.484 0.030  0.422 0.541
+    #> trt2.3        0.132 0.045  0.045 0.216
     #> 
     #> $Costs
     #>                 Mean     SD      QL      QU
-    #> (Intercept).1 58.100 32.104  -5.917 119.795
-    #> trt2.1        36.954 31.883 -21.309 100.637
-    #> (Intercept).2 56.465 32.546  -6.156 123.680
-    #> trt2.2        34.686 31.218 -24.457  93.296
-    #> (Intercept).3 35.502 31.440 -27.575  95.872
-    #> trt2.3        21.163 32.633 -40.003  85.796
-    #> e.1           -4.721 31.227 -64.264  51.771
-    #> e.2           -7.333 31.074 -70.296  53.639
-    #> e.3           -2.028 33.081 -66.156  61.588
+    #> (Intercept).1 57.225 31.562  -7.073 117.384
+    #> trt2.1        33.921 31.861 -27.453  97.683
+    #> (Intercept).2 55.319 31.055  -6.645 117.832
+    #> trt2.2        34.123 31.202 -29.562  94.931
+    #> (Intercept).3 32.937 31.129 -29.574  89.802
+    #> trt2.3        19.100 31.391 -43.626  79.097
+    #> e.1           -5.795 32.521 -71.233  59.202
+    #> e.2           -5.725 30.725 -64.880  54.265
+    #> e.3           -1.998 31.156 -63.093  57.309
 
 The regression output is separately reported by outcome. The following
 parameter estimates are reported at each time point in the model: the
@@ -694,6 +696,8 @@ corresponding credible intervals. The arguments `class = "boxplot"`,
 `outcome = "costs"`, `trt = "1"` and `time.plot = 2` instruct
 `missingHE` to display boxplots for the cost outcome in the TAU arm at
 time \\2\\.
+
+    #> Loading required namespace: ggthemes
 
 ![Boxplots of observed and imputed effectiveness data in the TAU arm at
 time 2 under normal distributions using a longitudinal

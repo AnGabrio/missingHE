@@ -1,18 +1,16 @@
 <urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
 <url><loc>https://angabrio.github.io/missingHE/404.html</loc></url>
-<url><loc>https://angabrio.github.io/missingHE/CODE_OF_CONDUCT.html</loc></url>
-<url><loc>https://angabrio.github.io/missingHE/CONTRIBUTING.html</loc></url>
-<url><loc>https://angabrio.github.io/missingHE/LICENSE.html</loc></url>
 <url><loc>https://angabrio.github.io/missingHE/articles/Fitting_MNAR_models_in_missingHE.html</loc></url>
+<url><loc>https://angabrio.github.io/missingHE/articles/index.html</loc></url>
 <url><loc>https://angabrio.github.io/missingHE/articles/Introduction_to_missingHE.html</loc></url>
 <url><loc>https://angabrio.github.io/missingHE/articles/Longitudinal_models_in_missingHE.html</loc></url>
 <url><loc>https://angabrio.github.io/missingHE/articles/Model_customisation_in_missingHE.html</loc></url>
-<url><loc>https://angabrio.github.io/missingHE/articles/index.html</loc></url>
 <url><loc>https://angabrio.github.io/missingHE/authors.html</loc></url>
+<url><loc>https://angabrio.github.io/missingHE/CODE_OF_CONDUCT.html</loc></url>
+<url><loc>https://angabrio.github.io/missingHE/CONTRIBUTING.html</loc></url>
 <url><loc>https://angabrio.github.io/missingHE/index.html</loc></url>
+<url><loc>https://angabrio.github.io/missingHE/LICENSE.html</loc></url>
 <url><loc>https://angabrio.github.io/missingHE/news/index.html</loc></url>
-<url><loc>https://angabrio.github.io/missingHE/reference/MenSS.html</loc></url>
-<url><loc>https://angabrio.github.io/missingHE/reference/PBS.html</loc></url>
 <url><loc>https://angabrio.github.io/missingHE/reference/anyBars.html</loc></url>
 <url><loc>https://angabrio.github.io/missingHE/reference/coef.missingHE.html</loc></url>
 <url><loc>https://angabrio.github.io/missingHE/reference/data_read_hurdle.html</loc></url>
@@ -27,9 +25,11 @@
 <url><loc>https://angabrio.github.io/missingHE/reference/isBar.html</loc></url>
 <url><loc>https://angabrio.github.io/missingHE/reference/jagsresults.html</loc></url>
 <url><loc>https://angabrio.github.io/missingHE/reference/lmdm.html</loc></url>
+<url><loc>https://angabrio.github.io/missingHE/reference/MenSS.html</loc></url>
 <url><loc>https://angabrio.github.io/missingHE/reference/missingHE-package.html</loc></url>
 <url><loc>https://angabrio.github.io/missingHE/reference/nobars_.html</loc></url>
 <url><loc>https://angabrio.github.io/missingHE/reference/pattern.html</loc></url>
+<url><loc>https://angabrio.github.io/missingHE/reference/PBS.html</loc></url>
 <url><loc>https://angabrio.github.io/missingHE/reference/pic.html</loc></url>
 <url><loc>https://angabrio.github.io/missingHE/reference/plot.missingHE.html</loc></url>
 <url><loc>https://angabrio.github.io/missingHE/reference/postsum.html</loc></url>

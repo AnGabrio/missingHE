@@ -180,7 +180,7 @@ out the computed criteria for each model by accessing the inner object
 > #print criteria for each model
 > looic_m123$pic
 #> LOOIC model 1 LOOIC model 2 LOOIC model 3 
-#>      806.6166      646.1595      602.4775
+#>      807.5622      644.9664      601.4216
 ```
 
 The printed estimates suggest a generally better fit for model 3
@@ -337,26 +337,26 @@ example, estimates for the “fixed effects” parameters (default) from
 ``` text
 > #print posterior summaries for fixed effects
 > postsum(x = sm1_nn_mar, display = "fixed")
-#>                   mean          sd         2.5%         50%       97.5% Rhat n.eff
-#> alpha[1]     0.8946066  0.02234853   0.85220858   0.8950471   0.9383649 1.00  1000
-#> alpha[2]    -0.0024451  0.03420813  -0.07016378  -0.0022852   0.0630928 1.00  1000
-#> beta[1]     82.5065650 25.73207599  28.64137711  83.2111609 131.5135984 1.01   220
-#> beta[2]     25.1451048 28.62972276 -28.31254587  23.7164217  83.7937257 1.00  1000
-#> beta_f      -5.5474010 31.22835079 -64.99480300  -5.7068389  53.4891085 1.00   440
-#> gamma_c[1]   1.5477516  1.18748829  -0.76746598   1.5485580   3.8632058 1.00  1000
-#> gamma_c[2]  -0.1919968  1.07189148  -2.30837201  -0.1375986   1.7684042 1.00  1000
-#> gamma_c[3]  -0.0157617  0.02054294  -0.05641580  -0.0159001   0.0246271 1.00  1000
-#> gamma_e[1]   1.5828999  1.14198581  -0.81889186   1.5920442   3.8604837 1.00  1000
-#> gamma_e[2]  -0.2588910  1.06691982  -2.38523981  -0.2487947   1.9216834 1.00  1000
-#> gamma_e[3]  -0.0146700  0.02038472  -0.05414492  -0.0155155   0.0242415 1.00   910
-#> p_c          0.7127221  0.03670839   0.63389290   0.7152563   0.7769678 1.00  1000
-#> p_e          0.7145158  0.03448123   0.64380827   0.7151948   0.7844717 1.00  1000
-#> s_c        248.7138988 31.58430470 199.39904004 243.9817673 321.9943077 1.00   480
-#> s_e          0.1165160  0.01199211   0.09521780   0.1155703   0.1426082 1.02  1000
-#> tau_c        0.0000169  0.00000405   0.00000965   0.0000168   0.0000252 1.00   480
-#> tau_e       76.0010125 15.60087641  49.17125125  74.8699508 110.2969981 1.02  1000
-#> tmu_c       95.7907713 28.68443619  35.88748472  96.7344120 149.3356211 1.01   230
-#> tmu_e        0.8933149  0.01752864   0.85877088   0.8936012   0.9266596 1.00  1000
+#>                   mean          sd        2.5%        50%      97.5% Rhat n.eff
+#> alpha[1]     0.8931716  0.02238089   0.8509324   0.893019   0.938556 1.00  1000
+#> alpha[2]    -0.0015898  0.03511743  -0.0684435  -0.001071   0.062435 1.00  1000
+#> beta[1]     82.2322378 27.51436815  25.1576462  83.569757 132.505500 1.02   250
+#> beta[2]     25.3817989 28.23647000 -29.4451445  25.794435  84.381319 1.00   640
+#> beta_f      -6.5895487 31.04250805 -66.0386820  -6.258360  53.932184 1.00  1000
+#> gamma_c[1]   1.5362389  1.21451444  -0.7228697   1.517247   4.066452 1.00   450
+#> gamma_c[2]  -0.2053551  1.10125122  -2.4286802  -0.195947   1.917503 1.01   290
+#> gamma_c[3]  -0.0146946  0.02045821  -0.0541831  -0.015119   0.026592 1.00  1000
+#> gamma_e[1]   1.4942274  1.21166002  -0.7650259   1.489211   3.940479 1.00  1000
+#> gamma_e[2]  -0.1726205  1.12669636  -2.4344256  -0.193551   1.957183 1.00  1000
+#> gamma_e[3]  -0.0143854  0.02048040  -0.0551721  -0.014759   0.024508 1.00   480
+#> p_c          0.7143464  0.03632610   0.6385060   0.713541   0.781740 1.00  1000
+#> p_e          0.7136037  0.03541102   0.6410810   0.714759   0.779037 1.00  1000
+#> s_c        245.3380770 28.58238964 195.9736676 242.319443 309.369953 1.01   470
+#> s_e          0.1167122  0.01329273   0.0939992   0.115486   0.146837 1.00  1000
+#> tau_c        0.0000173  0.00000393   0.0000104   0.000017   0.000026 1.01   470
+#> tau_e       76.2340960 16.99302834  46.3797938  74.978896 113.175621 1.00  1000
+#> tmu_c       95.6414901 28.88623135  38.5032861  96.327861 149.418880 1.01   180
+#> tmu_e        0.8923317  0.01795077   0.8575579   0.892097   0.927264 1.00  1000
 ```
 
 The output shows for each parameter a selection of posterior summaries
@@ -380,9 +380,9 @@ specified in `sm1_nn_mar`. In particular:
   coefficient in `model.me` associated with the intercept, `u.0` and
   `age`, respectively.
 - `p_c` and `p_e` denote the average missingness probabilities from
-  `model.mc` and `model.me`, respectively.  
+  `model.mc` and `model.me`, respectively.\
 - `s_c` (`tau_c`) and `s_e` (`tau_e`) denote the outcome standard
-  deviation (precision) for `c` and `e`, respectively.  
+  deviation (precision) for `c` and `e`, respectively.\
 - `tmu_c` and `tmu_e` denote the average outcome means from `model.cost`
   and `model.eff`, respectively.
 
@@ -397,7 +397,7 @@ we may access its posterior samples by typing
 > p_e <- sm1_nn_mar$model_output$model$BUGSoutput$sims.list$p_e
 > summary(c(p_e))
 #>    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-#>  0.5966  0.6911  0.7152  0.7145  0.7379  0.8115
+#>  0.5993  0.6892  0.7148  0.7136  0.7391  0.8055
 ```
 
 The function `coef` allows to compute and display key posterior
@@ -414,13 +414,13 @@ number of digits to be displayed for all estimates.
 #> $Effects
 #>             Mean   SD    QL   QU
 #> (Intercept) 0.89 0.02  0.85 0.94
-#> trtMenSS    0.00 0.03 -0.07 0.06
+#> trtMenSS    0.00 0.04 -0.07 0.06
 #> 
 #> $Costs
 #>              Mean    SD     QL     QU
-#> (Intercept) 82.51 25.73  28.64 131.51
-#> trtMenSS    25.15 28.63 -28.31  83.79
-#> e           -5.55 31.23 -64.99  53.49
+#> (Intercept) 82.23 27.51  25.16 132.51
+#> trtMenSS    25.38 28.24 -29.45  84.38
+#> e           -6.59 31.04 -66.04  53.93
 ```
 
 The output produced is split into two parts: one related to the
@@ -491,6 +491,8 @@ function `diagnostic` may be used to inspect graphical diagnostics for
 each family of model parameters. For example, the following code shows
 how autocorrelation plots for all regression coefficients in `model.eff`
 may be obtained based on the model in `sm1_nn_cov`.
+
+    #> Loading required namespace: ggmcmc
 
 ![Checking convergence using the diagnostic function for a family of
 model parameters estimated in missingHE, for example through inspection
